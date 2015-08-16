@@ -1,0 +1,10 @@
+allParameters.test
+logFiles/**
+outCL13/**
+outHP14/**
+outHPT14/**
+outTestHP11/**
+primer3Settings.txt
+saveOutputFiles/**
+*.o
+findMers
