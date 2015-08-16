@@ -9,9 +9,9 @@ SCARF was described in:
 
 (Publication in process)
 
-To download and install SCARF, follow the instructions in Install.md.
+To download and install SCARF, follow the instructions in INSTALL.txt.
 
-To run SCARF and generate markers after installing it, follow the instructions in MakeMarkers.md.
+To run SCARF and generate markers after installing it, follow the instructions in RUN.txt.
 
 For help, contact Ted Toal, twtoal@ucdavis.edu
 14-Aug-2015
