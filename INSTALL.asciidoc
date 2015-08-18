@@ -1,0 +1,39 @@
+SCARF INSTALLATION
+==================
+Ted Toal <twtoal@ucdavis.edu>
+
+This describes how to install all elements needed to run the SCARF software.
+It assumes installation is on a Mac OSX system.  For Linux or Windows systems,
+you can attempt installation using these instructions as a guide.  Please take
+detailed notes and email them to me, especially if you are successful! I will
+incorporate them into these instructions.
+
+.*If not done already, download SCARF files:*
+. Browse to https://github.com/BradyLab/SCARF
+. In upper-left area of screen, find drop-down box Branch:master, click to open it,
+and choose the "release" branch.
+. At bottom of right column on screen, click "Download ZIP" and choose a place to
+put it on your computer.
+. Unzip the zip file on your computer.
+. Rename the unzipped folder from "SCARF-release" to just "SCARF".
+
+.*To install SCARF:*
+. A variety of applications must be installed. Before installing them, it is
+helpful to prepare two text files for editing. There are two text files in the
+SCARF main directory that contain parameter settings for running SCARF:
++
+--
+  * allParameters.template is a template file containing sample settings for
+    running SCARF on your genome data.
+  * allParameters.test.template is a version of that same template, modified for
+    testing SCARF.
+--
++
+Both files includes settings of paths where applications have been installed.
+Although you may make many copies of the allParameters.template file for running
+SCARF using different genomes or parameters, all will have the same application
+paths in them.  You may as well put them in one time.
+
+.*To run SCARF to generate markers after installation:*
+* Find file RUN.asciidoc in the SCARF folder on your computer and open it and
+follow the instructions.
