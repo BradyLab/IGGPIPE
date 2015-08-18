@@ -6,5 +6,7 @@ outHPT14/**
 outTestHP11/**
 primer3Settings.txt
 saveOutputFiles/**
-*.o
 findMers
+*.o
+*.html
+*.xml
