@@ -519,7 +519,7 @@ dfInDels$kmer2offset = dfInDels$prmPosR - kmer2End
 ########################################
 # Change the "*pos1" and "*pos2" columns, which give the position of the 5' end
 # of each k-mer on the + strand, to columns "*ampPos1" and "*ampPos2", giving
-# the positionn of the endn of the amplicon.
+# the position of the end of the amplicon.
 #
 # The position change is different for each genome depending on whether the k-mer
 # "phase" is + or -.  The reference genome is always "+" phase for all k-mers,

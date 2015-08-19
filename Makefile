@@ -290,16 +290,14 @@ $(CONTIG_FILES) : $(PFX_GENOME_DATA_FILE)%.contigs : $$(PATH_GENOME_FASTA_$$*) |
 
 # A list of all FASTA files already defined above: FASTA_FILES
 
-# A list of all .kmers_0 files to be produced.
-KMERS_0_FILES := $(foreach G,$(GENOME_NUMBERS),$(PFX_KMERS_DATA_FILE)$(G).kmers_0)
+# A list of all .kmers files to be produced.
+KMERS_FILES := $(foreach G,$(GENOME_NUMBERS),$(PFX_KMERS_DATA_FILE)$(G).kmers)
 
-# Target .kmers_0 and .kmers_* file(s) for genome GENOME.
+# Target .kmers file(s) for genome GENOME.
 ifeq ($(GENOME),ALL)
-TARGET_KMERS := $(KMERS_0_FILES)
-KMERS_ALL_FILES := $(foreach G,$(GENOME_NUMBERS),$(PFX_KMERS_DATA_FILE)$(G).kmers_*)
+TARGET_KMERS := $(KMERS_FILES)
 else
-TARGET_KMERS := $(PFX_KMERS_DATA_FILE)$(GENOME).kmers_0
-KMERS_ALL_FILES := $(PFX_KMERS_DATA_FILE)$(GENOME).kmers_*
+TARGET_KMERS := $(PFX_KMERS_DATA_FILE)$(GENOME).kmers
 endif
 
 # Phony target to make or clean TARGET_KMERS file(s).
@@ -309,16 +307,14 @@ getKmers: $(TARGET_KMERS)
 	@echo "getKmers files for genome(s) $(GENOME) are up to date."
 else
 getKmers:
-	@$(CMD_DELETE_WHEN_CLEANING) $(KMERS_ALL_FILES)
+	@$(CMD_DELETE_WHEN_CLEANING) $(TARGET_KMERS)
 	@echo "getKmers output files removed."
 endif
 
-# KMERS_0_FILES is multiple targets, one per genome.
-# This is a little troublesome because the actual files end with _0 (and perhaps
-# _1, etc.), while the ARGUMENT to jellyfish does not include _0.
+# KMERS_FILES is multiple targets, one per genome.
 # Here, % is a genome number.
 
-$(KMERS_0_FILES) : $(PFX_KMERS_DATA_FILE)%.kmers_0 : $$(PATH_GENOME_FASTA_$$*) | \
+$(KMERS_FILES) : $(PFX_KMERS_DATA_FILE)%.kmers : $$(PATH_GENOME_FASTA_$$*) | \
         $(DIR_KMERS) $(PATH_JELLYFISH)
 	@echo
 	@echo "*** getKmers PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
@@ -331,7 +327,7 @@ $(KMERS_0_FILES) : $(PFX_KMERS_DATA_FILE)%.kmers_0 : $$(PATH_GENOME_FASTA_$$*) |
 # kmerStats: Get unique k-mer statistics.  Argument: GENOME
 ################################################################################
 
-# A list of all .kmers_0 files already defined above: KMERS_0_FILES
+# A list of all .kmers files already defined above: KMERS_FILES
 
 # A list of all .stats files to be produced.
 KMERS_STATS_FILES := $(foreach G,$(GENOME_NUMBERS),$(PFX_KMERS_DATA_FILE)$(G).stats)
@@ -357,7 +353,7 @@ endif
 # KMERS_STATS_FILES is multiple targets, one per genome.
 # Here, % is a genome number.
 
-$(KMERS_STATS_FILES) : $(PFX_KMERS_DATA_FILE)%.stats : $(PFX_KMERS_DATA_FILE)%.kmers_0 | \
+$(KMERS_STATS_FILES) : $(PFX_KMERS_DATA_FILE)%.stats : $(PFX_KMERS_DATA_FILE)%.kmers | \
         $(DIR_KMERS)
 	@echo
 	@echo "*** kmerStats PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
@@ -373,7 +369,7 @@ $(KMERS_STATS_FILES) : $(PFX_KMERS_DATA_FILE)%.stats : $(PFX_KMERS_DATA_FILE)%.k
 # sortKmers: Get sorted unique k-mers.  Argument: GENOME
 ################################################################################
 
-# A list of all .kmers_0 files already defined above: KMERS_0_FILES
+# A list of all .kmers files already defined above: KMERS_FILES
 
 # A list of all .isect.sorted files to be produced.
 SORTED_KMERS_FILES := $(foreach G,$(GENOME_NUMBERS),$(PFX_KMERS_DATA_FILE)$(G).isect.sorted)
@@ -399,7 +395,7 @@ endif
 # SORTED_KMERS_FILES is multiple targets, one per genome.
 # Here, % is a genome number.
 
-$(SORTED_KMERS_FILES) : $(PFX_KMERS_DATA_FILE)%.isect.sorted : $(PFX_KMERS_DATA_FILE)%.kmers_0 | \
+$(SORTED_KMERS_FILES) : $(PFX_KMERS_DATA_FILE)%.isect.sorted : $(PFX_KMERS_DATA_FILE)%.kmers | \
         $(DIR_KMERS)
 	@echo
 	@echo "*** sortKmers PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"

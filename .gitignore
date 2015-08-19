@@ -10,3 +10,4 @@ findMers
 *.o
 *.html
 *.xml
+.Rapp.history

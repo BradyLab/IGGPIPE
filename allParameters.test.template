@@ -31,23 +31,20 @@ WD := $(BRADYLAB)/Genomes/kmers/SCARF
 # commands for running it.
 ################################################################################
 
-# Path to the file that is the 'jellyfish' program file.  Set this to the
-# jellyfish file in the directory where you built jellyfish or to the place
-# where you moved it such as a bin directory.
+# Path to the file that is the 'jellyfish' program file.  Use the command line
+# command 'which jellyfish' to show this path on your computer, and put it here.
 ### CHANGE THIS TO YOUR PATH.
 
-# In this example, after building the jellyfish program I copied the program to
-# my bin directory.
-####CHANGE
-PATH_JELLYFISH := ~/bin/jellyfish
+# This is what 'which jellyfish' showed on my computer.
+PATH_JELLYFISH := /usr/local/bin/jellyfish
 
 
 # Number of entries in Jellyfish hash.  This should be large enough to make
 # Jellyfish run fast, without being so large that it uses up more memory than
-# is available.  On a 16GB RAM machine, I was able to use a size of 80000000.
+# is available.  On a 16GB RAM machine, I was able to use a size of 80M.
 ### THIS IS A REASONABLE VALUE FOR THIS PARAMETER.
 
-JELLYFISH_HASH_SIZE := 80000000
+JELLYFISH_HASH_SIZE := 80M
 
 
 # Path to the file that is the 'perl' program file.  Use the command line command
@@ -56,7 +53,7 @@ JELLYFISH_HASH_SIZE := 80000000
 
 # This is what 'which perl' showed on my computer.
 ####CHANGE
-PATH_PERL := ~/perl5/perlbrew/perls/perl-5.14.2/bin/perl
+PATH_PERL := ~/perl5/perlbrew/perls/perl-5.16.0/bin/perl
 
 
 # Path to the file that is the 'Rscript' program file that is part of the R
@@ -346,7 +343,7 @@ DIR_KMERS := $(DIR_SCARF_OUT)/Kmers
 # Prefix, including directory, of output files that will be generated containing
 # k-mer information.  These files are created for each genome:
 # 1. a list of unique k-mers in the genome:
-#       <this prefix><genome_number>.kmers_0 (and perhaps _1, etc.)
+#       <this prefix><genome_number>.kmers
 # 2. a text file of k-mer statistics:
 #       <this prefix><genome_number>.stats
 # 3. a list of SORTED unique k-mers in the genome:

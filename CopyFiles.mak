@@ -35,7 +35,10 @@ PARAM_SFX := $(patsubst allParameters.%,%,$(PARAMS))
 # If variable PARAMS is not defined, show basic usage info, else do the copy.
 ifeq ($(PARAMS),)
 all:
-	@echo "For basic usage, use this make command for example:"
+	@echo "This copies some of the output files from a specified SCARF run to"
+	@echo "a subfolder within folder saveOutputFiles. To use this, specify the"
+	@echo "parameters file whose output files are to be copied as the PARAMS="
+	@echo "argument, as follows:"
 	@echo
 	@echo "$(INDENT)make -f CopyFiles.mak PARAMS=allParameters.test"
 	@echo 

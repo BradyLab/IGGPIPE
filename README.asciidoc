@@ -30,12 +30,12 @@ put it on your computer.
 . Rename the unzipped folder from "SCARF-release" to just "SCARF".
 
 .*To install SCARF:*
-* Look inside the downloaded SCARF folder on your computer for file INSTALL.asciidoc
+* Look inside the downloaded SCARF folder on your computer for file INSTALL.pdf
 and open it with a NotePad or TextEdit or other ASCII text editor and follow the
 installation instructions.
 
 .*To run SCARF to generate markers after installation:*
-* Find file RUN.asciidoc in the SCARF folder on your computer and open it and
+* Find file RUN.pdf in the SCARF folder on your computer and open it and
 follow the instructions.
 
 *For help, contact Ted Toal, twtoal@ucdavis.edu*
