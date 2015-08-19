@@ -19,7 +19,7 @@ or INSTALL.html and open either one and follow the instructions.
 
 .*To run SCARF and generate markers:*
 
-. Work from the command line
+. *Work from the command line*
 +
 --
 Most work here is done from the command line, by opening the Terminal application.
@@ -38,7 +38,7 @@ Or a longer tutorial such as this one from UC Davis:
 http://korflab.ucdavis.edu/Unix_and_Perl/current.html
 --
 
-. Know how to use a plain text editor and have one available
+. *Know how to use a plain text editor and have one available*
 +
 --
 You must have a plain text editor you know how to use.  If nothing else, the Mac
@@ -49,7 +49,7 @@ Store (Applications, App Store) or from:
 http://www.barebones.com/products/textwrangler
 --
 
-. Obtain genome FASTA files
+. *Obtain genome FASTA files*
 +
 --
 SCARF uses as input two or more FASTA files of complete genome sequences (at
@@ -59,7 +59,7 @@ comparing.  If you haven't already, download their genomic FASTA files, which
 are required.
 --
 
-. Assign a single capital letter name to each genome
+. *Assign a single capital letter name to each genome*
 +
 --
 SCARF makes frequent use of a single capital letter to refer to a genome. For
@@ -68,7 +68,7 @@ a single capital letter you will use to represent each of your genomes. For
 example, I used H=Heinz and P=pennellii for some of my testing.
 --
 
-. Copy allParameters.mytemplate file to new file allParameters.XY
+. *Copy allParameters.mytemplate file to new file allParameters.XY*
 +
 --
 SCARF has a number of parameters that must be set to the values you desire. These
@@ -88,10 +88,10 @@ Copy allParameters.mytemplate to allParameters.XY (substituting your genome lett
 for X and Y), using either the Mac's Finder or via the command line. For example:
 
   cd ~/Documents/SCARF    (or whatever is appropriate for your system)
-  cp allParameters.mytemplate allParameters.HP
+  cp allParameters.mytemplate allParameters.HP    (here, X=H, Y=P)
 --
 
-. Open the allParameters.XY file in your plain text editor
+. *Open the allParameters.XY file in your plain text editor*
 +
 --
 Open the new allParameters.XY file created above in your plain text editor
@@ -108,7 +108,7 @@ want to know this information, at least for key parameters, to select the right
 parameter values for your needs.
 --
 
-. Search for "### " and set parameters to desired values
+. *Search for "### " and set parameters to desired values*
 +
 --
 Search for "### " in the allParameters.XY file and check each one to see if it
@@ -131,7 +131,7 @@ definitely want to review and consider are:
 After finishing changes, save the modified allParameters.XY file.
 --
 
-. Run SCARF with the command 'make PARAMS=allParameters.XY ALL'
+. *Run SCARF with the command "make PARAMS=allParameters.XY ALL"*
 +
 --
 The SCARF software consists of multiple software applications that progressively
@@ -139,7 +139,7 @@ analyze the genome sequence data and eventually produce candidate SCAR marker
 primers. The task of running all this software has been automated using a
 "Makefile", which is a file with that name containing commands formatted correctly
 for reading the allParameters.XY parameter file and running the software applications.
-The Makefile is applied by using the application named 'make', which was installed
+The Makefile is applied by using the application named "make", which was installed
 when SCARF was installed, if it didn't already exist.
 
 A big advantage of using "Makefile" and "make" is that if something goes wrong,
@@ -165,10 +165,35 @@ from the SCARF directory as follows:
 If "make" stops with the message "ALL files are up to date", it has completed
 the analysis successfully. Otherwise, look for an error message and try to
 diagnose it. I am available to a limited extent via email, for a while, to try
-to assist in diagnosing problems.
+to assist in diagnosing problems.  If you fix something and want to retry running
+SCARF, all you have to do is enter the same "make" command again.  The "make"
+program automatically skips pipeline steps that don't need to be repeated because
+the input files for those steps have not changed, and the output files were made
+with success previously.  Therefore, it will normally resume by repeating the
+same step that failed and caused it to halt with an error.  If the error still
+exists, it will halt again with the same error message.  Otherwise, it will
+continue until it reaches the end successfully, or until another error happens.
+Therefore, each time you try to re-run the pipeline, you are just entering the
+command:
+
+  make PARAMS=allParameters.XY ALL    (replacing XY with your genome letters)
+
+If at any point you want to remove all files already generated and start anew,
+you can do that with this command:
+
+  make PARAMS=allParameters.XY CLEAN=1 ALL    (replacing XY with your genome letters)
+
+You can also run individual steps of the pipeline.  To see how, use this command
+to get more complete usage information for running "make":
+
+  make usage
+
+Again, your final goal is to have "make" stop with the message "ALL files are up
+to date"
+
 --
 
-. Open marker output files and inspect the results
+. *Open marker output files and inspect the results*
 +
 --
 Unless you specifically changed the parameters otherwise, you will find the output
@@ -209,7 +234,7 @@ document.
 
 .*Post-processing tools:*
 
-. Dot plots
+. *Dot plots*
 +
 --
 The output file with the name "LCRs_*.tsv" (unless it was changed by you) contains
@@ -234,7 +259,7 @@ The "dotplot.template" file is configured for generating a dot plot file
 using the LCRs generated via the allParameters.test.template configuration file.
 --
 
-. Annotating marker files with other position data and producing GFF3 and GTF files
+. *Annotating marker files with other position data and producing GFF3 and GTF files*
 +
 --
 You may have other genome position data that you would like to have associated with
