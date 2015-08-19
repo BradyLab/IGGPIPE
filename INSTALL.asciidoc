@@ -10,18 +10,21 @@ incorporate them into these instructions.
 
 .*If not done already, download SCARF files:*
 . Browse to https://github.com/BradyLab/SCARF
-. In upper-left area of screen, find drop-down box Branch:master, click to open it,
-and choose the "release" branch.
 . At bottom of right column on screen, click "Download ZIP" and choose a place to
 put it on your computer.
 . Unzip the zip file on your computer.
-. Rename the unzipped folder from "SCARF-release" to just "SCARF".
+. Rename the unzipped folder from "SCARF-master" to just "SCARF".
 . If you are a GitHub user and wish to use the SCARF GitHub repository directly,
 instead of the above steps, you can fork the SCARF repository and work on your own
-copy. The "master" branch is where I work on changes, and the "release" branch has
-the releases, each tagged, with the latest one being the latest release. You can
-check out the release branch and do the installation process using it. I will try
-to monitor for pull requests if you make useful changes.
+copy. The "work" branch is where I do work. The "master" branch is where the
+releases reside, each tagged with a version number. You can create a branch whose
+contents are the same as a tagged version with the command:
+
+  git checkout -b my_V1.0_branch v1.0" 
+
+You can then do the installation process using those files.
+
+I will try to monitor for pull requests if you make useful changes.
 
 .*To install SCARF:*
 
@@ -315,5 +318,5 @@ That completes the installation of SCARF.
 --
 
 .*To run SCARF to generate markers after installation:*
-* Find file RUN.pdf in the SCARF folder on your computer and open it and
-follow the instructions.
+* Find file RUN.pdf or RUN.html in the SCARF folder on your computer and open
+either one and follow the instructions.

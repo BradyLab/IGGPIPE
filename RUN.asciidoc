@@ -8,17 +8,14 @@ length-polymorphic regions of those genomes.
 
 .*If not done already, download SCARF files:*
 . Browse to https://github.com/BradyLab/SCARF
-. In upper-left area of screen, find drop-down box Branch:master, click to open it,
-and choose the "release" branch.
 . At bottom of right column on screen, click "Download ZIP" and choose a place to
 put it on your computer.
 . Unzip the zip file on your computer.
-. Rename the unzipped folder from "SCARF-release" to just "SCARF".
+. Rename the unzipped folder from "SCARF-master" to just "SCARF".
 
 .*If not done already, install SCARF:*
 * Look inside the downloaded SCARF folder on your computer for file INSTALL.pdf
-and open it with a NotePad or TextEdit or other ASCII text editor and follow the
-installation instructions.
+or INSTALL.html and open either one and follow the instructions.
 
 .*To run SCARF and generate markers:*
 
