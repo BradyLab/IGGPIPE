@@ -25,7 +25,7 @@ to monitor for pull requests if you make useful changes.
 
 .*To install SCARF:*
 
-. Consider whether the computer is capable enough
+. *Consider whether the computer is capable enough*
 +
 --
 Before starting the installation, consider whether the computer on which the
@@ -35,7 +35,7 @@ For larger genomes, you may need more. My computer has a 2.4 GHz processor, whic
 has been adequate.
 --
 
-. Work from the command line
+. *Work from the command line*
 +
 --
 Most work here is done from the command line, by opening the Terminal application.
@@ -48,7 +48,7 @@ as much time as you need to feel you can get started here) from UC Davis is at:
 http://korflab.ucdavis.edu/Unix_and_Perl/current.html
 --
 
-. Know how to use a plain text editor and have one available
+. *Know how to use a plain text editor and have one available*
 +
 --
 You must have a plain text editor you know how to use.  If nothing else, the Mac
@@ -61,7 +61,7 @@ from:
 http://www.barebones.com/products/textwrangler
 --
 
-. Copy allParameters.template file to new file allParameters.mytemplate
+. *Copy allParameters.template file to new file allParameters.mytemplate*
 +
 --
 A variety of applications must be installed. Before installing them, it is
@@ -82,7 +82,7 @@ can do the copying in Mac's Finder or from the command line:
   cp allParameters.template allParameters.mytemplate
 --
 
-. Open the allParameters.mytemplate file in a plain text editor
+. *Open the allParameters.mytemplate file in a plain text editor*
 +
 --
 Open the new allParameters.mytemplate file created above in your plain text editor
@@ -97,7 +97,7 @@ explain the purpose of each parameter, and you will need to know this
 information, at least for key parameters, in order to run SCARF properly.
 --
 
-. Set WD to your SCARF directory in the allParameters.mytemplate file
+. *Set WD to your SCARF directory in the allParameters.mytemplate file*
 +
 --
 Search for "### " in the allParameters.mytemplate file and locate the one that is
@@ -111,7 +111,7 @@ the SCARF files). For example, maybe it would look like this:
   WD := /Users/johndoe/Documents/SCARF
 --
 
-. Install make and g++ (Xcode in Mac OSX)
+. *Install make and g++ (Xcode in Mac OSX)*
 +
 --
 SCARF makes use of a utility called "make", and also, some of the applications used
@@ -138,7 +138,7 @@ To verify they are installed, you can enter this command:
 and you should see the error message "clang: error: no input files".
 --
 
-. Install Jellyfish and set its path
+. *Install Jellyfish and set its path*
 +
 --
 Jellyfish is a free open-source bioinformatics application that searches FASTA
@@ -194,7 +194,7 @@ you may need to increase the size (and have sufficient computer memory).
   JELLYFISH_HASH_SIZE := 80M
 --
 
-. Install Perl if necessary and set its path
+. *Install Perl if necessary and set its path*
 +
 --
 Perl is a programming language used by SCARF. Using it requires a Perl interpreter
@@ -220,37 +220,37 @@ Assign the path, which was shown with the "which perl" command, to the parameter
   PATH_PERL := /usr/local/bin/perl
 --
 
-. Install R and set its path
+. *Install R and set its path*
 +
 --
 --
 
-. Install Primer3 and set its path
+. *Install Primer3 and set its path*
 +
 --
 --
 
-. Install ePCR and set its path
+. *Install ePCR and set its path*
 +
 --
 --
 
-. Build findMers
+. *Build findMers*
 +
 --
 --
 
-. Test trashing and choose deletion method
+. *Test trashing and choose deletion method*
 +
 --
 --
 
-. Copy primer3settings.default.txt and edit Primer3 settings
+. *Copy primer3settings.default.txt and edit Primer3 settings*
 +
 --
 --
 
-. Copy allParameters.test.template file to new file allParameters.test and add the changes made to allParameters.mytemplate
+. *Copy allParameters.test.template file to new file allParameters.test and add the changes made to allParameters.mytemplate*
 +
 --
 File allParameters.test.mytemplate is more-or-less a copy of the allParameters.template
@@ -308,10 +308,10 @@ mainly). Load allParameters.test into your text editor and quickly browse it to 
 it looks correct.
 --
 
-. Run SCARF using the test parameters in allParameters.test and check for success
+. *Run SCARF using the test parameters in allParameters.test and check for success*
 +
 --
-That completes the installation of SCARF.
+*That completes the installation of SCARF.*
 --
 
 .*To run SCARF to generate markers after installation:*

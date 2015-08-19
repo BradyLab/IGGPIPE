@@ -8,6 +8,5 @@ primer3Settings.txt
 saveOutputFiles/**
 findMers
 *.o
-*.html
 *.xml
 .Rapp.history
