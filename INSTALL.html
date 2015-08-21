@@ -740,21 +740,16 @@ asciidoc.install();
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
-<div class="paragraph"><p>This describes how to install all elements needed to run the SCARF software.
-It assumes installation is on a Mac OSX system.  For Linux or Windows systems,
-you can attempt installation using these instructions as a guide.  Please take
-detailed notes and email them to me, especially if you are successful! I will
-incorporate them into these instructions.</p></div>
-<div class="olist arabic"><div class="title"><strong>If not done already, download SCARF files:</strong></div><ol class="arabic">
+<div class="paragraph"><p>This describes how to install all elements needed to run the SCARF software.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_strong_if_not_done_already_download_scarf_files_strong"><strong>If not done already, download SCARF files</strong></h2>
+<div class="sectionbody">
+<div class="olist arabic"><ol class="arabic">
 <li>
 <p>
 Browse to <a href="https://github.com/BradyLab/SCARF">https://github.com/BradyLab/SCARF</a>
-</p>
-</li>
-<li>
-<p>
-In upper-left area of screen, find drop-down box Branch:master, click to open it,
-and choose the "release" branch.
 </p>
 </li>
 <li>
@@ -770,24 +765,49 @@ Unzip the zip file on your computer.
 </li>
 <li>
 <p>
-Rename the unzipped folder from "SCARF-release" to just "SCARF".
+Rename the unzipped folder from "SCARF-master" to just "SCARF".
 </p>
 </li>
 <li>
 <p>
 If you are a GitHub user and wish to use the SCARF GitHub repository directly,
 instead of the above steps, you can fork the SCARF repository and work on your own
-copy. The "master" branch is where I work on changes, and the "release" branch has
-the releases, each tagged, with the latest one being the latest release. You can
-check out the release branch and do the installation process using it. I will try
-to monitor for pull requests if you make useful changes.
+copy. The "work" branch is where I do work. The "master" branch is where the
+releases reside, each tagged with a version number. You can create a branch whose
+contents are the same as a tagged version with the command:
 </p>
+<div class="openblock">
+<div class="content">
+<div class="literalblock">
+<div class="content">
+<pre><code>git checkout -b my_V1.0_branch v1.0"</code></pre>
+</div></div>
+<div class="paragraph"><p>You can then do the installation process using those files.</p></div>
+<div class="paragraph"><p>I will try to monitor for pull requests if you make useful changes.</p></div>
+</div></div>
 </li>
 </ol></div>
-<div class="olist arabic"><div class="title"><strong>To install SCARF:</strong></div><ol class="arabic">
+</div>
+</div>
+<div class="sect1">
+<h2 id="_strong_requirements_for_installing_scarf_strong"><strong>Requirements for installing SCARF</strong></h2>
+<div class="sectionbody">
+<div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-<strong>Consider whether the computer is capable enough</strong>
+<strong>Mac OSX System</strong>
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>This assumes installation is on a Mac OSX system.  For Linux or Windows systems,
+you should be able to do the installation without too much trouble, using these
+instructions as a guide.  Please take detailed notes and email them to me,
+especially if you are successful! I will incorporate them into these instructions.</p></div>
+</div></div>
+</li>
+<li>
+<p>
+<strong>The computer must have enough memory and speed</strong>
 </p>
 <div class="openblock">
 <div class="content">
@@ -815,6 +835,22 @@ as much time as you need to feel you can get started here) from UC Davis is at:<
 </li>
 <li>
 <p>
+<strong>Work in the SCARF main directory unless otherwise instructed</strong>
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>While working from the command line to install SCARF, most of the time you will
+be in the SCARF main directory, unless instructed otherwise. If you unzipped
+the SCARF zip file in your Documents folder, you would change into the SCARF
+directory with this command:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>cd ~/Documents/SCARF</code></pre>
+</div></div>
+</div></div>
+</li>
+<li>
+<p>
 <strong>Know how to use a plain text editor and have one available</strong>
 </p>
 <div class="openblock">
@@ -828,6 +864,78 @@ from:</p></div>
 <div class="paragraph"><p><a href="http://www.barebones.com/products/textwrangler">http://www.barebones.com/products/textwrangler</a></p></div>
 </div></div>
 </li>
+<li>
+<p>
+<strong>The following programs/applications will be installed if they aren&#8217;t already:</strong>
+</p>
+<div class="openblock">
+<div class="content">
+<div class="olist loweralpha"><ol class="loweralpha">
+<li>
+<p>
+Xcode (V6.4 works) (Apple App Store; "make" and "g++")
+</p>
+</li>
+<li>
+<p>
+Jellyfish V2 or later (V2.2.3 works) (<a href="http://www.genome.umd.edu/jellyfish.html">http://www.genome.umd.edu/jellyfish.html</a>)
+</p>
+</li>
+<li>
+<p>
+Perl V5 or later (V5.16.0 works) (<a href="https://www.perl.org/get.html">https://www.perl.org/get.html</a>)
+</p>
+</li>
+<li>
+<p>
+R V3 or later (V3.2.1 works) (<a href="https://www.r-project.org">https://www.r-project.org</a>)
+</p>
+</li>
+<li>
+<p>
+Primer3 (V2.3.6 works) (<a href="http://sourceforge.net/projects/primer3">http://sourceforge.net/projects/primer3</a>)
+</p>
+</li>
+<li>
+<p>
+NCBI e-PCR (V2.3.12 works) (<a href="http://www.ncbi.nlm.nih.gov/tools/epcr">http://www.ncbi.nlm.nih.gov/tools/epcr</a>)
+</p>
+</li>
+</ol></div>
+</div></div>
+</li>
+<li>
+<p>
+<strong>Some of the above will require compilation and build on your computer using "make":</strong>
+</p>
+<div class="openblock">
+<div class="content">
+<div class="olist loweralpha"><ol class="loweralpha">
+<li>
+<p>
+Jellyfish
+</p>
+</li>
+<li>
+<p>
+e-PCR
+</p>
+</li>
+</ol></div>
+</div></div>
+</li>
+<li>
+<p>
+<strong>One C++ program provided with SCARF will be compiled and built: findMers</strong>
+</p>
+</li>
+</ol></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_strong_install_scarf_strong"><strong>Install SCARF</strong></h2>
+<div class="sectionbody">
+<div class="olist arabic"><ol class="arabic">
 <li>
 <p>
 <strong>Copy allParameters.template file to new file allParameters.mytemplate</strong>
@@ -848,8 +956,7 @@ the new file and add application paths to it as you install applications. You
 can do the copying in Mac&#8217;s Finder or from the command line:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>cd ~/Documents/SCARF    (or whatever is appropriate for your system)
-cp allParameters.template allParameters.mytemplate</code></pre>
+<pre><code>cp allParameters.template allParameters.mytemplate</code></pre>
 </div></div>
 </div></div>
 </li>
@@ -901,11 +1008,14 @@ the SCARF files). For example, maybe it would look like this:</p></div>
 by SCARF are distributed as source code that must be compiled and built into a runnable
 application on the user&#8217;s computer, which requires a C<code> compiler (g</code> utility). On
 Mac OSX, the Apple Developer Toolkit named Xcode provides these utilities, and it is
-available free from the Apple App Store (Applications, App Store). Xcode is a good
-thing to have installed anyway. If you don&#8217;t have it installed already, run the App Store
-application, search for "Xcode", and double-click the "Install" button to install it.
+available free from the Apple App Store (Applications, App Store).
+Xcode is a good thing to have installed anyway, for anyone doing bioinformatics work.
+If you don&#8217;t have it installed already, run the App Store
+application, search for "Xcode", and double-click the "Install" button to install it,
+and even if you do have it installed, make sure you are updated with the latest version.
+I used version 6.4, although later versions should work fine.
 Installation takes quite a long time, during which it appears nothing is happening.
-When the installation is finished, you can verify that it was installed successfully
+When it is finished, you can verify that it was installed successfully
 by finding the Xcode application icon in Applications and running it.  It may then
 display a box requesting your computer administrator password so it can install
 additional components. Then, close the Xcode application and go to the command line
@@ -921,6 +1031,36 @@ as "make" and "g++" are installed, and if not, installs them:</p></div>
 <pre><code>g++</code></pre>
 </div></div>
 <div class="paragraph"><p>and you should see the error message "clang: error: no input files".</p></div>
+</div></div>
+</li>
+<li>
+<p>
+<strong>Enable Access to FileMerge</strong>
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>There is a marvelous file comparison and merging tool called "FileMerge" that
+comes with Xcode. It will be handy for two subsequent steps. It is initially
+hidden within Xcode, but you can put it in your dock to make it more easily
+accessible. To run it, start Xcode, then on the menu choose Xcode,
+Open Developer Tool, FileMerge.  When it opens up, find its icon on the dock
+and set it to stay put in the dock, then you can close Xcode and in the future
+get to it directly from the dock.</p></div>
+<div class="paragraph"><p>When you run FileMerge, it prompts for two or three or four file names.
+To see an example of use, enter the first two file names, "left" and "right",
+setting "left" to allParameters.template and "right" to allParameters.test.template,
+then click "Compare". You will see a comparison of the two files, with the
+differences clearly shown. If you wanted to incorporate changes from one of
+these files into the other, you can do this easily by using the up/down arrow
+keys to go through the differences one
+by one, and use the left/right arrow keys to select whether you want the left or
+right side file text in the output, and you can also click in the box on the
+bottom that shows the merged text and edit it; when finished you can save the
+merged text to a new file or overwrite one of the two compared files, using
+File, Save Merge. Since we don&#8217;t want to merge these files, exit FileMerge
+without saving anything.</p></div>
+<div class="paragraph"><p>There is also additional useful functionality by using the "Ancestor" file box,
+which will will make use of below.</p></div>
 </div></div>
 </li>
 <li>
@@ -967,8 +1107,8 @@ and that I could run it with these commands:</p></div>
 <pre><code>which jellyfish
 jellyfish --version</code></pre>
 </div></div>
-<div class="paragraph"><p>Finally, the two .mytemplate files must have the path to Jellyfish included in them.
-Search the files for "# " and assign the path to Jellyfish, which was shown when
+<div class="paragraph"><p>Finally, the allParameters.mytemplate file must have the path to Jellyfish included in
+it. Search the files for "# " and assign the path to Jellyfish, which was shown when
 you gave the "which jellyfish" command above, to the parameter "PATH_JELLYFISH".
 The path will probably already be correct because Jellyfish usually gets installed
 in a standard location.</p></div>
@@ -990,7 +1130,7 @@ you may need to increase the size (and have sufficient computer memory).</p></di
 </li>
 <li>
 <p>
-<strong>Install Perl if necessary and set its path</strong>
+<strong>Install Perl and set its path</strong>
 </p>
 <div class="openblock">
 <div class="content">
@@ -998,8 +1138,8 @@ you may need to increase the size (and have sufficient computer memory).</p></di
 application on your computer. The Mac OSX system comes with a Perl interpreter
 already installed, and this should be sufficient. This version of SCARF was
 tested with Perl version 5.16.0, although later versions, and earlier V5 versions,
-will probably be fine. You can find out if you have Perl installed, where it is
-located, and what its version is with this command:</p></div>
+will probably be fine. You can find out if you already have Perl installed, where
+it is located, and what its version is with this command:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>which perl
@@ -1010,8 +1150,11 @@ perl --version</code></pre>
 <div class="content">
 <pre><code>https://www.perl.org/get.html</code></pre>
 </div></div>
-<div class="paragraph"><p>After installing it, re-run the "which perl" command to find the path to it.</p></div>
-<div class="paragraph"><p>The two .mytemplate files must have the path to Perl included in them.
+<div class="paragraph"><p>Perl is a good thing to have installed anyway, for anyone doing bioinformatics work.
+Explicit installation instructions are not given here.  Follow the instructions
+provided in the downloaded installation package, then re-run the "which perl" command
+to find the path to it.</p></div>
+<div class="paragraph"><p>The allParameters.mytemplate file must have the path to Perl included in it.
 Assign the path, which was shown with the "which perl" command, to the parameter
 "PATH_PERL". For example, maybe your path will be:</p></div>
 <div class="literalblock">
@@ -1026,6 +1169,33 @@ Assign the path, which was shown with the "which perl" command, to the parameter
 </p>
 <div class="openblock">
 <div class="content">
+<div class="paragraph"><p>R is a programming language used by SCARF. Using it requires that the R programming
+environment be installed on your computer. This version of SCARF was tested with R
+version 3.2.1, although later versions, and earlier V3 versions, will probably be
+fine. You can find out if you already have R installed, where it is located, and
+what its version is with this command, which invokes the command line version of
+the R interpreter:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>which Rscript
+Rscript --version</code></pre>
+</div></div>
+<div class="paragraph"><p>If you do not have R installed, look for it here:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>https://www.r-project.org</code></pre>
+</div></div>
+<div class="paragraph"><p>R is a good thing to have installed anyway, for anyone doing bioinformatics work.
+Explicit installation instructions are not given here.  Follow the instructions
+provided in the downloaded installation package, then re-run the "which Rscript"
+command to find the path to it.</p></div>
+<div class="paragraph"><p>The allParameters.mytemplate file must have the path to RScript included in it.
+Assign the path, which was shown with the "which RScript" command, to the parameter
+"PATH_RSCRIPT". For example, maybe your path will be:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>PATH_RSCRIPT := /usr/bin/Rscript</code></pre>
+</div></div>
 </div></div>
 </li>
 <li>
@@ -1034,14 +1204,101 @@ Assign the path, which was shown with the "which perl" command, to the parameter
 </p>
 <div class="openblock">
 <div class="content">
+<div class="paragraph"><p>Primer3 is a classic bioinformatics application that generates primers from
+sequence data.  It is used by SCARF to generate primers for candidate SCAR
+markers, so it must be installed on your computer. This version of SCARF was
+tested with Primer3 version 2.3.6, although later versions, and earlier V2
+versions, will probably be fine. You probably know if you already have
+Primer3 installed. If you don&#8217;t know that you do, then you should install
+it. Look for it here:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>http://sourceforge.net/projects/primer3</code></pre>
+</div></div>
+<div class="paragraph"><p>It comes pre-built for OSX, so make sure you download the OSX version. Put the
+downloaded directory whereever you want on your computer. The file named
+primer3_core in the root directory of the downloaded package is the executable
+program file. The allParameters.mytemplate file must have the path to primer3_core
+included in it. Assign the path to the parameter "PATH_PRIMER3CORE". For example,
+maybe you put the downloaded folder into your Documents folder and you set the
+parameter as follows:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>PATH_PRIMER3CORE := ~/Documents/primer3-2.3.6/primer3_core</code></pre>
+</div></div>
 </div></div>
 </li>
 <li>
 <p>
-<strong>Install ePCR and set its path</strong>
+<strong>Install e-PCR and set its path</strong>
 </p>
 <div class="openblock">
 <div class="content">
+<div class="paragraph"><p>e-PCR is an "electronic PCR" application from NCBI that uses primers and sequence
+data to do an in-silico PCR amplification.  It is used by SCARF to test primers
+of candidate SCAR markers to see if they generate unique amplicons of the
+expected length, so it must be installed on your computer. This version of SCARF
+was tested with e-PCR version 2.3.12, although later versions will probably be
+fine. To install e-PCR, look for it here:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>http://www.ncbi.nlm.nih.gov/tools/epcr</code></pre>
+</div></div>
+<div class="paragraph"><p>The download link uses FTP protocol. Log in as user GUEST with no password.
+Look for the latest .zip version and copy the zip file to your computer and unzip
+it.  Put the unzipped directory whereever you want on your computer.</p></div>
+<div class="paragraph"><p>It is now necessary to run "make" to compile and build the program. Version 2.3.12
+had two problems with it that required editing of the source code in order for the
+"make" operation to complete successfully. Perhaps these problems will have been
+fixed in the version you download. Test it by trying to build e-PCR. Change into
+the directory that you unzipped and enter the following command:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>cd e-PCR-2.3.12
+make LF64LDFLAGS= LF64CCFLAGS=-DNATIVE_LARGEFILES COMMON_CC_FLAGS=-w</code></pre>
+</div></div>
+<div class="paragraph"><p>If the "make" completes without error, there will be a file named "e-PCR" in the
+directory, and if you run it, it will display a page full of usage info:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>e-PCR    (Run e-PCR)</code></pre>
+</div></div>
+<div class="paragraph"><p>If you get errors from the "make" like I did, here are the changes I made that
+allowed the "make" to succeed:</p></div>
+<div class="olist loweralpha"><ol class="loweralpha">
+<li>
+<p>
+Edit file mmap.cpp and remove "//" from the start of the line that reads
+        "//#include &lt;sstream&gt;"
+</p>
+</li>
+<li>
+<p>
+Edit file minilcs.hpp and insert the following two lines after the line
+        that reads "#include &lt;cstring&gt;":
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><code>#include &lt;cstdlib&gt;
+#include &lt;sstream&gt;</code></pre>
+</div></div>
+</li>
+</ol></div>
+<div class="paragraph"><p>Now try the "make" command again, followed by running "e-PCR":</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>make LF64LDFLAGS= LF64CCFLAGS=-DNATIVE_LARGEFILES COMMON_CC_FLAGS=-w
+e-PCR    (Run e-PCR)</code></pre>
+</div></div>
+<div class="paragraph"><p>The "make" should succeed and e-PCR should display its usage information, meaning
+you are good to go.  Now the allParameters.mytemplate file must have the path to
+e-PCR included in it. Assign the path to the parameter "PATH_EPCR". For example,
+maybe you unzipped the zip file in your Documents folder and you set the parameter
+as follows:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>PATH_EPCR := ~/Documents/e-PCR-2.3.12/e-PCR</code></pre>
+</div></div>
 </div></div>
 </li>
 <li>
@@ -1050,6 +1307,26 @@ Assign the path, which was shown with the "which perl" command, to the parameter
 </p>
 <div class="openblock">
 <div class="content">
+<div class="paragraph"><p>findMers is a C++ program that is part of SCARF. It takes as input a file full of
+k-mers and a genome FASTA file, and produces as output a file of the k-mers with
+their genomic position included as additional data columns in the file. It can
+also locate all contigs in the genome FASTA file and output a file that lists
+the starting position and length of each contig. SCARF uses both of these
+functions of findMers to generate a list of common unique k-mers to be analyzed
+for LCRs (locally conserved regions). The findMers program must be compiled and
+built using "make". Its source files are located in subfolders within the code/cpp
+folder. Change into the code/cpp/findMers directory and enter the command "make":</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>cd code/cpp/findMers
+make
+findMers
+cd ../../..</code></pre>
+</div></div>
+<div class="paragraph"><p>The "make" should complete without error, and there will be a file named "findMers"
+in the directory, and when it is run with the "findMers" command shown above, it
+will display a page of usage information. The path to "findMers" is already set
+correctly in the allParameters.mytemplate file.</p></div>
 </div></div>
 </li>
 <li>
@@ -1058,6 +1335,23 @@ Assign the path, which was shown with the "which perl" command, to the parameter
 </p>
 <div class="openblock">
 <div class="content">
+<div class="paragraph"><p>SCARF uses "make" to run data through its pipeline. A command can be given to
+cause "make" to delete files that it has generate by running the pipeline.
+There are two different ways it can delete files: it can actually delete them,
+or it can move them to the Mac trash can where they can be found and undeleted
+if necessary. You must choose which of these methods you want. Since the trash
+can method seems more useful and flexible, it is the default method. You select
+the method by setting the parameter CMD_DELETE_WHEN_CLEANING to either $(CMD_DELETE)
+or $(CMD_TRASH). You should make sure it is set the way you want. Also, you should
+test the shell script that moves files to the trash, to make sure it works. To
+do this, use these commands:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>cp help.txt junk.txt
+$SHELL code/shell/trash.sh junk.txt</code></pre>
+</div></div>
+<div class="paragraph"><p>Now look in the trash can to see if file "junk.txt" is there. If this doesn&#8217;t work,
+you should set the $(CMD_DELETE) method as the delete method.</p></div>
 </div></div>
 </li>
 <li>
@@ -1066,6 +1360,50 @@ Assign the path, which was shown with the "which perl" command, to the parameter
 </p>
 <div class="openblock">
 <div class="content">
+<div class="paragraph"><p>Primer3 uses a settings file to control many of the settings it uses to generate
+primers. Several sample settings files come with Primer3, in its root directory.
+One of these, <strong>primer3web_v4_0_0_default_settings.txt</strong>, was copied and modified
+for use with SCARF. The file is named <strong>primer3settings.default.txt</strong>, in the main
+SCARF directory. One important change was to set parameter PRIMER_NUM_RETURN
+to 1 instead of its default 5.</p></div>
+<div class="paragraph"><p>You will want to be able to set the Primer3 settings appropriately for your needs.
+To do this, copy primer3settings.default.txt to primer3settings.txt:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>cp primer3settings.default.txt primer3settings.txt</code></pre>
+</div></div>
+<div class="paragraph"><p>Now, you can edit the new primer3settings.txt file with your text editor and make
+any changes that are important for your needs. For example, you might change the
+parameters that determine the acceptable range of primer Tm values. The Primer3
+user manual (<a href="http://primer3.sourceforge.net/primer3_manual.htm">http://primer3.sourceforge.net/primer3_manual.htm</a>) describes all
+the parameters. You do not need to make changes, SCARF will still work.</p></div>
+<div class="paragraph"><p>To see what was changed in the primer settings file, you can use FileMerge,
+introduced above. I recommend you run it now to compare primer3settings.txt
+to primer3web_v4_0_0_default_settings.txt in the Primer3 folder to see these
+changes.</p></div>
+<div class="paragraph"><p>An explanation of the sequence data SCARF gives Primer3 in order to generate
+primers will be helpful, particularly in understanding the setting of the
+parameter PRIMER_PRODUCT_SIZE_RANGE. Since SCARF is making primers to be used
+in different genomes with different sequences and sequence lengths between
+the two primer sites, it cannot use the typical method of giving Primer3 the
+entire sequence between the two primer sites. Instead, SCARF gives Primer3
+the concatenation of two short sequences, one around each of the two k-mers
+that define and anchor the candidate SCAR marker. Each sequence is equal to
+K plus twice EXTENSION_LEN in length. Both K (the k-mer length) and EXTENSION_LEN
+(the number of bases to add on each side of the k-mer) are defined in
+allParameters.mytemplate. Thus, the sequence that Primer3 uses for designing
+the primers is equal to 2K + 4*EXTENSION_LEN in length. SCARF also gives
+Primer3 a value for its parameter SEQUENCE_PRIMER_PAIR_OK_REGION_LIST.
+This tells Primer3 to design one primer in the left half of the sequence and
+one primer in the right half. Thus, the primer product size will appear to
+Primer3 to be much smaller than the actual amplicon size will be, which is
+why PRIMER_PRODUCT_SIZE_RANGE can be set to a smaller value than the amplicon
+sizes.</p></div>
+<div class="paragraph"><p>Although Primer3 is a stable program and unlikely to change a
+lot, if new versions of Primer3 add parameters, you might want to incorporate
+them into primer3settings.txt. You will see new parameters if you
+run FileMerge to compare primer3settings.txt to Primer3&#8217;s file
+primer3web_v4_0_0_default_settings.txt.</p></div>
 </div></div>
 </li>
 <li>
@@ -1075,37 +1413,12 @@ Assign the path, which was shown with the "which perl" command, to the parameter
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>File allParameters.test.mytemplate is more-or-less a copy of the allParameters.template
-file, modified for testing SCARF. Use one of two methods to modify it to incorporate
-the same changes you just made to allParameters.mytemplate:</p></div>
-<div class="paragraph"><p><strong>Method 1 (straightforward)</strong></p></div>
-<div class="paragraph"><p>Copy allParameters.test.template to allParameters.test, using either Finder
-or the command line:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>cp allParameters.test.template allParameters.test</code></pre>
-</div></div>
-<div class="paragraph"><p>Edit the new allParameters.test file with your plain text editor and put <strong>the same</strong>
-parameter changes into it as you just finished doing with allParameters.mytemplate.</p></div>
-<div class="paragraph"><p><strong>Method 2 (easiest and more fun)</strong></p></div>
-<div class="paragraph"><p>There is another way to do this rather than using your text editor: merging the
-changes. There is a marvelous file comparison and merging tool called "FileMerge"
-that comes with Xcode. To run it, start Xcode, then on the menu choose Xcode,
-Open Developer Tool, FileMerge.  When it opens up, you may want to find its icon
-on the dock and set it to stay put in the dock, then you can close Xcode and in
-the future get to it directly from the dock.  When you run FileMerge, it prompts
-for two or three or four file names. To see an example of use, enter the first
-two, "left" and "right", setting "left" to allParameters.mytemplate and "right"
-to allParameters.test, then click "Compare". You will see a comparison of the
-two files, with the differences clearly shown. If you wanted to incorporate
-changes from one of these files into the other (we don&#8217;t), you can do this easily
-by using the up/down arrow keys to go through the differences one by one, and use
-the left/right arrow keys to select whether you want the left or right side file
-text in the output, and you can also click in the box on the bottom that shows
-the merged text and edit it; when finished you can save the merged text to a new
-file or overwrite one of the two compared files, using File, Save Merge.  However,
-FileMerge actually makes the job at hand easier than that. Do another File, Compare
-Files with FileMerge, and set the four file text boxes to the following files:</p></div>
-<div class="olist arabic"><ol class="arabic">
+file, modified for testing SCARF, as you saw above when initially testing FileMerge.
+You now must incorporate the same changes you just made to allParameters.mytemplate
+into allParameters.test.mytemplate. You can do this by just editing it and adding
+in the changes, but a more reliable (and fun) way to do it is to use FileMerge.
+To do this, start FileMerge and set the four file text boxes to the following files:</p></div>
+<div class="olist loweralpha"><ol class="loweralpha">
 <li>
 <p>
 Left: allParameters.test.template file path
@@ -1131,12 +1444,13 @@ Merge: allParameters.test file path
 screen will point left, indicating that the essential changes in allParameters.test.template
 will be retained. However, every line you changed in allParameters.mytemplate should have
 an arrow pointing to the right, to your changed line (because the Right file differs from
-the Ancestor file), indicating that your changes will be incorporated. Go through to make
-sure all your changes have right arrows, and all the other differences have arrows pointing
-to the left. Then choose File, Save Merge, and the allParameters.test file will be
-overwritten with a new version containing your new parameter settings (application paths,
-mainly). Load allParameters.test into your text editor and quickly browse it to make sure
-it looks correct.</p></div>
+the Ancestor file), indicating that your changes will be incorporated into the merged file
+shown at the bottom. Go through to make sure all your changes have right arrows, and all
+the other differences have arrows pointing to the left. If necessary, you can click in the
+merge window at the bottom and edit the merged text. Then choose File, Save Merge, and the
+allParameters.test file will be overwritten with a new version containing your new
+parameter settings (application paths, mainly). Load allParameters.test into your text
+editor and quickly browse it to make sure it looks correct.</p></div>
 </div></div>
 </li>
 <li>
@@ -1145,15 +1459,99 @@ it looks correct.</p></div>
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p><strong>That completes the installation of SCARF.</strong></p></div>
+<div class="paragraph"><p>Everything is now ready to run the SCARF pipeline. Data for testing it is provided
+in the testFASTA folder. This consists of two FASTA files that are truncated versions
+of the S. lycopersicum (tomato) and S. pennellii genomes, with only two chromosomes
+(1 and 2) and only about 14 Mbp for each one. The parameter file allParameters.test.template
+has parameters set for using these FASTA files and doing the test. You edited that
+parameter file in the previous step to create file allParameters.test, containing the
+appropriate parameter values that point to the applications and programs you installed
+above.</p></div>
+<div class="paragraph"><p>To test SCARF, from the command line in the SCARF main directory, enter this command:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>make PARAMS=allParameters.test ALL | tee logFiles/makeLog.test.txt</code></pre>
+</div></div>
+<div class="paragraph"><p>The "tee" command routes the piped log output from "make" to the console and to the
+file logFiles/makeLog.test.txt. You can examine this file after the run to see what
+specifically happened at each step. Note that the output includes timestamps telling
+how long each step took to run.</p></div>
+<div class="paragraph"><p>If all goes well, the pipeline will run quickly, and after four or five minutes, it
+should finish with the message <strong>ALL files are up to date</strong>. There should be several
+files in the output folder "outTestHP11", including files starting with the prefixes
+BadKmers_, CandidateMarkers_, IndelsNonoverlapping_, IndelsOverlapping_, LCRs_,
+MarkerCounts_, MarkerDensity_, MarkerErrors_, MarkersNonoverlapping_, and
+MarkersOverlapping_. The last two are the final output files containing the markers.
+The .pdf and .png files should be examined to see how they depict marker counts
+and densities.</p></div>
+<div class="paragraph"><p>To make sure the pipeline ran correctly, compare the file of output markers to the
+expected result, which is in file MarkersOverlapping.test.tsv in the SCARF main
+directory:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>diff MarkersOverlapping.test.tsv outTestHP11/MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv</code></pre>
+</div></div>
+<div class="paragraph"><p>This command should not produce any output, indicating the two files are identical.</p></div>
+</div></div>
+</li>
+<li>
+<p>
+<strong>Run dotplot.R to make a dot plot</strong>
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>The LCRs_ file contains a list of common unique k-mers assigned to locally conserved
+regions (LCRs), and it can be used to make a dotplot depicting alignment of the two
+genomes. The R program dotplot.R is provided to do this. It is driven by a parameter
+file, a sample of which has been provided, dotplot.template, that is set for using
+the test data just produced. Run dotplot.R as follows:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>Rscript code/R/dotplot.R dotplot.template</code></pre>
+</div></div>
+<div class="paragraph"><p>This produces file outTestHP11/LCRs_K11k2L100D10_2000.dotplot.png, an image file.
+Examine it (e.g. in the Preview app) to see the dot plot.</p></div>
+</div></div>
+</li>
+<li>
+<p>
+<strong>Run annotateFile.R to make new files containing annotated marker data in different formats</strong>
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>A common need is to add additional annotation information the table of markers. For
+example, you might be working with an introgression line population (as I was) and
+wish to annotate each marker with the names of the lines whose introgressions that
+marker lies within, along with the marker position relative to the introgression.
+Or, you might want to annotate each marker with the ID of the nearest gene and its
+distance away. You may also want to change file format, from .tsv (tab-separated)
+to .gff3 or .gtf for adding the markers to a browser track. All this can be done with
+the R program annotateFile.R that is provided with SCARF. It is driven by a parameter
+file, a sample of which has been provided, annotate.template, that is set for using
+the test data just produced along with additional annotation test data in folder
+testAnnotation. Run annotateFile.R as follows:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>Rscript code/R/annotateFile.R annotate.template</code></pre>
+</div></div>
+<div class="paragraph"><p>This produces these files in folder outTestHP11: MarkersWithILs.tsv, MarkersWithGenes.tsv,
+MarkersWithGenes.gff3, and MarkersWithGenes.gtf. You can examine these files with
+a text editor, or load the .gff3 file into the tomato JBrowse genome browser at
+solgenomics.net. (How?)</p></div>
 </div></div>
 </li>
 </ol></div>
-<div class="ulist"><div class="title"><strong>To run SCARF to generate markers after installation:</strong></div><ul>
+<div class="paragraph"><p><strong>That completes the installation of SCARF.</strong></p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_strong_to_run_scarf_to_generate_markers_strong"><strong>To run SCARF to generate markers</strong></h2>
+<div class="sectionbody">
+<div class="ulist"><ul>
 <li>
 <p>
-Find file RUN.pdf in the SCARF folder on your computer and open it and
-follow the instructions.
+Find file RUN.pdf or RUN.html in the SCARF folder on your computer and open
+either one and follow the instructions.
 </p>
 </li>
 </ul></div>
@@ -1163,7 +1561,7 @@ follow the instructions.
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-08-19 10:01:44 PDT
+Last updated 2015-08-19 20:28:42 PDT
 </div>
 </div>
 </body>

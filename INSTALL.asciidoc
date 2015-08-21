@@ -3,12 +3,9 @@ SCARF INSTALLATION
 Ted Toal <twtoal@ucdavis.edu>
 
 This describes how to install all elements needed to run the SCARF software.
-It assumes installation is on a Mac OSX system.  For Linux or Windows systems,
-you can attempt installation using these instructions as a guide.  Please take
-detailed notes and email them to me, especially if you are successful! I will
-incorporate them into these instructions.
 
-.*If not done already, download SCARF files:*
+*If not done already, download SCARF files*
+-------------------------------------------
 . Browse to https://github.com/BradyLab/SCARF
 . At bottom of right column on screen, click "Download ZIP" and choose a place to
 put it on your computer.
@@ -19,16 +16,28 @@ instead of the above steps, you can fork the SCARF repository and work on your o
 copy. The "work" branch is where I do work. The "master" branch is where the
 releases reside, each tagged with a version number. You can create a branch whose
 contents are the same as a tagged version with the command:
++
+--
 
   git checkout -b my_V1.0_branch v1.0" 
 
 You can then do the installation process using those files.
 
 I will try to monitor for pull requests if you make useful changes.
+--
 
-.*To install SCARF:*
+*Requirements for installing SCARF*
+-----------------------------------
+. *Mac OSX System*
++
+--
+This assumes installation is on a Mac OSX system.  For Linux or Windows systems,
+you should be able to do the installation without too much trouble, using these
+instructions as a guide.  Please take detailed notes and email them to me,
+especially if you are successful! I will incorporate them into these instructions.
+--
 
-. *Consider whether the computer is capable enough*
+. *The computer must have enough memory and speed*
 +
 --
 Before starting the installation, consider whether the computer on which the
@@ -51,6 +60,17 @@ as much time as you need to feel you can get started here) from UC Davis is at:
 http://korflab.ucdavis.edu/Unix_and_Perl/current.html
 --
 
+. *Work in the SCARF main directory unless otherwise instructed*
++
+--
+While working from the command line to install SCARF, most of the time you will
+be in the SCARF main directory, unless instructed otherwise. If you unzipped
+the SCARF zip file in your Documents folder, you would change into the SCARF
+directory with this command:
+
+  cd ~/Documents/SCARF
+--
+
 . *Know how to use a plain text editor and have one available*
 +
 --
@@ -64,6 +84,28 @@ from:
 http://www.barebones.com/products/textwrangler
 --
 
+. *The following programs/applications will be installed if they aren't already:*
++
+--
+.. Xcode (V6.4 works) (Apple App Store; "make" and "g++")
+.. Jellyfish V2 or later (V2.2.3 works) (http://www.genome.umd.edu/jellyfish.html)
+.. Perl V5 or later (V5.16.0 works) (https://www.perl.org/get.html)
+.. R V3 or later (V3.2.1 works) (https://www.r-project.org)
+.. Primer3 (V2.3.6 works) (http://sourceforge.net/projects/primer3)
+.. NCBI e-PCR (V2.3.12 works) (http://www.ncbi.nlm.nih.gov/tools/epcr)
+--
+
+. *Some of the above will require compilation and build on your computer using "make":*
++
+--
+.. Jellyfish
+.. e-PCR
+--
+
+. *One C++ program provided with SCARF will be compiled and built: findMers*
+
+*Install SCARF*
+---------------
 . *Copy allParameters.template file to new file allParameters.mytemplate*
 +
 --
@@ -81,7 +123,6 @@ file to a new filename, replacing ".template" with ".mytemplate". You will edit
 the new file and add application paths to it as you install applications. You
 can do the copying in Mac's Finder or from the command line:
 
-  cd ~/Documents/SCARF    (or whatever is appropriate for your system)
   cp allParameters.template allParameters.mytemplate
 --
 
@@ -121,11 +162,14 @@ SCARF makes use of a utility called "make", and also, some of the applications u
 by SCARF are distributed as source code that must be compiled and built into a runnable
 application on the user's computer, which requires a C++ compiler (g++ utility). On
 Mac OSX, the Apple Developer Toolkit named Xcode provides these utilities, and it is
-available free from the Apple App Store (Applications, App Store). Xcode is a good
-thing to have installed anyway. If you don't have it installed already, run the App Store
-application, search for "Xcode", and double-click the "Install" button to install it.
+available free from the Apple App Store (Applications, App Store).
+Xcode is a good thing to have installed anyway, for anyone doing bioinformatics work.
+If you don't have it installed already, run the App Store
+application, search for "Xcode", and double-click the "Install" button to install it,
+and even if you do have it installed, make sure you are updated with the latest version.
+I used version 6.4, although later versions should work fine.
 Installation takes quite a long time, during which it appears nothing is happening.
-When the installation is finished, you can verify that it was installed successfully
+When it is finished, you can verify that it was installed successfully
 by finding the Xcode application icon in Applications and running it.  It may then
 display a box requesting your computer administrator password so it can install
 additional components. Then, close the Xcode application and go to the command line
@@ -139,6 +183,35 @@ To verify they are installed, you can enter this command:
   g++
 
 and you should see the error message "clang: error: no input files".
+--
+
+. *Enable Access to FileMerge*
++
+--
+There is a marvelous file comparison and merging tool called "FileMerge" that
+comes with Xcode. It will be handy for two subsequent steps. It is initially
+hidden within Xcode, but you can put it in your dock to make it more easily
+accessible. To run it, start Xcode, then on the menu choose Xcode,
+Open Developer Tool, FileMerge.  When it opens up, find its icon on the dock
+and set it to stay put in the dock, then you can close Xcode and in the future
+get to it directly from the dock.
+
+When you run FileMerge, it prompts for two or three or four file names.
+To see an example of use, enter the first two file names, "left" and "right",
+setting "left" to allParameters.template and "right" to allParameters.test.template,
+then click "Compare". You will see a comparison of the two files, with the
+differences clearly shown. If you wanted to incorporate changes from one of
+these files into the other, you can do this easily by using the up/down arrow
+keys to go through the differences one
+by one, and use the left/right arrow keys to select whether you want the left or
+right side file text in the output, and you can also click in the box on the
+bottom that shows the merged text and edit it; when finished you can save the
+merged text to a new file or overwrite one of the two compared files, using
+File, Save Merge. Since we don't want to merge these files, exit FileMerge
+without saving anything.
+
+There is also additional useful functionality by using the "Ancestor" file box,
+which will will make use of below.
 --
 
 . *Install Jellyfish and set its path*
@@ -179,8 +252,8 @@ and that I could run it with these commands:
   which jellyfish
   jellyfish --version
 
-Finally, the two .mytemplate files must have the path to Jellyfish included in them.
-Search the files for "### " and assign the path to Jellyfish, which was shown when
+Finally, the allParameters.mytemplate file must have the path to Jellyfish included in
+it. Search the files for "### " and assign the path to Jellyfish, which was shown when
 you gave the "which jellyfish" command above, to the parameter "PATH_JELLYFISH".
 The path will probably already be correct because Jellyfish usually gets installed
 in a standard location.
@@ -197,15 +270,15 @@ you may need to increase the size (and have sufficient computer memory).
   JELLYFISH_HASH_SIZE := 80M
 --
 
-. *Install Perl if necessary and set its path*
+. *Install Perl and set its path*
 +
 --
 Perl is a programming language used by SCARF. Using it requires a Perl interpreter
 application on your computer. The Mac OSX system comes with a Perl interpreter
 already installed, and this should be sufficient. This version of SCARF was
 tested with Perl version 5.16.0, although later versions, and earlier V5 versions,
-will probably be fine. You can find out if you have Perl installed, where it is
-located, and what its version is with this command:
+will probably be fine. You can find out if you already have Perl installed, where
+it is located, and what its version is with this command:
 
   which perl
   perl --version
@@ -214,9 +287,12 @@ If you do not have Perl installed, look for it here:
 
   https://www.perl.org/get.html
 
-After installing it, re-run the "which perl" command to find the path to it.
+Perl is a good thing to have installed anyway, for anyone doing bioinformatics work.
+Explicit installation instructions are not given here.  Follow the instructions
+provided in the downloaded installation package, then re-run the "which perl" command
+to find the path to it.
 
-The two .mytemplate files must have the path to Perl included in them.
+The allParameters.mytemplate file must have the path to Perl included in it.
 Assign the path, which was shown with the "which perl" command, to the parameter
 "PATH_PERL". For example, maybe your path will be:
 
@@ -226,97 +302,319 @@ Assign the path, which was shown with the "which perl" command, to the parameter
 . *Install R and set its path*
 +
 --
+R is a programming language used by SCARF. Using it requires that the R programming
+environment be installed on your computer. This version of SCARF was tested with R
+version 3.2.1, although later versions, and earlier V3 versions, will probably be
+fine. You can find out if you already have R installed, where it is located, and
+what its version is with this command, which invokes the command line version of
+the R interpreter:
+
+  which Rscript
+  Rscript --version
+
+If you do not have R installed, look for it here:
+
+  https://www.r-project.org
+
+R is a good thing to have installed anyway, for anyone doing bioinformatics work.
+Explicit installation instructions are not given here.  Follow the instructions
+provided in the downloaded installation package, then re-run the "which Rscript"
+command to find the path to it.
+
+The allParameters.mytemplate file must have the path to RScript included in it.
+Assign the path, which was shown with the "which RScript" command, to the parameter
+"PATH_RSCRIPT". For example, maybe your path will be:
+
+  PATH_RSCRIPT := /usr/bin/Rscript
 --
 
 . *Install Primer3 and set its path*
 +
 --
+Primer3 is a classic bioinformatics application that generates primers from
+sequence data.  It is used by SCARF to generate primers for candidate SCAR
+markers, so it must be installed on your computer. This version of SCARF was
+tested with Primer3 version 2.3.6, although later versions, and earlier V2
+versions, will probably be fine. You probably know if you already have
+Primer3 installed. If you don't know that you do, then you should install
+it. Look for it here:
+
+  http://sourceforge.net/projects/primer3
+
+It comes pre-built for OSX, so make sure you download the OSX version. Put the
+downloaded directory whereever you want on your computer. The file named
+primer3_core in the root directory of the downloaded package is the executable
+program file. The allParameters.mytemplate file must have the path to primer3_core
+included in it. Assign the path to the parameter "PATH_PRIMER3CORE". For example,
+maybe you put the downloaded folder into your Documents folder and you set the
+parameter as follows:
+
+  PATH_PRIMER3CORE := ~/Documents/primer3-2.3.6/primer3_core
 --
 
-. *Install ePCR and set its path*
+. *Install e-PCR and set its path*
 +
 --
+e-PCR is an "electronic PCR" application from NCBI that uses primers and sequence
+data to do an in-silico PCR amplification.  It is used by SCARF to test primers
+of candidate SCAR markers to see if they generate unique amplicons of the
+expected length, so it must be installed on your computer. This version of SCARF
+was tested with e-PCR version 2.3.12, although later versions will probably be
+fine. To install e-PCR, look for it here:
+
+  http://www.ncbi.nlm.nih.gov/tools/epcr
+
+The download link uses FTP protocol. Log in as user GUEST with no password.
+Look for the latest .zip version and copy the zip file to your computer and unzip
+it.  Put the unzipped directory whereever you want on your computer.
+
+It is now necessary to run "make" to compile and build the program. Version 2.3.12
+had two problems with it that required editing of the source code in order for the
+"make" operation to complete successfully. Perhaps these problems will have been
+fixed in the version you download. Test it by trying to build e-PCR. Change into
+the directory that you unzipped and enter the following command:
+
+  cd e-PCR-2.3.12
+  make LF64LDFLAGS= LF64CCFLAGS=-DNATIVE_LARGEFILES COMMON_CC_FLAGS=-w
+
+If the "make" completes without error, there will be a file named "e-PCR" in the
+directory, and if you run it, it will display a page full of usage info:
+
+  e-PCR    (Run e-PCR)
+
+If you get errors from the "make" like I did, here are the changes I made that
+allowed the "make" to succeed:
+
+  .. Edit file mmap.cpp and remove "//" from the start of the line that reads
+        "//#include <sstream>"
+  .. Edit file minilcs.hpp and insert the following two lines after the line
+        that reads "#include <cstring>":
+
+      #include <cstdlib>
+      #include <sstream>
+
+Now try the "make" command again, followed by running "e-PCR":
+
+  make LF64LDFLAGS= LF64CCFLAGS=-DNATIVE_LARGEFILES COMMON_CC_FLAGS=-w
+  e-PCR    (Run e-PCR)
+
+The "make" should succeed and e-PCR should display its usage information, meaning
+you are good to go.  Now the allParameters.mytemplate file must have the path to
+e-PCR included in it. Assign the path to the parameter "PATH_EPCR". For example,
+maybe you unzipped the zip file in your Documents folder and you set the parameter
+as follows:
+
+  PATH_EPCR := ~/Documents/e-PCR-2.3.12/e-PCR
 --
 
 . *Build findMers*
 +
 --
+findMers is a C++ program that is part of SCARF. It takes as input a file full of
+k-mers and a genome FASTA file, and produces as output a file of the k-mers with
+their genomic position included as additional data columns in the file. It can
+also locate all contigs in the genome FASTA file and output a file that lists
+the starting position and length of each contig. SCARF uses both of these
+functions of findMers to generate a list of common unique k-mers to be analyzed
+for LCRs (locally conserved regions). The findMers program must be compiled and
+built using "make". Its source files are located in subfolders within the code/cpp
+folder. Change into the code/cpp/findMers directory and enter the command "make":
+
+  cd code/cpp/findMers
+  make
+  findMers
+  cd ../../..
+
+The "make" should complete without error, and there will be a file named "findMers"
+in the directory, and when it is run with the "findMers" command shown above, it
+will display a page of usage information. The path to "findMers" is already set
+correctly in the allParameters.mytemplate file.
 --
 
 . *Test trashing and choose deletion method*
 +
 --
+SCARF uses "make" to run data through its pipeline. A command can be given to
+cause "make" to delete files that it has generate by running the pipeline.
+There are two different ways it can delete files: it can actually delete them,
+or it can move them to the Mac trash can where they can be found and undeleted
+if necessary. You must choose which of these methods you want. Since the trash
+can method seems more useful and flexible, it is the default method. You select
+the method by setting the parameter CMD_DELETE_WHEN_CLEANING to either $(CMD_DELETE)
+or $(CMD_TRASH). You should make sure it is set the way you want. Also, you should
+test the shell script that moves files to the trash, to make sure it works. To
+do this, use these commands:
+
+  cp help.txt junk.txt
+  $SHELL code/shell/trash.sh junk.txt
+
+Now look in the trash can to see if file "junk.txt" is there. If this doesn't work,
+you should set the $(CMD_DELETE) method as the delete method.
 --
 
 . *Copy primer3settings.default.txt and edit Primer3 settings*
 +
 --
+Primer3 uses a settings file to control many of the settings it uses to generate
+primers. Several sample settings files come with Primer3, in its root directory.
+One of these, *primer3web_v4_0_0_default_settings.txt*, was copied and modified
+for use with SCARF. The file is named *primer3settings.default.txt*, in the main
+SCARF directory. One important change was to set parameter PRIMER_NUM_RETURN
+to 1 instead of its default 5.
+
+You will want to be able to set the Primer3 settings appropriately for your needs.
+To do this, copy primer3settings.default.txt to primer3settings.txt:
+
+  cp primer3settings.default.txt primer3settings.txt
+
+Now, you can edit the new primer3settings.txt file with your text editor and make
+any changes that are important for your needs. For example, you might change the
+parameters that determine the acceptable range of primer Tm values. The Primer3
+user manual (http://primer3.sourceforge.net/primer3_manual.htm) describes all
+the parameters. You do not need to make changes, SCARF will still work.
+
+To see what was changed in the primer settings file, you can use FileMerge,
+introduced above. I recommend you run it now to compare primer3settings.txt
+to primer3web_v4_0_0_default_settings.txt in the Primer3 folder to see these
+changes.
+
+An explanation of the sequence data SCARF gives Primer3 in order to generate
+primers will be helpful, particularly in understanding the setting of the
+parameter PRIMER_PRODUCT_SIZE_RANGE. Since SCARF is making primers to be used
+in different genomes with different sequences and sequence lengths between
+the two primer sites, it cannot use the typical method of giving Primer3 the
+entire sequence between the two primer sites. Instead, SCARF gives Primer3
+the concatenation of two short sequences, one around each of the two k-mers
+that define and anchor the candidate SCAR marker. Each sequence is equal to
+K plus twice EXTENSION_LEN in length. Both K (the k-mer length) and EXTENSION_LEN
+(the number of bases to add on each side of the k-mer) are defined in
+allParameters.mytemplate. Thus, the sequence that Primer3 uses for designing
+the primers is equal to 2K + 4*EXTENSION_LEN in length. SCARF also gives
+Primer3 a value for its parameter SEQUENCE_PRIMER_PAIR_OK_REGION_LIST.
+This tells Primer3 to design one primer in the left half of the sequence and
+one primer in the right half. Thus, the primer product size will appear to
+Primer3 to be much smaller than the actual amplicon size will be, which is
+why PRIMER_PRODUCT_SIZE_RANGE can be set to a smaller value than the amplicon
+sizes.
+
+Although Primer3 is a stable program and unlikely to change a
+lot, if new versions of Primer3 add parameters, you might want to incorporate
+them into primer3settings.txt. You will see new parameters if you
+run FileMerge to compare primer3settings.txt to Primer3's file
+primer3web_v4_0_0_default_settings.txt.
 --
 
 . *Copy allParameters.test.template file to new file allParameters.test and add the changes made to allParameters.mytemplate*
 +
 --
 File allParameters.test.mytemplate is more-or-less a copy of the allParameters.template
-file, modified for testing SCARF. Use one of two methods to modify it to incorporate
-the same changes you just made to allParameters.mytemplate:
+file, modified for testing SCARF, as you saw above when initially testing FileMerge.
+You now must incorporate the same changes you just made to allParameters.mytemplate
+into allParameters.test.mytemplate. You can do this by just editing it and adding
+in the changes, but a more reliable (and fun) way to do it is to use FileMerge.
+To do this, start FileMerge and set the four file text boxes to the following files:
 
-*Method 1 (straightforward)*
+  .. Left: allParameters.test.template file path
 
-Copy allParameters.test.template to allParameters.test, using either Finder
-or the command line:
+  .. Right: allParameters.mytemplate file path
 
-  cp allParameters.test.template allParameters.test
+  .. Ancestor: allParameters.template file path
 
-Edit the new allParameters.test file with your plain text editor and put **the same**
-parameter changes into it as you just finished doing with allParameters.mytemplate.
-
-*Method 2 (easiest and more fun)*
-
-There is another way to do this rather than using your text editor: merging the
-changes. There is a marvelous file comparison and merging tool called "FileMerge"
-that comes with Xcode. To run it, start Xcode, then on the menu choose Xcode,
-Open Developer Tool, FileMerge.  When it opens up, you may want to find its icon
-on the dock and set it to stay put in the dock, then you can close Xcode and in
-the future get to it directly from the dock.  When you run FileMerge, it prompts
-for two or three or four file names. To see an example of use, enter the first
-two, "left" and "right", setting "left" to allParameters.mytemplate and "right"
-to allParameters.test, then click "Compare". You will see a comparison of the
-two files, with the differences clearly shown. If you wanted to incorporate
-changes from one of these files into the other (we don't), you can do this easily
-by using the up/down arrow keys to go through the differences one by one, and use
-the left/right arrow keys to select whether you want the left or right side file
-text in the output, and you can also click in the box on the bottom that shows
-the merged text and edit it; when finished you can save the merged text to a new
-file or overwrite one of the two compared files, using File, Save Merge.  However,
-FileMerge actually makes the job at hand easier than that. Do another File, Compare
-Files with FileMerge, and set the four file text boxes to the following files:
-
-. Left: allParameters.test.template file path
-
-. Right: allParameters.mytemplate file path
-
-. Ancestor: allParameters.template file path
-
-. Merge: allParameters.test file path
+  .. Merge: allParameters.test file path
 
 Now when you click "Compare", the majority of the arrows in the center of the FileMerge
 screen will point left, indicating that the essential changes in allParameters.test.template
 will be retained. However, every line you changed in allParameters.mytemplate should have
 an arrow pointing to the right, to your changed line (because the Right file differs from
-the Ancestor file), indicating that your changes will be incorporated. Go through to make
-sure all your changes have right arrows, and all the other differences have arrows pointing
-to the left. Then choose File, Save Merge, and the allParameters.test file will be
-overwritten with a new version containing your new parameter settings (application paths,
-mainly). Load allParameters.test into your text editor and quickly browse it to make sure
-it looks correct.
+the Ancestor file), indicating that your changes will be incorporated into the merged file
+shown at the bottom. Go through to make sure all your changes have right arrows, and all
+the other differences have arrows pointing to the left. If necessary, you can click in the
+merge window at the bottom and edit the merged text. Then choose File, Save Merge, and the
+allParameters.test file will be overwritten with a new version containing your new
+parameter settings (application paths, mainly). Load allParameters.test into your text
+editor and quickly browse it to make sure it looks correct.
 --
 
 . *Run SCARF using the test parameters in allParameters.test and check for success*
 +
 --
-*That completes the installation of SCARF.*
+Everything is now ready to run the SCARF pipeline. Data for testing it is provided
+in the testFASTA folder. This consists of two FASTA files that are truncated versions
+of the S. lycopersicum (tomato) and S. pennellii genomes, with only two chromosomes
+(1 and 2) and only about 14 Mbp for each one. The parameter file allParameters.test.template
+has parameters set for using these FASTA files and doing the test. You edited that
+parameter file in the previous step to create file allParameters.test, containing the
+appropriate parameter values that point to the applications and programs you installed
+above.
+
+To test SCARF, from the command line in the SCARF main directory, enter this command:
+
+  make PARAMS=allParameters.test ALL | tee logFiles/makeLog.test.txt
+
+The "tee" command routes the piped log output from "make" to the console and to the
+file logFiles/makeLog.test.txt. You can examine this file after the run to see what
+specifically happened at each step. Note that the output includes timestamps telling
+how long each step took to run.
+
+If all goes well, the pipeline will run quickly, and after four or five minutes, it
+should finish with the message *ALL files are up to date*. There should be several
+files in the output folder "outTestHP11", including files starting with the prefixes
+BadKmers_, CandidateMarkers_, IndelsNonoverlapping_, IndelsOverlapping_, LCRs_,
+MarkerCounts_, MarkerDensity_, MarkerErrors_, MarkersNonoverlapping_, and
+MarkersOverlapping_. The last two are the final output files containing the markers.
+The .pdf and .png files should be examined to see how they depict marker counts
+and densities.
+
+To make sure the pipeline ran correctly, compare the file of output markers to the
+expected result, which is in file MarkersOverlapping.test.tsv in the SCARF main
+directory:
+
+  diff MarkersOverlapping.test.tsv outTestHP11/MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv
+
+This command should not produce any output, indicating the two files are identical.
 --
 
-.*To run SCARF to generate markers after installation:*
+. *Run dotplot.R to make a dot plot*
++
+--
+The LCRs_ file contains a list of common unique k-mers assigned to locally conserved
+regions (LCRs), and it can be used to make a dotplot depicting alignment of the two
+genomes. The R program dotplot.R is provided to do this. It is driven by a parameter
+file, a sample of which has been provided, dotplot.template, that is set for using
+the test data just produced. Run dotplot.R as follows:
+
+  Rscript code/R/dotplot.R dotplot.template
+
+This produces file outTestHP11/LCRs_K11k2L100D10_2000.dotplot.png, an image file.
+Examine it (e.g. in the Preview app) to see the dot plot.
+--
+
+. *Run annotateFile.R to make new files containing annotated marker data in different formats*
++
+--
+A common need is to add additional annotation information the table of markers. For
+example, you might be working with an introgression line population (as I was) and
+wish to annotate each marker with the names of the lines whose introgressions that
+marker lies within, along with the marker position relative to the introgression.
+Or, you might want to annotate each marker with the ID of the nearest gene and its
+distance away. You may also want to change file format, from .tsv (tab-separated)
+to .gff3 or .gtf for adding the markers to a browser track. All this can be done with
+the R program annotateFile.R that is provided with SCARF. It is driven by a parameter
+file, a sample of which has been provided, annotate.template, that is set for using
+the test data just produced along with additional annotation test data in folder
+testAnnotation. Run annotateFile.R as follows:
+
+  Rscript code/R/annotateFile.R annotate.template
+
+This produces these files in folder outTestHP11: MarkersWithILs.tsv, MarkersWithGenes.tsv,
+MarkersWithGenes.gff3, and MarkersWithGenes.gtf. You can examine these files with
+a text editor, or load the .gff3 file into the tomato JBrowse genome browser at
+solgenomics.net. (How?)
+--
+
+*That completes the installation of SCARF.*
+
+*To run SCARF to generate markers*
+----------------------------------
 * Find file RUN.pdf or RUN.html in the SCARF folder on your computer and open
 either one and follow the instructions.

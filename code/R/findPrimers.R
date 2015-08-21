@@ -130,23 +130,23 @@ if (is.na(investigate))
 # Initialize.
 ########################################
 
-# Read indel k-mer pairs data.
-dfInDels = read.table(indelFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
-if (nrow(dfInDels) == 0)
+# Read indel k-mer pairs data, which become the initial marker candidates.
+dfMarkers = read.table(indelFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
+if (nrow(dfMarkers) == 0)
     stop("There are no INDELs.")
-inv(dim(dfInDels), "input markers dim")
-inv(colnames(dfInDels), "input markers columns")
-inv(head(dfInDels), "input markers head")
+inv(dim(dfMarkers), "input markers dim")
+inv(colnames(dfMarkers), "input markers columns")
+inv(head(dfMarkers), "input markers head")
 
 # Remove contig columns.
-dfInDels = dfInDels[, !grepl("^ctg", colnames(dfInDels))]
+dfMarkers = dfMarkers[, !grepl("^ctg", colnames(dfMarkers))]
 
 # The k-mer length we are working with.
-kmerLen = nchar(dfInDels$kmer1[1])
+kmerLen = nchar(dfMarkers$kmer1[1])
 inv(kmerLen, "k")
 
-# Get the genome identifying letters from the dfInDels kkLen columns names.
-genomeLtrs = sub("kkLen", "", colnames(dfInDels)[grepl("kkLen", colnames(dfInDels))])
+# Get the genome identifying letters from the dfMarkers kkLen columns names.
+genomeLtrs = sub("kkLen", "", colnames(dfMarkers)[grepl("kkLen", colnames(dfMarkers))])
 Ngenomes = length(genomeLtrs)
 if (Ngenomes < 2)
     stop("Expected to recognize at least two genomes in the data column names")
@@ -196,7 +196,7 @@ inv(colnames(df), "input DNA columns")
 inv(head(df), "input DNA head")
 
 ########################################
-# Create vectors of column names in df and dfInDels, indexed by genome.
+# Create vectors of column names in df and dfMarkers, indexed by genome.
 ########################################
 
 makeColVec = function(S)
@@ -265,20 +265,20 @@ for (genome in genomeLtrs)
 extensionLen = (nchar(df[1, refDnaSeqCol]) - kmerLen)/2
 
 ########################################
-# Now merge the DNA sequence data in columns dnaSeqCol of df into dfInDels
+# Now merge the DNA sequence data in columns dnaSeqCol of df into dfMarkers
 # columns dnaSeq1Col and dnaSeq2Col.  Use the kmer1 and kmer2 columns in
-# dfInDels as keys to match up with the df$kmer column.
+# dfMarkers as keys to match up with the df$kmer column.
 ########################################
 
-kmer1idxs = match(dfInDels$kmer1, df$kmer)
-kmer2idxs = match(dfInDels$kmer2, df$kmer)
+kmer1idxs = match(dfMarkers$kmer1, df$kmer)
+kmer2idxs = match(dfMarkers$kmer2, df$kmer)
 
 if (any(is.na(kmer1idxs))) stop("Missing kmer1 in primer output")
 if (any(is.na(kmer2idxs))) stop("Missing kmer2 in primer output")
 
-dfInDels[, dnaSeq1Col] = df[kmer1idxs, dnaSeqCol]
-dfInDels[, dnaSeq2Col] = df[kmer2idxs, dnaSeqCol]
-inv(dim(dfInDels), "Marker data frame with DNA sequence data dim")
+dfMarkers[, dnaSeq1Col] = df[kmer1idxs, dnaSeqCol]
+dfMarkers[, dnaSeq2Col] = df[kmer2idxs, dnaSeqCol]
+inv(dim(dfMarkers), "Marker data frame with DNA sequence data dim")
 
 ########################################
 # You may be wondering how primers are made if the extracted sequences in the
@@ -295,7 +295,7 @@ inv(dim(dfInDels), "Marker data frame with DNA sequence data dim")
 # in reverse complement order, so concatenating the k-mer #1 and k-mer #2
 # sequences is the correct thing to do; k-mer #1 position in that case is >
 # k-mer #2 position.
-seqs = paste(dfInDels[, refDnaSeq1Col], dfInDels[, refDnaSeq2Col], sep="")
+seqs = paste(dfMarkers[, refDnaSeq1Col], dfMarkers[, refDnaSeq2Col], sep="")
 
 # Split the sequences apart into vectors of characters.
 seqs = strsplit(seqs, "", fixed=TRUE)
@@ -304,7 +304,7 @@ seqs = strsplit(seqs, "", fixed=TRUE)
 # genome does not match (is not ".").
 for (genome in otherGenomeLtrs)
     {
-    seqsO = paste(dfInDels[, dnaSeq1Col[genome]], dfInDels[, dnaSeq2Col[genome]], sep="")
+    seqsO = paste(dfMarkers[, dnaSeq1Col[genome]], dfMarkers[, dnaSeq2Col[genome]], sep="")
     seqsO = strsplit(seqsO, "", fixed=TRUE)
     seqs = sapply(1:length(seqs), function(i)
         {
@@ -328,12 +328,12 @@ seqs = sapply(seqs, paste, collapse="")
 #   =
 ########################################
 
-seqIDs = paste("SEQUENCE_ID=", dfInDels$kmer1, "_", dfInDels$kmer2, sep="")
+seqIDs = paste("SEQUENCE_ID=", dfMarkers$kmer1, "_", dfMarkers$kmer2, sep="")
 primerTemplates = paste("SEQUENCE_TEMPLATE=", seqs, sep="")
 seqLen = 2*extensionLen+kmerLen
 primerRegions = paste("SEQUENCE_PRIMER_PAIR_OK_REGION_LIST=1,", seqLen, ",", seqLen+1,",", seqLen, sep="")
-primerRegions = rep(primerRegions, nrow(dfInDels))
-recordSeps = rep("=", nrow(dfInDels))
+primerRegions = rep(primerRegions, nrow(dfMarkers))
+recordSeps = rep("=", nrow(dfMarkers))
 records = c(rbind(seqIDs, primerTemplates, primerRegions, recordSeps))
 writeLines(records, primer3DataFile)
 
@@ -462,9 +462,9 @@ dfPrimers = dfPrimers[, !colnames(dfPrimers) %in% c("name", "poslenL", "poslenR"
 dfPrimers = dfPrimers[, c("seqL", "tmL", "posL", "lenL", "seqR", "tmR", "posR", "lenR")]
 colnames(dfPrimers) = c("prmSeqL",  "prmTmL",  "prmPosL",  "prmLenL",
     "prmSeqR",  "prmTmR",  "prmPosR",  "prmLenR")
-if (nrow(dfPrimers) != nrow(dfInDels))
+if (nrow(dfPrimers) != nrow(dfMarkers))
     stop("Wrong number of primers returned by primer3")
-dfInDels = cbind(dfInDels, dfPrimers, stringsAsFactors=FALSE)
+dfMarkers = cbind(dfMarkers, dfPrimers, stringsAsFactors=FALSE)
 rm(dfPrimers)
 
 ########################################
@@ -472,20 +472,31 @@ rm(dfPrimers)
 ########################################
 
 {
-catnow("Number of markers initially: ", nrow(dfInDels), "\n")
-catnow("No left primer found:        ", sum(dfInDels$prmSeqL == "" & dfInDels$prmSeqR != ""), "\n")
-catnow("No right primer found:       ", sum(dfInDels$prmSeqL != "" & dfInDels$prmSeqR == ""), "\n")
-catnow("Neither left nor right found:", sum(dfInDels$prmSeqL == "" & dfInDels$prmSeqR == ""), "\n")
-dfInDels = dfInDels[dfInDels$prmSeqL != "" & dfInDels$prmSeqR != "",]
-catnow("Number of markers remaining: ", nrow(dfInDels), "\n")
+catnow("Number of markers initially: ", nrow(dfMarkers), "\n")
+catnow("No left primer found:        ", sum(dfMarkers$prmSeqL == "" & dfMarkers$prmSeqR != ""), "\n")
+catnow("No right primer found:       ", sum(dfMarkers$prmSeqL != "" & dfMarkers$prmSeqR == ""), "\n")
+catnow("Neither left nor right found:", sum(dfMarkers$prmSeqL == "" & dfMarkers$prmSeqR == ""), "\n")
+dfMarkers = dfMarkers[dfMarkers$prmSeqL != "" & dfMarkers$prmSeqR != "",]
+catnow("Number of markers remaining: ", nrow(dfMarkers), "\n")
 }
 
 ########################################
 # If no markers remain, exit with error.
 ########################################
 
-if (nrow(dfInDels) == 0)
+if (nrow(dfMarkers) == 0)
     stop("No markers remaining.")
+
+########################################
+# There may be markers with identical primer-pairs.  This happens when two k-mers
+# are very near each other and the same primer is generated for both, on both the
+# start and end sides of the amplicon.  Get rid of duplicates.  We don't care which
+# ones we discard (losing certain k-mers is not an issue).
+########################################
+
+dupes = duplicated(paste(dfMarkers$prmSeqL, dfMarkers$prmSeqR, sep="_"))
+catnow(sum(dupes), "duplicate primer-pairs removed\n")
+dfMarkers = dfMarkers[!dupes,]
 
 ########################################
 # Add "phase" columns giving the genome strand which matches the reference genome
@@ -496,7 +507,7 @@ if (nrow(dfInDels) == 0)
 
 phaseCol = makeColVec(paste(refGenomeLtr, "phase", sep=""))
 for (genome in genomeLtrs)
-    dfInDels[, phaseCol[genome]] = ifelse(dfInDels[, refStrand1Col] == dfInDels[, strand1Col[genome]], "+", "-")
+    dfMarkers[, phaseCol[genome]] = ifelse(dfMarkers[, refStrand1Col] == dfMarkers[, strand1Col[genome]], "+", "-")
 
 ########################################
 # Change the "prmPosL" and "prmPosR" columns, which give the offset+1 of the 5'
@@ -511,10 +522,10 @@ for (genome in genomeLtrs)
 # concatenated to the kmer1 DNA sequence.
 ########################################
 
-dfInDels$kmer1offset = extensionLen - (dfInDels$prmPosL-1)
+dfMarkers$kmer1offset = extensionLen - (dfMarkers$prmPosL-1)
 seqLen = 2*(2*extensionLen+kmerLen)
 kmer2End = seqLen - extensionLen
-dfInDels$kmer2offset = dfInDels$prmPosR - kmer2End
+dfMarkers$kmer2offset = dfMarkers$prmPosR - kmer2End
 
 ########################################
 # Change the "*pos1" and "*pos2" columns, which give the position of the 5' end
@@ -542,14 +553,14 @@ refAmpPos2Col = ampPos2Col[refGenomeLtr]
 
 for (genome in genomeLtrs)
     {
-    posPhase = (dfInDels[, phaseCol[genome]] == "+")
+    posPhase = (dfMarkers[, phaseCol[genome]] == "+")
     negPhase = !posPhase
-    dfInDels[, ampPos1Col[genome]] = dfInDels[, pos1Col[genome]] - dfInDels$kmer1offset
-    dfInDels[, ampPos2Col[genome]] = dfInDels[, pos2Col[genome]] - dfInDels$kmer2offset
-    dfInDels[negPhase, ampPos1Col[genome]] =
-        dfInDels[negPhase, pos1Col[genome]] + dfInDels[negPhase, "kmer1offset"] + (kmerLen-1)
-    dfInDels[posPhase, ampPos2Col[genome]] =
-        dfInDels[posPhase, pos2Col[genome]] + dfInDels[posPhase, "kmer2offset"] + (kmerLen-1)
+    dfMarkers[, ampPos1Col[genome]] = dfMarkers[, pos1Col[genome]] - dfMarkers$kmer1offset
+    dfMarkers[, ampPos2Col[genome]] = dfMarkers[, pos2Col[genome]] - dfMarkers$kmer2offset
+    dfMarkers[negPhase, ampPos1Col[genome]] =
+        dfMarkers[negPhase, pos1Col[genome]] + dfMarkers[negPhase, "kmer1offset"] + (kmerLen-1)
+    dfMarkers[posPhase, ampPos2Col[genome]] =
+        dfMarkers[posPhase, pos2Col[genome]] + dfMarkers[posPhase, "kmer2offset"] + (kmerLen-1)
     }
 
 ########################################
@@ -562,8 +573,8 @@ ampLenCol = makeColVec("ampLen")
 refAmpLenCol = ampLenCol[refGenomeLtr]
 for (genome in genomeLtrs)
     {
-    dfInDels[, ampLenCol[genome]] = abs(dfInDels[, ampPos1Col[genome]] - dfInDels[, ampPos2Col[genome]]) + 1
-    dfInDels = dfInDels[, colnames(dfInDels) != kkLenCol[genome]]
+    dfMarkers[, ampLenCol[genome]] = abs(dfMarkers[, ampPos1Col[genome]] - dfMarkers[, ampPos2Col[genome]]) + 1
+    dfMarkers = dfMarkers[, colnames(dfMarkers) != kkLenCol[genome]]
     }
 
 ########################################
@@ -574,14 +585,14 @@ for (genome in genomeLtrs)
 
 difToRefCol = makeColVec(paste(refGenomeLtr, "dif", sep=""))
 for (genome in otherGenomeLtrs)
-    dfInDels[, difToRefCol[genome]] = dfInDels[, ampLenCol[genome]] - dfInDels[, refAmpLenCol]
+    dfMarkers[, difToRefCol[genome]] = dfMarkers[, ampLenCol[genome]] - dfMarkers[, refAmpLenCol]
 
 ########################################
 # Concatenate the k-mer strand signs of all genomes into a single column.
 ########################################
 
-dfInDels$kmer1strands = apply(dfInDels[, strand1Col], 1, paste, collapse="")
-dfInDels$kmer2strands = apply(dfInDels[, strand2Col], 1, paste, collapse="")
+dfMarkers$kmer1strands = apply(dfMarkers[, strand1Col], 1, paste, collapse="")
+dfMarkers$kmer2strands = apply(dfMarkers[, strand2Col], 1, paste, collapse="")
 
 ########################################
 # Put the data in a nice order and write it to the output file.
@@ -613,15 +624,15 @@ for (genome in genomeLtrs)
     colOrder = c(colOrder, dnaSeq1Col[genome], dnaSeq2Col[genome])
 
 # Put the columns in order and discard unwanted columns.
-dfInDels = dfInDels[, colOrder[]]
-rownames(dfInDels) = NULL
+dfMarkers = dfMarkers[, colOrder[]]
+rownames(dfMarkers) = NULL
 
 ########################################
-# Write the dfInDels data frame to the output file.
+# Write the dfMarkers data frame to the output file.
 ########################################
 
-write.table(dfInDels, tsvMarkerFile, col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
-# dfInDels = read.table(tsvMarkerFile, header=TRUE, sep="\t", stringsAsFactors=FALSE)
+write.table(dfMarkers, tsvMarkerFile, col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
+# dfMarkers = read.table(tsvMarkerFile, header=TRUE, sep="\t", stringsAsFactors=FALSE)
 
 catnow("Finished adding primer sequences to indels, candidate marker output file:\n", tsvMarkerFile, "\n")
 }

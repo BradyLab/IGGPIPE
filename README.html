@@ -1,8 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta name="generator" content="AsciiDoc 8.6.9">
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>SCARF</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -733,8 +734,8 @@ asciidoc.install();
 <body class="article">
 <div id="header">
 <h1>SCARF</h1>
-<span id="author">Ted Toal</span><br>
-<span id="email" class="monospaced">&lt;<a href="mailto:twtoal@ucdavis.edu">twtoal@ucdavis.edu</a>&gt;</span><br>
+<span id="author">Ted Toal</span><br />
+<span id="email"><code>&lt;<a href="mailto:twtoal@ucdavis.edu">twtoal@ucdavis.edu</a>&gt;</code></span><br />
 <span id="revnumber">version 0.0,</span>
 <span id="revdate">Aug 2015</span>
 </div>
@@ -742,9 +743,9 @@ asciidoc.install();
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph"><p>The BradyLab/SCARF GitHub repository contains code and documentation for the
-software package called <strong>SCARF</strong> (SCAR Finder).</p></div>
+software package called <strong>SCARF</strong> (<strong>SCAR</strong> <strong>F</strong>inder).</p></div>
 <div class="paragraph"><p><strong>SCARF</strong> analyzes two or more genomes
-for length-polymorphic regions bounded by unique sequences, and designs PCR
+for length-polymorphic regions bounded by unique sequences and designs PCR
 primers within these sequences. The primers can be used to amplify the region
 from genomic DNA of any of the species used to create the markers, and the
 amplicon size will indicate which species the DNA came from - a <strong>SCAR</strong> marker.</p></div>
@@ -754,18 +755,23 @@ amplicon size will indicate which species the DNA came from - a <strong>SCAR</st
 <div class="sect1">
 <h2 id="_download_installation_and_running">Download, Installation, and Running</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Installation instructions are for Mac OSX. For other systems you are on your own,
-but please take copious notes and send them to me, and I&#8217;ll update these instructions.</p></div>
-<div class="olist arabic"><div class="title"><strong>To download SCARF files:</strong></div><ol class="arabic">
+<div class="sect2">
+<h3 id="_strong_requirements_strong"><strong>Requirements</strong></h3>
+<div class="ulist"><ul>
+<li>
+<p>
+The installation instructions are for Mac OSX. For other systems you are on your own,
+but please take copious notes and send them to me, and I&#8217;ll update these instructions.
+</p>
+</li>
+</ul></div>
+</div>
+<div class="sect2">
+<h3 id="_strong_download_scarf_files_strong"><strong>Download SCARF files</strong></h3>
+<div class="olist arabic"><ol class="arabic">
 <li>
 <p>
 Browse to <a href="https://github.com/BradyLab/SCARF">https://github.com/BradyLab/SCARF</a>
-</p>
-</li>
-<li>
-<p>
-In upper-left area of screen, find drop-down box Branch:master, click to open it,
-and choose the "release" branch.
 </p>
 </li>
 <li>
@@ -781,47 +787,63 @@ Unzip the zip file on your computer.
 </li>
 <li>
 <p>
-Rename the unzipped folder from "SCARF-release" to just "SCARF".
+Rename the unzipped folder from "SCARF-master" to just "SCARF".
 </p>
 </li>
 </ol></div>
-<div class="ulist"><div class="title"><strong>To install SCARF:</strong></div><ul>
+</div>
+<div class="sect2">
+<h3 id="_strong_install_scarf_strong"><strong>Install SCARF</strong></h3>
+<div class="ulist"><ul>
 <li>
 <p>
-Look inside the downloaded SCARF folder on your computer for file INSTALL.asciidoc
-and open it with a NotePad or TextEdit or other ASCII text editor and follow the
-installation instructions.
+Look inside the downloaded SCARF folder on your computer for file INSTALL.pdf
+or INSTALL.html and open either one and follow the instructions.
 </p>
 </li>
 </ul></div>
-<div class="ulist"><div class="title"><strong>To run SCARF and generate markers:</strong></div><ul>
+</div>
+<div class="sect2">
+<h3 id="_strong_run_scarf_to_generate_markers_after_installation_strong"><strong>Run SCARF to generate markers after installation</strong></h3>
+<div class="ulist"><ul>
 <li>
 <p>
-After installing SCARF using instructions in INSTALL.asciidoc, find file RUN.asciidoc
-in the SCARF folder on your computer and open it and follow the run instructions.
+Find file RUN.pdf or RUN.html in the SCARF folder on your computer and open
+either one and follow the instructions.
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p><strong>For help, contact Ted Toal, <a href="mailto:twtoal@ucdavis">twtoal@ucdavis</a>.edu</strong></p></div>
+</div>
+<div class="sect2">
+<h3 id="_strong_for_help_contact_strong"><strong>For help, contact:</strong></h3>
+<div class="ulist"><ul>
+<li>
+<p>
+Ted Toal, <a href="mailto:twtoal@ucdavis.edu">twtoal@ucdavis.edu</a>
+</p>
+</li>
+</ul></div>
+</div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_references">References</h2>
 <div class="sectionbody">
-<div class="ulist bibliography"><div class="title">SCAR markers were defined here:</div><ul>
+<div class="ulist bibliography"><div class="title"><strong>SCAR markers were defined here:</strong></div><ul>
 <li>
 <p>
-<a id="Paran"></a>[Paran], I., and R. W. Michelmore. <em>Development of reliable PCR-based markers
+Paran, I., and Michelmore, R. W. <em>Development of reliable PCR-based markers
 linked to downy mildew resistance genes in lettuce.</em> Theoretical and Applied
 Genetics 85.8 (1993): 985-993.
 </p>
 </li>
 </ul></div>
-<div class="ulist bibliography"><div class="title">The SCARF software is described in:</div><ul>
+<div class="ulist bibliography"><div class="title"><strong>The SCARF software is described in:</strong></div><ul>
 <li>
 <p>
-<a id="Toal"></a>[Toal], T., and . <em>SCARF: In silico K-mer-based Pipeline Finds Candidate
-SCAR Genomic Markers and PCR Primers using NGS Data and Tomato Test Case</em>
+Toal, T., Burkart-Waco, D., and Brady, S.M. <em>SCARF: In silico K-mer-based Pipeline Finds Candidate
+SCAR Genomic Markers and PCR Primers using NGS Data and Tomato/Potato/Pennellii
+Test Case</em>
 (Publication in process)
 </p>
 </li>
@@ -829,11 +851,11 @@ SCAR Genomic Markers and PCR Primers using NGS Data and Tomato Test Case</em>
 </div>
 </div>
 </div>
-<div id="footnotes"><hr></div>
+<div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Version 0.0<br>
-Last updated 2015-08-16 20:28:00 PDT
+Version 0.0<br />
+Last updated 2015-08-20 07:33:35 PDT
 </div>
 </div>
 </body>

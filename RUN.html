@@ -743,16 +743,15 @@ asciidoc.install();
 <div class="paragraph"><p>This describes how to run the SCARF software to analyze two or more genome
 sequences and produce a file of candidate SCAR marker primer pairs for amplifying
 length-polymorphic regions of those genomes.</p></div>
-<div class="olist arabic"><div class="title"><strong>If not done already, download SCARF files:</strong></div><ol class="arabic">
+</div>
+</div>
+<div class="sect1">
+<h2 id="_strong_if_not_done_already_download_scarf_files_strong"><strong>If not done already, download SCARF files</strong></h2>
+<div class="sectionbody">
+<div class="olist arabic"><ol class="arabic">
 <li>
 <p>
 Browse to <a href="https://github.com/BradyLab/SCARF">https://github.com/BradyLab/SCARF</a>
-</p>
-</li>
-<li>
-<p>
-In upper-left area of screen, find drop-down box Branch:master, click to open it,
-and choose the "release" branch.
 </p>
 </li>
 <li>
@@ -768,20 +767,42 @@ Unzip the zip file on your computer.
 </li>
 <li>
 <p>
-Rename the unzipped folder from "SCARF-release" to just "SCARF".
+Rename the unzipped folder from "SCARF-master" to just "SCARF".
 </p>
 </li>
 </ol></div>
-<div class="ulist"><div class="title"><strong>If not done already, install SCARF:</strong></div><ul>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_strong_if_not_done_already_install_scarf_strong"><strong>If not done already, install SCARF</strong></h2>
+<div class="sectionbody">
+<div class="ulist"><ul>
 <li>
 <p>
 Look inside the downloaded SCARF folder on your computer for file INSTALL.pdf
-and open it with a NotePad or TextEdit or other ASCII text editor and follow the
-installation instructions.
+or INSTALL.html and open either one and follow the instructions.
 </p>
 </li>
 </ul></div>
-<div class="olist arabic"><div class="title"><strong>To run SCARF and generate markers:</strong></div><ol class="arabic">
+</div>
+</div>
+<div class="sect1">
+<h2 id="_strong_requirements_for_running_scarf_strong"><strong>Requirements for running SCARF</strong></h2>
+<div class="sectionbody">
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+<strong>Obtain genome FASTA files</strong>
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>SCARF uses as input two or more FASTA files of complete genome sequences (at
+least one of which is assembled into chromosomes, the other(s) can be in the
+scaffold state). You should know ahead of time <strong>which</strong> genomes you are
+comparing.  If you haven&#8217;t already, download their genomic FASTA files, which
+are required.</p></div>
+</div></div>
+</li>
 <li>
 <p>
 <strong>Work from the command line</strong>
@@ -802,6 +823,22 @@ one of these:</p></div>
 </li>
 <li>
 <p>
+<strong>Work in the SCARF main directory unless otherwise instructed</strong>
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>While working from the command line to install SCARF, most of the time you will
+be in the SCARF main directory, unless instructed otherwise. If you unzipped
+the SCARF zip file in your Documents folder, you would change into the SCARF
+directory with this command:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>cd ~/Documents/SCARF</code></pre>
+</div></div>
+</div></div>
+</li>
+<li>
+<p>
 <strong>Know how to use a plain text editor and have one available</strong>
 </p>
 <div class="openblock">
@@ -813,19 +850,13 @@ Store (Applications, App Store) or from:</p></div>
 <div class="paragraph"><p><a href="http://www.barebones.com/products/textwrangler">http://www.barebones.com/products/textwrangler</a></p></div>
 </div></div>
 </li>
-<li>
-<p>
-<strong>Obtain genome FASTA files</strong>
-</p>
-<div class="openblock">
-<div class="content">
-<div class="paragraph"><p>SCARF uses as input two or more FASTA files of complete genome sequences (at
-least one of which is assembled into chromosomes, the other(s) can be in the
-scaffold state). You should know ahead of time <strong>which</strong> genomes you are
-comparing.  If you haven&#8217;t already, download their genomic FASTA files, which
-are required.</p></div>
-</div></div>
-</li>
+</ol></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_strong_running_scarf_strong"><strong>Running SCARF</strong></h2>
+<div class="sectionbody">
+<div class="olist arabic"><ol class="arabic">
 <li>
 <p>
 <strong>Assign a single capital letter name to each genome</strong>
@@ -846,7 +877,7 @@ example, I used H=Heinz and P=pennellii for some of my testing.</p></div>
 <div class="content">
 <div class="paragraph"><p>SCARF has a number of parameters that must be set to the values you desire. These
 are contained in plain text files whose name starts with "allParameters". During
-SCARF installation, a file should have been created named "allParameters.mytemplate".
+SCARF installation, a file should have been created named <strong>allParameters.mytemplate</strong>.
 This is a template containing some parameters already set correctly for your system.
 You need to copy and edit this file to change other parameters to the settings you
 want. You should make a new parameter file for each different set of settings you
@@ -857,12 +888,12 @@ parameter files. Here, we assume to begin with that you are only running your ge
 with a single set of parameters, and we will name the parameter file allParameters.XY
 where X and Y are the genome capital letters you chose. It is convenient to include
 those letters in the file name, to help you keep multiple parameter file straight.
-Copy allParameters.mytemplate to allParameters.XY (substituting your genome letters
+<strong>Copy allParameters.mytemplate to allParameters.XY</strong> (substituting your genome letters
 for X and Y), using either the Mac&#8217;s Finder or via the command line. For example:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>cd ~/Documents/SCARF    (or whatever is appropriate for your system)
-cp allParameters.mytemplate allParameters.HP</code></pre>
+cp allParameters.mytemplate allParameters.HP    (here, X=H, Y=P)</code></pre>
 </div></div>
 </div></div>
 </li>
@@ -872,9 +903,9 @@ cp allParameters.mytemplate allParameters.HP</code></pre>
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>Open the new allParameters.XY file created above in your plain text editor
+<div class="paragraph"><p>Open the new <strong>allParameters.XY</strong> file created above in your plain text editor
 for editing. If you are in a hurry, you don&#8217;t need to read anything in the file, but
-can simply search for "# ", which are comment lines marking items that may need
+can simply <strong>search for "# "</strong>, which are comment lines marking items that may need
 to be changed. Each "#" comment says whether it must be changed, might need to
 be changed, or probably will never need to be changed, etc. Many of these items
 typically will never need to be changed, so the actual number of changes that need
@@ -895,7 +926,7 @@ parameter values for your needs.</p></div>
 <div class="paragraph"><p>Search for "# " in the allParameters.XY file and check each one to see if it
 needs to be changed. If so, set it to the value you desire. Parameters you will
 definitely want to review and consider are:</p></div>
-<div class="olist arabic"><ol class="arabic">
+<div class="olist loweralpha"><ol class="loweralpha">
 <li>
 <p>
 K
@@ -962,6 +993,21 @@ EPCR_MAX_MISMATCH and EPCR_MAX_GAPS
 </li>
 <li>
 <p>
+<strong>Check Primer3 settings in primer3settings.txt</strong>
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>The file <strong>primer3settings.txt</strong> contains parameter settings for Primer3, which
+is used to generate the actual primers. This file should have been edited
+during SCARF installation to make any obvious changes you might need for
+your primers. However, it is possible that for a specific run of SCARF, you
+might want to use different settings. If so, edit primer3settings.txt and
+make the desired changes. (You may want to save a backup copy of the original
+version).</p></div>
+</div></div>
+</li>
+<li>
+<p>
 <strong>Run SCARF with the command "make PARAMS=allParameters.XY ALL"</strong>
 </p>
 <div class="openblock">
@@ -973,8 +1019,8 @@ primers. The task of running all this software has been automated using a
 for reading the allParameters.XY parameter file and running the software applications.
 The Makefile is applied by using the application named "make", which was installed
 when SCARF was installed, if it didn&#8217;t already exist.</p></div>
-<div class="paragraph"><p>A big advantage of using "Makefile" and "make" is that if something goes wrong,
-and unfortunately, it probably will, the portion of the work successfully completed
+<div class="paragraph"><p>A big advantage of using "Makefile" and "make" is that if something goes wrong
+(and unfortunately, it probably will), the portion of the work successfully completed
 is not lost, and does not need to be repeated. This is important because it can take
 quite a long time to run genomes all the way through the SCARF software. Depending
 on your computer speed and memory, it can take hours or even days.</p></div>
@@ -985,14 +1031,14 @@ anticipate how often errors will occur, or what will cause them. Please email me
 with information about errors, and their resolution if you were able to resolve
 them. I&#8217;ll try to make improvements to SCARF in error handling and in its input
 data format flexibility to try to prevent errors.</p></div>
-<div class="paragraph"><p>After the allParameters.XY file is edited and ready to go, run the SCARF pipeline
-from the SCARF directory as follows:</p></div>
+<div class="paragraph"><p>After the allParameters.XY file is edited and ready to go, <strong>run the SCARF pipeline
+from the SCARF directory as follows</strong>:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>cd ~/Documents/SCARF    (or whatever is appropriate for your system)
 make PARAMS=allParameters.XY ALL    (replacing XY with your genome letters)</code></pre>
 </div></div>
-<div class="paragraph"><p>If "make" stops with the message "ALL files are up to date", it has completed
+<div class="paragraph"><p>If "make" stops with the message <strong>ALL files are up to date</strong>, it has completed
 the analysis successfully. Otherwise, look for an error message and try to
 diagnose it. I am available to a limited extent via email, for a while, to try
 to assist in diagnosing problems.  If you fix something and want to retry running
@@ -1021,8 +1067,8 @@ to get more complete usage information for running "make":</p></div>
 <div class="content">
 <pre><code>make usage</code></pre>
 </div></div>
-<div class="paragraph"><p>Again, your final goal is to have "make" stop with the message "ALL files are up
-to date"</p></div>
+<div class="paragraph"><p>Again, your final goal is to have "make" stop with the message <strong>ALL files are up
+to date</strong></p></div>
 </div></div>
 </li>
 <li>
@@ -1040,7 +1086,7 @@ the parameter settings otherwise, the file names are very long and cumbersome, b
 they include parameter values in them. You may want to copy files to a shorter name
 to work with them. The main ones of interest (using "*" in place of the long text),
 again assuming you didn&#8217;t change their names in the parameter file, are:</p></div>
-<div class="olist arabic"><ol class="arabic">
+<div class="olist loweralpha"><ol class="loweralpha">
 <li>
 <p>
 MarkerCounts_*.plot.pdf is a pdf file showing plots of marker counts on chromosomes
@@ -1069,7 +1115,7 @@ explanation of the parameter OVERLAP_REMOVAL in the comments in allParameters.XY
 The two .tsv files contain the SCAR marker positions and primer sequences, among
 other things.</p></div>
 <div class="paragraph"><p>Several other ".tsv" tab-separated output files exist:</p></div>
-<div class="olist arabic"><ol class="arabic">
+<div class="olist loweralpha"><ol class="loweralpha">
 <li>
 <p>
 MarkerErrors_*.tsv contains candidate markers rejected because e-PCR failed
@@ -1106,7 +1152,12 @@ document.</p></div>
 </div></div>
 </li>
 </ol></div>
-<div class="olist arabic"><div class="title"><strong>Post-processing tools:</strong></div><ol class="arabic">
+</div>
+</div>
+<div class="sect1">
+<h2 id="_strong_post_processing_tools_strong"><strong>Post-processing tools</strong></h2>
+<div class="sectionbody">
+<div class="olist arabic"><ol class="arabic">
 <li>
 <p>
 <strong>Dot plots</strong>
@@ -1169,6 +1220,11 @@ using the markers generated via the allParameters.test.template configuration fi
 </div></div>
 </li>
 </ol></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_strong_tables_strong"><strong>Tables</strong></h2>
+<div class="sectionbody">
 <div class="tableblock">
 <table rules="all"
 width="100%"
@@ -1524,7 +1580,7 @@ cellspacing="0" cellpadding="4">
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-08-19 10:29:29 PDT
+Last updated 2015-08-19 20:29:14 PDT
 </div>
 </div>
 </body>

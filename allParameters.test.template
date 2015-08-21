@@ -72,10 +72,10 @@ PATH_RSCRIPT := /usr/bin/Rscript
 # built primer3 or to the place where you moved it such as a bin directory.
 ### CHANGE THIS TO YOUR PATH.
 
-# In this example, after building the primer3 program in my ~/bin directory, the
-# primer3core file was located in that directory.
+# In this example, after downloading the pre-built OSX primer3 package, I moved
+# the primer3-2.3.6 directory containing the files to my ~/src directory.
 ####CHANGE
-PATH_PRIMER3CORE := ~/bin/primer3_core
+PATH_PRIMER3CORE := ~/src/primer3-2.3.6/primer3_core
 
 
 # Path to the file that is the 'e-PCR' program file that is part of the NCBI
@@ -83,10 +83,10 @@ PATH_PRIMER3CORE := ~/bin/primer3_core
 # e-PCR or to the place where you copied it such as a bin directory.
 ### CHANGE THIS TO YOUR PATH.
 
-# In this example, after building the e-PCR program in one directory, I copied
-# it to my ~/bin directory.
+# In this example, I downloading the e-PCR zip file to my ~/src folder and
+# unzipped it and built "e-PCR" there.
 ####CHANGE
-PATH_EPCR := ~/bin/e-PCR
+PATH_EPCR := ~/src/e-PCR-2.3.12/e-PCR
 
 
 ################################################################################
