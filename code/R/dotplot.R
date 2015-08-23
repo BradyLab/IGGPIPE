@@ -306,8 +306,8 @@ if (!file.exists(L$Y.idlens))
 if (!L["PLOT.which"] %in% c("points", "lines"))
     stop("PLOT.which must be either 'points' or 'lines'")
 
-L$X.plot.seqids = strsplit(L$X.plot.seqids, ",", fixed=TRUE)[[1]]
-L$Y.plot.seqids = strsplit(L$Y.plot.seqids, ",", fixed=TRUE)[[1]]
+L$X.plot.seqids = strsplit(gsub(" ", "", L$X.plot.seqids), ",", fixed=TRUE)[[1]]
+L$Y.plot.seqids = strsplit(gsub(" ", "", L$Y.plot.seqids), ",", fixed=TRUE)[[1]]
 
 ################################################################################
 # Read data files.
