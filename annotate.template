@@ -1,0 +1,738 @@
+################################################################################
+# This is a template for a parameter file for running the R program
+# annotateFile.R, which:
+#   1. Converts files between .csv, .tsv, .gff3, and .gtf formats.
+#   2. Match and merge: Adds new columns to data tables in such files by using
+#       position data in each table to match up rows of one with rows of the
+#       other, then copying data from matching rows of one table into the other
+#       table's corresponding matching rows.
+#
+# As an example of match and merge, a file of SCAR markers could have a column
+# added which gives the nearest gene to the marker (obtained from a gene model
+# .gff3 file) and the distance from the marker to the gene.  As another example,
+# a file of SCAR markers could have a column added which lists the introgression
+# lines whose introgression includes the marker, and gives the position of the
+# marker within the introgression.
+#
+# This file is currently configured to use the MarkersOverlapping.test.tsv file
+# produced as a result of running SCARF using the test parameter file named
+# allParameters.test.template.  It also uses the file ITAG2.4_test.gff3 in the
+# SCARF subfolder code/R/test_GFFfuncsAndMergeData, which is a gene model file
+# in GFF3 format for the truncated chromosome data testFASTA/ITAG2.4_test.fasta,
+# which is used as one of the genomes by allParameters.test.template.  It adds
+# a column named "genes" that contains a comma-separated list of gene IDs of
+# genes that overlap or are within 3K bp of the marker.
+#
+# Therefore, you can test annotateFile.R by running this command from the SCARF
+# main directory:
+#
+#   Rscript code/R/annotateFile.R annotate.template
+#
+# To do your own file conversions and match and merges, copy this file to another
+# filename and edit it to set the parameters for your own needs.
+#
+# Many parameters are only relevant when a preceding parameter has been set to
+# a particular value.  Comments will describe each one.
+################################################################################
+
+
+
+################################################################################
+################################################################################
+# Input files(s).  One or two input files may be specified.  Two are specified
+# only if doing match and merge.
+#
+# For simple file conversion, specify only inputFileT.
+#
+# To add columns to one file using matched positions between it and another file
+# that contains data to be added, specify InputFileT for the file to which
+# columns are to be added, and specify InputFileS for the the file containing
+# data to be added.  Both files must contain compatible position information.
+################################################################################
+################################################################################
+
+
+################################################################################
+# inputFileT
+################################################################################
+
+# Parameters describing the first input file.  The letter "T" in the name is for
+# "target", because this input file's data is the "target" of a match and merge
+# (if one is done) and is the "target" data written to the output file.
+
+inputFileT:
+
+    # Path of the input file, relative to directory from which annotateFile.R is run.
+
+    path := "MarkersOverlapping.test.tsv"
+
+    # Type of file, one of:
+    #   "tsv" (tab-separated variables)
+    #   "csv" (comma-separated variables)
+    #   "gff3" (general feature format v3, often used for genome features)
+    #   "gtf" (gene transfer format, similar to but more precisely defined than a gff3)
+    # If either "gff3" or "gtf" is specified, the data columns will be named:
+    #   "seqname", "source", "feature", "start", "end", "score", "strand", "frame", "attributes"
+
+    type := tsv
+
+    # Column names for the file, or "" if the file contains column names on the first (header) line.
+    # Ignored for .gff3 and .gtf files.
+
+    columns := ""
+
+    # If there is a header line in the file and it has one fewer field than the other lines
+    # (a common technique when the first field is meant to be a data row name), this gives
+    # the name to use for that first unnamed column.  (Row names are not otherwise used).
+    # Set this to "" to ignore such columns.  Ignored for .gff3 and .gtf files.
+
+    column1 := "" # Not used in this file.
+
+    # Characters use as quotation marks in the file.  If for example the data of a column contains
+    # a comma within a csv (comma-separated) file, the data must be quoted to eliminate confusion.
+    # This can be "" for no quotation mark characters.
+    # Ignored for .gff3 and .gtf files.
+
+    quote := "'""  # Allow either single or double quote.
+
+    # Character to be interpreted as a comment character so that rest of line is ignored.  Use "" for none.
+    # Ignored for .gff3 and .gtf files.
+    
+    comment := ""
+
+    # Column names to retain (not remove), or "" to retain all columns.
+    # This is used for all file types including for .gff3 and .gtf files.
+
+    keepColumns := ""
+
+
+################################################################################
+# inputFileS
+################################################################################
+
+# Parameters describing the second input file.  The letter "S" in the name is for
+# "source", because this input file's data is the "source" for a match and merge
+# operation.
+
+inputFileS:
+
+    # Path of the input file, relative to directory from which annotateFile.R is run.
+    # Set this to "" to disable match and merge and ignore the remaining parameters
+    # in this section.
+    path := "code/R/test_GFFfuncsAndMergeData/ITAG2.4_test.gff3"
+
+    # Type of file, one of:
+    #   "tsv" (tab-separated variables)
+    #   "csv" (comma-separated variables)
+    #   "gff3" (general feature format v3, often used for genome features)
+    #   "gtf" (gene transfer format, similar to but more precisely defined than a gff3)
+    # If either "gff3" or "gtf" is specified, the data columns will be named:
+    #   "seqname", "source", "feature", "start", "end", "score", "strand", "frame", "attributes"
+
+    type := gff3
+
+    # Column names for the file, or "" if the file contains column names on the first (header) line.
+    # Ignored for .gff3 and .gtf files.
+
+    columns := ""
+
+    # If there is a header line in the file and it has one fewer field than the other lines
+    # (a common technique when the first field is meant to be a data row name), this gives
+    # the name to use for that first unnamed column.  (Row names are not otherwise used).
+    # Set this to "" to ignore such columns.  Ignored for .gff3 and .gtf files.
+
+    column1 := "" # Not used in this file.
+
+    # Characters use as quotation marks in the file.  If for example the data of a column contains
+    # a comma within a csv (comma-separated) file, the data must be quoted to eliminate confusion.
+    # This can be "" for no quotation mark characters.
+    # Ignored for .gff3 and .gtf files.
+
+    quote := "'""  # Allow either single or double quote.
+
+    # Character to be interpreted as a comment character so that rest of line is ignored.  Use "" for none.
+    # Ignored for .gff3 and .gtf files.
+    
+    comment := ""
+
+    # Column names to retain (not remove), or "" to retain all columns.
+    # This is used for all file types including for .gff3 and .gtf files.
+
+    keepColumns := ""
+
+
+################################################################################
+################################################################################
+# Attribute extraction from input files when they are a gff3 or gtf file or when
+# the file has an attributes column.
+#
+# Files of type gff3 and gtf are text files with 9 columns.  One column contains
+# a sequence ID (such as a chromosome ID).  Two columns contain a start and stop
+# position within that sequence ID.  One column contains "attributes".  Attributes
+# are items having a name and a value.  The attributes column may contain more than
+# one attribute.  The format of the attributes differs between gff3 and gtf files.
+#
+#   gff3 file attribute column example:
+#
+#     ID=gene:Solyc01g005000.2;Name=Solyc01g005000.2;Alias=Solyc01g005000;length=2187
+#
+#   gtf file attribute column example:
+#
+#     ID "gene:Solyc01g005000.2"; Name "Solyc01g005000.2"; Alias "Solyc01g005000"; length 2187
+#
+# In both these cases, there are four attributes present in the attributes string
+# that we see here.  Their names are "ID", "Name", "Alias", and "length".  Their
+# values are "gene:Solyc01g005000.2", "Solyc01g005000.2", "Solyc01g005000", and
+# "2187", respectively.
+#
+# The following parameters let you specify that one or more attributes with the
+# names you specify are to be extracted from the attributes column and their
+# values placed in a separate column.
+#
+# For example, given the above, you could specify that the "Alias" attribute is
+# to be extracted and placed in a column named "gene".
+#
+# Why would you want to do this?  First, maybe you want to convert a gff3 file
+# to a .tsv file and extract certain information, such as a list of gene names
+# and their lengths.  Second, if you are doing match and merge from a gff3 file
+# into a tsv file based on position, you may want to extract an attribute as a
+# new column so you can add that column to the merged data frame.  As an example,
+# suppose the gff3 file is a gene model file and you want to annotate a marker
+# file with the name of the nearest gene.  The gene name in a gff3 file appears
+# in the attribute list, as you can see in the above samples. You would want to
+# extract the gene name from the attributes so it can be inserted as a new column
+# in the marker file.
+#
+# Another column in the gff3 and gtf files that you need to know about is the
+# "feature" column, which contains a single word that describes what that row's
+# data is for.  Typically the "feature" column has words such as "gene", "mRNA",
+# "intron", "exon", "CDS".  In the case where you are extracting attribute values
+# for merging data into a second file, you may want to exclude all but one feature.
+# For example, you may be interested only in the rows that are "gene" features, if
+# you want to obtain a list of gene names.  The parameters below let you include
+# only specific features, and delete the other feature rows from the data.
+#
+# There are two identical sets of parameters below, one for use with inputFileT
+# and the other for inputFileS.
+################################################################################
+################################################################################
+
+
+################################################################################
+# inputFileT attribute extraction.
+################################################################################
+
+# inputFileT attribute extraction parameters.
+
+attrExtractT:
+
+    # Name of data column that contains attributes, or "" to NOT extract
+    # attributes (and the remaining parameters are ignored).
+    # For gff3 and gtf files, this must be set to "attributes", which is the
+    # column name that is set internally for those file types.  If you have an
+    # attributes column in a tsv or csv file, you can extract attributes from
+    # it by specifying the column name here.
+
+    attributesColumn := attributes
+
+    # Feature name(s) to keep.  If this is "", all feature names in the file
+    # are retained.  Otherwise, this must be a comma-separated list of one or
+    # more feature names to be retained.  Examine the start of the file using
+    # a text editor or command line "more" if you don't know the feature names.
+    # The feature column is the third column.
+
+    keepFeatures := gene
+
+    # Names of attributes to extract into separate columns.  This must be a comma-
+    # separated list of one or more attribute names.  If this is "", ALL attribute
+    # names are extracted into separate columns (except those specified in the
+    # "excludeAttrs" parameter).
+
+    extractAttrs := Alias
+
+    # Names of attributes to exclude when extracting attributes into separate columns.
+    # This must be a comma-separated list of one or more attribute names.  If this
+    # is "", no attributes are specifically excluded.
+
+    excludeAttrs := ""
+
+    # Names to give to the new columns of extracted attributes, comma-separated and
+    # in the same order as the attributes were listed in parameter "extractAttrs".
+    # If this is "", the columns are named using the attribute name.
+
+    newAttrColumns := ""
+
+    # Values to place in the data rows that do not have that attribute present in
+    # the attributes column.  This must be a comma-separated list of values, one
+    # for each new column in the same order as the attributes were listed in
+    # parameter "extractAttrs", and the values are used in the rows when the
+    # attribute is missing from that row.  The values may be empty ("" or "a,,b"
+    # for example), causing an empty value in that row for that new column.  If
+    # "R.NA" is specified for a value, the R language "NA" value is used for an
+    # empty value.  If only one value is specified and more than one attribute
+    # column is extracted, that one value is used for empty values for all columns.
+
+    missingAttrValues := ""
+
+    # Set this to YES to remove the attributes column after extracting attributes.
+    # Set it to NO to leave the attributes column, which is modified so that it
+    # no longer contains the extracted attributes.
+
+    removeAttrColumns := YES
+
+
+################################################################################
+# inputFileS attribute extraction.
+################################################################################
+
+# inputFileS attribute extraction parameters.
+
+attrExtractS:
+
+    # Name of data column that contains attributes, or "" to NOT extract
+    # attributes (and the remaining parameters are ignored).
+    # For gff3 and gtf files, this must be set to "attributes", which is the
+    # column name that is set internally for those file types.  If you have an
+    # attributes column in a tsv or csv file, you can extract attributes from
+    # it by specifying the column name here.
+
+    attributesColumn := attributes
+
+    # Feature name(s) to keep.  If this is "", all feature names in the file
+    # are retained.  Otherwise, this must be a comma-separated list of one or
+    # more feature names to be retained.  Examine the start of the file using
+    # a text editor or command line "more" if you don't know the feature names.
+    # The feature column is the third column.
+
+    keepFeatures := gene
+
+    # Names of attributes to extract into separate columns.  This must be a comma-
+    # separated list of one or more attribute names.  If this is "", ALL attribute
+    # names are extracted into separate columns (except those specified in the
+    # "excludeAttrs" parameter).
+
+    extractAttrs := Alias
+
+    # Names of attributes to exclude when extracting attributes into separate columns.
+    # This must be a comma-separated list of one or more attribute names.  If this
+    # is "", no attributes are specifically excluded.
+
+    excludeAttrs := ""
+
+    # Names to give to the new columns of extracted attributes, comma-separated and
+    # in the same order as the attributes were listed in parameter "extractAttrs".
+    # If this is "", the columns are named using the attribute name.
+
+    newAttrColumns := "gene"
+
+    # Values to place in the data rows that do not have that attribute present in
+    # the attributes column.  This must be a comma-separated list of values, one
+    # for each new column in the same order as the attributes were listed in
+    # parameter "extractAttrs", and the values are used in the rows when the
+    # attribute is missing from that row.  The values may be empty ("" or "a,,b"
+    # for example), causing an empty value in that row for that new column.  If
+    # "R.NA" is specified for a value, the R language "NA" value is used for an
+    # empty value.  If only one value is specified and more than one attribute
+    # column is extracted, that one value is used for empty values for all columns.
+
+    missingAttrValues := ""
+
+    # Set this to YES to remove the attributes column after extracting attributes.
+    # Set it to NO to leave the attributes column, which is modified so that it
+    # no longer contains the extracted attributes.
+
+    removeAttrColumns := YES
+
+
+
+################################################################################
+################################################################################
+# Matching and merging of column data from inputFileS into inputFileT is
+# controlled by the parameters in this section.  It is done by finding matching
+# pairs of rows using position information in both files to find overlapping
+# and/or nearby data, and then by formatting the data in specified columns of
+# the matching rows according to a format you specify, and inserting this
+# formatted data as new columns in inputFileT.
+#
+# These parameters are ignored unless both input files were specified.
+#
+# inputFileT has the data to which additional columns are added by the match and
+# merge, and that data is what is written to the output file.
+#
+# inputFileS has data which is added to inputFileT in a manner controlled by
+# position information in both files, and controlled by formatting parameters
+# specified here.
+################################################################################
+################################################################################
+
+
+################################################################################
+# Match and merge: inputFileT position columns.
+################################################################################
+
+# inputFileT position parameters for match and merge.  These parameters are
+# ignored if match and merge is disabled (inputFileS is not specified).
+
+positionT:
+
+    # Name of the data column in inputFileT that contains the starting position,
+    # or in the case of non-contig SNP-like data, contains the position.  This
+    # is required if match and merge is enabled.
+    # For match and merge of a SCAR marker file, this will be one of the
+    # *ampPos1 columns.  
+
+    start := HampPos1
+
+    # Name of the data column in inputFileT that contains the ending position.
+    # This value is optional, use "" if there is no ending position column.
+    # For match and merge of a SCAR marker file, this will be one of the
+    # *ampPos2 columns.  
+
+    end := HampPos2
+
+    # Name of the data column in inputFileT that contains the length of the
+    # entity represented by inputFileT (equivalent to ending position minus
+    # starting position plus one).  This value is optional, use "" if there
+    # is no length column.
+    # For match and merge of a SCAR marker file, this will be "".
+
+    len := ""
+
+    # Name of the data column in inputFileT that contains a sequence ID or other
+    # type of ID that must match a similar ID column in inputFileS in order for
+    # a row in inputFileT to match a row in inputFileS.  This value is optional,
+    # use "" if there is no ID column.
+    # For match and merge of a SCAR marker file, this will be one of the *id
+    # columns.
+
+    id := Hid
+
+
+################################################################################
+# Match and merge: inputFileS position columns.
+################################################################################
+
+# inputFileS position parameters for match and merge.  These parameters are
+# ignored if match and merge is disabled (inputFileS is not specified).
+
+positionS:
+
+    # Name of the data column in inputFileS that contains the starting position,
+    # or in the case of non-contig SNP-like data, contains the position.  This
+    # is required if match and merge is enabled.
+    # If inputFileS is a .gff3 or .gtf file, the column name is "start".
+
+    start := start
+
+    # Name of the data column in inputFileS that contains the ending position.
+    # This value is optional, use "" if there is no ending position column.
+    # If inputFileS is a .gff3 or .gtf file, the column name is "end".
+
+    end := end
+
+    # Name of the data column in inputFileS that contains the length of the
+    # entity represented by inputFileS (equivalent to ending position minus
+    # starting position plus one).  This value is optional, use "" if there
+    # is no length column.
+    # If inputFileS is a .gff3 or .gtf file, there is no length column.
+
+    len := ""
+
+    # Name of the data column in inputFileS that contains a sequence ID or other
+    # type of ID that must match a similar ID column in inputFileT in order for
+    # a row in inputFileT to match a row in inputFileS.  This value is optional,
+    # use "" if there is no ID column.
+    # If inputFileS is a .gff3 or .gtf file, the column name is "seqname".
+
+    id := seqname
+
+
+################################################################################
+# Match and merge: Match method for matching rows from inputFileT with rows from
+# inputFileS based on matching positions within the rows.
+################################################################################
+
+# Match method parameters.  These parameters are ignored if match and merge is
+# disabled (inputFileS not specified).
+
+match:
+
+    # Matching can be done by one of five methods (parameter "method"):
+    #  OVERLAP: find rows of inputFileT whose position OVERLAPS the position of inputFileS rows
+    #  S.TINY: find rows of inputFileS whose position is fully contained in the position of inputFileT rows
+    #  T.TINY: find rows of inputFileT whose position is fully contained in the position of inputFileS rows
+    #  S.NEAR: find rows of inputFileS whose position overlaps or is near the position of inputFileT rows
+    #  T.NEAR: find rows of inputFileT whose position overlaps or is near the position of inputFileS rows
+    # Details of S.NEAR and T.NEAR will become clearer with additional parameters.
+
+    method := S.NEAR
+
+    # Indented parameters are those giving additional information for the "S.NEAR"
+    # and "T.NEAR" methods.  All other methods ignore these additional parameters.
+
+    # The S.NEAR and T.NEAR methods are almost the same.  They give the same results
+    # in most cases.  Their difference will be pointed out below.
+
+    # The definition of "near" for the S.NEAR and T.NEAR methods is determined by
+    # four parameters, start.up, start.down, end.up, and end.down:
+    #   start.up: x.start must be no less than y.start-start.up
+    #   start.down: x.start must be no more than y.end+start.down
+    #   end.up: x.end must be no less than y.start-end.up
+    #   end.down: x.end must be no more than y.end+end.down
+    # where x.start, x.end, y.start, and y.end are start and end positions in
+    # inputFileT or inputFileS depending on whether method is S.NEAR or T.NEAR:
+    #                       S.NEAR       T.NEAR
+    #   x.start & x.end     inputFileS  inputFileT
+    #   y.start & y.end     inputFileT  inputFileS
+    #
+    # Conveniently, if only start.up is specified as a number and the others are
+    # specified as "", they will default to reasonable values, so that the start.up
+    # value gives the number of base pairs away before two rows are no longer "near"
+    # one another.  For example, for method S.NEAR, if start.up=3000, an inputFileS
+    # row is "near" if it is within 3000 bp upstream of the start of the inputFileT
+    # row or within 3000 bp downstream of the end of the inputFileT row.
+    # When "" is specified for any of x.start, x.end, y.start, y.end, the value used
+    # for it is the maximum of any x.start to the next x.start (used for start.up and
+    # start.down), or the maximum of any x.end to the next x.end (used for end.up and
+    # end.down).
+
+    start.up := 3000
+    start.down := ""
+    end.up := ""
+    end.down := ""
+
+    # Since there can be multiple rows of inputFileS that are near an inputFileT row,
+    # another parameter, "closest", lets you select ALL of them to appear in the new
+    # inputFileT column(s), or only the NEAREST, or only the nearest UPSTREAM and
+    # nearest DOWNSTREAM.  In the case of overlaps, ALL overlaps appear in the new
+    # column(s).
+    #   closest := 0: all inputFileS rows that are near are added to the new column(s).
+    #   closest := 1: the NEAREST inputFileS row is added to the new column(s).
+    #   closest := 2: the nearest UPSTREAM and DOWNSTREAM rows are added to the new column(s).
+
+    closest := 0
+
+
+################################################################################
+# Match and merge: columns to add and the format of the new column data.
+################################################################################
+
+# There can be one or more columns added to inputFileT data as a result of
+# matching inputFileT data dows to inputFileS data rows.  Within the "mergeCols"
+# section below, each "column" subsection contains the parameters describing one
+# column to be added. These parameters are ignored if match and merge is disabled
+# (inputFileS not specified).
+
+mergeCols:
+
+    # Parameters for first added column.
+    
+    column:
+
+        # Name of the column to be added to inputFileT data.  If this is set to ""
+        # then this "column" section is ignored.
+
+        name := gene
+
+        # Name of column before which the new column is to be added.  If this
+        # is "", the new column is added as the last column.
+
+        before := prmSeqL
+
+        # Maximum number of inputFileS rows that can match a row of inputFileT and
+        # still have the data from the inputFileS rows included.  Use 0 for no limit.
+        # If non-zero and more than that number of matches are found for a row, only
+        # the first maxMatch matched rows of inputFileS are included in the new column.
+
+        maxMatch := 0
+
+        # Set this to YES to join the formatted match data for each matching inputFileS
+        # row together and insert it into the new column.  Set this to NO to keep the
+        # matches separate, and add multiple new columns whose names are the specified
+        # name followed by 1, 2, 3, etc. up to maxMatch, or if maxMatch is 0, up to
+        # the number needed for the maximum number of matches of any inputFileT row.
+
+        join := YES
+
+        # String to prefix the joined formatted match data when "join" is YES.  This
+        # string will occur at the start of the data placed in the new column in every
+        # row.
+
+        joinPfx := ""
+
+        # String to suffix the joined formatted match data when "join" is YES.  This
+        # string will occur at the end of the data placed in the new column in every
+        # row.
+
+        joinSfx := ""
+
+        # String to separate joined formatted match data when "join" is YES.
+
+        joinSep := ","
+
+        # Format control string that determines the format of the data in the new
+        # column, for each matching row of inputFileS.  Each character is copied
+        # verbatim to the new column except for values surrounded by {} braces,
+        # and these are defined as follows:
+        #   {lb} : a verbatim left brace
+        #   {rb} : a verbatim right brace
+        #   {+col} : the value in inputFileS column "col" of the matching inputFileT row
+        #   {#T} : bp position of InputFileS start position in matching inputFileT row.
+        #   {#S} : bp position of inputFileT start position in matching inputFileS row.
+        #   {%T} : percent position of inputFileS start position in matching inputFileT row.
+        #   {%S} : percent position of inputFileT start position in matching inputFileS row.
+        #   {*S*col*val*dgts} : multiply the value in matching row inputFileS column "col"
+        #       by "val" and round to "dgts" digits after decimal (e.g. {*S*start*1e-6*0}).
+        #   {*T*col*val*dgts} : likewise for inputFileT
+        #   {/S/col/RE/RE.replace} : regular expression search/replace of matching row
+        #       inputFileS column "col" (e.g. {/S/chr/SL2.40ch0?/})
+        #   {/T/col/RE/RE.replace} : likewise for inputFileT
+        #
+        #   A start position in a matching row may lie UPSTREAM, WITHIN, or DOWNSTREAM of
+        #   the start/end of the row it is matched to.  When {#T}, {#S}, {%T}, or {%S} is
+        #   used, the number placed in the formatted output string is prefixed by characters
+        #   "-", "@", and "+" to indicate UPSTREAM, WITHIN, or DOWNSTREAM.
+
+        format := "{+gene}({#T})"
+
+
+    # Parameters for second added column are specified the same way.  Delete the
+    # section or set "name" to "" to ignore the parameters in this section.
+    
+    column:
+        name := ""
+        before := prmSeqL
+        maxMatch := 0
+        join := YES
+        joinPfx := ""
+        joinSfx := ""
+        joinSep := ","
+        format := "{+gene}({#T})"
+
+    # Parameters for third added column.  Add more column sections if needed.
+    
+    column:
+        name := ""
+        before := prmSeqL
+        maxMatch := 0
+        join := YES
+        joinPfx := ""
+        joinSfx := ""
+        joinSep := ","
+        format := "{+gene}({#T})"
+
+
+################################################################################
+################################################################################
+# Attribute creation within the output file.
+#
+# The earlier attribute extraction parameter section allowed you to extract
+# attribute values from an attributes column and place them in their own columns.
+# This parameter section does the reverse, letting you take data in existing
+# columns and turn it into attribute values in an attributes column.
+################################################################################
+################################################################################
+
+# Parameters describing attribute creation.
+
+attrCreation:
+
+    # A comma-separated list of names of the columns whose data is to be placed
+    # into the attributes column.  If this is "", no new attributes are created
+    # (and the remaining parameters are ignored).
+
+    columnsForAttrs := ""
+
+    # A comma-separated list of names to give to the new attributes, in the same
+    # order as the attributes were listed in parameter "columnsForAttrs".  If
+    # this is "", the attributes are named using the column name.
+
+    newAttrNames := ""
+
+    # Values that mean no attribute should be created for that data row.  This must
+    # be a comma-separated list in the same order as the attributes were listed in
+    # parameter "columnsForAttrs".  If a row/column contains the value specified,
+    # no attribute is created.  If this is "R.NA", then if a row/column contains
+    # the R language "NA" value, no attribute is created.
+
+    noAttrValues := ""
+
+    # Name of data column to contain attributes.  For gff3 and gtf files,
+    # this must be set to "attributes", which is the column name that is set
+    # internally for those file types.
+
+    attributesColumn := attributes
+
+    # Set this to YES to MERGE the column data into existing attributes, if any.
+    # Set it to NO to DELETE existing attributes and replace them with these new
+    # ones.
+
+    merge := YES
+
+    # Set this to YES to remove the column data after creating the attributes.
+    # Set it to NO to leave the columns in place.
+
+    remove := YES
+
+
+################################################################################
+################################################################################
+# Output file.  There is only one output file.  The data obtained from inputFileT,
+# optionally modified by match and merge of data from inputFileS, is written to
+# the output file.
+################################################################################
+################################################################################
+
+# Parameters describing the output file.
+
+outputFile:
+
+    # Path of the output file, relative to directory from which annotateFile.R is run.
+
+    path := "MarkersAnnotated.test.tsv"
+
+    # Type of file, one of:
+    #   "tsv" (tab-separated variables)
+    #   "csv" (comma-separated variables)
+    #   "gff3" (general feature format v3, often used for genome features)
+    #   "gtf" (gene transfer format, similar to but more precisely defined than a gff3)
+    # If either "gff3" or "gtf" is specified, the data must have these columns:
+    #   "seqname", "source", "feature", "start", "end", "score", "strand", "frame", "attributes"
+    # and only those columns will be written to the output file.
+
+    type := tsv
+
+    # Names of columns to be written to the output file, in the order they are to appear,
+    # as a comma-separated list of names.  If this is "", all existing columns are written.
+    # For .gff3 and .gtf files, exactly nine names must be given, and these must correspond
+    # to the .gff3 and .gtf data columns "seqname", "source", "feature", "start", "end",
+    # "score", "strand", "frame", "attributes".
+
+    columns := ""
+
+    # Set this to YES to write a header line containing the column names as the first
+    # line of the data in a .tsv or .csv file.  Set it to NO to not write a header line.
+    # Ignored for .gff3 and .gtf output files.
+
+    header := YES
+
+    # Set this to the name of a column to write as the first column of data, without a
+    # column name in the header line.  This situation is sometimes used for columns
+    # containing a unique value for each row, to create a "row name" column to be used
+    # to assign row names when the file is later read.  If this is used, that column
+    # must contain a unique value for each row.  To not do this, set this to "".
+    # Set this to "#" to force sequential numbering of each row in the output file.
+    # Ignored for .gff3 and .gtf output files.
+
+    column1 := ""
+
+    # Set this to YES to cause columns containing character data to surround the
+    # data with double quotation marks.  Set it to NO to not use quotation marks.
+    # Ignored for .gff3 and .gtf output files.
+
+    quote := NO
+
+
+################################################################################
+# End of file.
+################################################################################

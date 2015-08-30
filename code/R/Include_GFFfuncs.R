@@ -1,8 +1,8 @@
 #######################################################################################
 # This file contains R definitions and functions for working with .gff3 and .gtf files.
 # Author: Ted Toal
-# Lab: Brady
-# 2014-2015
+# Date: 2015
+# Brady Lab, UC Davis
 #######################################################################################
 
 #######################################################################################
@@ -119,7 +119,7 @@ clean_GTF = function(df)
     df$feature[df$feature == "five_prime_UTR"] = "5UTR"
     df$feature[df$feature == "three_prime_UTR"] = "3UTR"
     if (!any(colnames(df) == "attributes"))
-        stop("clean_GFF3: data frame has no 'attributes' column")
+        stop("clean_GTF: data frame has no 'attributes' column")
     df$attributes = gsub(";", "; ", df$attributes)
     df$attributes = gsub('(^|; )([a-zA-Z0-9_]+)[= ]?"?([^;"]+)"?', '\\1\\2 "\\3"', df$attributes)
     df$attributes = gsub('(^|; )([a-zA-Z0-9_]+) "([0-9.+\\-]+)"', '\\1\\2 \\3', df$attributes)
@@ -166,21 +166,33 @@ selectFeatures = function(df, selectFeatures)
 #       to make columns out of every attribute name that is found.
 #   excludeAttrs: names of attributes to NOT be made into columns even if in includeAttrs,
 #       NULL means to exclude none.
-#   removeAttrCol: TRUE to remove the "attributes" column from the data frame.  If not
-#       removed, the attributes column no longer contains the data moved to separate columns.
+#   removeAttrCol: TRUE to remove the attrCol column from the data frame.  If not removed,
+#       the attributes column no longer contains the data moved to separate columns.
+#   attrCol: name of attributes column, normally "attributes".
+#   newAttrCols: names of new data columns, or NULL to name the columns with the attribute
+#       name.  Must be same length and same order as number of new columns to be added.
+#   missingAttrVals: values to use in rows lacking the attribute, or NULL to use NA.
+#       Must be same length and same order as number of new columns to be added or length 1 (in which
+#       case that one value is used for missing attributes in ALL added columns).
+#   maxAttrCols: maximum number of attribute data columns ever to be added.
 #
 # Returns: modified data frame.
 #
 # Note: The new columns have NA for any row whose attributes did not include that column.
 #######################################################################################
-convertAttrsToCols = function(df, includeAttrs=NULL, excludeAttrs=NULL, removeAttrCol=TRUE)
+convertAttrsToCols = function(df, includeAttrs=NULL, excludeAttrs=NULL, removeAttrCol=TRUE,
+    attrCol="attributes", newAttrCols=NULL, missingAttrVals=NULL, maxAttrCols=100)
     {
-    N1 = sum(grepl("; ", df$attributes, fixed=TRUE))
-    N2 = sum(grepl(";", df$attributes, fixed=TRUE))
+    if (!any(colnames(df) == attrCol))
+        stop("convertAttrsToCols: no such column: ", attrCol)
+
+    N1 = sum(grepl("; ", df[[attrCol]], fixed=TRUE))
+    N2 = sum(grepl(";", df[[attrCol]], fixed=TRUE))
     isGTF = (N1 > N2/2)
     if (isGTF)
         df = clean_GFF3(df)
-    attrs = strsplit(df$attributes, ";", fixed=TRUE)
+
+    attrs = strsplit(df[[attrCol]], ";", fixed=TRUE)
     names(attrs) = NULL
     attrNamesVals = sapply(attrs, function(V)
         {
@@ -193,23 +205,55 @@ convertAttrsToCols = function(df, includeAttrs=NULL, excludeAttrs=NULL, removeAt
         return(V)
         }, simplify=FALSE)
     attrNames = unique(names(unlist(attrNamesVals)))
-    if (length(attrNames) > 100+length(includeAttrs)+length(excludeAttrs))
-        stop("There are ", length(attrNames), " attribute columns to be added, too many")
+    if (length(attrNames) > maxAttrCols+length(includeAttrs)+length(excludeAttrs))
+        stop("convertAttrsToCols: There are ", length(attrNames), " attribute columns to be added, too many")
+
     if (is.null(includeAttrs))
         includeAttrs = attrNames
     if (!is.null(excludeAttrs))
         includeAttrs = setdiff(includeAttrs, excludeAttrs)
+    N = length(includeAttrs)
+
+    if (is.null(newAttrCols))
+        newAttrCols = includeAttrs
+    else
+        {
+        if (length(newAttrCols) != N)
+            stop("convertAttrsToCols: there are ", N,
+                "columns to be included but newAttrCols has only ", length(newAttrCols))
+        }
+    names(newAttrCols) = includeAttrs
+
+    if (is.null(missingAttrVals))
+        missingAttrVals = NA
+    if (length(missingAttrVals) == 1)
+        missingAttrVals = rep(missingAttrVals, N)
+    else
+        {
+        if (length(missingAttrVals) != N)
+            stop("convertAttrsToCols: there are ", N,
+                "columns to be included but missingAttrVals has only ", length(missingAttrVals))
+        }
+    names(missingAttrVals) = includeAttrs
+
     includeAttrs = intersect(includeAttrs, attrNames)
-    df[, includeAttrs] = NA
+    newAttrCols = newAttrCols[includeAttrs]
+    missingAttrVals = missingAttrVals[includeAttrs]
+
     rownames(df) = NULL
     for (attr in includeAttrs)
-        df[, attr] = sapply(attrNamesVals, "[", attr)
+        {
+        df[, newAttrCols[attr]] = sapply(attrNamesVals, "[", attr)
+        isNA = is.na(df[, newAttrCols[attr]])
+        df[isNA, newAttrCols[attr]] = missingAttrVals[attr]
+        }
+
     if (removeAttrCol)
-        df = df[, colnames(df) != "attributes", drop=FALSE]
+        df = df[, colnames(df) != attrCol, drop=FALSE]
     else
         {
         attrNamesVals = sapply(attrNamesVals, function(V) return(V[!names(V) %in% includeAttrs]), simplify=FALSE)
-        df$attributes = sapply(attrNamesVals, function(V) return(paste(names(V), V, sep="=", collapse=";")))
+        df[[attrCol]] = sapply(attrNamesVals, function(V) return(paste(names(V), V, sep="=", collapse=";")))
         if (isGTF)
             df = clean_GTF(df)
         }
@@ -225,6 +269,14 @@ convertAttrsToCols = function(df, includeAttrs=NULL, excludeAttrs=NULL, removeAt
 #   df: data frame of .gff3 or .gtf data with extra columns to merge into attributes.
 #   cols: names of df columns to be made into attributes.  The column name is the
 #       attribute name.
+#   newAttrNames: names to give to the new attributes, or NULL to use 'cols' as names.
+#       Must be same length and same order as 'cols'.
+#   noAttrValues: values which, when present in a row, indicate that the attribute of
+#       that column should not be added at the attributes list for that row.  If NULL,
+#       an NA value means to not add an attribute to the row.  Must be same length and
+#       same order as 'cols', or length 1, which means that that value applies to all
+#       'cols'.
+#   attrCol: name of attributes column, normally "attributes".
 #   merge: TRUE to merge the data in the "cols" columns into the existing attributes,
 #       if any, and FALSE to replace the existing attributes with the new data.
 #   remove: TRUE to remove the "cols" columns from the data frame.
@@ -235,13 +287,37 @@ convertAttrsToCols = function(df, includeAttrs=NULL, excludeAttrs=NULL, removeAt
 # attributes column, and if merge is TRUE, the value of the attribute already in the
 # attributes column remains unchanged.
 #######################################################################################
-convertColsToAttrs = function(df, cols, merge=TRUE, remove=TRUE)
+convertColsToAttrs = function(df, cols, newAttrNames=NULL, noAttrValues=NULL,
+    attrCol="attributes", merge=TRUE, remove=TRUE)
     {
-    if (remove || !any(colnames(df) == "attributes"))
-        df$attributes = ""
+    if (is.null(cols) || length(cols) == 0)
+        stop("convertColsToAttrs: no column names specified in 'cols' argument")
+    N = length(cols)
+
+    if (is.null(newAttrNames))
+        newAttrNames = cols
+    if (length(newAttrNames) != N)
+        stop("convertColsToAttrs: there are ", N, " columns to convert but newAttrNames has only ", N)
+    names(newAttrNames) = cols
+
+    if (is.null(noAttrValues))
+        noAttrValues = NA
+    if (length(noAttrValues) == 1)
+        noAttrValues = rep(noAttrValues, N)
+    else
+        {
+        if (length(noAttrValues) != N)
+            stop("convertColsToAttrs: there are ", N,
+                "columns to be converted but noAttrValues has only ", length(noAttrValues))
+        }
+    names(noAttrValues) = cols
+
+    if (remove || !any(colnames(df) == attrCol))
+        df[[attrCol]] = ""
     else
         df = clean_GFF3(df)
-    attrs = strsplit(df$attributes, ";", fixed=TRUE)
+
+    attrs = strsplit(df[[attrCol]], ";", fixed=TRUE)
     names(attrs) = NULL
     attrNamesVals = sapply(attrs, function(V)
         {
@@ -253,18 +329,26 @@ convertColsToAttrs = function(df, cols, merge=TRUE, remove=TRUE)
             }
         return(V)
         }, simplify=FALSE)
+
     for (col in cols)
         {
+        attrName = newAttrNames[col]
+        noAttrValue = noAttrValues[col]
         d = df[,col]
-        idxs = which(!is.na(d))
+        if (is.na(noAttrValue))
+            idxs = which(!is.na(d))
+        else
+            idxs = which(d != noAttrValue)
         attrNamesVals[idxs] = sapply(idxs, function(i)
             {
             V = attrNamesVals[[i]]
-            V[col] = d[i]
+            V[attrName] = d[i]
             return(V)
             }, simplify=FALSE)
         }
-    df$attributes = sapply(attrNamesVals, function(V) return(paste(names(V), V, sep="=", collapse=";")))
+
+    df[[attrCol]] = sapply(attrNamesVals, function(V) return(paste(names(V), V, sep="=", collapse=";")))
+
     if (remove)
         df = df[, !colnames(df) %in% cols, drop=FALSE]
     rownames(df) = NULL

@@ -1,6 +1,6 @@
 ################################################################################
 # This is a parameter file for running the R program dotplot.R.  It is
-# configured for a dot plot of all chromosomes of S. lycopersicum and
+# currently configured for a dot plot of all chromosomes of S. lycopersicum and
 # S. pennellii.
 ################################################################################
 

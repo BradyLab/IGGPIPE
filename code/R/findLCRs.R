@@ -11,7 +11,7 @@
 # Pathname separator.
 PATHSEP = ifelse(grepl("/", Sys.getenv("HOME")), "/", "\\")
 
-# Cat that immediately flushes to console.
+# cat() that immediately flushes to console.
 catnow = function(...)
     {
     cat(...)
@@ -90,7 +90,7 @@ if (length(args) != Nexpected)
     stop("Try again with correct number of arguments")
     }
 
-catnow("findLCRs arguments:\n")
+catnow("findLCRs.R arguments:\n")
 workingDirectory = args[1]
 catnow("  workingDirectory: ", workingDirectory, "\n")
 if (!dir.exists(workingDirectory))

@@ -35,11 +35,12 @@ Nexpected = 1
 if (length(args) != 1)
     {
     usage = c(
-        "Read a file of LCRs, described as a set of common unique k-mers between two",
-        "genomes, and plot them as a dot plot consisting of a series of line segments,",
-        "each line segment defined by the (x,y) points that are the positions of each",
-        "common unique k-mer within the two genomes.  Genome 1 is the x-axis and genome",
-        "2 is the y-axis.",
+        "Read a parameter file that specifies parameters for a dot plot, including the",
+        "name of a file of LCRs (a set of common unique k-mers between two genomes, each",
+        "assigned to a locally conserved region), and plot them as a dot plot consisting",
+        "of a series of line segments or dots, each one defined by the (x,y) points that",
+        "are the positions of each common unique k-mer within the two genomes.  Genome 1",
+        "is the x-axis and genome 2 is the y-axis.",
         "",
         "Usage: Rscript dotplot.R <paramFile>",
         "",
@@ -51,7 +52,7 @@ if (length(args) != 1)
     stop("Try again with correct number of arguments")
     }
 
-cat("dotplot arguments:\n")
+cat("dotplot.R arguments:\n")
 paramFile = args[1]
 cat("  paramFile: ", paramFile, "\n")
 if (!file.exists(paramFile))
@@ -62,7 +63,7 @@ if (!file.exists(paramFile))
 ################################################################################
 
 ################################################################################
-# Cat that immediately flushes to console.
+# cat() that immediately flushes to console.
 ################################################################################
 catnow = function(...)
     {
@@ -171,7 +172,7 @@ coerceObj = function(obj, type, errfunc, ..., allowNA=FALSE, name=NULL)
     }
 
 ################################################################################
-# Read, verify, and convert parameter file.
+# Read and verify parameter file, and convert parameters to their correct type.
 ################################################################################
 
 S = readLines(paramFile)
@@ -196,6 +197,7 @@ S = sub("[ \t]+=[ \t]+", "=", S)
 
 # Remove quote marks.
 S = sub('="(.*)"', "=\\1", S)
+S = sub("='(.*)'", "=\\1", S)
 
 # Split on "="
 S = strsplit(S, "=", fixed=TRUE)

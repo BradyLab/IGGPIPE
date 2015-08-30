@@ -70,7 +70,7 @@ if (length(args) < NexpectedMin)
     stop("Try again with correct number of arguments")
     }
 
-cat("splitKmers arguments:\n")
+cat("splitKmers.R arguments:\n")
 workingDirectory = args[1]
 cat("  workingDirectory: ", workingDirectory, "\n")
 if (!dir.exists(workingDirectory))

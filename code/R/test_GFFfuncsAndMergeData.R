@@ -1,28 +1,13 @@
 #######################################################################################
 # Perform extensive testing of functions in Include_GFFfuncs.R and
 # Include_MergeDataUsingPosition.R, using test data in folder test_GFFfuncsAndMergeData.
+# Author: Ted Toal
+# Date: 2015
+# Brady Lab, UC Davis
 #######################################################################################
 
-# Include the root R source code file.
-R_INCLUDE_DIR = Sys.getenv("R_INCLUDE_DIR")
-if (R_INCLUDE_DIR == "")
-    stop("Set environment variable R_INCLUDE_DIR or assign that variable to a path here.")
-source(paste(R_INCLUDE_DIR, "Include_RootRsourceFile.R", sep=""))
-
-# Source our basic utility functions file.
-source(Include_UtilityFunctions)
-
-# Load libraries we need.
-addThisLibrary("xlsx")
-
-# Source other files we need.
-source(Include_GenomeDb)
-source(Include_atGenome)
-source(Include_solyGenome)
-source(Include_sopeGenome)
-
 # Set working directory.
-setwd(paste(genomeDbDir, "Code", sep=PATHSEP))
+setwd("~/Documents/UCDavis/BradyLab/Genomes/kmers/SCARF/code/R")
 
 # Source the files we are testing.
 source("Include_GFFfuncs.R")
@@ -43,9 +28,9 @@ dfILs$id = sprintf("SL2.50ch%02d", dfILs$chr)
 
 # Read additional test file data: a .gff3 and .gtf gene model file for Soly, truncated
 # to first 14 Mbp of ch 01 and ch 02.
-dfGff = readFile_GFF3("test_GFFfuncsAndMergeData/test.gff3")
+dfGff = readFile_GFF3("test_GFFfuncsAndMergeData/ITAG2.4_test.gff3")
 head(dfGff)
-dfGtf = readFile_GTF("test_GFFfuncsAndMergeData/test.gtf")
+dfGtf = readFile_GTF("test_GFFfuncsAndMergeData/ITAG2.4_test.gtf")
 head(dfGtf)
 
 getFeatures(dfGff)
@@ -66,11 +51,32 @@ df2a[1,]
 df1a[10,]
 df2a[10,]
 
+dfx = convertAttrsToCols(dfGff, missingAttrVals="missing")
+head(dfx)
+
+dfx = convertAttrsToCols(dfGff, includeAttrs=c("Ontology_term", "nb_exon"),
+    missingAttrVals=c(NA, "R.NA"))
+head(dfx)
+
+dfx = convertAttrsToCols(dfGff, includeAttrs=c("Ontology_term", "nb_exon"),
+    missingAttrVals=c(NA, "R.NA"), newAttrCols=c("term", "exon"))
+head(dfx)
+
+dfx = convertAttrsToCols(dfGff, excludeAttrs=c("Ontology_term", "nb_exon"), removeAttrCol=FALSE)
+head(dfx)
+
+
+dfx = convertColsToAttrs(df1, "Alias", newAttrNames="synonym", noAttrValues="(None)",
+    merge=FALSE, remove=FALSE)
+head(dfx)
+
+
+dir.create("testOutput", showWarnings=FALSE)
 writeFile_GFF3_GTF(df1a, "testOutput/gff1.gff3")
 writeFile_GFF3_GTF(df2a, "testOutput/gff1.gtf")
 
-df1b = readFile_GFF3_GTF("testOutput/gff1.gff3")
-df2b = readFile_GFF3_GTF("testOutput/gff1.gtf")
+df1b = readFile_GFF3("testOutput/gff1.gff3")
+df2b = readFile_GTF("testOutput/gff1.gtf")
 df1b = convertAttrsToCols(df1b)
 df2b = convertAttrsToCols(df2b)
 identical(df1, df1b)
@@ -88,17 +94,16 @@ identical(df2c, dfGtf)
 #######################################################################################
 
 # First test.
-t.df = dfMarkers
-s.df = dfILs
-t.pos = list(id="Hid", start="HampPos1", end="HampPos2")
-s.pos = list(id="id", start="start_right", end="end_left")
+T.df = dfMarkers
+S.df = dfILs
+T.pos = list(id="Hid", start="HampPos1", end="HampPos2")
+S.pos = list(id="id", start="start_right", end="end_left")
 dist = list(method="OVERLAP")
-cols = list(list(col="ILs", before="prmSeqL", maxMatch=0, join="YES", joinSep=";", format="{+IL_segment}({%s})"))
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+cols = list(list(col="ILs", before="prmSeqL", maxMatch=0, join="YES", joinSep=";", format="{+IL_segment}({%S})"))
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 df[1:10,1:11]
 df[1500:1510,1:11]
 df[1600:1610,1:11]
-df[2000:2010,1:11]
 tail(df[,1:11], 20)
 
 #############################################
@@ -107,22 +112,22 @@ tail(df[,1:11], 20)
 
 # Check that we can insert as last column.
 cols[[1]]$before = ""
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 df[1,]
 
 # Check that we can insert just before last column.
 cols[[1]]$before = "Pseq2"
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 df[1,]
 
 # Check that we can insert as first column.
 cols[[1]]$before = "NDA"
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 df[1,]
 
 # Check that we can insert as second column.
 cols[[1]]$before = "Hid"
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 df[1,]
 
 # Restore "before" column.
@@ -133,39 +138,39 @@ cols[[1]]$before = "prmSeqL"
 #############################################
 
 dist$method = "OVERLAP"
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 dim(df)
 sum(df$ILs != "") # No surprise, every amplicon is in at least one introgression.
 
-dist$method = "s.TINY" # ILs are not tiny.  Should get empty result = error.
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols) # Yup.
+dist$method = "S.TINY" # ILs are not tiny.  Should get empty result = error.
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols) # Yup.
 
-dist$method = "t.TINY"
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+dist$method = "T.TINY"
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 sum(df$ILs != "") # No surprise, all amplicons are INSIDE the introgressions, which are huge.
 
-dist = list(method="s.NEAR", closest=0, start.up=0, end.up=0, start.down=0, end.down=0)
+dist = list(method="S.NEAR", closest=0, start.up=0, end.up=0, start.down=0, end.down=0)
 # ILs are huge compared to markers.  Will probably get empty result = error.
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols) # Yup.
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols) # Yup.
 
-dist$method = "t.NEAR"
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+dist$method = "T.NEAR"
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 sum(df$ILs != "") # No surprise, all amplicons are INSIDE the introgressions, which are huge.
 
 # We will re-test dist$method with genes.  But now, let's test various output formats.
 
-# Try inserting two different columns of s.df.
+# Try inserting two different columns of S.df.
 cols = list(
-    list(col="ILs", before="prmSeqL", maxMatch=0, join="YES", joinSep=";", format="{+IL_segment}({%s})"),
+    list(col="ILs", before="prmSeqL", maxMatch=0, join="YES", joinSep=";", format="{+IL_segment}({%S})"),
     list(col="ILstart", before="prmSeqL", maxMatch=0, join="YES", joinSep=";", format="{+start_right}")
     )
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 df[1,]
 
 # Try not joining columns.
 dist$method = "OVERLAP"
-cols = list(list(col="ILs", before="prmSeqL", maxMatch=0, join="NO", format="{+IL_segment}({%s})"))
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+cols = list(list(col="ILs", before="prmSeqL", maxMatch=0, join="NO", format="{+IL_segment}({%S})"))
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 df[1,]
 unique(df$ILs1)
 unique(df$ILs2)
@@ -174,13 +179,13 @@ unique(df$ILs4)
 
 # Test smaller maxMatch.
 cols[[1]]$maxMatch=3
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 df[1,]
 
 # Join columns with start and end strings.
-cols = list(list(col="ILs", before="prmSeqL", maxMatch=0, join="YES", joinSep=";", joinStart="[", joinEnd="]",
-    format="{+IL_segment}({%s})"))
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+cols = list(list(col="ILs", before="prmSeqL", maxMatch=0, join="YES", joinSep=";", joinPfx="[", joinSfx="]",
+    format="{+IL_segment}({%S})"))
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 df[1,]
 
 #############################################
@@ -188,121 +193,121 @@ df[1,]
 #############################################
 
 # Test {lb} and {rb}
-cols = list(list(col="ILs", before="prmSeqL", maxMatch=0, join="YES", joinSep=";", format="{+IL_segment}({%s})"))
-cols[[1]]$format = "{+IL_segment}{lb}{%s}{rb}"
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+cols = list(list(col="ILs", before="prmSeqL", maxMatch=0, join="YES", joinSep=";", format="{+IL_segment}({%S})"))
+cols[[1]]$format = "{+IL_segment}{lb}{%S}{rb}"
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 df[100,]
 dfILs[dfILs$IL_segment == "IL1-1-3",]
 100*(260327-20659)/(4416584-20659)
 
-# Test {#s}
-cols[[1]]$format = "{+IL_segment}({#s})"
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+# Test {#S}
+cols[[1]]$format = "{+IL_segment}({#S})"
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 df[100,]
 (260327-20659)
 
-# Test {%t}
-cols[[1]]$format = "{+IL_segment}({%t})"
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+# Test {%T}
+cols[[1]]$format = "{+IL_segment}({%T})"
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 df[100,]
 100*(20659-260327)/(261232-260327)
 
-# Test {#t}
-cols[[1]]$format = "{+IL_segment}({#t})"
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+# Test {#T}
+cols[[1]]$format = "{+IL_segment}({#T})"
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 df[100,]
 (20659-260327)
 
-# Test {*s*col*val*dgts}
-cols[[1]]$format = "{+IL_segment}[{+start_right}]({*s*start_right*1e-3*0}Kbp)"
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+# Test {*S*col*val*dgts}
+cols[[1]]$format = "{+IL_segment}[{+start_right}]({*S*start_right*1e-3*0}Kbp)"
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 df[100,]
 
-# Test {*t*col*val*dgts}
-cols[[1]]$format = "{+IL_segment}({*t*PampPos1*1e-3*1}Kbp)"
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+# Test {*T*col*val*dgts}
+cols[[1]]$format = "{+IL_segment}({*T*PampPos1*1e-3*1}Kbp)"
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 df[100,]
 
-# Test {/s/col/RE/RE.replace}
-cols[[1]]$format = "{+IL_segment}({/s/id/SL2.50ch0?/})"
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+# Test {/S/col/RE/RE.replace}
+cols[[1]]$format = "{+IL_segment}({/S/id/SL2.50ch0?/})"
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 df[100,]
 
-cols[[1]]$format = "{+IL_segment}({/s/id/SL2.50ch0?/chrom})"
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+cols[[1]]$format = "{+IL_segment}({/S/id/SL2.50ch0?/chrom})"
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 df[100,]
 
 #############################################
 # Test various bad arguments.
 #############################################
 
-df = mergeOnMatches(s.df=s.df, t.pos=t.pos, s.pos=s.pos, dist=dist, cols=cols)
-df = mergeOnMatches(t.df=t.df, t.pos=t.pos, s.pos=s.pos, dist=dist, cols=cols)
-df = mergeOnMatches(t.df=t.df, s.df=s.df, s.pos=s.pos, dist=dist, cols=cols)
-df = mergeOnMatches(t.df=t.df, s.df=s.df, t.pos=t.pos, dist=dist, cols=cols)
-df = mergeOnMatches(t.df=t.df, s.df=s.df, t.pos=t.pos, s.pos=s.pos, cols=cols)
-df = mergeOnMatches(t.df=t.df, s.df=s.df, t.pos=t.pos, s.pos=s.pos, dist=dist)
-df = mergeOnMatches(NULL, s.df, t.pos, s.pos, dist, cols)
-df = mergeOnMatches(NA, s.df, t.pos, s.pos, dist, cols)
-df = mergeOnMatches("A", s.df, t.pos, s.pos, dist, cols)
-df = mergeOnMatches(1:10, s.df, t.pos, s.pos, dist, cols)
-df = mergeOnMatches(t.df, NULL, t.pos, s.pos, dist, cols)
-df = mergeOnMatches(t.df, NA, t.pos, s.pos, dist, cols)
-df = mergeOnMatches(t.df, "A", t.pos, s.pos, dist, cols)
-df = mergeOnMatches(t.df, 1:10, t.pos, s.pos, dist, cols)
-df = mergeOnMatches(t.df, s.df, NULL, s.pos, dist, cols)
-df = mergeOnMatches(t.df, s.df, NA, s.pos, dist, cols)
-df = mergeOnMatches(t.df, s.df, list(end=0), s.pos, dist, cols)
-df = mergeOnMatches(t.df, s.df, list(start="id"), s.pos, dist, cols)
-df = mergeOnMatches(t.df, s.df, list(start="kmer1"), s.pos, dist, cols)
-df = mergeOnMatches(t.df, s.df, list(start="Hpct"), s.pos, dist, cols)
-df = mergeOnMatches(t.df, s.df, list(end="HampPos1", start="HampPos2"), s.pos, dist, cols)
-df = mergeOnMatches(t.df, s.df, list(start="HampPos2", len="kmer1offset"), s.pos, dist, cols)
-df = mergeOnMatches(t.df, s.df, t.pos, NULL, dist, cols)
-df = mergeOnMatches(t.df, s.df, t.pos, NA, dist, cols)
-df = mergeOnMatches(t.df, s.df, t.pos, list(end=0), dist, cols)
-df = mergeOnMatches(t.df, s.df, t.pos, list(start="ID"), dist, cols)
-df = mergeOnMatches(t.df, s.df, t.pos, list(start="id"), dist, cols)
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, NULL, cols)
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, NA, cols)
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, list(ted=0), cols)
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, list(method=0), cols)
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, list(method="overlap"), cols)
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, list(method="s.NEAR", closest="A"), cols)
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, list(method="s.NEAR", closest=3), cols)
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, list(method="s.NEAR", closest=NA), cols)
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, list(method="s.NEAR", closest=1, start.up="A"), cols)
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, list(method="s.NEAR", closest=1, start.up=7.5), cols)
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, list(method="s.NEAR", closest=1, start.up=NA), cols)
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, list(method="s.NEAR", closest=1, start.down=7.5), cols)
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, list(method="s.NEAR", closest=1, end.up=7.5), cols)
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, list(method="s.NEAR", closest=1, end.down=7.5), cols)
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist)
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, NULL)
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, NA)
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, 3)
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, list())
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, list(5))
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, list(list()))
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, list(list(col=NA)))
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, list(list(col="NDA")))
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, list(list(col="X")))
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, list(list(col="X", before="X")))
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, list(list(col="X", before="")))
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, list(list(col="X", before="", format=NA)))
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, list(list(col="X", before="", format="{junk}")))
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, list(list(col="X", before="", format="X", maxMatch="A")))
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, list(list(col="X", before="", format="X", maxMatch=NA)))
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, list(list(col="X", before="", format="X", maxMatch=-1)))
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, list(list(col="X", before="", format="X", joinStart=t.df)))
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, list(list(col="X", before="", format="X", joinEnd=t.df)))
+df = mergeOnMatches(S.df=S.df, T.pos=T.pos, S.pos=S.pos, dist=dist, cols=cols)
+df = mergeOnMatches(T.df=T.df, T.pos=T.pos, S.pos=S.pos, dist=dist, cols=cols)
+df = mergeOnMatches(T.df=T.df, S.df=S.df, S.pos=S.pos, dist=dist, cols=cols)
+df = mergeOnMatches(T.df=T.df, S.df=S.df, T.pos=T.pos, dist=dist, cols=cols)
+df = mergeOnMatches(T.df=T.df, S.df=S.df, T.pos=T.pos, S.pos=S.pos, cols=cols)
+df = mergeOnMatches(T.df=T.df, S.df=S.df, T.pos=T.pos, S.pos=S.pos, dist=dist)
+df = mergeOnMatches(NULL, S.df, T.pos, S.pos, dist, cols)
+df = mergeOnMatches(NA, S.df, T.pos, S.pos, dist, cols)
+df = mergeOnMatches("A", S.df, T.pos, S.pos, dist, cols)
+df = mergeOnMatches(1:10, S.df, T.pos, S.pos, dist, cols)
+df = mergeOnMatches(T.df, NULL, T.pos, S.pos, dist, cols)
+df = mergeOnMatches(T.df, NA, T.pos, S.pos, dist, cols)
+df = mergeOnMatches(T.df, "A", T.pos, S.pos, dist, cols)
+df = mergeOnMatches(T.df, 1:10, T.pos, S.pos, dist, cols)
+df = mergeOnMatches(T.df, S.df, NULL, S.pos, dist, cols)
+df = mergeOnMatches(T.df, S.df, NA, S.pos, dist, cols)
+df = mergeOnMatches(T.df, S.df, list(end=0), S.pos, dist, cols)
+df = mergeOnMatches(T.df, S.df, list(start="id"), S.pos, dist, cols)
+df = mergeOnMatches(T.df, S.df, list(start="kmer1"), S.pos, dist, cols)
+df = mergeOnMatches(T.df, S.df, list(start="Hpct"), S.pos, dist, cols)
+df = mergeOnMatches(T.df, S.df, list(end="HampPos1", start="HampPos2"), S.pos, dist, cols)
+df = mergeOnMatches(T.df, S.df, list(start="HampPos2", len="kmer1offset"), S.pos, dist, cols)
+df = mergeOnMatches(T.df, S.df, T.pos, NULL, dist, cols)
+df = mergeOnMatches(T.df, S.df, T.pos, NA, dist, cols)
+df = mergeOnMatches(T.df, S.df, T.pos, list(end=0), dist, cols)
+df = mergeOnMatches(T.df, S.df, T.pos, list(start="ID"), dist, cols)
+df = mergeOnMatches(T.df, S.df, T.pos, list(start="id"), dist, cols)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, NULL, cols)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, NA, cols)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, list(ted=0), cols)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, list(method=0), cols)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, list(method="overlap"), cols)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, list(method="S.NEAR", closest="A"), cols)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, list(method="S.NEAR", closest=3), cols)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, list(method="S.NEAR", closest=NA), cols)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, list(method="S.NEAR", closest=1, start.up="A"), cols)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, list(method="S.NEAR", closest=1, start.up=7.5), cols)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, list(method="S.NEAR", closest=1, start.up=NA), cols)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, list(method="S.NEAR", closest=1, start.down=7.5), cols)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, list(method="S.NEAR", closest=1, end.up=7.5), cols)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, list(method="S.NEAR", closest=1, end.down=7.5), cols)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, NULL)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, NA)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, 3)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, list())
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, list(5))
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, list(list()))
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, list(list(col=NA)))
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, list(list(col="NDA")))
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, list(list(col="X")))
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, list(list(col="X", before="X")))
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, list(list(col="X", before="")))
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, list(list(col="X", before="", format=NA)))
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, list(list(col="X", before="", format="{junk}")))
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, list(list(col="X", before="", format="X", maxMatch="A")))
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, list(list(col="X", before="", format="X", maxMatch=NA)))
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, list(list(col="X", before="", format="X", maxMatch=-1)))
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, list(list(col="X", before="", format="X", joinPfx=T.df)))
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, list(list(col="X", before="", format="X", joinSfx=T.df)))
 
 #############################################
 # Test using a GFF3 gene file with various dist$methods.
 #############################################
 
 # Read .gff3 file of genes in same chromosomes as the sequence used to create the markers in dfMarkers.
-dfGff = readFile_GFF3("test_GFFfuncsAndMergeData/test.gff3")
+dfGff = readFile_GFF3("test_GFFfuncsAndMergeData/ITAG2.4_test.gff3")
 head(dfGff)
 dfGff = clean_GFF3(dfGff)
 dfG = selectFeatures(dfGff, "gene")
@@ -314,13 +319,13 @@ dfG = dfG[, c("gene", "id", "start", "end", "strand")]
 # Now annotate markers with genes using different methods.
 
 # method = OVERLAP
-t.df = dfMarkers
-s.df = dfG
-t.pos = list(id="Hid", start="HampPos1", end="HampPos2")
-s.pos = list(id="id", start="start", end="end")
+T.df = dfMarkers
+S.df = dfG
+T.pos = list(id="Hid", start="HampPos1", end="HampPos2")
+S.pos = list(id="id", start="start", end="end")
 dist = list(method="OVERLAP")
-cols = list(list(col="genes", before="prmSeqL", maxMatch=0, join="YES", joinSep=";", format="{+gene}({#s})"))
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+cols = list(list(col="genes", before="prmSeqL", maxMatch=0, join="YES", joinSep=";", format="{+gene}({#S})"))
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 sum(df$genes != "")
 df[1:10,1:11]
 df[1500:1510,1:11]
@@ -330,10 +335,10 @@ df[1,]
 head(dfG)
 # Correct
 
-# Try #t in place of #s
+# Try #T in place of #S
 dist = list(method="OVERLAP")
-cols = list(list(col="genes", before="prmSeqL", maxMatch=0, join="YES", joinSep=";", format="{+gene}({#t})"))
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+cols = list(list(col="genes", before="prmSeqL", maxMatch=0, join="YES", joinSep=";", format="{+gene}({#T})"))
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 sum(df$genes != "")
 df[1:10,1:11]
 df[1500:1510,1:11]
@@ -345,18 +350,18 @@ head(dfG)
 df.overlap = df[df$genes != "",]
 dim(df.overlap)
 
-# method = s.TINY : amplicon must contain entire gene
-dist = list(method="s.TINY")
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+# method = S.TINY : amplicon must contain entire gene
+dist = list(method="S.TINY")
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 sum(df$genes != "") # Not very many (8), sounds good.
 df[df$genes != "",1:11]
 df[1488,]
 dfG[dfG$gene == "Solyc01g009550",]
 # Correct
 
-# method = t.TINY : gene must contain entire amplicon
-dist = list(method="t.TINY")
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+# method = T.TINY : gene must contain entire amplicon
+dist = list(method="T.TINY")
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 sum(df$genes != "")
 dim(df) # Interesting, about 2/3 of the amplicons ARE within genes!!!
 df[1:10,1:11]
@@ -368,7 +373,7 @@ dfG[dfG$gene == "Solyc02g005520",]
 # Correct
 
 #############################################
-# method = s.NEAR, closest = 0, distance 100bp : gene must be within 100 bp of amplicon (or contain it)
+# method = S.NEAR, closest = 0, distance 100bp : gene must be within 100 bp of amplicon (or contain it)
 #############################################
 
 #               start.up: G.start must be no less than M.start-twice max gene start-start distance
@@ -376,248 +381,223 @@ dfG[dfG$gene == "Solyc02g005520",]
 #               end.up: G.end must be no less than M.start-100 bp
 #               end.down: G.end must be no more than M.end+twice max gene end-end distance
 
-dist = list(method="s.NEAR", closest=0, start.down=100, end.up=100)
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+dist = list(method="S.NEAR", closest=0, start.down=100, end.up=100)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 sum(df$genes != "") # 1671
 dim(df.overlap) # 1647
-df.s.near = df[df$genes != "",]
+df.S.NEAR = df[df$genes != "",]
 # Some of the markers overlapping genes should now also be near another gene, so
 # the marker's gene list should have an additional gene in it.  Let's use HampPos1_HampPos2
-# as row names for df.overlap and df.s.near, which will help us.
+# as row names for df.overlap and df.S.NEAR, which will help us.
 rownames(df.overlap) = paste(df.overlap$HampPos1, df.overlap$HampPos2, sep="_")
-rownames(df.s.near) = paste(df.s.near$HampPos1, df.s.near$HampPos2, sep="_")
-# Get annotated markers common between OVERLAP and s.NEAR, and those specific to each.
-common = intersect(rownames(df.overlap), rownames(df.s.near))
-only.overlap = setdiff(rownames(df.overlap), rownames(df.s.near))
-only.s.near = setdiff(rownames(df.s.near), rownames(df.overlap))
+rownames(df.S.NEAR) = paste(df.S.NEAR$HampPos1, df.S.NEAR$HampPos2, sep="_")
+# Get annotated markers common between OVERLAP and S.NEAR, and those specific to each.
+common = intersect(rownames(df.overlap), rownames(df.S.NEAR))
+only.OVERLAP = setdiff(rownames(df.overlap), rownames(df.S.NEAR))
+only.S.NEAR = setdiff(rownames(df.S.NEAR), rownames(df.overlap))
 length(common) # 1647
-length(only.overlap) # 0, good, it should be that way.
-length(only.s.near) # 24
+length(only.OVERLAP) # 0, good, it should be that way.
+length(only.S.NEAR) # 24
 # For the common ones, get the ones whose gene annotation mismatches.
-common.gene.mismatch = common[df.overlap[common, "genes"] != df.s.near[common, "genes"]]
+common.gene.mismatch = common[df.overlap[common, "genes"] != df.S.NEAR[common, "genes"]]
 length(common.gene.mismatch) # Only 23 genes 
-data.frame(overlap=df.overlap[common.gene.mismatch, "genes"], s.near=df.s.near[common.gene.mismatch, "genes"],
+data.frame(overlap=df.overlap[common.gene.mismatch, "genes"], S.NEAR=df.S.NEAR[common.gene.mismatch, "genes"],
     stringsAsFactors=FALSE)
-# Looks good, the s.NEAR have the same gene as OVERLAP plus one more gene next to it.
+# Looks good, the S.NEAR have the same gene as OVERLAP plus one more gene next to it.
 df.overlap[common.gene.mismatch[1],]
-df.s.near[common.gene.mismatch[1],]
+df.S.NEAR[common.gene.mismatch[1],]
 dfG[dfG$gene %in% c("Solyc01g005070", "Solyc01g005080"),]
 # Note: distance to gene, in (), is to START of gene, even though END of gene is closer.
 # It looks good.
-# Check an only.s.near gene.
-df.s.near[only.s.near[1],]
+# Check an only.S.NEAR gene.
+df.S.NEAR[only.S.NEAR[1],]
 dfG[dfG$gene == "Solyc01g005560",]
 # Looks good.
 
 # Expand the near-distance to 3000 and we should get a lot more, including a bunch with
 # multiple genes per marker.
-t.df = dfMarkers
-s.df = dfG
-t.pos = list(id="Hid", start="HampPos1", end="HampPos2")
-s.pos = list(id="id", start="start", end="end")
-dist = list(method="s.NEAR", closest=0, start.down=3000, end.up=3000)
-cols = list(list(col="genes", before="prmSeqL", maxMatch=0, join="YES", joinSep=";", format="{+gene}({#t})"))
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+T.df = dfMarkers
+S.df = dfG
+T.pos = list(id="Hid", start="HampPos1", end="HampPos2")
+S.pos = list(id="id", start="start", end="end")
+dist = list(method="S.NEAR", closest=0, start.down=3000, end.up=3000)
+cols = list(list(col="genes", before="prmSeqL", maxMatch=0, join="YES", joinSep=";", format="{+gene}({#T})"))
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 sum(df$genes != "") # 1815 vs 1671
-df.s.near = df[df$genes != "",]
-rownames(df.s.near) = paste(df.s.near$HampPos1, df.s.near$HampPos2, sep="_")
-common = intersect(rownames(df.overlap), rownames(df.s.near))
-only.overlap = setdiff(rownames(df.overlap), rownames(df.s.near))
-only.s.near = setdiff(rownames(df.s.near), rownames(df.overlap))
+df.S.NEAR = df[df$genes != "",]
+rownames(df.S.NEAR) = paste(df.S.NEAR$HampPos1, df.S.NEAR$HampPos2, sep="_")
+common = intersect(rownames(df.overlap), rownames(df.S.NEAR))
+only.OVERLAP = setdiff(rownames(df.overlap), rownames(df.S.NEAR))
+only.S.NEAR = setdiff(rownames(df.S.NEAR), rownames(df.overlap))
 length(common) # 1647
-length(only.overlap) # 0, good, it should be that way.
-length(only.s.near) # 168
-common.gene.mismatch = common[df.overlap[common, "genes"] != df.s.near[common, "genes"]]
+length(only.OVERLAP) # 0, good, it should be that way.
+length(only.S.NEAR) # 168
+common.gene.mismatch = common[df.overlap[common, "genes"] != df.S.NEAR[common, "genes"]]
 length(common.gene.mismatch) # Now 685!
 data.frame(name=common.gene.mismatch,
-    overlap=df.overlap[common.gene.mismatch, "genes"], s.near=df.s.near[common.gene.mismatch, "genes"],
+    overlap=df.overlap[common.gene.mismatch, "genes"], S.NEAR=df.S.NEAR[common.gene.mismatch, "genes"],
     stringsAsFactors=FALSE)
 # Looks good.  One with 3 genes is 4683900_4684979
-df.s.near[only.s.near[1], "genes"]
-only.s.near[1]
+df.S.NEAR[only.S.NEAR[1], "genes"]
+only.S.NEAR[1]
 # 54857_55150 has 3 genes (30/40/50), none of them overlapping.
 
 # Repeat but use closest=1.  We should get only the overlapping genes in the common
 # set, and in the unique set we should get only the closest one.
-dist = list(method="s.NEAR", closest=1, start.down=3000, end.up=3000)
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+dist = list(method="S.NEAR", closest=1, start.down=3000, end.up=3000)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 sum(df$genes != "") # Still 1815
-df.s.near = df[df$genes != "",]
-rownames(df.s.near) = paste(df.s.near$HampPos1, df.s.near$HampPos2, sep="_")
-common = intersect(rownames(df.overlap), rownames(df.s.near))
-only.overlap = setdiff(rownames(df.overlap), rownames(df.s.near))
-only.s.near = setdiff(rownames(df.s.near), rownames(df.overlap))
+df.S.NEAR = df[df$genes != "",]
+rownames(df.S.NEAR) = paste(df.S.NEAR$HampPos1, df.S.NEAR$HampPos2, sep="_")
+common = intersect(rownames(df.overlap), rownames(df.S.NEAR))
+only.OVERLAP = setdiff(rownames(df.overlap), rownames(df.S.NEAR))
+only.S.NEAR = setdiff(rownames(df.S.NEAR), rownames(df.overlap))
 length(common) # 1647
-length(only.overlap) # 0, good, it should be that way.
-length(only.s.near) # 168
-common.gene.mismatch = common[df.overlap[common, "genes"] != df.s.near[common, "genes"]]
+length(only.OVERLAP) # 0, good, it should be that way.
+length(only.S.NEAR) # 168
+common.gene.mismatch = common[df.overlap[common, "genes"] != df.S.NEAR[common, "genes"]]
 length(common.gene.mismatch) # Now 0 because if it has an overlap we don't include ANY nearby ones
 # We should only see genes 40 and 50 here, because 60 only showed up in the overlap set
-df.s.near["4683900_4684979","genes"]
+df.S.NEAR["4683900_4684979","genes"]
 # We should see only nearest one of 30, 40, 50, which is 30 (I looked).
-df.s.near["54857_55150","genes"]
+df.S.NEAR["54857_55150","genes"]
 
 # Repeat but use closest=2.  We should get only the overlapping genes in the common
 # set, and in the unique set we should get only the closest UPSTREAM *AND* closest
 # DOWNSTREAM one.
-dist = list(method="s.NEAR", closest=2, start.down=3000, end.up=3000)
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+dist = list(method="S.NEAR", closest=2, start.down=3000, end.up=3000)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 sum(df$genes != "") # Still 1815
-df.s.near = df[df$genes != "",]
-rownames(df.s.near) = paste(df.s.near$HampPos1, df.s.near$HampPos2, sep="_")
-common = intersect(rownames(df.overlap), rownames(df.s.near))
-only.overlap = setdiff(rownames(df.overlap), rownames(df.s.near))
-only.s.near = setdiff(rownames(df.s.near), rownames(df.overlap))
+df.S.NEAR = df[df$genes != "",]
+rownames(df.S.NEAR) = paste(df.S.NEAR$HampPos1, df.S.NEAR$HampPos2, sep="_")
+common = intersect(rownames(df.overlap), rownames(df.S.NEAR))
+only.OVERLAP = setdiff(rownames(df.overlap), rownames(df.S.NEAR))
+only.S.NEAR = setdiff(rownames(df.S.NEAR), rownames(df.overlap))
 length(common) # 1647
-length(only.overlap) # 0, good, it should be that way.
-length(only.s.near) # 168
-common.gene.mismatch = common[df.overlap[common, "genes"] != df.s.near[common, "genes"]]
+length(only.OVERLAP) # 0, good, it should be that way.
+length(only.S.NEAR) # 168
+common.gene.mismatch = common[df.overlap[common, "genes"] != df.S.NEAR[common, "genes"]]
 length(common.gene.mismatch) # Still 0
 # We should only see genes 40 and 50 here, because 60 only showed up in the overlap set
-df.s.near["4683900_4684979","genes"]
+df.S.NEAR["4683900_4684979","genes"]
 # We should see only the nearest upstream gene, which is 30, and nearest downstream
 # gene, which is 40 (I looked).
-df.s.near["54857_55150","genes"]
+df.S.NEAR["54857_55150","genes"]
 
 #############################################
-# method = t.NEAR, closest = 0, distance 100bp : amplicon must be within 100 bp of gene (or contain it)
+# method = T.NEAR, closest = 0, distance 100bp : amplicon must be within 100 bp of gene (or contain it)
 #############################################
 
-# Now reverse it and use t.NEAR, so we are looking for markers that are near genes.
-# It should actually generate the same results as with s.NEAR., right?
-dist = list(method="t.NEAR", closest=0, start.down=100, end.up=100)
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+# Now reverse it and use T.NEAR, so we are looking for markers that are near genes.
+# It should actually generate the same results as with S.NEAR., right?
+dist = list(method="T.NEAR", closest=0, start.down=100, end.up=100)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 sum(df$genes != "") # 1671
 dim(df.overlap) # 1647
-df.t.near = df[df$genes != "",]
+df.T.NEAR = df[df$genes != "",]
 # Some of the genes overlapping markers should now also be near another marker, so
 # the gene list should have an additional gene in it.  Let's use HampPos1_HampPos2
-# as row names for df.overlap and df.t.near, which will help us.
+# as row names for df.overlap and df.T.NEAR, which will help us.
 rownames(df.overlap) = paste(df.overlap$HampPos1, df.overlap$HampPos2, sep="_")
-rownames(df.t.near) = paste(df.t.near$HampPos1, df.t.near$HampPos2, sep="_")
-# Get annotated markers common between OVERLAP and t.NEAR, and those specific to each.
-common = intersect(rownames(df.overlap), rownames(df.t.near))
-only.overlap = setdiff(rownames(df.overlap), rownames(df.t.near))
-only.t.near = setdiff(rownames(df.t.near), rownames(df.overlap))
+rownames(df.T.NEAR) = paste(df.T.NEAR$HampPos1, df.T.NEAR$HampPos2, sep="_")
+# Get annotated markers common between OVERLAP and T.NEAR, and those specific to each.
+common = intersect(rownames(df.overlap), rownames(df.T.NEAR))
+only.OVERLAP = setdiff(rownames(df.overlap), rownames(df.T.NEAR))
+only.T.NEAR = setdiff(rownames(df.T.NEAR), rownames(df.overlap))
 length(common) # 1647
-length(only.overlap) # 0, good, it should be that way.
-length(only.t.near) # 24
+length(only.OVERLAP) # 0, good, it should be that way.
+length(only.T.NEAR) # 24
 # For the common ones, get the ones whose gene annotation mismatches.
-common.gene.mismatch = common[df.overlap[common, "genes"] != df.t.near[common, "genes"]]
+common.gene.mismatch = common[df.overlap[common, "genes"] != df.T.NEAR[common, "genes"]]
 length(common.gene.mismatch) # Only 23 genes 
-data.frame(overlap=df.overlap[common.gene.mismatch, "genes"], s.near=df.t.near[common.gene.mismatch, "genes"],
+data.frame(overlap=df.overlap[common.gene.mismatch, "genes"], S.NEAR=df.T.NEAR[common.gene.mismatch, "genes"],
     stringsAsFactors=FALSE)
-# Looks good, the t.NEAR have the same gene as OVERLAP plus one more gene next to it.
+# Looks good, the T.NEAR have the same gene as OVERLAP plus one more gene next to it.
 df.overlap[common.gene.mismatch[1],]
-df.t.near[common.gene.mismatch[1],]
+df.T.NEAR[common.gene.mismatch[1],]
 dfG[dfG$gene %in% c("Solyc01g005070", "Solyc01g005080"),]
 # Note: distance to gene, in (), is to START of gene, even though END of gene is closer.
 # It looks good.
-# Check an only.t.near gene.
-df.t.near[only.t.near[1],]
+# Check an only.T.NEAR gene.
+df.T.NEAR[only.T.NEAR[1],]
 dfG[dfG$gene == "Solyc01g005560",]
 # Looks good.
 
 # Expand the near-distance to 3000 and we should get a lot more, including a bunch with
 # multiple genes per marker.
-t.df = dfMarkers
-s.df = dfG
-t.pos = list(id="Hid", start="HampPos1", end="HampPos2")
-s.pos = list(id="id", start="start", end="end")
-dist = list(method="t.NEAR", closest=0, start.down=3000, end.up=3000)
-cols = list(list(col="genes", before="prmSeqL", maxMatch=0, join="YES", joinSep=";", format="{+gene}({#t})"))
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+T.df = dfMarkers
+S.df = dfG
+T.pos = list(id="Hid", start="HampPos1", end="HampPos2")
+S.pos = list(id="id", start="start", end="end")
+dist = list(method="T.NEAR", closest=0, start.down=3000, end.up=3000)
+cols = list(list(col="genes", before="prmSeqL", maxMatch=0, join="YES", joinSep=";", format="{+gene}({#T})"))
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 sum(df$genes != "") # 1815 vs 1671
-df.t.near = df[df$genes != "",]
-rownames(df.t.near) = paste(df.t.near$HampPos1, df.t.near$HampPos2, sep="_")
-common = intersect(rownames(df.overlap), rownames(df.t.near))
-only.overlap = setdiff(rownames(df.overlap), rownames(df.t.near))
-only.t.near = setdiff(rownames(df.t.near), rownames(df.overlap))
+df.T.NEAR = df[df$genes != "",]
+rownames(df.T.NEAR) = paste(df.T.NEAR$HampPos1, df.T.NEAR$HampPos2, sep="_")
+common = intersect(rownames(df.overlap), rownames(df.T.NEAR))
+only.OVERLAP = setdiff(rownames(df.overlap), rownames(df.T.NEAR))
+only.T.NEAR = setdiff(rownames(df.T.NEAR), rownames(df.overlap))
 length(common) # 1647
-length(only.overlap) # 0, good, it should be that way.
-length(only.t.near) # 168
-common.gene.mismatch = common[df.overlap[common, "genes"] != df.t.near[common, "genes"]]
+length(only.OVERLAP) # 0, good, it should be that way.
+length(only.T.NEAR) # 168
+common.gene.mismatch = common[df.overlap[common, "genes"] != df.T.NEAR[common, "genes"]]
 length(common.gene.mismatch) # Now 685!
 data.frame(name=common.gene.mismatch,
-    overlap=df.overlap[common.gene.mismatch, "genes"], s.near=df.t.near[common.gene.mismatch, "genes"],
+    overlap=df.overlap[common.gene.mismatch, "genes"], S.NEAR=df.T.NEAR[common.gene.mismatch, "genes"],
     stringsAsFactors=FALSE)
 # Looks good.  One with 3 genes is 4683900_4684979
-df.t.near[only.t.near[1], "genes"]
-only.t.near[1]
+df.T.NEAR[only.T.NEAR[1], "genes"]
+only.T.NEAR[1]
 # 54857_55150 has 3 genes (30/40/50), none of them overlapping.
 
 # Repeat but use closest=1.  We should get only the overlapping genes in the common
 # set, and in the unique set we should get only the closest marker to each gene,
-# which will give a different result than s.NEAR which was closest gene to each
-# marker.  With s.NEAR closest=1 simply reduced the number of genes for each marker,
-# but each marker that had genes still had genes.  With t.NEAR, some markers that
+# which will give a different result than S.NEAR which was closest gene to each
+# marker.  With S.NEAR, closest=1 simply reduced the number of genes for each marker,
+# but each marker that had genes still had genes.  With T.NEAR, some markers that
 # picked up their nearest gene now have that gene picking its closest marker, which
 # is a different marker.  So, we should end up with fewer markers with genes.
-dist = list(method="t.NEAR", closest=1, start.down=3000, end.up=3000)
+dist = list(method="T.NEAR", closest=1, start.down=3000, end.up=3000)
 Solyc01g005570
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 sum(df$genes != "") # Now 1691 instead of 1815.  Fewer, as expected.
-df.t.near = df[df$genes != "",]
-rownames(df.t.near) = paste(df.t.near$HampPos1, df.t.near$HampPos2, sep="_")
-common = intersect(rownames(df.overlap), rownames(df.t.near))
-only.overlap = setdiff(rownames(df.overlap), rownames(df.t.near))
-only.t.near = setdiff(rownames(df.t.near), rownames(df.overlap))
+df.T.NEAR = df[df$genes != "",]
+rownames(df.T.NEAR) = paste(df.T.NEAR$HampPos1, df.T.NEAR$HampPos2, sep="_")
+common = intersect(rownames(df.overlap), rownames(df.T.NEAR))
+only.OVERLAP = setdiff(rownames(df.overlap), rownames(df.T.NEAR))
+only.T.NEAR = setdiff(rownames(df.T.NEAR), rownames(df.overlap))
 length(common) # still 1647
-length(only.overlap) # 0, good, it should be that way.
-length(only.t.near) # 44 instead of 168, fewer, as expected.
-common.gene.mismatch = common[df.overlap[common, "genes"] != df.t.near[common, "genes"]]
+length(only.OVERLAP) # 0, good, it should be that way.
+length(only.T.NEAR) # 44 instead of 168, fewer, as expected.
+common.gene.mismatch = common[df.overlap[common, "genes"] != df.T.NEAR[common, "genes"]]
 length(common.gene.mismatch) # Now 57 instead of 0.  If a gene overlaps a marker, it gets just that marker, but if not, it gets nearest marker, and so one marker may get several nearest genes even though it overlaps another marker.
 # We should only see genes 40 and 50 here, because 60 only showed up in the overlap set
-df.t.near["4683900_4684979","genes"]
+df.T.NEAR["4683900_4684979","genes"]
 # Is this marker the closest marker to which genes?  Apparently to 40 and 50.
-df.t.near["54857_55150","genes"]
+df.T.NEAR["54857_55150","genes"]
 
 # Repeat but use closest=2.  We should get only the overlapping genes in the common
 # set, and in the unique set we should get MORE because now we have both upstream
 # and downstream.
-dist = list(method="t.NEAR", closest=2, start.down=3000, end.up=3000)
-df = mergeOnMatches(t.df, s.df, t.pos, s.pos, dist, cols)
+dist = list(method="T.NEAR", closest=2, start.down=3000, end.up=3000)
+df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 sum(df$genes != "") # 1692 now, we picked up one more, would have thought more than that.
-df.t.near = df[df$genes != "",]
-rownames(df.t.near) = paste(df.t.near$HampPos1, df.t.near$HampPos2, sep="_")
-common = intersect(rownames(df.overlap), rownames(df.t.near))
-only.overlap = setdiff(rownames(df.overlap), rownames(df.t.near))
-only.t.near = setdiff(rownames(df.t.near), rownames(df.overlap))
+df.T.NEAR = df[df$genes != "",]
+rownames(df.T.NEAR) = paste(df.T.NEAR$HampPos1, df.T.NEAR$HampPos2, sep="_")
+common = intersect(rownames(df.overlap), rownames(df.T.NEAR))
+only.OVERLAP = setdiff(rownames(df.overlap), rownames(df.T.NEAR))
+only.T.NEAR = setdiff(rownames(df.T.NEAR), rownames(df.overlap))
 length(common) # still 1647
-length(only.overlap) # 0, good, it should be that way.
-length(only.t.near) # 45 now instead of 4, we gained one.
-common.gene.mismatch = common[df.overlap[common, "genes"] != df.t.near[common, "genes"]]
+length(only.OVERLAP) # 0, good, it should be that way.
+length(only.T.NEAR) # 45 now instead of 4, we gained one.
+common.gene.mismatch = common[df.overlap[common, "genes"] != df.T.NEAR[common, "genes"]]
 length(common.gene.mismatch) # Now 62 instead of 57, gained 5.
 # We should only see genes 40 and 50 here, because 60 only showed up in the overlap set
-df.t.near["4683900_4684979","genes"]
+df.T.NEAR["4683900_4684979","genes"]
 # Is this marker the closest marker to which genes?  Apparently to 40 and 50.
-df.t.near["54857_55150","genes"]
+df.T.NEAR["54857_55150","genes"]
 
-
-
-# Arguments:
-#   t.df: target data frame to which columns will be added and containing positions.
-#   s.df: source data frame containing data to be added to t.df and containing positions.
-#   t.pos: list giving column names in t.df that define a position.  Members:
-#           "start" (required) : start position or main position.
-#           "id", "len", "end" (optional) : sequence ID, length, and end position in bp.
-#   s.pos: like t.pos, for s.df.
-#   dist: list defining how to find position matches between t.df and s.df.  Members:
-#           "method" (required) : one of "OVERLAP", "s.TINY", "t.TINY", "t.NEAR", "t.NEAR"
-#           "closest" (optional) : for "s/t.NEAR", 0 (all), 1 (nearest 1), or 2 (nearest 2)
-#           "start.up", "start.down", "end.up", "end.down" (optional) : for "x.NEAR" (x=s/t):
-#                   start.up: x.start must be no less than y.start-start.up
-#                   start.down: x.start must be no more than y.end+start.down
-#                   end.up: x.end must be no less than y.start-end.up
-#                   end.down: x.end must be no more than y.end+end.down
-#   cols: list defining the column names in s.df to be copied to t.df, the format of
-#       the column data that is copied, and the column names in t.df to which the data
-#       is copied.  Members are sublists, one per column to be added to t.df.  Members:
-#           "col" : name of column to add
-#           "before" : column to add it before, "" to add to end
-#           "format" : constructs are: {lb}, {rb}, {+col}, {#t}, {#s}, {%t}, {%s},
-#               {*s*col*val*dgts}, {*t*col*val*dgts}, {/s/col/RE/RE.replace}, {/t/col/RE/RE.replace}
-#           "maxMatch" : maximum number of matches per t.df row, 0 for no limit, default 0.
-#           "join" : "YES" to join all match strings for the t.df row into one column,
-#               "NO" to put them in separate columns with a number appended to column name
-#           "joinStart", "joinSep", "joinEnd" : strings to separate joined match strings.
+#######################################################################################
+# End of file.
+#######################################################################################
