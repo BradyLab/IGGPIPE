@@ -1,5 +1,5 @@
 ################################################################################
-# Sample parameter file for annotateFile.R which converts a .gff3 full of gene
+# Sample parameter file for annotateFile.R to convert a .gff3 full of gene
 # models to a .tsv with gene name and start/end position:
 #   1. Reads code/R/test_GFFfuncsAndMergeData/ITAG2.4_test.gff3
 #   2. Extracts attribute "Alias" into new column "gene".

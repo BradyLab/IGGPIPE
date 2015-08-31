@@ -1,5 +1,5 @@
 ################################################################################
-# Sample parameter file for annotateFile.R which converts a .tsv file of SCAR
+# Sample parameter file for annotateFile.R to convert a .tsv file of SCAR
 # markers into a .gff3 file that could be used to display markers as a browser
 # track:
 #   1. Reads MarkersOverlapping.test.tsv

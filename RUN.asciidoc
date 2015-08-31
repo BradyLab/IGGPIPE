@@ -319,6 +319,11 @@ The "annotate.template" file is configured for generating ".tsv" and ".gff3" fil
 using the markers generated via the allParameters.test.template configuration file.
 --
 
+*For problems and help:*
+~~~~~~~~~~~~~~~~~~~~~~~~
+* Post an issue on GitHub under BradyLab/SCARF repository
+* Contact me, Ted Toal, twtoal@ucdavis.edu
+ 
 *Tables*
 --------
 

@@ -1,5 +1,5 @@
 ################################################################################
-# Parameter file for annotateFile.R which converts the SCAR marker file generated
+# Parameter file for annotateFile.R to convert the SCAR marker file generated
 # by allParameters.template for the S. lycopersicum ITAG2.4 and S. pennellii V2.0
 # genomes into a .gff3 file that could be used to display markers as a browser
 # track:

@@ -1,8 +1,8 @@
 ################################################################################
 # Parameter file for annotateFile.R to add an "ILs" column to the SCAR marker
-# .tsv file MarkersOverlapping.test.tsv.  The column gives the ILs whose
-# introgression contains the marker, and the position of the marker within the
-# IL as a percentage of the distance along the introgression.
+# .tsv file code/R/testOutput/MarkersOverlapping.test.tsv.  The column gives
+# the ILs whose introgression contains the marker, and the position of the
+# marker within the IL as a percentage of the distance along the introgression.
 ################################################################################
 
 ################################################################################
@@ -72,7 +72,7 @@ mergeCols:
 ################################################################################
 
 outputFile:
-    path := "MarkersWithILs.test.tsv"
+    path := "code/R/testOutput/MarkersWithILs.test.tsv"
     type := tsv
     header := YES
     quote := NO

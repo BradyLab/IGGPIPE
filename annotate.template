@@ -567,20 +567,21 @@ match:
 
 # There can be one or more columns added to inputFileT data as a result of
 # matching inputFileT data dows to inputFileS data rows.  Within the "mergeCols"
-# section below, each "column" subsection contains the parameters describing one
-# column to be added. These parameters are ignored if match and merge is disabled
-# (inputFileS not specified).
+# section below, each subsection starts with "#:", where # is 1 for the first
+# subsection, 2 for the second, etc., and each subsection contains the parameters
+# describing one column to be added. These parameters are ignored if match and
+# merge is disabled (inputFileS not specified).
 
 mergeCols:
 
     # Parameters for first added column.
     
-    column:
+    1:
 
         # Name of the column to be added to inputFileT data.  If this is set to ""
-        # then this "column" section is ignored.
+        # then this column subsection is ignored.
 
-        name := gene
+        col := gene
 
         # Name of column before which the new column is to be added.  If this
         # is "", the new column is added as the last column.
@@ -649,10 +650,10 @@ mergeCols:
 
 
     # Parameters for second added column are specified the same way.  Delete the
-    # section or set "name" to "" to ignore the parameters in this section.
+    # section or set "col" to "" to ignore the parameters in this section.
     
-    column:
-        name := ""
+    2:
+        col := ""
         before := prmSeqL
         maxMatch := 0
         join := YES
@@ -663,8 +664,8 @@ mergeCols:
 
     # Parameters for third added column.  Add more column sections if needed.
     
-    column:
-        name := ""
+    3:
+        col := ""
         before := prmSeqL
         maxMatch := 0
         join := YES

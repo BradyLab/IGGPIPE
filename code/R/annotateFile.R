@@ -23,6 +23,8 @@ testing = 0
 #testing = 1 # For testing only.
 #testing = 2 # For testing only.
 #testing = 3 # For testing only.
+#testing = 4 # For testing only.
+#testing = 5 # For testing only.
 {
 if (testing == 0)
     args = commandArgs(TRUE)
@@ -31,8 +33,14 @@ else if (testing == 1)
     args = "annotate.template"
 else if (testing == 2)
     args = "annotate/annotate.gff3_to_tsv"
-else
+else if (testing == 3)
     args = "annotate/tsv_to_gff3.markers"
+else if (testing == 4)
+    args = "annotate/HPintrogressions_to_gff3"
+else if (testing == 5)
+    args = "annotate/addILs_column.test_tsv"
+else
+    stop("Unknown value for 'testing'")
 }
 
 Nexpected = 1
@@ -124,28 +132,8 @@ S = sub("='(.*)'", "=\\1", S)
 # Each section will be a sublist of a main list L, named with the section name.
 # Sections can be nested, and this creates sub-sublists.  
 
-# Since the same section name can appear multiple times ("column" section), when
-# this happens, insert two additional sublists between these multiple-instance
-# lists and their parent, as this example shows:
-#   First occurrence of section "column" for new column "gene":
-#       L
-#         L[["column"]]:
-#           .indent = 4
-#           .outer = "mergeCols"
-#           name = "gene"
-#           etc.
-#   After second occurrence of section "column" for new column "position":
-#       L
-#         L[["column"]]:
-#           .indent = 4
-#           .outer = "mergeCols"
-#           .sublists
-#             .sublists[[1]]:
-#               name = "gene"
-#               etc.
-#             .sublists[[2]]:
-#               name = "position"
-#               etc.
+# In some cases a section name can be a number ("mergeCols" subsections).  Here
+# we treat that no differently than named sections (the section name is a number).
 
 # Lines not ending in ":" are parameter lines consisting of a parameter name and
 # value, and these are placed in the sublist for the section they are in, with
@@ -165,132 +153,99 @@ S = sub("='(.*)'", "=\\1", S)
 
 isSectionHeader = grepl(":$", S)
 indents = sub("[^ \t].*$", "", S)
+if (any(grepl(" ", indents)) && any(grepl("\t", indents)))
+    cat("Warning: parameter file lines are indented with a mixture of spaces and tab characters.\n",
+        "This may cause confusion over how much each line is indented.\n")
 indents = gsub("\t", "    ", indents)
 indentAmt = nchar(indents)
 S = sub("^[ \t]*", "", S)
 
-# Loop for each line and insert the line into list L.  Initially, all sublists
-# appear as a separate sublist inside L, and are not nested as they should be.
-# We will nest them properly after this.
-L = list()
-curSection = "outermost"
-L[[curSection]]$.indent = -1
-L[[curSection]]$.outer = "outermost"
-for (i in 1:length(S))
+# Define a recursive function to process the parameter lines of a section and turn
+# them into a list.  The list element names are the section names or the parameter
+# names, and the list element values are sublists (for section names) or parameter
+# values (for parameter names).
+#
+# Arguments:
+#   Sidx: index into parameter line vector S of next line to process
+#   indent: amount of indent of the section that contains lines starting at S[Sidx].
+#       If a line is indented by this amount or less, it is a line that does not
+#       belong within this section, so return from this function.
+#
+# Returns:
+#   A list with members "Sidx" (index of line whose indent caused return from
+#   this function) and "L" (the sublist containing the contents of this section).
+collectSectionIntoList = function(Sidx, indent)
     {
-    # First determine which section is the parent section that contains this line,
-    # and make that section be "curSection".
-    while (indentAmt[i] <= L[[curSection]]$.indent)
-        curSection = L[[curSection]]$.outer
-    #cat("Parent section: ", curSection, "\n")
+    # Make empty list for the section.
+    L = list()
 
-    # If this line is a section header line, start a new list in L, named with the
-    # section name.  If this section name already exists within L, use two nested
-    # lists as shown in example above.
-    if (isSectionHeader[i])
+    # Loop for each line until end of lines or until a line is found which is not
+    # a member of this section.
+    # Is the next line a member of this section?
+    while (Sidx <= length(S) && indentAmt[Sidx] > indent)
         {
-        newSection = sub("^[ \t]*([^:]+):$", "\\1", S[i])
-        if (grepl("[^A-Za-z0-9_.]", newSection))
-            stop("Invalid characters in section name '", newSection, "' in line: ", Orig[i])
-
-        # Basic: add a new section sublist.
-        if (!any(names(L) == newSection))
+        # If next line is a section line, process a sub-section and add its sublist
+        # to L, named with the section name.
+        if (isSectionHeader[Sidx])
             {
-            L2 = list()
-            L2$.indent = indentAmt[i]
-            L2$.outer = curSection
-            L[[newSection]] = L2
+            newSectionName = sub("^[ \t]*([^:]+):$", "\\1", S[Sidx])
+            if (grepl("[^A-Za-z0-9_.]", newSectionName))
+                stop("Invalid characters in section name '", newSectionName, "' in line: ", Orig[Sidx])
+
+            # Process a subsection and add its sublist to the current section's list.
+            L2 = collectSectionIntoList(Sidx+1, indentAmt[Sidx])
+            Sidx = L2$Sidx
+            L[[newSectionName]] = L2$L
             }
-        # Repeated section name: if indexed sublist not yet created, create it.
-        else if (is.null(L[[newSection]]$.sublists))
+        # Else this line is a parameter line, so add a new element to L, named with
+        # the parameter name and with value equal to the parameter value.
+        else
             {
-            L2 = L[[newSection]]
-            .indent = L2$.indent
-            .outer = L2$.outer
-            L2$.indent = NULL
-            L2$.outer = NULL
-            L[[newSection]] = list(.indent=.indent, .outer=.outer, .sublists=list(L2, list()))
+            pos = regexpr("=", S[Sidx])
+            if (length(pos) == 0)
+                stop("Expected to find := on line but did not: ", Orig[Sidx])
+            if (pos[1] == 1)
+                stop("Missing parameter name on line: ", Orig[Sidx])
+            paramName = substring(S[Sidx], 1, pos[1]-1)
+            paramVal = substring(S[Sidx], pos[1]+1)
+            if (grepl("[^A-Za-z0-9_.]", paramName))
+                stop("Invalid characters in parameter name '", paramName, "' in line: ", Orig[Sidx])
+
+            L[[paramName]] = paramVal
+
+            # Next S line.
+            Sidx = Sidx + 1
             }
-        # Repeated section name: if indexed sublist has been created, insert a new empty sublist.
-        else
-            L[[newSection]]$.sublists = c(L[[newSection]]$.sublists, list())
-
-        # Record new section name as current section.
-        curSection = newSection
-        #cat("New section: ", curSection, "\n")
         }
-
-    # If this line is a parameter line, add a new element to the list for the current
-    # section, with the parameter name as the element name and parameter value as the value.
-    else
-        {
-        pos = regexpr("=", S[i])
-        if (length(pos) == 0)
-            stop("Expected to find := on line but did not: ", Orig[i])
-        if (pos[1] == 1)
-            stop("Missing parameter name on line: ", Orig[i])
-        paramName = substring(S[i], 1, pos[1]-1)
-        paramVal = substring(S[i], pos[1]+1)
-        if (grepl("[^A-Za-z0-9_.]", paramName))
-            stop("Invalid characters in parameter name '", paramName, "' in line: ", Orig[i])
-
-        # If the current section is an indexed section (e.g. the "column" example
-        # above), add the new parameter to the last sublist of the current section
-        # .sublists member.  Otherwise, just add it to the current section sublist.
-        if (is.null(L[[curSection]]$.sublists))
-            L[[curSection]][[paramName]] = paramVal
-        else
-            L[[curSection]]$.sublists[[length(L[[curSection]]$.sublists)]][[paramName]] = paramVal
-        }
+    # Return the current value of Sidx and the section list L that we made.
+    return(list(Sidx=Sidx, L=L))
     }
-# str(L) # Is it good?  Especially, L$column
 
-# Now loop through each list member of L and move it into its proper containing
-# parent if it isn't at the outermost level.  For this to work, we must do it
-# from the innermost lists to the outermost ones, so that each parent can always
-# be found at the outer level of L because it hasn't been moved into a nested
-# sublist yet.  So, work from largest .indent to smallest.  Get rid of the
-# .indent and .outer members, and also, collapse .sublists member up into its
-# parent, so for example we have "L$mergeCols$column[[i]]" rather than
-# "L$mergeCols$column$.sublists[[i]]".
-L$outermost = NULL
-indents = sapply(L, function(L) { if (!is.list(L)) return(NA); return(L$.indent) })
-outer = sapply(L, function(L) L$.outer)
-ord = order(indents, decreasing=TRUE)
-indents = indents[ord]
-outer = outer[ord]
-subsections = names(indents)
-for (subsection in subsections)
-    {
-    outer = L[[subsection]]$.outer
-    L[[subsection]]$.indent = NULL
-    L[[subsection]]$.outer = NULL
-    L2 = L[[subsection]]$.sublists
-    if (!is.null(L2))
-        {
-        L[[subsection]]$.sublists = NULL
-        L[[subsection]] = L2
-        } 
-    if (outer != "outermost")
-        {
-        L[[outer]][[subsection]] = L[[subsection]]
-        L[[subsection]] = NULL
-        }
-    }
-# str(L) # Now how does it look?
+# Get the list at the root level, starting with the first line, and using an
+# indent of -1 so all lines with no indent (indent 0) will be part of this
+# section.
+L = collectSectionIntoList(1, -1)$L
+
+# str(L) # Is it good?
 
 ################################################################################
 # Verify that we have the parameters we expect and need.
 ################################################################################
 
 # Define the expected parameters by defining a list with the same structure as
-# the expected list.  Member names in this "expected" list must be the expected
-# member name OR, for a list member, that name with ".match" appended.  If a
-# list member is missing, an empty list is added as that member.  When ".match"
-# is appended, it means that list is ignored if inputFileS path is empty (no
-# match/merge operation is to be done).  In that case the list is deleted.
-# The value of each non-list member indicates the action to take to evaluate the
-# parameter value:
+# the expected input data list L.  Member names in this "expected" list must be
+# the expected member name, either a section name containing a sublist or a
+# parameter name containing a parameter value.  If it is a sublist member, that
+# sublist name may optionally have ".match" appended.  If an expected sublist
+# member is missing in the input list L, an empty sublist of that name will be
+# added to it.  When ".match" is appended to a sublist name in the "expected"
+# list, it means that the expected sublist in L is ignored if inputFileS path
+# is empty (no match/merge operation is to be done).  In that case the sublist
+# is deleted from L.  If any sublist (nested or not) has no names (e.g.
+# expected$mergeCols.match), this means there may be any number of instances
+# of that sublist at that position in L, and their names don't matter and don't
+# even have to exist. For parameter members of "expected", the member value
+# indicates the action to take to evaluate the parameter value in L:
 #       "rmv.if.empty" : remove the parameter if it is an empty string value 
 #       "error.if.empty" : it is an error if the parameter is an empty string or missing
 #       "rmv.parent.if.empty" : remove enclosing list if parameter is empty string or missing
@@ -365,17 +320,15 @@ expected = list(
         closest = "rmv.if.empty"
         ),
     mergeCols.match = list(
-        column = list(
-            list(
-                name = "rmv.parent.if.empty",
-                before = "rmv.if.empty",
-                maxMatch = "rmv.if.empty",
-                join = "logical.YES",
-                joinPfx = "",
-                joinSfx = "",
-                joinSep = ",",
-                format = "error.if.empty"
-                )
+        list(
+            col = "rmv.parent.if.empty",
+            before = "rmv.if.empty",
+            maxMatch = "rmv.if.empty",
+            join = "logical.YES",
+            joinPfx = "",
+            joinSfx = "",
+            joinSep = ",",
+            format = "error.if.empty"
             )
         ),
     attrCreation = list(
@@ -410,8 +363,8 @@ expected = list(
 #   doMatchMerge: global parameter, TRUE if match/merge is being done.
 #
 # Returns: the modified L.sublist.
+doMatchMerge = (!is.null(L$inputFileS) && L$inputFileS != "")
 
-doMatchMerge = (!is.null(L$inputFileS) && inputFileS != "")
 checkParams = function(expected.sublist, L.sublist, fullName)
     {
     #cat("fullName:", fullName, "\n")
@@ -450,14 +403,15 @@ checkParams = function(expected.sublist, L.sublist, fullName)
                 }
             }
         }
-    # Else if the first element of expected.sublist is a list then expected.sublist
-    # must not have names, so expected.sublist is an unnamed section of parameters
-    # (mergeCols.column is our only case like this).
+    # Else if the first element of expected.sublist is a list (without names),
+    # then L.sublist can have any number of members like this (mergeCols.column
+    # is our only case like this) and their names are optional.
     else if (is.list(expected.sublist[[1]]))
         {
-        # Make sure L.sublist is unnamed.
-        if (!is.null(names(L.sublist)))
-            stop("Unexpected parameter names found within section '", fullName, "'", call.=FALSE)
+        # There should only be one element in expected.sublist.
+        if (length(expected.sublist) != 1)
+            stop("Programming error, 'expected' sublist without names should be the only member of its parent")
+
         # There is only one element in the unnamed sublist of expected.sublist, but
         # but there can be any number of elements in L.sublist.
         # Loop for each member of L.sublist, backwards so if an element is removed,
@@ -465,9 +419,18 @@ checkParams = function(expected.sublist, L.sublist, fullName)
         for (i in length(L.sublist):1)
             {
             #cat("section:", i, " in ", fullName, "\n")
+
+            # Get name or number for L sublist.
+            if (is.null(names(L.sublist)))
+                sectionName = i
+            else
+                sectionName = names(L.sublist)[i]
+
+            # Get fullName for the sublist.
+            newFullName = paste(fullName, "[", sectionName, "]", sep="")
+
             # Process the section's members.
-            newFullName = paste(fullName, "[", i, "]", sep="")
-            newSublist = checkParams(expected.sublist[[1]], L.sublist[[i]], newFullName)
+            newSublist = checkParams(expected.sublist[[1]], L.sublist[[sectionName]], newFullName)
             L.sublist[[i]] = newSublist
             if (is.null(newSublist))
                 {
@@ -852,7 +815,7 @@ if (doMatchMerge && !is.null(L$attrExtractS))
 # Match and merge.
 ################################################################################
 
-if (doMatchMerge && !is.null(L$attrExtractS))
+if (doMatchMerge)
     {
     T.df = mergeOnMatches(T.df, S.df, L$positionT, L$positionS, L$match, L$mergeCols)
     }
@@ -882,7 +845,7 @@ if (!is.null(L$attrCreation))
     if (!is.null(outColNames))
         {
         missing = outColNames[!outColNames %in% colnames(T.df)]
-        if (any(missing))
+        if (length(missing) > 0)
             stop("No such columns in output data frame: ", paste(missing, collapse=":"))
         T.df = T.df[, outColNames]
         }

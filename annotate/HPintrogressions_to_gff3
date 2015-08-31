@@ -10,7 +10,7 @@
 #   5. Adds fixed column "score" containing "." (no score)
 #   6. Adds fixed column "strand" containing "." (not stranded)
 #   7. Adds fixed column "frame" containing "." (no frame)
-#   8. Writes the data to .gff3 file: code/R/test_GFFfuncsAndMergeData/ILintrogressions.gff3
+#   8. Writes the data to .gff3 file: code/R/testOutput/ILintrogressions.gff3
 #       using data taken from these input columns:
 #           seqname: (seqname column added above)
 #           start: start_right
@@ -70,7 +70,7 @@ attrCreation:
 ################################################################################
 
 outputFile:
-    path := "code/R/test_GFFfuncsAndMergeData/ILintrogressions.gff3"
+    path := "code/R/testOutput/ILintrogressions.gff3"
     type := gff3
     outColNames := "seqname,source,feature,start_right,end_left,score,strand,frame,attributes"
     newColNames := "seqname,source,feature,start,end,score,strand,frame,attributes"

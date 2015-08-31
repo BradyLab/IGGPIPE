@@ -1,5 +1,5 @@
 ################################################################################
-# Sample parameter file for annotateFile.R which adds an ID column to a .tsv
+# Sample parameter file for annotateFile.R to add an ID column to a .tsv
 # file of SCAR markers and writes the result to a new .tsv file:
 #   1. Reads MarkersOverlapping.test.tsv
 #   2. Adds column "ID" containing a unique row ID equal to "ID_nn_YYY" where

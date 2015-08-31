@@ -937,8 +937,8 @@ mergeOnMatches = function(T.df, S.df, T.pos, S.pos, match, mergeCols)
     requireMember(T.pos, "start")
     requireMember(S.pos, "start")
 
-    mems.mergeCols = c("start", "id", "len", "end")
-    mems = intersect(names(T.pos), mems.mergeCols)
+    mems.posCols = c("start", "id", "len", "end")
+    mems = intersect(names(T.pos), mems.posCols)
     for (mem in mems)
         {
         requireNonNAcolName(T.pos, mem, colnames(T.df), "column name of T.df")
@@ -951,7 +951,7 @@ mergeOnMatches = function(T.df, S.df, T.pos, S.pos, match, mergeCols)
     if (!is.null(T.pos[["end"]]) && any(T.df[,T.pos[["start"]]] > T.df[,T.pos[["end"]]]))
         error("One or more in column T.df$", T.pos[["start"]], " is greater than corresponding T.df$", T.pos[["end"]])
 
-    mems = intersect(names(S.pos), mems.mergeCols)
+    mems = intersect(names(S.pos), mems.posCols)
     for (mem in mems)
         {
         requireNonNAcolName(S.pos, mem, colnames(S.df), "column name of S.df")

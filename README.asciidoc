@@ -40,9 +40,10 @@ or INSTALL.html and open either one and follow the instructions.
 * Find file RUN.pdf or RUN.html in the SCARF folder on your computer and open
 either one and follow the instructions.
 
-*For help, contact:*
-~~~~~~~~~~~~~~~~~~~~
-* Ted Toal, twtoal@ucdavis.edu
+*For problems and help:*
+~~~~~~~~~~~~~~~~~~~~~~~~
+* Post an issue on GitHub under BradyLab/SCARF repository
+* Contact me, Ted Toal, twtoal@ucdavis.edu
  
 References
 ----------
