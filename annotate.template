@@ -53,7 +53,7 @@
 
 
 ################################################################################
-# inputFileT
+# inputFileT parameters.
 ################################################################################
 
 # Parameters describing the first input file.  The letter "T" in the name is for
@@ -62,7 +62,7 @@
 
 inputFileT:
 
-    # Path of the input file, relative to directory from which annotateFile.R is run.
+    # Path of the input file, relative to current directory at time annotateFile.R is run.
 
     path := "MarkersOverlapping.test.tsv"
 
@@ -100,14 +100,48 @@ inputFileT:
     
     comment := ""
 
-    # Column names to retain (not remove), or "" to retain all columns.
-    # This is used for all file types including for .gff3 and .gtf files.
+    # Column names to retain (not remove).  If this is "", all columns are retained.
+    # Otherwise, this must be a comma-separated list of one or more names of columns to
+    # be retained.  This is used for all file types including for .gff3 and .gtf files.
 
     keepColumns := ""
 
+    # Names of new columns to be added to the inputFileT data, as a comma-separated list.
+    # If this is "", no new columns are added.  These new columns will contain values determined
+    # by parameter "addColValues" below.
+
+    addColNames := ""
+
+    # Values to insert in the new columns specified by "addColNames", as a comma-separated
+    # list in the same order as the column names were listed in "addColNames".  The values
+    # may be empty ("" or "a,,b" for example), causing an empty value in that new column.
+    # If "R.NA" is specified for a value, the R language "NA" value is used.  Otherwise,
+    # the value is taken as a format control string.  Each added column has its own format
+    # control string, they are separated from one another by commas.  The characters of
+    # the format control string are copied verbatim to the new column except for values
+    # surrounded by {} braces, and these are defined as follows:
+    #   {com} : a verbatim comma
+    #   {lb} : a verbatim left brace
+    #   {rb} : a verbatim right brace
+    #   {+col} : the value in column "col"
+    #   {/col/RE/RE.replace} : regular expression search/replace of data in column "col"
+    #       (e.g. {/chr/SL2.40ch0?/ID_})
+    #   {#n} : append a number with at least n digits to the column value, adding leading
+    #       0's if necessary to make the number have n digits, with numbers starting at 1
+    #       and counting up as high as needed so that each row value is unique and appears
+    #       only once in that column.  Use 1 for n to suppress leading 0's and have a
+    #       simple counting number.  The number is appended to the END of the value in the
+    #       column even if {#n} appears somewhere in the middle of the format string. For
+    #       example, a format string of simply "ID_{1}" means that column will contain the
+    #       values "ID_1", "ID_2", etc.
+    # If only one value or format string is specified and more than one column was
+    # specified in "addColNames", that one value is used for all of the new columns.
+
+    addColValues := ""
+
 
 ################################################################################
-# inputFileS
+# inputFileS parameters.
 ################################################################################
 
 # Parameters describing the second input file.  The letter "S" in the name is for
@@ -116,9 +150,10 @@ inputFileT:
 
 inputFileS:
 
-    # Path of the input file, relative to directory from which annotateFile.R is run.
+    # Path of the input file, relative to current directory at time annotateFile.R is run.
     # Set this to "" to disable match and merge and ignore the remaining parameters
     # in this section.
+
     path := "code/R/test_GFFfuncsAndMergeData/ITAG2.4_test.gff3"
 
     # Type of file, one of:
@@ -155,10 +190,23 @@ inputFileS:
     
     comment := ""
 
-    # Column names to retain (not remove), or "" to retain all columns.
-    # This is used for all file types including for .gff3 and .gtf files.
+    # Column names to retain (not remove).  If this is "", all columns are retained.
+    # Otherwise, this must be a comma-separated list of one or more names of columns to
+    # be retained.  This is used for all file types including for .gff3 and .gtf files.
 
     keepColumns := ""
+
+    # Names of new columns to be added to the inputFileS data, as a comma-separated list.
+    # If this is "", no new columns are added.  These new columns will contain values determined
+    # by parameter "addColValues" below.
+
+    addColNames := ""
+
+    # Values to insert in the new columns specified by "addColNames", as a comma-separated
+    # list in the same order as the column names were listed in "addColNames".  The values
+    # are formatted the same as the addColValues in the inputFileT section.
+
+    addColValues := ""
 
 
 ################################################################################
@@ -276,7 +324,7 @@ attrExtractT:
 
     # Set this to YES to remove the attributes column after extracting attributes.
     # Set it to NO to leave the attributes column, which is modified so that it
-    # no longer contains the extracted attributes.
+    # no longer contains the extracted attributes.  Default is NO.
 
     removeAttrColumns := YES
 
@@ -339,7 +387,7 @@ attrExtractS:
 
     # Set this to YES to remove the attributes column after extracting attributes.
     # Set it to NO to leave the attributes column, which is modified so that it
-    # no longer contains the extracted attributes.
+    # no longer contains the extracted attributes.  Default is NO.
 
     removeAttrColumns := YES
 
@@ -551,6 +599,7 @@ mergeCols:
         # matches separate, and add multiple new columns whose names are the specified
         # name followed by 1, 2, 3, etc. up to maxMatch, or if maxMatch is 0, up to
         # the number needed for the maximum number of matches of any inputFileT row.
+        # Default is YES.
 
         join := YES
 
@@ -571,9 +620,12 @@ mergeCols:
         joinSep := ","
 
         # Format control string that determines the format of the data in the new
-        # column, for each matching row of inputFileS.  Each character is copied
-        # verbatim to the new column except for values surrounded by {} braces,
-        # and these are defined as follows:
+        # column, for each matching row of inputFileS.  This is very similar to the
+        # "format" parameters in the "inputFileT" and "inputFileS" sections above,
+        # except that here we are dealing with pairs of matching inputFileT and
+        # inputFileS data.  Each format string character is copied verbatim to the
+        # new column except for values surrounded by {} braces, and these are
+        # defined as follows:
         #   {lb} : a verbatim left brace
         #   {rb} : a verbatim right brace
         #   {+col} : the value in inputFileS column "col" of the matching inputFileT row
@@ -585,7 +637,7 @@ mergeCols:
         #       by "val" and round to "dgts" digits after decimal (e.g. {*S*start*1e-6*0}).
         #   {*T*col*val*dgts} : likewise for inputFileT
         #   {/S/col/RE/RE.replace} : regular expression search/replace of matching row
-        #       inputFileS column "col" (e.g. {/S/chr/SL2.40ch0?/})
+        #       inputFileS column "col" (e.g. {/S/chr/SL2.40ch0?/chrm#})
         #   {/T/col/RE/RE.replace} : likewise for inputFileT
         #
         #   A start position in a matching row may lie UPSTREAM, WITHIN, or DOWNSTREAM of
@@ -633,7 +685,9 @@ mergeCols:
 ################################################################################
 ################################################################################
 
-# Parameters describing attribute creation.
+################################################################################
+# Output file attribute creation parameters.
+################################################################################
 
 attrCreation:
 
@@ -653,7 +707,9 @@ attrCreation:
     # be a comma-separated list in the same order as the attributes were listed in
     # parameter "columnsForAttrs".  If a row/column contains the value specified,
     # no attribute is created.  If this is "R.NA", then if a row/column contains
-    # the R language "NA" value, no attribute is created.
+    # the R language "NA" value, no attribute is created.  If only one value is
+    # specified and more than one column was specified for "columnsForAttrs",
+    # that one value is used for the no-attribute value for all columns.
 
     noAttrValues := ""
 
@@ -665,12 +721,12 @@ attrCreation:
 
     # Set this to YES to MERGE the column data into existing attributes, if any.
     # Set it to NO to DELETE existing attributes and replace them with these new
-    # ones.
+    # ones.  Default is YES.
 
     merge := YES
 
     # Set this to YES to remove the column data after creating the attributes.
-    # Set it to NO to leave the columns in place.
+    # Set it to NO to leave the columns in place.  Default is YES.
 
     remove := YES
 
@@ -683,11 +739,13 @@ attrCreation:
 ################################################################################
 ################################################################################
 
-# Parameters describing the output file.
+################################################################################
+# Output file parameters.
+################################################################################
 
 outputFile:
 
-    # Path of the output file, relative to directory from which annotateFile.R is run.
+    # Path of the output file, relative to current directory at time annotateFile.R is run.
 
     path := "MarkersAnnotated.test.tsv"
 
@@ -702,17 +760,23 @@ outputFile:
 
     type := tsv
 
-    # Names of columns to be written to the output file, in the order they are to appear,
-    # as a comma-separated list of names.  If this is "", all existing columns are written.
-    # For .gff3 and .gtf files, exactly nine names must be given, and these must correspond
-    # to the .gff3 and .gtf data columns "seqname", "source", "feature", "start", "end",
-    # "score", "strand", "frame", "attributes".
+    # Names of columns in inputFileT to be retained for writing to the output file, and in
+    # the order they are to appear, as a comma-separated list of names.  If this is "", all
+    # existing columns are written.  For .gff3 and .gtf files, exactly nine names must be
+    # given, and these must correspond to the .gff3 and .gtf data columns "seqname", "source",
+    # "feature", "start", "end", "score", "strand", "frame", "attributes".
 
-    columns := ""
+    outColNames := ""
+
+    # New names of columns to be written to the output file, in same order as the old names
+    # appear in "outColNames" above.  If this is "", the column names are not changed but are
+    # left as in "outColNames" (or if that is "", left as is in the modified inputFileT data).
+
+    newColNames := ""
 
     # Set this to YES to write a header line containing the column names as the first
     # line of the data in a .tsv or .csv file.  Set it to NO to not write a header line.
-    # Ignored for .gff3 and .gtf output files.
+    # Ignored for .gff3 and .gtf output files.  Default is YES.
 
     header := YES
 
@@ -728,7 +792,7 @@ outputFile:
 
     # Set this to YES to cause columns containing character data to surround the
     # data with double quotation marks.  Set it to NO to not use quotation marks.
-    # Ignored for .gff3 and .gtf output files.
+    # Ignored for .gff3 and .gtf output files.  Default is NO.
 
     quote := NO
 

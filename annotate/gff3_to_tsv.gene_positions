@@ -1,0 +1,46 @@
+################################################################################
+# Sample parameter file for annotateFile.R which converts a .gff3 full of gene
+# models to a .tsv with gene name and start/end position:
+#   1. Reads code/R/test_GFFfuncsAndMergeData/ITAG2.4_test.gff3
+#   2. Extracts attribute "Alias" into new column "gene".
+#   3. Writes data to the .tsv file code/R/testOutput/genePos.tsv with columns
+#       "gene", "id", "start", "end", "strand" (the .gff3 "seqname" column is
+#       renamed to "id").
+################################################################################
+
+
+################################################################################
+# inputFileT parameters.
+################################################################################
+
+inputFileT:
+    path := "code/R/test_GFFfuncsAndMergeData/ITAG2.4_test.gff3"
+    type := gff3
+
+################################################################################
+# inputFileT attribute extraction.
+################################################################################
+
+attrExtractT:
+    attributesColumn := attributes
+    keepFeatures := gene
+    extractAttrs := Alias
+    newAttrColumns := gene
+    missingAttrValues := ""
+    removeAttrColumns := YES
+
+################################################################################
+# Output file parameters.
+################################################################################
+
+outputFile:
+    path := "code/R/testOutput/genePos.tsv"
+    type := tsv
+    outColNames := "gene,seqname,start,end,strand"
+    newColNames := "gene,id,start,end,strand"
+    header := YES
+    quote := NO
+
+################################################################################
+# End of file.
+################################################################################

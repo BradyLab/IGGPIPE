@@ -1,0 +1,75 @@
+################################################################################
+# Sample parameter file for annotateFile.R which converts a .tsv file of SCAR
+# markers into a .gff3 file that could be used to display markers as a browser
+# track:
+#   1. Reads MarkersOverlapping.test.tsv
+#   2. Adds column "ID" containing a unique row ID equal to "ID_nn_YYY" where
+#       "nn" is the integer part of the Hid column and "YYY" is a sequence number
+#       that increments when the "nn" value is the same for more than 1 column.
+#   3. Adds fixed column "source" containing "SCARF.markers" 
+#   4. Adds fixed column "feature" containing "genetic_marker"
+#       (Sequence Ontology term SO:0001645)
+#   5. Adds fixed column "score" containing "." (no score)
+#   6. Adds fixed column "strand" containing "." (not stranded)
+#   7. Adds fixed column "frame" containing "." (no frame)
+#   8. Writes the data to .gff3 file code/R/testOutput/Markers.gff3 with columns
+#       taken from these input columns:
+#           seqname: Hid
+#           start: HampPos1
+#           end: HampPos2
+#           attributes: the following columns from the input file, using the
+#               column name as the attribute name, in this order:
+#                   ID, HampLen, PampLen, PHdif, prmSeqL, prmSeqR, prmTmL, prmTmR,
+#                   PHphase, Hpct, Ppct, Pid, PampPos1, PampPos2
+#
+# This data file can be added as a track to the solgenomics.net S. lycopersicum
+# ITAG2.4 JBrowse genome browser.  Go to solgenomics.net, select Genomes, Tomato,
+# expand Download section, choose Genome Browser.  In JBrowse browser, select
+# File, Open, and in Local Files choose Select Files, choose the output file
+# from here, choose Open.  In the browser make sure "GFF3 Markers" and "ITAG2.4
+# gene models" tracks are selected at the left.  In the drop-down box choose
+# chromosome 1 (SL2.50ch01) and enter "SL2.50ch01:39198..43998" in the position
+# box.  You should see orange bands representing markers, labelled ID_0_001 etc.
+# Clicking on a marker shows its attributes, such as primer sequences.
+################################################################################
+
+################################################################################
+# inputFileT parameters.
+################################################################################
+
+# Parameters describing the first input file.  The letter "T" in the name is for
+# "target", because this input file's data is the "target" of a match and merge
+# (if one is done) and is the "target" data written to the output file.
+
+inputFileT:
+    path := "MarkersOverlapping.test.tsv"
+    type := tsv
+    quote := ""
+    comment := ""
+    keepColumns := "Hid,HampPos1,HampPos2,HampLen,PampLen,PHdif,prmSeqL,prmSeqR,prmTmL,prmTmR,PHphase,Hpct,Ppct,Pid,PampPos1,PampPos2"
+    addColNames := "ID,source,feature,score,strand,frame"
+    addColValues := "ID_{/Hpct/\.[0-9]*$/}_{#3},SCARF.markers,genetic_marker,.,.,."
+
+################################################################################
+# Output file attribute creation parameters.
+################################################################################
+
+attrCreation:
+    columnsForAttrs := "ID,HampLen,PampLen,PHdif,prmSeqL,prmSeqR,prmTmL,prmTmR,PHphase,Hpct,Ppct,Pid,PampPos1,PampPos2"
+    attributesColumn := attributes
+    merge := NO
+    remove := YES
+
+################################################################################
+# Output file parameters.
+################################################################################
+
+outputFile:
+    path := "code/R/testOutput/Markers.gff3"
+    type := gff3
+    outColNames := "Hid,source,feature,HampPos1,HampPos2,score,strand,frame,attributes"
+    newColNames := "seqname,source,feature,start,end,score,strand,frame,attributes"
+
+################################################################################
+# End of file.
+################################################################################

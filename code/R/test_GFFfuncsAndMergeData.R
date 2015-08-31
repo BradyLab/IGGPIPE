@@ -99,7 +99,7 @@ S.df = dfILs
 T.pos = list(id="Hid", start="HampPos1", end="HampPos2")
 S.pos = list(id="id", start="start_right", end="end_left")
 dist = list(method="OVERLAP")
-cols = list(list(col="ILs", before="prmSeqL", maxMatch=0, join="YES", joinSep=";", format="{+IL_segment}({%S})"))
+cols = list(list(col="ILs", before="prmSeqL", maxMatch=0, join=TRUE, joinSep=";", format="{+IL_segment}({%S})"))
 df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 df[1:10,1:11]
 df[1500:1510,1:11]
@@ -161,8 +161,8 @@ sum(df$ILs != "") # No surprise, all amplicons are INSIDE the introgressions, wh
 
 # Try inserting two different columns of S.df.
 cols = list(
-    list(col="ILs", before="prmSeqL", maxMatch=0, join="YES", joinSep=";", format="{+IL_segment}({%S})"),
-    list(col="ILstart", before="prmSeqL", maxMatch=0, join="YES", joinSep=";", format="{+start_right}")
+    list(col="ILs", before="prmSeqL", maxMatch=0, join=TRUE, joinSep=";", format="{+IL_segment}({%S})"),
+    list(col="ILstart", before="prmSeqL", maxMatch=0, join=TRUE, joinSep=";", format="{+start_right}")
     )
 df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 df[1,]
@@ -183,7 +183,7 @@ df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 df[1,]
 
 # Join columns with start and end strings.
-cols = list(list(col="ILs", before="prmSeqL", maxMatch=0, join="YES", joinSep=";", joinPfx="[", joinSfx="]",
+cols = list(list(col="ILs", before="prmSeqL", maxMatch=0, join=TRUE, joinSep=";", joinPfx="[", joinSfx="]",
     format="{+IL_segment}({%S})"))
 df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 df[1,]
@@ -193,7 +193,7 @@ df[1,]
 #############################################
 
 # Test {lb} and {rb}
-cols = list(list(col="ILs", before="prmSeqL", maxMatch=0, join="YES", joinSep=";", format="{+IL_segment}({%S})"))
+cols = list(list(col="ILs", before="prmSeqL", maxMatch=0, join=TRUE, joinSep=";", format="{+IL_segment}({%S})"))
 cols[[1]]$format = "{+IL_segment}{lb}{%S}{rb}"
 df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 df[100,]
@@ -324,7 +324,7 @@ S.df = dfG
 T.pos = list(id="Hid", start="HampPos1", end="HampPos2")
 S.pos = list(id="id", start="start", end="end")
 dist = list(method="OVERLAP")
-cols = list(list(col="genes", before="prmSeqL", maxMatch=0, join="YES", joinSep=";", format="{+gene}({#S})"))
+cols = list(list(col="genes", before="prmSeqL", maxMatch=0, join=TRUE, joinSep=";", format="{+gene}({#S})"))
 df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 sum(df$genes != "")
 df[1:10,1:11]
@@ -337,7 +337,7 @@ head(dfG)
 
 # Try #T in place of #S
 dist = list(method="OVERLAP")
-cols = list(list(col="genes", before="prmSeqL", maxMatch=0, join="YES", joinSep=";", format="{+gene}({#T})"))
+cols = list(list(col="genes", before="prmSeqL", maxMatch=0, join=TRUE, joinSep=";", format="{+gene}({#T})"))
 df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 sum(df$genes != "")
 df[1:10,1:11]
@@ -421,7 +421,7 @@ S.df = dfG
 T.pos = list(id="Hid", start="HampPos1", end="HampPos2")
 S.pos = list(id="id", start="start", end="end")
 dist = list(method="S.NEAR", closest=0, start.down=3000, end.up=3000)
-cols = list(list(col="genes", before="prmSeqL", maxMatch=0, join="YES", joinSep=";", format="{+gene}({#T})"))
+cols = list(list(col="genes", before="prmSeqL", maxMatch=0, join=TRUE, joinSep=";", format="{+gene}({#T})"))
 df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 sum(df$genes != "") # 1815 vs 1671
 df.S.NEAR = df[df$genes != "",]
@@ -530,7 +530,7 @@ S.df = dfG
 T.pos = list(id="Hid", start="HampPos1", end="HampPos2")
 S.pos = list(id="id", start="start", end="end")
 dist = list(method="T.NEAR", closest=0, start.down=3000, end.up=3000)
-cols = list(list(col="genes", before="prmSeqL", maxMatch=0, join="YES", joinSep=";", format="{+gene}({#T})"))
+cols = list(list(col="genes", before="prmSeqL", maxMatch=0, join=TRUE, joinSep=";", format="{+gene}({#T})"))
 df = mergeOnMatches(T.df, S.df, T.pos, S.pos, dist, cols)
 sum(df$genes != "") # 1815 vs 1671
 df.T.NEAR = df[df$genes != "",]

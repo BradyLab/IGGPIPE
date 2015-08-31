@@ -232,7 +232,7 @@ convertAttrsToCols = function(df, includeAttrs=NULL, excludeAttrs=NULL, removeAt
         {
         if (length(missingAttrVals) != N)
             stop("convertAttrsToCols: there are ", N,
-                "columns to be included but missingAttrVals has only ", length(missingAttrVals))
+                " columns to be included but missingAttrVals has only ", length(missingAttrVals))
         }
     names(missingAttrVals) = includeAttrs
 
@@ -297,7 +297,7 @@ convertColsToAttrs = function(df, cols, newAttrNames=NULL, noAttrValues=NULL,
     if (is.null(newAttrNames))
         newAttrNames = cols
     if (length(newAttrNames) != N)
-        stop("convertColsToAttrs: there are ", N, " columns to convert but newAttrNames has only ", N)
+        stop("convertColsToAttrs: there are ", N, " columns to convert but newAttrNames has only ", length(newAttrNames))
     names(newAttrNames) = cols
 
     if (is.null(noAttrValues))

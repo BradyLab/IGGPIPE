@@ -19,16 +19,20 @@ library("methods")
 ################################################################################
 
 # Get arguments.
-testing = FALSE
-#testing = TRUE # For testing only.
+testing = 0
+#testing = 1 # For testing only.
+#testing = 2 # For testing only.
+#testing = 3 # For testing only.
 {
-if (!testing)
+if (testing == 0)
     args = commandArgs(TRUE)
 # For testing only:
-else
-    {
+else if (testing == 1)
     args = "annotate.template"
-    }
+else if (testing == 2)
+    args = "annotate/annotate.gff3_to_tsv"
+else
+    args = "annotate/tsv_to_gff3.markers"
 }
 
 Nexpected = 1
@@ -289,10 +293,13 @@ for (subsection in subsections)
 # parameter value:
 #       "rmv.if.empty" : remove the parameter if it is an empty string value 
 #       "error.if.empty" : it is an error if the parameter is an empty string or missing
-#       "rmv.parent.if.empty" : remove enclosing list if parameter is empty string
+#       "rmv.parent.if.empty" : remove enclosing list if parameter is empty string or missing
+#       "NA.if.missing" : set the parameter to NA if it is missing, else leave as-is.
+#       "logical.YES" or "logical.NO" : parameter must be YES/NO/TRUE/FALSE/1/0
+#           (ignoring case) and it is set to R TRUE or FALSE, or if missing is set
+#           to the value after "logical.".
 #       "(A,B,C,...)" : the parameter value must equal either A, B, C, ...
 #           (ignoring case) or, if it is missing, set it to A.
-#       "NA.if.missing" : set the parameter to NA if it is missing, else leave as-is.
 #       any other string : set the parameter to that string if the parameter is an
 #           empty string or missing.
 
@@ -304,7 +311,9 @@ expected = list(
         column1 = "rmv.if.empty",
         quote = "",
         comment = "",
-        keepColumns = "rmv.if.empty"
+        keepColumns = "rmv.if.empty",
+        addColNames = "rmv.if.empty",
+        addColValues = "NA.if.missing"
         ),
     inputFileS.match = list(
         path = "rmv.parent.if.empty",
@@ -313,7 +322,9 @@ expected = list(
         column1 = "rmv.if.empty",
         quote = "",
         comment = "",
-        keepColumns = "rmv.if.empty"
+        keepColumns = "rmv.if.empty",
+        addColNames = "rmv.if.empty",
+        addColValues = "NA.if.missing"
         ),
     attrExtractT = list(
         attributesColumn = "rmv.parent.if.empty",
@@ -322,7 +333,7 @@ expected = list(
         excludeAttrs = "rmv.if.empty",
         newAttrColumns = "rmv.if.empty",
         missingAttrValues = "NA.if.missing",
-        removeAttrColumns = "(NO,YES)"
+        removeAttrColumns = "logical.NO"
         ),
     attrExtractS.match = list(
         attributesColumn = "rmv.parent.if.empty",
@@ -331,7 +342,7 @@ expected = list(
         excludeAttrs = "rmv.if.empty",
         newAttrColumns = "rmv.if.empty",
         missingAttrValues = "NA.if.missing",
-        removeAttrColumns = "(NO,YES)"
+        removeAttrColumns = "logical.NO"
         ),
     positionT.match = list(
         start = "error.if.empty",
@@ -359,7 +370,7 @@ expected = list(
                 name = "rmv.parent.if.empty",
                 before = "rmv.if.empty",
                 maxMatch = "rmv.if.empty",
-                join = "(YES,NO)",
+                join = "logical.YES",
                 joinPfx = "",
                 joinSfx = "",
                 joinSep = ",",
@@ -369,19 +380,20 @@ expected = list(
         ),
     attrCreation = list(
         columnsForAttrs = "rmv.parent.if.empty",
-        newAttrNames = "",
+        newAttrNames = "rmv.if.empty",
         noAttrValues = "NA.if.missing",
         attributesColumn = "attributes",
-        merge = "(YES,NO)",
-        remove = "(YES,NO)"
+        merge = "logical.YES",
+        remove = "logical.YES"
         ),
     outputFile = list(
         path = "error.if.empty",
         type = "(tsv,csv,gff3,gtf)",
-        columns = "rmv.if.empty",
-        header = "rmv.if.empty",
+        outColNames = "rmv.if.empty",
+        newColNames = "rmv.if.empty",
+        header = "logical.YES",
         column1 = "rmv.if.empty",
-        quote = "(NO,YES)"
+        quote = "logical.NO"
         )
     )
 
@@ -445,7 +457,7 @@ checkParams = function(expected.sublist, L.sublist, fullName)
         {
         # Make sure L.sublist is unnamed.
         if (!is.null(names(L.sublist)))
-            stop("Unexpected parameter names found within section '", fullName, "'")
+            stop("Unexpected parameter names found within section '", fullName, "'", call.=FALSE)
         # There is only one element in the unnamed sublist of expected.sublist, but
         # but there can be any number of elements in L.sublist.
         # Loop for each member of L.sublist, backwards so if an element is removed,
@@ -482,11 +494,11 @@ checkParams = function(expected.sublist, L.sublist, fullName)
             else if (handling == "error.if.empty")
                 {
                 if (is.null(L.sublist[[param]]) || L.sublist[[param]] == "")
-                    stop("Expected a value for parameter '", param, "' in section '", fullName, "'")
+                    stop("Expected a value for parameter '", param, "' in section '", fullName, "'", call.=FALSE)
                 }
             else if (handling == "rmv.parent.if.empty")
                 {
-                if (!is.null(L.sublist[[param]]) && L.sublist[[param]] == "")
+                if (is.null(L.sublist[[param]]) || L.sublist[[param]] == "")
                     {
                     #cat(" Removing parent\n")
                     return(NULL)
@@ -500,6 +512,19 @@ checkParams = function(expected.sublist, L.sublist, fullName)
                     #cat(" Parameter set to NA\n")
                     }
                 }
+            else if (handling == "logical.YES" || handling == "logical.NO")
+                {
+                val = L.sublist[[param]]
+                if (is.null(val) || val == "")
+                    val = sub("logical\\.", "", handling)
+                val = toupper(val)
+                if (val %in% c("YES", "TRUE", "1"))
+                    L.sublist[[param]] = TRUE
+                else if (val %in% c("NO", "FALSE", "0"))
+                    L.sublist[[param]] = FALSE
+                else
+                    stop("Expected a logical value (YES or NO) for parameter ", param)
+                }
             else if (grepl("^\\(", handling))
                 {
                 handling = gsub("[()]", "", handling)
@@ -508,7 +533,7 @@ checkParams = function(expected.sublist, L.sublist, fullName)
                     L.sublist[[param]] = handling[1]
                 else if (!toupper(L.sublist[[param]]) %in% toupper(handling))
                     stop("Expected parameter '", param, "' in section '", fullName, "' to be one of ",
-                        expected.sublist[[param]])
+                        expected.sublist[[param]], call.=FALSE)
                 }
             else
                 {
@@ -521,13 +546,142 @@ checkParams = function(expected.sublist, L.sublist, fullName)
     }
 
 # Now call it to check the parameters.
-L = checkParams(expected, L, "", !is.null(L$inputFileS))
+L = checkParams(expected, L, "")
 
 ################################################################################
 ################################################################################
-# Ready.  Do it.
+# Define helper functions.
 ################################################################################
 ################################################################################
+
+#######################################################################################
+# Function to parse outputFile$addColValues format strings and generate a vector of
+# data formatted accordingly.
+#
+# Arguments:
+#   format: a outputFile$addColValues format string.
+#   T.df: the T.df data frame.
+#
+# Returns: vector of data formatted as per "format", and of length equal to nrow(T.df).
+#######################################################################################
+formatNewColData = function(format, T.df)
+    {
+    chk.col = function(col)
+        {
+        if (!any(col == colnames(T.df)))
+            stop("'", col, "' is not one of the T data frame columns: ", paste(colnames(T.df), collapse=":"), call.=FALSE)
+        }
+
+    # Function to try to do sub() with given arguments, but catch errors and
+    # warnings and call our own error function with ... instead.
+    sub.catch = function(RE, RE.replace, x, ...)
+        {
+        # Establish simpleWarning handler that converts a warning into an error,
+        # and use tryCatch to catch errors.
+        withCallingHandlers(simpleWarning=function(w) error(...),
+            {
+            x = tryCatch(sub(RE, RE.replace, x), error=function(e) e, warning=function(w) w)
+            if (is(x, "error") || is(x, "warning"))
+                error(...)
+            })
+        return(x)
+        }
+
+    # Split on "{" or "}".
+    V = unlist(strsplit(format, "[{}]"))
+    if (length(V) %% 2 == 1)
+        V = c(V, "")
+    if (length(V) == 0) stop("formatData: software error, V is empty")
+    V = matrix(V, ncol=2, byrow=TRUE, dimnames=list(NULL, c("verbatim", "format")))
+
+    # Generate formatted strings from the format codes.
+    fmtstrs = rep("", nrow(T.df))
+    numUniqueID = 0 # 0 means don't add unique add to end.
+    for (i in 1:nrow(V))
+        {
+        code = V[i,2]
+
+        # Add the verbatim text.
+        fmtstrs = paste(fmtstrs, V[i, "verbatim"], sep="")
+
+        # Get first character of the code after "{"
+        firstChar = substring(code, 1, 1)
+
+        # Process the code.
+
+        # {com} : a verbatim comma
+        if (code == "com")
+            fmtstrs = paste(fmtstrs, ",", sep="")
+
+        # {lb} : a verbatim left brace
+        else if (code == "lb")
+            fmtstrs = paste(fmtstrs, "{", sep="")
+
+        # {rb} : a verbatim right brace
+        else if (code == "rb")
+            fmtstrs = paste(fmtstrs, "}", sep="")
+
+        # {+col} : the value in T.df column "col"
+        else if (firstChar == "+")
+            {
+            col = sub("^\\+(.*)$", "\\1", code)
+            chk.col(col)
+            fmtstrs = paste(fmtstrs, T.df[[col]], sep="")
+            }
+
+        # {/col/RE/RE.replace} : regular expression search/replace of T.df column "col"
+        else if (firstChar == "/")
+            {
+            s = unlist(strsplit(code, "/", fixed=TRUE))
+            if (length(s) == 3)
+                s[4] = ""
+            if (length(s) != 4)
+                error("expected {/col/RE/RE.replace} but got: ", code)
+            col = s[2]
+            chk.col(col)
+            RE = s[3]
+            RE.replace = s[4]
+            S = sub.catch(RE, RE.replace, T.df[[col]])
+            fmtstrs = paste(fmtstrs, S, sep="")
+            }
+
+        # {#n}
+        else if (firstChar == "#")
+            {
+            numUniqueID = as.integer(substring(code, 2))
+            if (numUniqueID <= 0)
+                stop("Invalid outputFile$addColValues {#n} code, must be > 0: '", code, "'")
+            }
+
+        # else if not empty, it is an invalid code.
+        else if (code != "")
+            {
+            stop("Invalid outputFile$addColValues format code: '", code, "'")
+            }
+        }
+
+    # If requested to do so, add a unique ID string.
+    if (numUniqueID > 0)
+        {
+        idxs = unlist(split(1:length(fmtstrs), fmtstrs))
+        IDs = unlist(as.list(tapply(1:length(fmtstrs), fmtstrs, function(V) 1:length(V))))
+        if (numUniqueID > 0)
+            {
+            Nadd0s = numUniqueID - nchar(IDs)
+            Nadd0s[Nadd0s < 0] = 0
+            maxAdd0s = max(Nadd0s)
+            if (maxAdd0s > 0)
+                {
+                zeroes = paste(rep("0", maxAdd0s), collapse="")
+                IDs = paste(substring(zeroes, 1, Nadd0s), IDs, sep="")
+                }
+            }
+        fmtstrs[idxs] = paste(fmtstrs[idxs], IDs, sep="")
+        }
+
+    # Return result.
+    return(fmtstrs)
+    }
 
 ################################################################################
 # Function to split a comma-separated string apart into a vector of separate
@@ -539,7 +693,8 @@ splitCommaList = function(S, NAstring=NULL)
     {
     if (is.null(S))
         return(NULL)
-    S = unlist(strsplit(S, ",", fixed=TRUE))
+    if (!is.na(S) && S != "")
+        S = unlist(strsplit(S, ",", fixed=TRUE))
     if (!is.null(NAstring))
         S[S == NAstring] = NA
     return(S)
@@ -552,7 +707,7 @@ splitCommaList = function(S, NAstring=NULL)
 readInputFile = function(sectionName, params)
     {
     if (!file.exists(params$path))
-        stop(sectionName, ": ", params$path, " does not exist")
+        stop(sectionName, ": ", params$path, " does not exist", call.=FALSE)
 
     # gff3
     if (params$type == "gff3")
@@ -585,16 +740,16 @@ readInputFile = function(sectionName, params)
         else
             df = do.call(read.csv, args)
         if (nrow(df) == 0)
-            stop(sectionName, " had no data")
+            stop(sectionName, " had no data", call.=FALSE)
         if (ncol(df) == 0)
-            stop(sectionName, " had no columns")
+            stop(sectionName, " had no columns", call.=FALSE)
         # columns
         if (!is.null(params$columns))
             {
             columns = params$columns
             if (length(columns) != ncol(df))
                 stop("Expected ", sectionName, " to have ", length(columns), " columns but it had ",
-                    ncol(df), " which were ", paste(colnames(df), collapse=","))
+                    ncol(df), " which were ", paste(colnames(df), collapse=":"), call.=FALSE)
             colnames(df) = columns
             }
         # column1
@@ -606,14 +761,38 @@ readInputFile = function(sectionName, params)
     # keepColumns
     if (!is.null(params$keepColumns))
         {
-        columns = params$keepColumns
-        missing = columns[!columns %in% colnames(df)]
+        keepColumns = splitCommaList(params$keepColumns)
+        missing = keepColumns[!keepColumns %in% colnames(df)]
         if (length(missing) > 0)
-            stop(sectionName, " does not have these 'keepColumns': ", paste(missing, collapse=","))
-        df = df[,columns]
+            stop(sectionName, " does not have these 'keepColumns':\n",
+                paste(missing, collapse=":"), "\nIt has:\n",
+                paste(colnames(df), collapse=":"), call.=FALSE)
+        df = df[,keepColumns]
         }
+
+    # addColNames, addColValues.
+    addColNames = splitCommaList(params$addColNames)
+    addColValues = splitCommaList(params$addColValues, NAstring="R.NA")
+    if (!is.null(addColNames))
+        {
+        if (length(addColValues) == 1)
+            addColValues = rep(addColValues, length(addColNames))
+        else if (length(addColValues) != length(addColNames))
+            stop("Expected ", length(addColNames), " column values in addColValues, section '",
+                sectionName, "' but found ", length(addColValues))
+        names(addColValues) = addColNames
+        for (col in addColNames)
+            df[[col]] = formatNewColData(addColValues[col], df)
+        }
+
     return(df)
     }
+
+################################################################################
+################################################################################
+# Ready.  Do it.
+################################################################################
+################################################################################
 
 ################################################################################
 # Read inputFileT.
@@ -699,13 +878,22 @@ if (!is.null(L$attrCreation))
 # always
     {
     # Reduce output to only the requested columns.
-    columns = splitCommaList(L$outputFile$columns)
-    if (!is.null(columns))
+    outColNames = splitCommaList(L$outputFile$outColNames)
+    if (!is.null(outColNames))
         {
-        missing = columns[!columns %in% colnames(T.df)]
+        missing = outColNames[!outColNames %in% colnames(T.df)]
         if (any(missing))
-            stop("No such columns in output data frame: ", paste(missing, collapse=","), "\n")
-        T.df = T.df[, columns]
+            stop("No such columns in output data frame: ", paste(missing, collapse=":"))
+        T.df = T.df[, outColNames]
+        }
+
+    # Rename columns if requested.
+    newColNames = splitCommaList(L$outputFile$newColNames)
+    if (!is.null(newColNames))
+        {
+        if (length(newColNames) != ncol(T.df))
+            stop("Expected ", ncol(T.df), " column names in newColNames but found ", length(newColNames))
+        colnames(T.df) = newColNames
         }
 
     # Eliminate any possible row names.
@@ -750,9 +938,13 @@ if (!is.null(L$attrCreation))
     # gff3 or gtf
     else
         {
+        if (ncol(T.df) != 9)
+            stop("GFF3 and GTF files must have 9 columns, this has ", ncol(T.df))
         writeFile_GFF3_GTF(T.df, L$outputFile$path)
         }
     }
+
+cat("Output file ", L$outputFile$path, " written\n")
 
 ################################################################################
 # Finished.

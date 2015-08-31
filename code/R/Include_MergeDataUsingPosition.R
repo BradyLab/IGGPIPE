@@ -715,8 +715,8 @@ formatData = function(format, T.colnames, S.colnames, T.df=NULL, S.df=NULL, idxs
 #           "format" : constructs are: {lb}, {rb}, {+col}, {#T}, {#S}, {%T}, {%S},
 #               {*S*col*val*dgts}, {*T*col*val*dgts}, {/S/col/RE/RE.replace}, {/T/col/RE/RE.replace}
 #           "maxMatch" : maximum number of matches per T.df row, 0 for no limit, default 0.
-#           "join" : "YES" to join all match strings for the T.df row into one column,
-#               "NO" to put them in separate columns with a number appended to column name
+#           "join" : "TRUE" to join all match strings for the T.df row into one column,
+#               "FALSE" to put them in separate columns with a number appended to column name
 #           "joinPfx", "joinSep", "joinSfx" : strings to separate joined match strings.
 #
 #   *** See Details below for complete information. ***
@@ -826,17 +826,17 @@ formatData = function(format, T.colnames, S.colnames, T.df=NULL, S.df=NULL, idxs
 #           T.df row, whose data is to be copied to "col".  If 0 or if not specified, there is no limit, all
 #           matches are copied.  Otherwise, if there are more matches than this integer, the remaining matches
 #           are ignored.
-#       join: optional character string that is "YES" to join together the strings that are generated from the
+#       join: optional character string that is "TRUE" to join together the strings that are generated from the
 #           'format' member for each match, using the members 'joinPfx', 'joinSep', and 'joinSfx' below as
-#           separators between the joined strings, or is "NO" to not join the strings but instead put each one
+#           separators between the joined strings, or is "FALSE" to not join the strings but instead put each one
 #           in a separate column of T.df by appending numbers 1,2,...maxMatch to the column name specified by
-#           'col' (unless "maxMatch" is 1).  If not specified, it defaults to "YES".
+#           'col' (unless "maxMatch" is 1).  If not specified, it defaults to "TRUE".
 #       joinPfx: optional character string to prepend to the beginning of the joined strings when 'join' is
-#           "YES".  Defaults to "" (nothing is prepended).
+#           "TRUE".  Defaults to "" (nothing is prepended).
 #       joinSep: optional character string to separate each string generated from each match via the 'format'
-#           member when 'join' is "YES".  Defaults to "," (comma separator).
-#       joinSfx: optional character string to append to the end of the joined strings when 'join' is "YES".
-#           YES.  Defaults to "" (nothing is appended).
+#           member when 'join' is "TRUE".  Defaults to "," (comma separator).
+#       joinSfx: optional character string to append to the end of the joined strings when 'join' is "TRUE".
+#           Defaults to "" (nothing is appended).
 # Example: mergeCols=list(col="genes", before="", format="{+gene_id}({#S})")
 #######################################################################################
 mergeOnMatches = function(T.df, S.df, T.pos, S.pos, match, mergeCols)
@@ -997,9 +997,9 @@ mergeOnMatches = function(T.df, S.df, T.pos, S.pos, match, mergeCols)
             L[["maxMatch"]] = 0
         # This does not work.  L[["x"]] is equivalent to L[["x", exact=FALSE]]  !!!!!   Better not use $!
         #if (is.null(L[["join"]]))
-        #    L[["join"]] = "YES"
+        #    L[["join"]] = TRUE
         if (is.null(L[["join"]]))
-            L[["join"]] = "YES"
+            L[["join"]] = TRUE
         if (is.null(L[["joinPfx"]]))
             L[["joinPfx"]] = ""
         if (is.null(L[["joinSep"]]))
@@ -1012,14 +1012,16 @@ mergeOnMatches = function(T.df, S.df, T.pos, S.pos, match, mergeCols)
             if (is.null(L[[S]]))
                 error("Each mergeCols sublist must have a member named '", S, "'")
             req.type = ifelse(S != "maxMatch", "character", "integer")
+            if (S == "join")
+                req.type = "logical"
             L[[S]] = coerceJustOne(L[[S]], req.type, allowNA=FALSE,
                 name=paste("mergeCols[[", i, "]][['", S, "']]", sep=""))
             if (S == "col" && L[["col"]] %in% colnames(T.df))
                 error("mergeCols[[", i, "]][['col']] must NOT be a column name of T.df")
             if (S == "before" && L[["before"]] != "" && !L[["before"]] %in% colnames(T.df))
                 error("mergeCols[[", i, "]][['before']] must be an empty string or a column name of T.df")
-            if (S == "join" && !L[["join"]] %in% c("YES", "NO"))
-                error("mergeCols[[", i, "]][['join']] must be 'YES' or 'NO'")
+            if (S == "join" && !is.logical(L[["join"]]))
+                error("mergeCols[[", i, "]][['join']] must be TRUE of FALSE")
             if (S == "maxMatch" && L[["maxMatch"]] < 0)
                 error("mergeCols[[", i, "]][['maxMatch']] must be >= 0")
             }
@@ -1102,20 +1104,20 @@ mergeOnMatches = function(T.df, S.df, T.pos, S.pos, match, mergeCols)
 
                 # Collect together the formatted strings for individual rows of T.df
                 # as specified by idxs[,1].  Discard any beyond L[["maxMatch"]].  Join the
-                # strings if L[["join"]] is "YES".
+                # strings if L[["join"]] is TRUE.
                 colStrs = tapply(V, idxs[,1], function(S)
                     {
                     N = length(S)
                     if (L[["maxMatch"]] > 0 && N > L[["maxMatch"]])
                         S = S[1:L[["maxMatch"]]]
-                    if (L[["join"]] == "YES")
+                    if (L[["join"]])
                         S = paste(L[["joinPfx"]], paste(S, collapse=L[["joinSep"]]), L[["joinSfx"]], sep="")
                     return(S)
                     }, simplify=FALSE)
                 colStrsIdxs = as.integer(names(colStrs))
 
                 # The elements of colStrs generally have varying numbers of strings
-                # in them, in which colStrs will be a list.  If L[["join"]] is "YES", it
+                # in them, in which colStrs will be a list.  If L[["join"]] is TRUE, it
                 # will be a 1-dimensional array of character strings.  If it is a list,
                 # add empty strings to elements so that all elements are the same length.
                 # This will turn colStrs into a matrix, but we need to transpose it to
@@ -1129,7 +1131,7 @@ mergeOnMatches = function(T.df, S.df, T.pos, S.pos, match, mergeCols)
                         colStrs = t(colStrs)
                     }
 
-                # Create a data frame with the new column(s).  If L[["join"]] is "YES" or if
+                # Create a data frame with the new column(s).  If L[["join"]] is TRUE or if
                 # there is just one column (L[["maxMatch"]] = 1), the data frame will have
                 # one column, else it will (most likely) have L[["maxMatch"]] columns.  The
                 # actual number of columns is in numNewCols, computed above.
