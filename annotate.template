@@ -533,20 +533,18 @@ match:
     #   x.start & x.end     inputFileS  inputFileT
     #   y.start & y.end     inputFileT  inputFileS
     #
-    # Conveniently, if only start.up is specified as a number and the others are
-    # specified as "", they will default to reasonable values, so that the start.up
-    # value gives the number of base pairs away before two rows are no longer "near"
-    # one another.  For example, for method S.NEAR, if start.up=3000, an inputFileS
-    # row is "near" if it is within 3000 bp upstream of the start of the inputFileT
-    # row or within 3000 bp downstream of the end of the inputFileT row.
+    # In this example, for method S.NEAR, setting start.down=3000 and end.up=3000,
+    # an inputFileS row is "near" if its end is within 3000 bp upstream of the
+    # start of the inputFileT row or if its start is within 3000 bp downstream
+    # of the end of the inputFileT row.
     # When "" is specified for any of x.start, x.end, y.start, y.end, the value used
     # for it is the maximum of any x.start to the next x.start (used for start.up and
     # start.down), or the maximum of any x.end to the next x.end (used for end.up and
     # end.down).
 
-    start.up := 3000
-    start.down := ""
-    end.up := ""
+    start.up := ""
+    start.down := 3000
+    end.up := 3000
     end.down := ""
 
     # Since there can be multiple rows of inputFileS that are near an inputFileT row,
@@ -630,10 +628,10 @@ mergeCols:
         #   {lb} : a verbatim left brace
         #   {rb} : a verbatim right brace
         #   {+col} : the value in inputFileS column "col" of the matching inputFileT row
-        #   {#T} : bp position of InputFileS start position in matching inputFileT row.
-        #   {#S} : bp position of inputFileT start position in matching inputFileS row.
-        #   {%T} : percent position of inputFileS start position in matching inputFileT row.
-        #   {%S} : percent position of inputFileT start position in matching inputFileS row.
+        #   {#T} : bp position of InputFileS start position relative to inputFileT start, in matching inputFileT row.
+        #   {#S} : bp position of inputFileT start position relative to inputFileS start, in matching inputFileS row.
+        #   {%T} : percent position of inputFileS start position relative to inputFileT start, in matching inputFileT row.
+        #   {%S} : percent position of inputFileT start position relative to inputFileS start, in matching inputFileS row.
         #   {*S*col*val*dgts} : multiply the value in matching row inputFileS column "col"
         #       by "val" and round to "dgts" digits after decimal (e.g. {*S*start*1e-6*0}).
         #   {*T*col*val*dgts} : likewise for inputFileT
@@ -641,10 +639,23 @@ mergeCols:
         #       inputFileS column "col" (e.g. {/S/chr/SL2.40ch0?/chrm#})
         #   {/T/col/RE/RE.replace} : likewise for inputFileT
         #
-        #   A start position in a matching row may lie UPSTREAM, WITHIN, or DOWNSTREAM of
-        #   the start/end of the row it is matched to.  When {#T}, {#S}, {%T}, or {%S} is
-        #   used, the number placed in the formatted output string is prefixed by characters
-        #   "-", "@", and "+" to indicate UPSTREAM, WITHIN, or DOWNSTREAM.
+        # One contig or position may lie UPSTREAM, DOWNSTREAM, or OVERLAPPING of a second
+        # contig or position, and the prefix characters "-" (UPSTREAM), "+" (DOWNSTREAM),
+        # and "@" (OVERLAPPING) are displayed when any of the four distance or percent
+        # specifiers {#T}, {#S}, {%T}, and {%S} is used, to indicate which one is the case.
+        # For {#T} and {#S}, letting X=character within {#} (T or S) and Y=opposite (S or T),
+        # the distance that each prefix character gives is:
+        #         For "-" : number of base pairs upstream from START of X to END of Y
+        #         For "+" : number of base pairs downstream from END of X to START of Y
+        #         For "@" : number of base pairs downstream from START of X to START of Y,
+        #             and if @ is followed by "-", START of Y lies UPSTREAM of START of X.
+        # (Remember the meaning of the character inside {#}: that's the one that the distance
+        # is measured relative to; the OTHER one is what you are measuring distance TO).
+        # For {%T} and {%S}, a percentage is displayed that is equal to the number of
+        # base pairs shown AS A PERCENTAGE OF THE LENGTH OF X.
+        # So, if {#T} is used and -140 is displayed, this means the end of S lies 140 bp
+        # upstream of the start of T.  If {%S} is used and @-12 is displayed, this means
+        # the start of T lies 12% of the length of S UPSTREAM from the start of S.
 
         format := "{+gene}({#T})"
 

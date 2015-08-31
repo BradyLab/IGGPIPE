@@ -1,7 +1,7 @@
 ################################################################################
 # Sample parameter file for annotateFile.R to convert a .tsv file of SCAR
 # markers into a .gff3 file that could be used to display markers as a browser
-# track:
+# track.  Specifically:
 #   1. Reads MarkersOverlapping.test.tsv
 #   2. Adds column "ID" containing a unique row ID equal to "ID_nn_YYY" where
 #       "nn" is the integer part of the Hid column and "YYY" is a sequence number

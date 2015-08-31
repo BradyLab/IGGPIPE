@@ -13,16 +13,22 @@
 #   5. Adds fixed column "score" containing "." (no score)
 #   6. Adds fixed column "strand" containing "." (not stranded)
 #   7. Adds fixed column "frame" containing "." (no frame)
-#   8. Writes the data to .gff3 file:
+#   8. Adds an "attributes" column, creating attributes from the following input
+#       data columns and using the column name as the attribute name, in this order:
+#           ID, CampLen, LampLen, LCdif, prmSeqL, prmSeqR, prmTmL, prmTmR,
+#           LCphase, Cpct, Lpct, Lid, LampPos1, LampPos2
+#   9. Writes the data to .gff3 file:
 # outCL13/MarkersOverlapping_K13k10L400D30_1500A400_1500d50_300N2F2X20V5000W8M0G0.gff3
 #       using data taken from these input columns:
 #           seqname: Cid
+#           source: source
+#           feature: feature
 #           start: CampPos1
 #           end: CampPos2
-#           attributes: the following columns from the input file, using the
-#               column name as the attribute name, in this order:
-#                   ID, CampLen, LampLen, LCdif, prmSeqL, prmSeqR, prmTmL, prmTmR,
-#                   LCphase, Cpct, Lpct, Lid, LampPos1, LampPos2
+#           score: score
+#           strand: strand
+#           frame: frame
+#           attributes: attributes
 #
 # This data file can be added as a track to the www.arabidopsis.org genome
 # browser for Arabidopsis thaliana.  Go to www.arabidopsis.org, select Tools,
@@ -33,7 +39,7 @@
 # on the track, change its shape to a box and click "Change".  If you zoom in on
 # a marker, you can see its attributes, such as primer sequences.
 #
-# The output file from this is copied to annotate/CL13_to_gff3.savedOutput because
+# The output file from this is copied to annotate/CL13.savedOutput because
 # it may be useful to people.
 ################################################################################
 

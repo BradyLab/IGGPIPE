@@ -13,16 +13,22 @@
 #   5. Adds fixed column "score" containing "." (no score)
 #   6. Adds fixed column "strand" containing "." (not stranded)
 #   7. Adds fixed column "frame" containing "." (no frame)
-#   8. Writes the data to .gff3 file:
+#   8. Adds an "attributes" column, creating attributes from the following input
+#       data columns and using the column name as the attribute name, in this order:
+#           ID, HampLen, PampLen, PHdif, prmSeqL, prmSeqR, prmTmL, prmTmR,
+#           PHphase, Hpct, Ppct, Pid, PampPos1, PampPos2
+#   9. Writes the data to .gff3 file:
 # outHP14/MarkersOverlapping_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.gff3
 #       using data taken from these input columns:
 #           seqname: Hid
+#           source: source
+#           feature: feature
 #           start: HampPos1
 #           end: HampPos2
-#           attributes: the following columns from the input file, using the
-#               column name as the attribute name, in this order:
-#                   ID, HampLen, PampLen, PHdif, prmSeqL, prmSeqR, prmTmL, prmTmR,
-#                   PHphase, Hpct, Ppct, Pid, PampPos1, PampPos2
+#           score: score
+#           strand: strand
+#           frame: frame
+#           attributes: attributes
 #
 # This data file can be added as a track to the solgenomics.net S. lycopersicum
 # ITAG2.4 JBrowse genome browser.  Go to solgenomics.net, select Genomes, Tomato,
@@ -34,7 +40,7 @@
 # box.  You should see orange bands representing markers, labelled ID_0_001 etc.
 # Clicking on a marker shows its attributes, such as primer sequences.
 #
-# The output file from this is copied to annotate/HP14_to_gff3.savedOutput because
+# The output file from this is copied to annotate/HP14.savedOutput because
 # it may be useful to people.
 ################################################################################
 

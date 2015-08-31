@@ -1,16 +1,17 @@
 ################################################################################
-# Parameter file for annotateFile.R to add an "ILs" column to the SCAR marker
-# test file and writes the result to a new file.  The ILs column gives the ILs
-# whose introgression contains the marker, and the position of the marker within
-# the IL as a percentage of the distance along the introgression.  Specifically:
+# Parameter file for annotateFile.R to add a "genes" column to the SCAR marker
+# test file and write the result to a new file.  The "genes" column gives the
+# genes overlapping or within 3000 bp up/downstream of each marker, and the
+# position of the gene in base-pairs from the marker.  Specifically:
 #   1. Reads MarkersOverlapping.test.tsv as inputFileT
-#   2. Reads code/R/test_GFFfuncsAndMergeData/ILintrogressions.tsv as inputFileS
-#   3. Adds a new column to the inputFileS data, massaging the numeric "chr" column
-#       into an "SL2.50chXX" chromosome ID column named "id"
+#   2. Reads code/R/test_GFFfuncsAndMergeData/ITAG2.4_test.gff3 as inputFileS,
+#       containing a truncated gene model list for the test data used for markers.
+#   3. Adds a new column to the inputFileS data, extracting the attribute named
+#       "Alias" from "gene" feature rows and placing it in new column "gene".
 #   4. Performs a match-and-merge operation between the two files and adds column
-#       "ILs" to the inputFileT data, containing IL segment name and percent
-#       position of the marker relative to the introgression.
-#   5. Writes the new inputFileT data to file code/R/testOutput/MarkersWithILs.test.tsv
+#       "genes" to the inputFileT data, containing gene name and relative base
+#       pair position of the gene relative to the marker.
+#   5. Writes the new inputFileT data to file code/R/testOutput/MarkersWithGenes.test.tsv
 ################################################################################
 
 ################################################################################
@@ -26,15 +27,20 @@ inputFileT:
 ################################################################################
 
 inputFileS:
-    path := "code/R/test_GFFfuncsAndMergeData/ILintrogressions.tsv"
-    type := tsv
-    quote := "'""  # Allow either single or double quote.
-    addColNames := "id"
-    # Following format string forges an SL2.50 sequence ID for the ILs even though
-    # this data is actually SL2.40, so the results are incorrect, but they allow
-    # us to do this test.
-    # Following format string manages to get 2 digits for each chromosome number.
-    addColValues := "SL2.50ch{/chr/^([0-9])$/0\1}"
+    path := "code/R/test_GFFfuncsAndMergeData/ITAG2.4_test.gff3"
+    type := gff3
+
+################################################################################
+# inputFileS attribute extraction.
+################################################################################
+
+attrExtractS:
+    attributesColumn := attributes
+    keepFeatures := gene
+    extractAttrs := Alias
+    newAttrColumns := gene
+    missingAttrValues := ""
+    removeAttrColumns := YES
 
 ################################################################################
 # Match and merge: inputFileT position columns.
@@ -50,9 +56,9 @@ positionT:
 ################################################################################
 
 positionS:
-    start := start_right
-    end := end_left
-    id := id
+    start := start
+    end := end
+    id := seqname
 
 ################################################################################
 # Match and merge: Match method for matching rows from inputFileT with rows from
@@ -60,7 +66,10 @@ positionS:
 ################################################################################
 
 match:
-    method := T.TINY
+    method := S.NEAR
+    start.down := 3000
+    end.up := 3000
+    closest := 0
 
 ################################################################################
 # Match and merge: columns to add and the format of the new column data.
@@ -68,19 +77,19 @@ match:
 
 mergeCols:
     1:
-        col := ILs
+        col := genes
         before := NDA
         maxMatch := 0
         join := YES
         joinSep := ","
-        format := "{+IL_segment}({%S})"
+        format := "{+gene}({#T})"
 
 ################################################################################
 # Output file parameters.
 ################################################################################
 
 outputFile:
-    path := "code/R/testOutput/MarkersWithILs.test.tsv"
+    path := "code/R/testOutput/MarkersWithGenes.test.tsv"
     type := tsv
     header := YES
     quote := NO

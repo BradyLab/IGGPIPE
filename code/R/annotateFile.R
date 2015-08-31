@@ -25,6 +25,7 @@ testing = 0
 #testing = 3 # For testing only.
 #testing = 4 # For testing only.
 #testing = 5 # For testing only.
+#testing = 6 # For testing only.
 {
 if (testing == 0)
     args = commandArgs(TRUE)
@@ -39,6 +40,8 @@ else if (testing == 4)
     args = "annotate/HPintrogressions_to_gff3"
 else if (testing == 5)
     args = "annotate/addILs_column.test_tsv"
+else if (testing == 6)
+    args = "annotate/add_genesColumn.test_tsv"
 else
     stop("Unknown value for 'testing'")
 }

@@ -481,9 +481,21 @@ positionString = function(code, T.position, S.position, idxs)
     #       {#S} : bp position of T.start in S.df contig, as: -#, +#, or @#, see below.
     #       {%T} : percent position of S.start in T.df contig, as: -#%, +#%, or @#%, see below.
     #       {%S} : percent position of T.start in S.df contig, as: -#%, +#%, or @#%, see below.
-    #   A start position may lie UPSTREAM, WITHIN, or DOWNSTREAM of a contig, and the prefix
-    #   characters "-", "@", and "+", respectively, are used in the four distance/percent
-    #   specifiers above to indicate which one is the case.
+    #   One contig or position may lie UPSTREAM, DOWNSTREAM, or OVERLAPPING of a second
+    #   contig or position, and the prefix characters "-" (UPSTREAM), "+" (DOWNSTREAM),
+    #   and "@" (OVERLAPPING) are displayed when any of the four distance or percent
+    #   specifiers {#T}, {#S}, {%T}, and {%S} is used, to indicate which one is the case.
+    #   For {#T} and {#S}, letting X=character within {#} (T or S) and Y=opposite (S or T),
+    #   the distance that each prefix character gives is:
+    #           For "-" : number of base pairs upstream from START of X to END of Y
+    #           For "+" : number of base pairs downstream from END of X to START of Y
+    #           For "@" : number of base pairs downstream from START of X to START of Y,
+    #               and if @ is followed by "-", START of Y lies UPSTREAM of START of X.
+    #   For {%T} and {%S}, a percentage is displayed that is equal to the number of
+    #   base pairs shown AS A PERCENTAGE OF THE LENGTH OF X.
+    #   So, if {#T} is used and -140 is displayed, this means the end of S lies 140 bp
+    #   upstream of the start of T.  If {%S} is used and @-12 is displayed, this means
+    #   the start of T lies 12% of the length of S UPSTREAM from the start of S.
 
     # Make it so it is always like {#T} or {%T}.  Must swap idxs columns also.
     if (code == "#S" || code == "%S")
@@ -497,21 +509,25 @@ positionString = function(code, T.position, S.position, idxs)
 
     # Figure out {#T}.
     len = (T.position[["end"]] - T.position[["start"]] + 1)[idxs[,1]]
-    amount = (S.position[["start"]][idxs[,2]] - T.position[["start"]][idxs[,1]])
+    amount = (S.position[["end"]][idxs[,2]] - T.position[["start"]][idxs[,1]])
     isUpstream = (amount < 0)
-    isDownstream = (amount >= len)
+    amount2 = (S.position[["start"]][idxs[,2]] - T.position[["end"]][idxs[,1]])
+    isDownstream = (amount2 > 0)
+    amount[isDownstream] = amount2[isDownstream]
     isWithin = (!isUpstream & !isDownstream)
-    amount[isDownstream] = amount[isDownstream] - len[isDownstream] + 1
+    amount3 = (S.position[["start"]][idxs[,2]] - T.position[["start"]][idxs[,1]])
+    amount[isWithin] = amount3[isWithin]
 
     # Figure out {%T}.
     if (code == "%T" || code == "%S")
         amount = as.integer(100*amount/len)
 
-    # Make character strings.
+    # Make character strings and add prefix characters.
     S = as.character(amount)
     # S[isUpstream] = paste("-", S[isUpstream], sep="") # Already has a "-" sign.
-    S[isDownstream] = paste("+", S[isDownstream], sep="")
-    S[isWithin] = paste("@", S[isWithin], sep="")
+    S[isDownstream] = paste("+", S[isDownstream], sep="") # No "-" sign, is positive.
+    S[isWithin] = paste("@", S[isWithin], sep="") # May or may not have a "-" sign.
+    # Add "%" suffix.
     if (code == "%T" || code == "%S")
         S = paste(S, "%", sep="")
     return(S)
@@ -819,9 +835,21 @@ formatData = function(format, T.colnames, S.colnames, T.df=NULL, S.df=NULL, idxs
 #               {/S/col/RE/RE.replace} : regular expression search/replace of S.df column "col"
 #                   (e.g. {/S/chr/SL2.40ch0?/})
 #               {/T/col/RE/RE.replace} : likewise for T.df
-#           A start position may lie UPSTREAM, WITHIN, or DOWNSTREAM of a contig, and the prefix characters
-#           "-", "@", and "+", respectively, are used in the four distance/percent specifiers above to
-#           indicate which one is the case.
+#           One contig or position may lie UPSTREAM, DOWNSTREAM, or OVERLAPPING of a second
+#           contig or position, and the prefix characters "-" (UPSTREAM), "+" (DOWNSTREAM),
+#           and "@" (OVERLAPPING) are displayed when any of the four distance or percent
+#           specifiers {#T}, {#S}, {%T}, and {%S} is used, to indicate which one is the case.
+#           For {#T} and {#S}, letting X=character within {#} (T or S) and Y=opposite (S or T),
+#           the distance that each prefix character gives is:
+#                   For "-" : number of base pairs upstream from START of X to END of Y
+#                   For "+" : number of base pairs downstream from END of X to START of Y
+#                   For "@" : number of base pairs downstream from START of X to START of Y,
+#                       and if @ is followed by "-", START of Y lies UPSTREAM of START of X.
+#           For {%T} and {%S}, a percentage is displayed that is equal to the number of
+#           base pairs shown AS A PERCENTAGE OF THE LENGTH OF X.
+#           So, if {#T} is used and -140 is displayed, this means the end of S lies 140 bp
+#           upstream of the start of T.  If {%S} is used and @-12 is displayed, this means
+#           the start of T lies 12% of the length of S UPSTREAM from the start of S.
 #       maxMatch: optional integer specifying the maximum number of matches of multiple S.df rows to a single
 #           T.df row, whose data is to be copied to "col".  If 0 or if not specified, there is no limit, all
 #           matches are copied.  Otherwise, if there are more matches than this integer, the remaining matches

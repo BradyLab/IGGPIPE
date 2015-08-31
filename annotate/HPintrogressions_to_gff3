@@ -10,20 +10,27 @@
 #   5. Adds fixed column "score" containing "." (no score)
 #   6. Adds fixed column "strand" containing "." (not stranded)
 #   7. Adds fixed column "frame" containing "." (no frame)
-#   8. Writes the data to .gff3 file: code/R/testOutput/ILintrogressions.gff3
+#   8. Adds an "attributes" column, creating attributes from the following input
+#       data columns and using the column name as the attribute name, in this order:
+#           column          attribute name
+#           ------          --------------
+#           IL_segment      ID
+#           IL              IL
+#           start_left      up.outer
+#           start_right     up.inner
+#           end_left        down.inner
+#           end_right       down.outer
+#   9. Writes the data to .gff3 file: code/R/testOutput/ILintrogressions.gff3
 #       using data taken from these input columns:
-#           seqname: (seqname column added above)
+#           seqname: seqname
+#           source: source
+#           feature: feature
 #           start: start_right
 #           end: end_left
-#           attributes: the following columns from the input file, using the
-#               attribute names shown, in this order:
-#       column          attribute name
-#       IL_segment      ID
-#       IL              IL
-#       start_left      up.outer
-#       start_right     up.inner
-#       end_left        down.inner
-#       end_right       down.outer
+#           score: score
+#           strand: strand
+#           frame: frame
+#           attributes: attributes
 #
 # This data file can be added as a track to the solgenomics.net S. lycopersicum
 # ITAG2.3 JBrowse genome browser.  Go to solgenomics.net, select Genomes, Tomato,
@@ -33,7 +40,7 @@
 # choose the output file from here, choose Open.  You should see orange bands
 # representing introgressions, spanning long regions of each chromosome.
 #
-# The output file from this is copied to annotate/HP14_to_gff3.savedOutput because
+# The output file from this is copied to annotate/HP14.savedOutput because
 # it may be useful to people.
 ################################################################################
 

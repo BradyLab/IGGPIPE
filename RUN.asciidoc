@@ -290,17 +290,21 @@ using the LCRs generated via the allParameters.test.template configuration file.
 . *Annotating marker files with other position data and producing GFF3 and GTF files*
 +
 --
-You may have other genome position data that you would like to have associated with
-your marker data. For example, I had a file listing positions of introgressions of
-one genome within another, and wanted each marker to be annotated with a list of
-which introgressions contained it, and what position the marker occupied in each
-introgression. As another example, you might want to annotate each marker with
-the name of the gene that is closest to the marker, and how far away the gene is
-from the marker. Both of these situations and more can be handled by an R program,
-annotateMarkers.R, provided with SCARF. Besides adding annotation data, the program
-can output the markers in either .tsv (tab-separated variable) file format, or .gff3
-or .gtf file format (common formats used to hold genome browser track data or FASTA
-file annotation data).
+You may want to make your marker data more conveniently available.  For example,
+you might want to convert it to GFF3 file format so you can add a "marker" track
+to a genome browser.  Or, you may have other genome position data that you would
+like to have associated with your marker data, such as a file giving positions
+of introgressions of one genome within another (you might want a column in the
+marker file showing which introgressions the marker was near). As another example,
+you might want to add a column in the marker file containing the names of the
+genes closest to the marker, and the distance to the genes.  All of these
+situations and more can be handled by an R program, annotateMarkers.R, provided
+with SCARF. The program can read and write files of type .tsv (tab-separated
+variable), .csv (comma-separated variable), .gff3 (general feature format), or
+.gtf (gene transfer format), all common formats used to hold genome browser track
+data or FASTA file annotation data.  It can add, remove, edit, and rename columns.
+It can read two separate files and merge their data.  It can convert from one of
+these file formats to another.
 
 This program is run by first copying the text file "annotate.template" to a new
 name (e.g. annotateIntrogressions.XY or addGeneInfo.XY or makeGFF3.XY) and then
@@ -312,11 +316,33 @@ command line with a command like this:
   Rscript code/R/annotate.R addGenes.XY    (or whatever name you gave the parameter file)
 
 When it finishes running, the output files can be found in the place(s) and under
-the name(s) specified in the parameter file. Use multiple parameter files with different
-settings to do different types of annotation and file conversion.
+the name(s) specified in the parameter file.
 
-The "annotate.template" file is configured for generating ".tsv" and ".gff3" files
-using the markers generated via the allParameters.test.template configuration file.
+Besides the sample parameter file "annotate.template" (which has settings for
+testing the SCARF installation), there are several more sample parameter files in
+the folder "annotate", with file names hinting at what they do, and comments at
+the start of each file describing what it does.  It may be easier to copy one of
+these and modify it.
+
+So, the idea is to use multiple parameter files with different settings to do
+different types of annotation and file conversion.
+
+Some of the sample parameter files generate .gff3 files that can be added as a
+track to a genome browser, to display markers in the browser.  Instructions for
+adding the track are given in comments at the start of the parameter file.  Two
+marker files, one for Arabidopsis thaliana Col-0 vs. Ler-0 ecotypes, and the
+other for Solanum lycopersicum vs. Solanum pennellii genomes, were created to
+test SCARF, and the marker files were converted to .gff3 files suitable for
+making a browser track.  These files can be found in subdirectories of the
+"annotate" directory.
+
+File formats can be finicky, especially .gff3 files.  An incorrectly formatted
+file will cause problems with annotateFile.R.  When you have problems, if you
+can submit an issue to the GitHub repository named "BradyLab/SCARF", and attach
+or insert a copy of your parameter file, that would be helpful.  A copy of the
+input data files would probably also be needed to debug problems, but GitHub
+does not allow files to be attached.  You can email them to me, or find some
+other way to send them.
 --
 
 *For problems and help:*
