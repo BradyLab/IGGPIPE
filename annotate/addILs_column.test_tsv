@@ -1,0 +1,82 @@
+################################################################################
+# Parameter file for annotateFile.R to add an "ILs" column to the SCAR marker
+# .tsv file MarkersOverlapping.test.tsv.  The column gives the ILs whose
+# introgression contains the marker, and the position of the marker within the
+# IL as a percentage of the distance along the introgression.
+################################################################################
+
+################################################################################
+# inputFileT parameters.
+################################################################################
+
+inputFileT:
+    path := "MarkersOverlapping.test.tsv"
+    type := tsv
+
+################################################################################
+# inputFileS parameters.
+################################################################################
+
+inputFileS:
+    path := "code/R/test_GFFfuncsAndMergeData/ILintrogressions.tsv"
+    type := tsv
+    quote := "'""  # Allow either single or double quote.
+    addColNames := "id"
+    # Following format string forges an SL2.50 sequence ID for the ILs even though
+    # this data is actually SL2.40, so the results are incorrect, but they allow
+    # us to do this test.
+    # Following format string manages to get 2 digits for each chromosome number.
+    addColValues := "SL2.50ch{/chr/^([0-9])$/0\1}"
+
+################################################################################
+# Match and merge: inputFileT position columns.
+################################################################################
+
+positionT:
+    start := HampPos1
+    end := HampPos2
+    id := Hid
+
+################################################################################
+# Match and merge: inputFileS position columns.
+################################################################################
+
+positionS:
+    start := start_right
+    end := end_left
+    id := id
+
+################################################################################
+# Match and merge: Match method for matching rows from inputFileT with rows from
+# inputFileS based on matching positions within the rows.
+################################################################################
+
+match:
+    method := T.TINY
+
+################################################################################
+# Match and merge: columns to add and the format of the new column data.
+################################################################################
+
+mergeCols:
+    1:
+        col := ILs
+        before := NDA
+        maxMatch := 0
+        join := YES
+        joinSep := ","
+        format := "{+IL_segment}({%S})"
+
+################################################################################
+# Output file parameters.
+################################################################################
+
+outputFile:
+    path := "MarkersWithILs.test.tsv"
+    type := tsv
+    header := YES
+    quote := NO
+
+################################################################################
+# End of file.
+################################################################################
