@@ -52,7 +52,7 @@ if (!testing)
     args = commandArgs(TRUE)
 else
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/SCARF",
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
         "outTestHP11/IndelsOverlapping_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0.tsv",
         "outTestHP11/GenomeData/Genome_",
         "outTestHP11/CandidateMarkers_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0XL20.tsv",
@@ -67,7 +67,7 @@ if (length(args) != Nexpected)
     usage = c(
         "Read a data frame of indels bounded by k-mer pairs and, for each genome, another data frame",
         "of genome DNA sequences around the k-mer pairs, then run Primer3 to create primers from those",
-        "sequences.  Write the new candidate SCAR marker data including primers to a new file.",
+        "sequences.  Write the new candidate IGG marker data including primers to a new file.",
         "",
         "Usage: Rscript findPrimers.R <wd> <indelFile> <seqInPfx> <tsvMarkerFile> \\",
         "       <primer3core> <primer3Settings> <primer3DataFile> <primer3OutFile> <investigate>",
@@ -79,7 +79,7 @@ if (length(args) != Nexpected)
         "                       suffix is the genome number followed by '.dnaseqs'",
         "   <tsvMarkerFile>   : Output file to be written containing the candidate marker k-mer pairs with DNA sequences.",
         "   <primer3core>     : Full path of the primer3_core program file",
-        "   <primer3Settings> : File containing primer3 settings edited for desired SCAR marker primer characteristics.",
+        "   <primer3Settings> : File containing primer3 settings edited for desired IGG marker primer characteristics.",
         "   <primer3DataFile> : File in which to place sequence data for primer3 to use to design primers.",
         "   <primer3OutFile>  : File into which primer3 should place its primer design results.",
         "   <investigate>     : FALSE for normal operation, TRUE for more verbose debugging output."

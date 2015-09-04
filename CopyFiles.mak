@@ -1,7 +1,7 @@
 # Copy final marker .tsv, .plot.pdf, and .plot.png files from directory given by
 # the parameter file given by argument PARAMS= to the saveOutputFiles directory,
-# same subdirectory name as given by DIR_SCARF_OUT in the PARAMS= file, but with
-# simpler file names.
+# same subdirectory name as given by DIR_IGGPIPE_OUT in the PARAMS= file, but
+# with simpler file names.
 
 # Delete created files if error occurs creating them.
 .DELETE_ON_ERROR:
@@ -35,7 +35,7 @@ PARAM_SFX := $(patsubst allParameters.%,%,$(PARAMS))
 # If variable PARAMS is not defined, show basic usage info, else do the copy.
 ifeq ($(PARAMS),)
 all:
-	@echo "This copies some of the output files from a specified SCARF run to"
+	@echo "This copies some of the output files from a specified IGGPIPE run to"
 	@echo "a subfolder within folder saveOutputFiles. To use this, specify the"
 	@echo "parameters file whose output files are to be copied as the PARAMS="
 	@echo "argument, as follows:"
@@ -55,7 +55,7 @@ COPIED_DENSITY_PLOT_FILES := $(foreach G,$(GENOME_LETTERS),MarkerDensity_$(G).$(
 $(foreach G,$(GENOME_LETTERS),$(eval DENSITY_$(G) := $(PFX_MARKER_DENSITY_PATH)_$(G).plot.png))
 
 # The output directory to copy files to.
-COPY_TO := saveOutputFiles/$(DIR_SCARF_OUT)
+COPY_TO := saveOutputFiles/$(DIR_IGGPIPE_OUT)
 
 all: $(COPIED_DENSITY_PLOT_FILES) $(PATH_OVERLAPPING_MARKERS_FILE) \
         $(PATH_NONOVERLAPPING_MARKERS_FILE) $(MARKER_COUNTS_FILE) | $(COPY_TO)

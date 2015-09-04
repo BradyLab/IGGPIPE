@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 8.6.9" />
-<title>RUNNING SCARF TO GENERATE SCAR MARKERS</title>
+<title>RUNNING IGGPIPE TO GENERATE IGG MARKERS</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -733,25 +733,25 @@ asciidoc.install();
 </head>
 <body class="article">
 <div id="header">
-<h1>RUNNING SCARF TO GENERATE SCAR MARKERS</h1>
+<h1>RUNNING IGGPIPE TO GENERATE IGG MARKERS</h1>
 <span id="author">Ted Toal</span><br />
 <span id="email"><code>&lt;<a href="mailto:twtoal@ucdavis.edu">twtoal@ucdavis.edu</a>&gt;</code></span><br />
 </div>
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
-<div class="paragraph"><p>This describes how to run the SCARF software to analyze two or more genome
-sequences and produce a file of candidate SCAR marker primer pairs for amplifying
+<div class="paragraph"><p>This describes how to run the IGGPIPE software to analyze two or more genome
+sequences and produce a file of candidate IGG marker primer pairs for amplifying
 length-polymorphic regions of those genomes.</p></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_strong_if_not_done_already_download_scarf_files_strong"><strong>If not done already, download SCARF files</strong></h2>
+<h2 id="_strong_if_not_done_already_download_iggpipe_files_strong"><strong>If not done already, download IGGPIPE files</strong></h2>
 <div class="sectionbody">
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-Browse to <a href="https://github.com/BradyLab/SCARF">https://github.com/BradyLab/SCARF</a>
+Browse to <a href="https://github.com/BradyLab/IGGPIPE">https://github.com/BradyLab/IGGPIPE</a>
 </p>
 </li>
 <li>
@@ -767,19 +767,19 @@ Unzip the zip file on your computer.
 </li>
 <li>
 <p>
-Rename the unzipped folder from "SCARF-master" to just "SCARF".
+Rename the unzipped folder from "IGGPIPE-master" to just "IGGPIPE".
 </p>
 </li>
 </ol></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_strong_if_not_done_already_install_scarf_strong"><strong>If not done already, install SCARF</strong></h2>
+<h2 id="_strong_if_not_done_already_install_iggpipe_strong"><strong>If not done already, install IGGPIPE</strong></h2>
 <div class="sectionbody">
 <div class="ulist"><ul>
 <li>
 <p>
-Look inside the downloaded SCARF folder on your computer for file INSTALL.pdf
+Look inside the downloaded IGGPIPE folder on your computer for file INSTALL.pdf
 or INSTALL.html and open either one and follow the instructions.
 </p>
 </li>
@@ -787,7 +787,7 @@ or INSTALL.html and open either one and follow the instructions.
 </div>
 </div>
 <div class="sect1">
-<h2 id="_strong_requirements_for_running_scarf_strong"><strong>Requirements for running SCARF</strong></h2>
+<h2 id="_strong_requirements_for_running_iggpipe_strong"><strong>Requirements for running IGGPIPE</strong></h2>
 <div class="sectionbody">
 <div class="olist arabic"><ol class="arabic">
 <li>
@@ -796,7 +796,7 @@ or INSTALL.html and open either one and follow the instructions.
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>SCARF uses as input two or more FASTA files of complete genome sequences (at
+<div class="paragraph"><p>IGGPIPE uses as input two or more FASTA files of complete genome sequences (at
 least one of which is assembled into chromosomes, the other(s) can be in the
 scaffold state). You should know ahead of time <strong>which</strong> genomes you are
 comparing.  If you haven&#8217;t already, download their genomic FASTA files, which
@@ -823,17 +823,17 @@ one of these:</p></div>
 </li>
 <li>
 <p>
-<strong>Work in the SCARF main directory unless otherwise instructed</strong>
+<strong>Work in the IGGPIPE main directory unless otherwise instructed</strong>
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>While working from the command line to install SCARF, most of the time you will
-be in the SCARF main directory, unless instructed otherwise. If you unzipped
-the SCARF zip file in your Documents folder, you would change into the SCARF
+<div class="paragraph"><p>While working from the command line to install IGGPIPE, most of the time you will
+be in the IGGPIPE main directory, unless instructed otherwise. If you unzipped
+the IGGPIPE zip file in your Documents folder, you would change into the IGGPIPE
 directory with this command:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>cd ~/Documents/SCARF</code></pre>
+<pre><code>cd ~/Documents/IGGPIPE</code></pre>
 </div></div>
 </div></div>
 </li>
@@ -854,7 +854,7 @@ Store (Applications, App Store) or from:</p></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_strong_running_scarf_strong"><strong>Running SCARF</strong></h2>
+<h2 id="_strong_running_iggpipe_strong"><strong>Running IGGPIPE</strong></h2>
 <div class="sectionbody">
 <div class="olist arabic"><ol class="arabic">
 <li>
@@ -863,7 +863,7 @@ Store (Applications, App Store) or from:</p></div>
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>SCARF makes frequent use of a single capital letter to refer to a genome. For
+<div class="paragraph"><p>IGGPIPE makes frequent use of a single capital letter to refer to a genome. For
 example, filenames and tab-separated file column names use such letters. Choose
 a single capital letter you will use to represent each of your genomes. For
 example, I used H=Heinz and P=pennellii for some of my testing.</p></div>
@@ -875,13 +875,13 @@ example, I used H=Heinz and P=pennellii for some of my testing.</p></div>
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>SCARF has a number of parameters that must be set to the values you desire. These
+<div class="paragraph"><p>IGGPIPE has a number of parameters that must be set to the values you desire. These
 are contained in plain text files whose name starts with "allParameters". During
-SCARF installation, a file should have been created named <strong>allParameters.mytemplate</strong>.
+IGGPIPE installation, a file should have been created named <strong>allParameters.mytemplate</strong>.
 This is a template containing some parameters already set correctly for your system.
 You need to copy and edit this file to change other parameters to the settings you
 want. You should make a new parameter file for each different set of settings you
-want to run with SCARF. For example, each new set of genomes would have a different
+want to run with IGGPIPE. For example, each new set of genomes would have a different
 parameter file. Also, if you decided to make two different sets of markers from the
 same genomes, using two different parameter settings, you might make two different
 parameter files. Here, we assume to begin with that you are only running your genomes
@@ -892,7 +892,7 @@ those letters in the file name, to help you keep multiple parameter file straigh
 for X and Y), using either the Mac&#8217;s Finder or via the command line. For example:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>cd ~/Documents/SCARF    (or whatever is appropriate for your system)
+<pre><code>cd ~/Documents/IGGPIPE    (or whatever is appropriate for your system)
 cp allParameters.mytemplate allParameters.HP    (here, X=H, Y=P)</code></pre>
 </div></div>
 </div></div>
@@ -910,7 +910,7 @@ to be changed. Each "#" comment says whether it must be changed, might need to
 be changed, or probably will never need to be changed, etc. Many of these items
 typically will never need to be changed, so the actual number of changes that need
 to be made is smaller than it might first appear. Some of the parameters have
-already been set correctly during installation of SCARF.  However, it is
+already been set correctly during installation of IGGPIPE.  However, it is
 recommended that rather than hurrying, you take time to read through
 the file, as the comments explain the purpose of each parameter, and you will
 want to know this information, at least for key parameters, to select the right
@@ -999,8 +999,8 @@ EPCR_MAX_MISMATCH and EPCR_MAX_GAPS
 <div class="content">
 <div class="paragraph"><p>The file <strong>primer3settings.txt</strong> contains parameter settings for Primer3, which
 is used to generate the actual primers. This file should have been edited
-during SCARF installation to make any obvious changes you might need for
-your primers. However, it is possible that for a specific run of SCARF, you
+during IGGPIPE installation to make any obvious changes you might need for
+your primers. However, it is possible that for a specific run of IGGPIPE, you
 might want to use different settings. If so, edit primer3settings.txt and
 make the desired changes. (You may want to save a backup copy of the original
 version).</p></div>
@@ -1008,41 +1008,41 @@ version).</p></div>
 </li>
 <li>
 <p>
-<strong>Run SCARF with the command "make PARAMS=allParameters.XY ALL"</strong>
+<strong>Run IGGPIPE with the command "make PARAMS=allParameters.XY ALL"</strong>
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>The SCARF software consists of multiple software applications that progressively
-analyze the genome sequence data and eventually produce candidate SCAR marker
+<div class="paragraph"><p>The IGGPIPE software consists of multiple software applications that progressively
+analyze the genome sequence data and eventually produce candidate IGG marker
 primers. The task of running all this software has been automated using a
 "Makefile", which is a file with that name containing commands formatted correctly
 for reading the allParameters.XY parameter file and running the software applications.
 The Makefile is applied by using the application named "make", which was installed
-when SCARF was installed, if it didn&#8217;t already exist.</p></div>
+when IGGPIPE was installed, if it didn&#8217;t already exist.</p></div>
 <div class="paragraph"><p>A big advantage of using "Makefile" and "make" is that if something goes wrong
 (and unfortunately, it probably will), the portion of the work successfully completed
 is not lost, and does not need to be repeated. This is important because it can take
-quite a long time to run genomes all the way through the SCARF software. Depending
+quite a long time to run genomes all the way through the IGGPIPE software. Depending
 on your computer speed and memory, it can take hours or even days.</p></div>
-<div class="paragraph"><p>You run "make" from the command line to run SCARF. If an error occurs, "make" will
+<div class="paragraph"><p>You run "make" from the command line to run IGGPIPE. If an error occurs, "make" will
 stop, and an error message should be visible. If you are lucky, you will have no
-errors. I do not yet have enough experience running SCARF on different genomes to
+errors. I do not yet have enough experience running IGGPIPE on different genomes to
 anticipate how often errors will occur, or what will cause them. Please email me
 with information about errors, and their resolution if you were able to resolve
-them. I&#8217;ll try to make improvements to SCARF in error handling and in its input
+them. I&#8217;ll try to make improvements to IGGPIPE in error handling and in its input
 data format flexibility to try to prevent errors.</p></div>
-<div class="paragraph"><p>After the allParameters.XY file is edited and ready to go, <strong>run the SCARF pipeline
-from the SCARF directory as follows</strong>:</p></div>
+<div class="paragraph"><p>After the allParameters.XY file is edited and ready to go, <strong>run the IGGPIPE pipeline
+from the IGGPIPE directory as follows</strong>:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>cd ~/Documents/SCARF    (or whatever is appropriate for your system)
+<pre><code>cd ~/Documents/IGGPIPE    (or whatever is appropriate for your system)
 make PARAMS=allParameters.XY ALL    (replacing XY with your genome letters)</code></pre>
 </div></div>
 <div class="paragraph"><p>If "make" stops with the message <strong>ALL files are up to date</strong>, it has completed
 the analysis successfully. Otherwise, look for an error message and try to
 diagnose it. I am available to a limited extent via email, for a while, to try
 to assist in diagnosing problems.  If you fix something and want to retry running
-SCARF, all you have to do is enter the same "make" command again.  The "make"
+IGGPIPE, all you have to do is enter the same "make" command again.  The "make"
 program automatically skips pipeline steps that don&#8217;t need to be repeated because
 the input files for those steps have not changed, and the output files were made
 with success previously.  Therefore, it will normally resume by repeating the
@@ -1078,7 +1078,7 @@ to date</strong></p></div>
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>Unless you specifically changed the parameters otherwise, you will find the output
-files from the SCARF run in a subdirectory of the SCARF directory named something
+files from the IGGPIPE run in a subdirectory of the IGGPIPE directory named something
 like outXY14, where XY are the genome letters you chose, and 14 is the value of K
 for the k-mer size, which was one of the parameters in the parameter file.</p></div>
 <div class="paragraph"><p>Within that output subdirectory, you will find a number of files. Unless you changed
@@ -1099,7 +1099,7 @@ MarkerDensity_*.plot.png is a png image file showing plots of marker density and
 </li>
 <li>
 <p>
-MarkerOverlapping_*.tsv is a tab-separated file containing the candidate SCAR markers
+MarkerOverlapping_*.tsv is a tab-separated file containing the candidate IGG markers
 </p>
 </li>
 <li>
@@ -1112,7 +1112,7 @@ MarkerNonoverlapping_*.tsv is a tab-separated file containing a non-overlapping 
 the markers, and they can also be post-processed (see below) to change them into other
 formats. The meaning of "overlapping" and "non-overlapping" should be clear from the
 explanation of the parameter OVERLAP_REMOVAL in the comments in allParameters.XY.
-The two .tsv files contain the SCAR marker positions and primer sequences, among
+The two .tsv files contain the IGG marker positions and primer sequences, among
 other things.</p></div>
 <div class="paragraph"><p>Several other ".tsv" tab-separated output files exist:</p></div>
 <div class="olist loweralpha"><ol class="loweralpha">
@@ -1128,7 +1128,7 @@ CandidateMarkers_*.tsv contains candidate markers not yet subjected to e-PCR
 </li>
 <li>
 <p>
-IndelsOverlapping_*.tsv contains overlapping regions of LCRs satisfying parameters for a possible SCAR marker
+IndelsOverlapping_*.tsv contains overlapping regions of LCRs satisfying parameters for a possible IGG marker
 </p>
 </li>
 <li>
@@ -1166,7 +1166,7 @@ document.</p></div>
 <div class="content">
 <div class="paragraph"><p>The output file with the name "LCRs_*.tsv" (unless it was changed by you) contains
 locally conserved regions associated with common unique k-mers. It represents a
-whole genome alignment between the genomes used in SCARF analysis. An R program,
+whole genome alignment between the genomes used in IGGPIPE analysis. An R program,
 dotplot.R, is provided that can plot this data as a dot plot.</p></div>
 <div class="paragraph"><p>This program is run
 by first copying the text file "dotplot.template" to a new name (e.g. dotplot.XY)
@@ -1175,7 +1175,7 @@ describe each parameter. The program is then run from the command line with a
 command like this:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>cd ~/Documents/SCARF    (or whatever is appropriate for your system)
+<pre><code>cd ~/Documents/IGGPIPE    (or whatever is appropriate for your system)
 Rscript code/R/dotplot.R dotplot.XY    (or whatever name you gave the parameter file)</code></pre>
 </div></div>
 <div class="paragraph"><p>When it finishes running, the dot plot output file can be found in the place and under
@@ -1200,7 +1200,7 @@ marker file showing which introgressions the marker was near). As another exampl
 you might want to add a column in the marker file containing the names of the
 genes closest to the marker, and the distance to the genes.  All of these
 situations and more can be handled by an R program, annotateMarkers.R, provided
-with SCARF. The program can read and write files of type .tsv (tab-separated
+with IGGPIPE. The program can read and write files of type .tsv (tab-separated
 variable), .csv (comma-separated variable), .gff3 (general feature format), or
 .gtf (gene transfer format), all common formats used to hold genome browser track
 data or FASTA file annotation data.  It can add, remove, edit, and rename columns.
@@ -1213,13 +1213,13 @@ Comments in the file describe each parameter. The program is then run from the
 command line with a command like this:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>cd ~/Documents/SCARF    (or whatever is appropriate for your system)
+<pre><code>cd ~/Documents/IGGPIPE    (or whatever is appropriate for your system)
 Rscript code/R/annotate.R addGenes.XY    (or whatever name you gave the parameter file)</code></pre>
 </div></div>
 <div class="paragraph"><p>When it finishes running, the output files can be found in the place(s) and under
 the name(s) specified in the parameter file.</p></div>
 <div class="paragraph"><p>Besides the sample parameter file "annotate.template" (which has settings for
-testing the SCARF installation), there are several more sample parameter files in
+testing the IGGPIPE installation), there are several more sample parameter files in
 the folder "annotate", with file names hinting at what they do, and comments at
 the start of each file describing what it does.  It may be easier to copy one of
 these and modify it.</p></div>
@@ -1230,12 +1230,12 @@ track to a genome browser, to display markers in the browser.  Instructions for
 adding the track are given in comments at the start of the parameter file.  Two
 marker files, one for Arabidopsis thaliana Col-0 vs. Ler-0 ecotypes, and the
 other for Solanum lycopersicum vs. Solanum pennellii genomes, were created to
-test SCARF, and the marker files were converted to .gff3 files suitable for
+test IGGPIPE, and the marker files were converted to .gff3 files suitable for
 making a browser track.  These files can be found in subdirectories of the
 "annotate" directory.</p></div>
 <div class="paragraph"><p>File formats can be finicky, especially .gff3 files.  An incorrectly formatted
 file will cause problems with annotateFile.R.  When you have problems, if you
-can submit an issue to the GitHub repository named "BradyLab/SCARF", and attach
+can submit an issue to the GitHub repository named "BradyLab/IGGPIPE", and attach
 or insert a copy of your parameter file, that would be helpful.  A copy of the
 input data files would probably also be needed to debug problems, but GitHub
 does not allow files to be attached.  You can email them to me, or find some
@@ -1248,7 +1248,7 @@ other way to send them.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-Post an issue on GitHub under BradyLab/SCARF repository
+Post an issue on GitHub under BradyLab/IGGPIPE repository
 </p>
 </li>
 <li>
@@ -1618,7 +1618,7 @@ cellspacing="0" cellpadding="4">
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-08-31 14:22:14 PDT
+Last updated 2015-09-04 09:53:06 PDT
 </div>
 </div>
 </body>

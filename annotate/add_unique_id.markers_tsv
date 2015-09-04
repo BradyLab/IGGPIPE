@@ -1,6 +1,6 @@
 ################################################################################
 # Sample parameter file for annotateFile.R to add an ID column to a .tsv
-# file of SCAR markers and writes the result to a new .tsv file.  Specifically:
+# file of IGG markers and writes the result to a new .tsv file.  Specifically:
 #   1. Reads MarkersOverlapping.test.tsv
 #   2. Adds column "ID" containing a unique row ID equal to "ID_nn_YYY" where
 #       "nn" is the integer part of the Hid column and "YYY" is a sequence number

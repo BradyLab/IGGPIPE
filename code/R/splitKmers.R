@@ -21,10 +21,10 @@ if (!testing)
 else
     {
     if (testGenome1)
-        args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/SCARF",
+        args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
            "outTestHP11/Kmers/Split/Genome_1_", "outTestHP11/Kmers/Genome_1.isect.kmers")
     else
-        args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/SCARF",
+        args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
            "outTestHP11/Kmers/Split/Genome_2_", "outTestHP11/Kmers/Genome_2.isect.kmers",
            "outTestHP11/Kmers/Genome_1.isect.kmers")
     }

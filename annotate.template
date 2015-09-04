@@ -7,23 +7,23 @@
 #       other, then copying data from matching rows of one table into the other
 #       table's corresponding matching rows.
 #
-# As an example of match and merge, a file of SCAR markers could have a column
+# As an example of match and merge, a file of IGG markers could have a column
 # added which gives the nearest gene to the marker (obtained from a gene model
 # .gff3 file) and the distance from the marker to the gene.  As another example,
-# a file of SCAR markers could have a column added which lists the introgression
+# a file of IGG markers could have a column added which lists the introgression
 # lines whose introgression includes the marker, and gives the position of the
 # marker within the introgression.
 #
 # This file is currently configured to use the MarkersOverlapping.test.tsv file
-# produced as a result of running SCARF using the test parameter file named
+# produced as a result of running IGGPIPE using the test parameter file named
 # allParameters.test.template.  It also uses the file ITAG2.4_test.gff3 in the
-# SCARF subfolder code/R/test_GFFfuncsAndMergeData, which is a gene model file
+# IGGPIPE subfolder code/R/test_GFFfuncsAndMergeData, which is a gene model file
 # in GFF3 format for the truncated chromosome data testFASTA/ITAG2.4_test.fasta,
 # which is used as one of the genomes by allParameters.test.template.  It adds
 # a column named "genes" that contains a comma-separated list of gene IDs of
 # genes that overlap or are within 3K bp of the marker.
 #
-# Therefore, you can test annotateFile.R by running this command from the SCARF
+# Therefore, you can test annotateFile.R by running this command from the IGGPIPE
 # main directory:
 #
 #   Rscript code/R/annotateFile.R annotate.template
@@ -426,14 +426,14 @@ positionT:
     # Name of the data column in inputFileT that contains the starting position,
     # or in the case of non-contig SNP-like data, contains the position.  This
     # is required if match and merge is enabled.
-    # For match and merge of a SCAR marker file, this will be one of the
+    # For match and merge of an IGG marker file, this will be one of the
     # *ampPos1 columns.  
 
     start := HampPos1
 
     # Name of the data column in inputFileT that contains the ending position.
     # This value is optional, use "" if there is no ending position column.
-    # For match and merge of a SCAR marker file, this will be one of the
+    # For match and merge of an IGG marker file, this will be one of the
     # *ampPos2 columns.  
 
     end := HampPos2
@@ -442,7 +442,7 @@ positionT:
     # entity represented by inputFileT (equivalent to ending position minus
     # starting position plus one).  This value is optional, use "" if there
     # is no length column.
-    # For match and merge of a SCAR marker file, this will be "".
+    # For match and merge of an IGG marker file, this will be "".
 
     len := ""
 
@@ -450,7 +450,7 @@ positionT:
     # type of ID that must match a similar ID column in inputFileS in order for
     # a row in inputFileT to match a row in inputFileS.  This value is optional,
     # use "" if there is no ID column.
-    # For match and merge of a SCAR marker file, this will be one of the *id
+    # For match and merge of an IGG marker file, this will be one of the *id
     # columns.
 
     id := Hid

@@ -1,5 +1,5 @@
 ################################################################################
-# Parameter file for annotateFile.R to add a "genes" column to the SCAR marker
+# Parameter file for annotateFile.R to add a "genes" column to the IGG marker
 # test file and write the result to a new file.  The "genes" column gives the
 # genes overlapping or within 3000 bp up/downstream of each marker, and the
 # position of the gene in base-pairs from the marker.  Specifically:
@@ -9,8 +9,8 @@
 #   3. Adds a new column to the inputFileS data, extracting the attribute named
 #       "Alias" from "gene" feature rows and placing it in new column "gene".
 #   4. Performs a match-and-merge operation between the two files and adds column
-#       "genes" to the inputFileT data, containing gene name and relative base
-#       pair position of the gene relative to the marker.
+#       "genes" to the inputFileT data, containing gene name, strand, and relative
+#       base pair position of the gene relative to the marker.
 #   5. Writes the new inputFileT data to file code/R/testOutput/MarkersWithGenes.test.tsv
 ################################################################################
 
@@ -82,7 +82,7 @@ mergeCols:
         maxMatch := 0
         join := YES
         joinSep := ","
-        format := "{+gene}({#T})"
+        format := "{+gene}({#T}:{+strand})" # E.g. "Solyc07g008570(@384:+)" means plus strand, overlaps with marker starting 384 bp after gene start.
 
 ################################################################################
 # Output file parameters.

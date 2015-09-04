@@ -52,7 +52,7 @@ if (!testing)
     args = commandArgs(TRUE)
 else
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/SCARF", "MIN",
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE", "MIN",
         "outTestHP11/CandidateMarkers_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0XL20.tsv",
         "outTestHP11/MarkerErrors_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0XL20V3000W8M3G1_",
         "outTestHP11/MarkersOverlapping_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0XL20V3000W8M3G1.tsv",
@@ -65,9 +65,9 @@ NexpectedMin = 7
 if (length(args) < NexpectedMin)
     {
     usage = c(
-        "Read a data frame of candidate SCAR marker primer pairs and, for each genome, another data",
-        "frame of bad primer pairs, then remove the bad pairs from the candidate SCAR marker file",
-        "and write the cleaned-up SCAR marker data to a new file.",
+        "Read a data frame of candidate IGG marker primer pairs and, for each genome, another data",
+        "frame of bad primer pairs, then remove the bad pairs from the candidate IGG marker file",
+        "and write the cleaned-up IGG marker data to a new file.",
         "",
         "Usage: Rscript removeBadMarkers.R <wd> <minMax> <tsvMarkerFile> <badMarkerPfx> \\",
         "       <overlappingFile> <nonoverlappingFile> <investigate>",

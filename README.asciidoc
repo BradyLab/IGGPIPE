@@ -1,18 +1,18 @@
-SCARF
-=====
+IGGPIPE
+=======
 Ted Toal <twtoal@ucdavis.edu>
 Version v0.0, Aug 2015
 
-The BradyLab/SCARF GitHub repository contains code and documentation for the
-software package called *SCARF* (*SCAR* **F**inder).
+The BradyLab/IGGPIPE GitHub repository contains code and documentation for the
+software package called *IGGPIPE* (*IGG* **P**ipeline).
 
-*SCARF* analyzes two or more genomes
+*IGGPIPE* analyzes two or more genomes
 for length-polymorphic regions bounded by unique sequences and designs PCR
 primers within these sequences. The primers can be used to amplify the region
 from genomic DNA of any of the species used to create the markers, and the
-amplicon size will indicate which species the DNA came from - a *SCAR* marker.
+amplicon size will indicate which species the DNA came from - an *IGG* marker.
 
-*SCAR* stands for _Sequence Characterized Amplified Regions_.
+*IGG* stands for _Indel Group in Genomes_.
 
 Download, Installation, and Running
 -----------------------------------
@@ -22,43 +22,36 @@ Download, Installation, and Running
 * The installation instructions are for Mac OSX. For other systems you are on your own,
 but please take copious notes and send them to me, and I'll update these instructions.
 
-*Download SCARF files*
-~~~~~~~~~~~~~~~~~~~~~~
-. Browse to https://github.com/BradyLab/SCARF
+*Download IGGPIPE files*
+~~~~~~~~~~~~~~~~~~~~~~~~
+. Browse to https://github.com/BradyLab/IGGPIPE
 . At bottom of right column on screen, click "Download ZIP" and choose a place to
 put it on your computer.
 . Unzip the zip file on your computer.
-. Rename the unzipped folder from "SCARF-master" to just "SCARF".
+. Rename the unzipped folder from "IGGPIPE-master" to just "IGGPIPE".
 
-*Install SCARF*
-~~~~~~~~~~~~~~~
-* Look inside the downloaded SCARF folder on your computer for file INSTALL.pdf
+*Install IGGPIPE*
+~~~~~~~~~~~~~~~~~
+* Look inside the downloaded IGGPIPE folder on your computer for file INSTALL.pdf
 or INSTALL.html and open either one and follow the instructions.
 
-*Run SCARF to generate markers after installation*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-* Find file RUN.pdf or RUN.html in the SCARF folder on your computer and open
+*Run IGGPIPE to generate markers after installation*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Find file RUN.pdf or RUN.html in the IGGPIPE folder on your computer and open
 either one and follow the instructions.
 
 *For problems and help:*
 ~~~~~~~~~~~~~~~~~~~~~~~~
-* Post an issue on GitHub under BradyLab/SCARF repository
+* Post an issue on GitHub under BradyLab/IGGPIPE repository
 * Contact me, Ted Toal, twtoal@ucdavis.edu
  
 References
 ----------
 
-.*SCAR markers were defined here:*
+.*IGG markers and the IGGPIPE software are described in:*
 
 [bibliography]
-- Paran, I., and Michelmore, R. W. 'Development of reliable PCR-based markers
-linked to downy mildew resistance genes in lettuce.' Theoretical and Applied
-Genetics 85.8 (1993): 985-993.
-
-.*The SCARF software is described in:*
-
-[bibliography]
-- Toal, T., Burkart-Waco, D., and Brady, S.M. 'SCARF: In silico K-mer-based Pipeline Finds Candidate
-SCAR Genomic Markers and PCR Primers using NGS Data and Tomato/Potato/Pennellii
+- Toal, T., Burkart-Waco, D., and Brady, S.M. 'IGGPIPE: In silico K-mer-based Pipeline Finds Candidate
+IGG Genomic Markers and PCR Primers using NGS Data and Tomato/Potato/Pennellii
 Test Case'
 (Publication in process)

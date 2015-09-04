@@ -55,7 +55,7 @@ else
     {
     fastaFile = ifelse(testing == 1, "testFASTA/ITAG2.4_test.fasta", "testFASTA/Spenn2.0_test.fasta")
 
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/SCARF",
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
         "outTestHP11/CandidateMarkers_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0XL20.tsv",
         testing, paste("outTestHP11/MarkerErrors_",
             "K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0XL20V3000W8M3G1_",
@@ -68,7 +68,7 @@ Nexpected = 12
 if (length(args) != Nexpected)
     {
     usage = c(
-        "Read a data frame of primer pairs for candidate SCAR markers and test each pair using e-PCR.",
+        "Read a data frame of primer pairs for candidate IGG markers and test each pair using e-PCR.",
         "",
         "Usage: Rscript ePCRtesting.R <wd> <tsvMarkerFile> <genomeNum> <badMarkerFile> <pcrInfoDir> \\",
         "       <ePCRpath> <maxDeviation> <wordSize> <maxMismatches> <maxGaps> <fastaFile> <investigate>",

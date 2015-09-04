@@ -1,5 +1,5 @@
 ################################################################################
-# Parameter file for annotateFile.R to convert the SCAR marker file generated
+# Parameter file for annotateFile.R to convert the IGG marker file generated
 # by allParameters.template for the S. lycopersicum ITAG2.4 and S. pennellii V2.0
 # genomes into a .gff3 file that could be used to display markers as a browser
 # track:
@@ -7,7 +7,7 @@
 #   2. Adds column "ID" containing a unique row ID equal to "ID_nn_YYY" where
 #       "nn" is the integer part of the Hid column and "YYY" is a sequence number
 #       that increments when the "nn" value is the same for more than 1 column.
-#   3. Adds fixed column "source" containing "SCARF.markers" 
+#   3. Adds fixed column "source" containing "IGG.markers" 
 #   4. Adds fixed column "feature" containing "genetic_marker"
 #       (Sequence Ontology term SO:0001645)
 #   5. Adds fixed column "score" containing "." (no score)
@@ -59,7 +59,7 @@ inputFileT:
     comment := ""
     keepColumns := "Hid,HampPos1,HampPos2,HampLen,PampLen,PHdif,prmSeqL,prmSeqR,prmTmL,prmTmR,PHphase,Hpct,Ppct,Pid,PampPos1,PampPos2"
     addColNames := "ID,source,feature,score,strand,frame"
-    addColValues := "ID_{/Hpct/\.[0-9]*$/}_{#3},SCARF.markers,genetic_marker,.,.,."
+    addColValues := "ID_{/Hpct/\.[0-9]*$/}_{#3},IGG.markers,genetic_marker,.,.,."
 
 ################################################################################
 # Output file attribute creation parameters.

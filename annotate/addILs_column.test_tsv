@@ -1,5 +1,5 @@
 ################################################################################
-# Parameter file for annotateFile.R to add an "ILs" column to the SCAR marker
+# Parameter file for annotateFile.R to add an "ILs" column to the IGG marker
 # test file and writes the result to a new file.  The ILs column gives the ILs
 # whose introgression contains the marker, and the position of the marker within
 # the IL as a percentage of the distance along the introgression.  Specifically:

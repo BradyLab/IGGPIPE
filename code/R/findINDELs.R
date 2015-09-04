@@ -52,7 +52,7 @@ if (!testing)
     args = commandArgs(TRUE)
 else
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/SCARF",
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
         "outTestHP11/LCRs_K11Km2Lm100Dm10Dx2000.tsv", 100, 2000, 10, 100, 2, 0,
         "MAX",
         "outTestHP11/IndelsOverlapping_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0.tsv",
@@ -78,8 +78,8 @@ if (length(args) < NexpectedMin)
         "Arguments:",
         "   <wd>        : Path of R working directory, specify other file paths relative to this.",
         "   <inFile>    : Input file containing the LCR k-mers.",
-        "   <Amin>      : Minimum SCAR marker amplicon size in any genome.",
-        "   <Amax>      : Maximum SCAR marker amplicon size in any genome.  Size will always be less than <Dmax> (findLCRs.R)",
+        "   <Amin>      : Minimum IGG marker amplicon size in any genome.",
+        "   <Amax>      : Maximum IGG marker amplicon size in any genome.  Size will always be less than <Dmax> (findLCRs.R)",
         "   <ADmin>     : When smallest amplicon size is <Amin>, this is minimum ADDITIONAL bp's of next larger amplicon.",
         "   <ADmax>     : When largest amplicon size is <Amax>, this is minimum FEWER bp's of next smaller amplicon.",
         "                 Interpolation is linear between <ADmin> and <ADmax>.",
@@ -324,7 +324,7 @@ for (genome in otherGenomes)
     }
 inv(length(unique(df$LCRname)), "Number of LCRs after removing those with too little polymorphism")
 
-# Locate ALL pairs of k-mers that satisfy the requirements for a SCAR marker
+# Locate ALL pairs of k-mers that satisfy the requirements for an IGG marker
 # (Amin, Amax, ADmin, ADmax).
 #
 # This is challenging to do efficiently, but I've found a way (not as efficient
@@ -406,7 +406,7 @@ goodPairs = NULL
 progressEverySecs = 5 # Show progress every this many seconds.
 lastProgressTime = Sys.time()
 loopCount = 0
-catnow("Seeking good SCAR marker candidate indel regions:\n")
+catnow("Seeking good IGG marker candidate indel regions:\n")
 while (length(rightSideKmers) > 0)
     {
     # Calculate distance between left-side k-mer and right-side k-mer in each genome,

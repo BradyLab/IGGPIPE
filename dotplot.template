@@ -1,8 +1,8 @@
 ################################################################################
 # This is a template for a parameter file for running the R program dotplot.R,
-# which makes dot plots of LCR data from a SCARF LCRs_*.tsv output file.  This
-# file is configured to use the LCRs_*.tsv file produced as a result of running
-# SCARF using the test parameter file named allParameters.test.template.
+# which makes dot plots of LCR data from an IGGPIPE LCRs_*.tsv output file.
+# This file is configured to use the LCRs_*.tsv file produced as a result of
+# running IGGPIPE using the test parameter file named allParameters.test.template.
 # Therefore, you can test dotplot.R with this command:
 #
 #   Rscript code/R/dotplot.R dotplot.template
@@ -16,7 +16,7 @@
 
 
 # Path of the "LCRs_*.tsv" file to use as input for the dot plot.  This path
-# should be specified relative to the main SCARF directory, assuming that the
+# should be specified relative to the main IGGPIPE directory, assuming that the
 # dotplot.R program is run after changing to that directory.
 
 LCR.file := "outTestHP11/LCRs_K11k2L100D10_2000.tsv"
@@ -28,9 +28,9 @@ PLOT.file := "outTestHP11/LCRs_K11k2L100D10_2000.dotplot.png"
 
 
 # Names of .idlens files containing IDs and lengths of each sequence in each
-# genome's FASTA file.  These files are made by SCARF when it is run.  They
+# genome's FASTA file.  These files are made by IGGPIPE when it is run.  They
 # can be found in the GenomeData subfolder within the output folder for that
-# SCARF run.  They are normally named "Genome_1.idlens", "Genome_2.idlens".
+# IGGPIPE run.  They are normally named "Genome_1.idlens", "Genome_2.idlens".
 X.idlens := "outTestHP11/GenomeData/Genome_1.idlens"
 Y.idlens := "outTestHP11/GenomeData/Genome_2.idlens"
 

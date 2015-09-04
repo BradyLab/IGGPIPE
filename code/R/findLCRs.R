@@ -52,7 +52,7 @@ if (!testing)
     args = commandArgs(TRUE)
 else
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/SCARF",
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
         "outTestHP11/Kmers/Split/Genome_", "HP", 2, 100, 10, 2000,
         "outTestHP11/LCRs_K11Km2Lm100Dm10Dx2000.tsv",
         "outTestHP11/BadKmers_K11Km2Lm100Dm10Dx2000.tsv", TRUE)

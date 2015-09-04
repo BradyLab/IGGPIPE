@@ -5,7 +5,7 @@
 ################################################################################
 
 # Path of the "LCRs_*.tsv" file to use as input for the dot plot.  This path
-# should be specified relative to the main SCARF directory, assuming that the
+# should be specified relative to the main IGGPIPE directory, assuming that the
 # dotplot.R program is run after changing to that directory.
 
 LCR.file := "outHP14/LCRs_K14k2L400D10_1500.tsv"
@@ -83,9 +83,9 @@ GRID.label.size := 1.5
 
 
 # Names of .idlens files containing IDs and lengths of each sequence in each
-# genome's FASTA file.  These files are made by SCARF when it is run.  They
+# genome's FASTA file.  These files are made by IGGPIPE when it is run.  They
 # can be found in the GenomeData subfolder within the output folder for that
-# SCARF run.  They are normally named "Genome_1.idlens", "Genome_2.idlens".
+# IGGPIPE run.  They are normally named "Genome_1.idlens", "Genome_2.idlens".
 X.idlens := "outHP14/GenomeData/Genome_1.idlens"
 Y.idlens := "outHP14/GenomeData/Genome_2.idlens"
 

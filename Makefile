@@ -1,5 +1,5 @@
-# This is a Makefile for running the SCARF pipeline on genome files to produce
-# candidate SCAR markers.  Before running this, edit file allParameters.template.
+# This is a Makefile for running the IGGPIPE pipeline on genome files to produce
+# candidate IGG markers.  Before running this, edit file allParameters.template.
 # Run this Makefile with command 'make PARAMS=<allParameters filename>' to get
 # further usage instructions, e.g. 'make PARAMS=allParameters.myFile'.
 
@@ -126,13 +126,13 @@ ALL:
 	@echo
 	@echo "Removing all files from the output directory."
 	@# Try to remove output directory first.  If trashing, entire thing will be in trash.
-	-$(CMD_DELETE_WHEN_CLEANING) $(DIR_SCARF_OUT)
+	-$(CMD_DELETE_WHEN_CLEANING) $(DIR_IGGPIPE_OUT)
 	-$(CMD_DELETE_WHEN_CLEANING) $(DIR_GENOME_OUT_DATA)/*
 	-$(CMD_DELETE_WHEN_CLEANING) $(DIR_SPLIT_KMERS)/*
 	-$(CMD_DELETE_WHEN_CLEANING) $(DIR_KMERS)/*
 	-$(CMD_DELETE_WHEN_CLEANING) $(DIR_PRIMER_DATA)/*
-	-$(CMD_DELETE_WHEN_CLEANING) $(DIR_SCARF_OUT)/*
-	-$(CMD_DELETE_WHEN_CLEANING) $(DIR_SCARF_OUT)
+	-$(CMD_DELETE_WHEN_CLEANING) $(DIR_IGGPIPE_OUT)/*
+	-$(CMD_DELETE_WHEN_CLEANING) $(DIR_IGGPIPE_OUT)
 	@echo "Removed all files from the output directory."
 endif
 	@echo
@@ -178,10 +178,10 @@ all_ePCRtesting:
 ################################################################################
 
 # Target for making the main output directory.
-$(DIR_SCARF_OUT):
+$(DIR_IGGPIPE_OUT):
 	@echo
-	@echo "Creating directory $(DIR_SCARF_OUT)"
-	mkdir -p $(DIR_SCARF_OUT)
+	@echo "Creating directory $(DIR_IGGPIPE_OUT)"
+	mkdir -p $(DIR_IGGPIPE_OUT)
 
 # Target for making the genome data output directory.
 $(DIR_GENOME_OUT_DATA):
@@ -554,7 +554,7 @@ PTN_BAD_KMERS_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_BAD_KMERS_FILE)%
 
 # Use the patterns in a pattern target.
 $(PTN_LCR_FILE) $(PTN_BAD_KMERS_FILE) : $(SPLIT_KMER_EMPTY_TARGET) | \
-        $(DIR_SCARF_OUT) $(PATH_RSCRIPT) $(PATH_FIND_LCRS)
+        $(DIR_IGGPIPE_OUT) $(PATH_RSCRIPT) $(PATH_FIND_LCRS)
 	@echo
 	@echo "*** findLCRs PARAMS=$(PARAMS) $(CLEAN) ***"
 	@echo "Finding locally conserved regions using common unique $(K)-mers from .isect files into $@"
@@ -592,7 +592,7 @@ PTN_NONOVERLAPPING_INDELS_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_NONOVERLAPPING_INDELS
 
 # Use the patterns in a pattern target.
 $(PTN_OVERLAPPING_INDELS_FILE) $(PTN_NONOVERLAPPING_INDELS_FILE) : $(PATH_LCR_FILE) $(IDLEN_FILES) | \
-        $(DIR_SCARF_OUT) $(PATH_RSCRIPT) $(PATH_FIND_INDELS)
+        $(DIR_IGGPIPE_OUT) $(PATH_RSCRIPT) $(PATH_FIND_INDELS)
 	@echo
 	@echo "*** findINDELs PARAMS=$(PARAMS) $(CLEAN) ***"
 	@echo "Find indels using locally conserved regions in $< and write them to two output files"
@@ -638,7 +638,7 @@ endif
 
 $(DNA_SEQ_FILES) : $(PFX_GENOME_DATA_FILE)%.dnaseqs : $$(PATH_GENOME_FASTA_$$*) \
         $(PFX_GENOME_DATA_FILE)$$*.contigs $(PATH_OVERLAPPING_INDELS_FILE) | \
-        $(DIR_SCARF_OUT) $(DIR_GENOME_OUT_DATA) \
+        $(DIR_IGGPIPE_OUT) $(DIR_GENOME_OUT_DATA) \
         $(PATH_RSCRIPT) $(PATH_GET_DNA_SEQS) $(PATH_GET_SEQS_FASTA)
 	@echo
 	@echo "*** getDNAseqs PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
@@ -716,7 +716,7 @@ endif
 # Here, % is a genome letter, which is a pain in the ass to convert back to a genome number.
 
 $(BAD_MARKER_FILES) : $(PFX_BAD_MARKER_ERROR_PATH)_%.bad.tsv : $$(PATH_GENOME_FASTA_$$(GENOME_$$*)) \
-        $(PATH_MARKER_DATA_FILE) | $(DIR_SCARF_OUT) $(DIR_GENOME_OUT_DATA) $(DIR_PRIMER_DATA) \
+        $(PATH_MARKER_DATA_FILE) | $(DIR_IGGPIPE_OUT) $(DIR_GENOME_OUT_DATA) $(DIR_PRIMER_DATA) \
         $(PATH_RSCRIPT) $(PATH_EPCR_TESTING) $(PATH_EPCR)
 	@echo
 	@echo "*** ePCRtesting PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
@@ -771,7 +771,7 @@ $(PTN_OVERLAPPING_MARKERS_FILE) $(PTN_NONOVERLAPPING_MARKERS_FILE) : $(PATH_MARK
 	@echo "Finished."
 
 ################################################################################
-# plotMarkers: Make density plots of final "good" candidate SCAR markers, both
+# plotMarkers: Make density plots of final "good" candidate IGG markers, both
 # overlapping and non-overlapping.
 ################################################################################
 
@@ -806,7 +806,7 @@ $(PTN_COUNTS_FILE) $(PTN_DENSITY_FILES) : $(PATH_OVERLAPPING_MARKERS_FILE) $(PAT
         $(IDLEN_FILES) | $(PATH_RSCRIPT) $(PATH_PLOT_MARKERS)
 	@echo
 	@echo "*** plotMarkers PARAMS=$(PARAMS) $(CLEAN) ***"
-	@echo "Make density plots of 'good' candidate SCAR markers to file $@"
+	@echo "Make density plots of 'good' candidate IGG markers to file $@"
 	$(TIME) $(PATH_RSCRIPT) $(PATH_PLOT_MARKERS) $(WD) $(PLOT_NDAMIN) $(PLOT_ALPHA) \
 	    $(PATH_OVERLAPPING_MARKERS_FILE) \
 	    $(PATH_NONOVERLAPPING_MARKERS_FILE) \

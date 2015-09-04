@@ -27,14 +27,14 @@ testing = 0
 if (testing == 0)
     args = commandArgs(TRUE)
 else if (testing == 1)
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/SCARF", 2, 0.3,
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE", 2, 0.3,
         "outTestHP11/MarkersOverlapping_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0XL20V3000W8M3G1.tsv",
         "outTestHP11/MarkersNonoverlapping_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0XL20V3000W8M3G1.tsv",
         "outTestHP11/MarkerCounts_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0XL20V3000W8M3G1",
         "outTestHP11/MarkerDensity_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0XL20V3000W8M3G1",
         "outTestHP11/GenomeData/Genome_1.idlens", "outTestHP11/GenomeData/Genome_2.idlens")
 else if (testing == 2)
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/SCARF", 2, 0.25,
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE", 2, 0.25,
         "outHP14/MarkersOverlapping_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.tsv",
         "outHP14/MarkersNonoverlapping_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.tsv",
         "outHP14/MarkerCounts_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1",
@@ -46,7 +46,7 @@ NexpectedMin = 9
 if (length(args) < NexpectedMin)
     {
     usage = c(
-        "Read a data frame of good candidate SCAR markers that have passed all tests, and make",
+        "Read a data frame of good candidate IGG markers that have passed all tests, and make",
         "marker bar plots and density plots showing numbers of markers on each chromosome.",
         "",
         "Usage: Rscript findPrimers.R <wd> <plotNDAmin> <alpha> <overlappingFile> <nonoverlappingFile> \\",
@@ -121,7 +121,7 @@ for (idlensFile in idlensFiles)
 # Read overlapping marker data.
 dfMarkers = read.table(overlappingFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
 if (nrow(dfMarkers) == 0)
-    stop("There are no overlapping SCAR markers.")
+    stop("There are no overlapping IGG markers.")
 
 # The k-mer length we are working with.
 kmerLen = nchar(dfMarkers$kmer1[1])
@@ -161,7 +161,7 @@ catnow("Number of overlapping markers:", nrow(dfMarkers), "\n")
 
 dfNoOverlaps = read.table(nonoverlappingFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
 if (nrow(dfNoOverlaps) == 0)
-    stop("There are no non-overlapping SCAR markers.")
+    stop("There are no non-overlapping IGG markers.")
 
 # The k-mer length should be the same.
 if (nchar(dfNoOverlaps$kmer1[1]) != kmerLen)
@@ -224,8 +224,8 @@ for (genome in genomeLtrs)
         {
         ylim = range(pretty(c(0, max(V)*1.1)))
         barplot(V, col="gray", las=2, cex.main=1.5, cex.names=1.5, ylim=ylim, yaxp=c(ylim, 10), tck=1,
-            ylab="SCAR markers per 1 Mbp", cex.lab=2, cex.axis=1.2,
-            main=paste("Density of SCAR markers in each FASTA sequence of genome '", genome, "'", sep=""))
+            ylab="IGG markers per 1 Mbp", cex.lab=2, cex.axis=1.2,
+            main=paste("Density of IGG markers in each FASTA sequence of genome '", genome, "'", sep=""))
         barplot(V2, width=0.5, space=c(1.4, 0.9), col="blue", add=TRUE, axes=FALSE, axisnames=FALSE, main="")
         legend("topright", c("All markers", "Non-overlapping markers"), fill=c("gray", "blue"), cex=1.5)
         }
@@ -235,8 +235,8 @@ for (genome in genomeLtrs)
         V = V[ord]
         V2 = V2[ord]
         plot(1:length(V), V, type="l", col="black", cex.main=1.5, cex.axis=1.2,
-            xlab="Number of FASTA Sequences", ylab="Density of SCAR markers per 1 Mbp", cex.lab=2,
-            main=paste("Density of SCAR markers in FASTA sequences of genome '", genome, "'", sep=""))
+            xlab="Number of FASTA Sequences", ylab="Density of IGG markers per 1 Mbp", cex.lab=2,
+            main=paste("Density of IGG markers in FASTA sequences of genome '", genome, "'", sep=""))
         lines(1:length(V2), V2, col="blue")
         legend("topleft", c("All markers", "Non-overlapping markers"), lwd=2, col=c("black", "blue"), cex=1.5)
         }
@@ -285,7 +285,7 @@ for (genome in genomeLtrs)
     ylim = c(0, maxSeqLenMbp)
     plot(NA, type="n", xlim=xlim, ylim=ylim, cex.main=cex.main,
         xlab="", ylab="Sequence position (Mbp)", cex.lab=3, axes=FALSE, frame=FALSE,
-        main=paste("Non-overlapping SCAR markers in each FASTA sequence of genome '", genome, "'", sep=""))
+        main=paste("Non-overlapping IGG markers in each FASTA sequence of genome '", genome, "'", sep=""))
     at = pretty(ylim)
     axis(2, at=at, line=-2, cex.axis=3)
 

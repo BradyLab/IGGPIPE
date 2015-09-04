@@ -55,7 +55,7 @@ else
     {
     fastaFile = ifelse(testing == 1, "testFASTA/ITAG2.4_test.fasta", "testFASTA/SpennV2.0_test.fasta")
 
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/SCARF",
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
         "outTestHP11/IndelsOverlapping_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0.tsv",
         testing, paste("outTestHP11/GenomeData/Genome_", testing, ".dnaseqs", sep=""),
         "outTestHP11/GenomeData", 20,

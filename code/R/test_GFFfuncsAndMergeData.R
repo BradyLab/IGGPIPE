@@ -7,7 +7,7 @@
 #######################################################################################
 
 # Set working directory.
-setwd("~/Documents/UCDavis/BradyLab/Genomes/kmers/SCARF/code/R")
+setwd("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE/code/R")
 
 # Source the files we are testing.
 source("Include_GFFfuncs.R")
