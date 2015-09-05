@@ -43,7 +43,7 @@ show the names of file(s) that are produced.
      make PARAMS=filename getGenomicPos GENOME=ALL
      make PARAMS=filename splitKmers    GENOME=ALL
      make PARAMS=filename findLCRs
-     make PARAMS=filename findINDELs
+     make PARAMS=filename findIndelGroups
      make PARAMS=filename getDNAseqs    GENOME=ALL
      make PARAMS=filename findPrimers
      make PARAMS=filename ePCRtesting   GENOME=ALL

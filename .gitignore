@@ -11,3 +11,5 @@ findMers
 *.o
 *.xml
 .Rapp.history
+temp.*
+x.*

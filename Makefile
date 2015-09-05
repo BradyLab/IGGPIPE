@@ -113,7 +113,7 @@ endif
 # Target for running or cleaning entire pipeline or cleaning entire output directory.
 ifneq ($(CLEAN_OUT_DIR),1)
 ALL: all_getSeqInfo all_getKmers all_kmerStats all_sortKmers all_getContigFile \
-    kmerIsect all_getGenomicPos all_splitKmers findLCRs findINDELs \
+    kmerIsect all_getGenomicPos all_splitKmers findLCRs findIndelGroups \
     all_getDNAseqs findPrimers all_ePCRtesting removeBadMarkers plotMarkers
 	@echo
 ifeq ($(CLEAN),)
@@ -571,41 +571,41 @@ $(PTN_LCR_FILE) $(PTN_BAD_KMERS_FILE) : $(SPLIT_KMER_EMPTY_TARGET) | \
 
 # A list of all .idlens files is already defined above: IDLEN_FILES
 
-# Phony target to make or clean PATH_OVERLAPPING_INDELS_FILE and PATH_NONOVERLAPPING_INDELS_FILE files.
+# Phony target to make or clean PATH_OVERLAPPING_INDEL_GROUPS_FILE and PATH_NONOVERLAPPING_INDEL_GROUPS_FILE files.
 ifeq ($(CLEAN),)
-findINDELs: $(PATH_OVERLAPPING_INDELS_FILE) $(PATH_NONOVERLAPPING_INDELS_FILE)
+findIndelGroups: $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) $(PATH_NONOVERLAPPING_INDEL_GROUPS_FILE)
 	@echo
-	@echo "findINDELs files are up to date."
+	@echo "findIndelGroups files are up to date."
 else
-findINDELs:
-	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_OVERLAPPING_INDELS_FILE) $(PATH_NONOVERLAPPING_INDELS_FILE)
-	@echo "findINDELs output files removed."
+findIndelGroups:
+	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) $(PATH_NONOVERLAPPING_INDEL_GROUPS_FILE)
+	@echo "findIndelGroups output files removed."
 endif
 
-# PATH_OVERLAPPING_INDELS_FILE and PATH_NONOVERLAPPING_INDELS_FILE targets are built at the same time.
+# PATH_OVERLAPPING_INDEL_GROUPS_FILE and PATH_NONOVERLAPPING_INDEL_GROUPS_FILE targets are built at the same time.
 # Define target names with % in them, so we can create a pattern target.  The %
 # tells make that all the target files are made at one time by the recipe.  Here
-# the only thing in common between the names is "$(SFX_INDELS_FILE).tsv", and
-# $(SFX_INDELS_FILE) might be empty, but % at least matches .tsv.
-PTN_OVERLAPPING_INDELS_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_OVERLAPPING_INDELS_FILE)%
-PTN_NONOVERLAPPING_INDELS_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_NONOVERLAPPING_INDELS_FILE)%
+# the only thing in common between the names is "$(SFX_INDEL_GROUPS_FILE).tsv", and
+# $(SFX_INDEL_GROUPS_FILE) might be empty, but % at least matches .tsv.
+PTN_OVERLAPPING_INDELS_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_OVERLAPPING_INDEL_GROUPS_FILE)%
+PTN_NONOVERLAPPING_INDELS_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_NONOVERLAPPING_INDEL_GROUPS_FILE)%
 
 # Use the patterns in a pattern target.
 $(PTN_OVERLAPPING_INDELS_FILE) $(PTN_NONOVERLAPPING_INDELS_FILE) : $(PATH_LCR_FILE) $(IDLEN_FILES) | \
-        $(DIR_IGGPIPE_OUT) $(PATH_RSCRIPT) $(PATH_FIND_INDELS)
+        $(DIR_IGGPIPE_OUT) $(PATH_RSCRIPT) $(PATH_FIND_INDEL_GROUPS)
 	@echo
-	@echo "*** findINDELs PARAMS=$(PARAMS) $(CLEAN) ***"
-	@echo "Find indels using locally conserved regions in $< and write them to two output files"
-	$(TIME) $(PATH_RSCRIPT) $(PATH_FIND_INDELS) $(WD) \
+	@echo "*** findIndelGroups PARAMS=$(PARAMS) $(CLEAN) ***"
+	@echo "Find Indel Groups using locally conserved regions in $< and write them to two output files"
+	$(TIME) $(PATH_RSCRIPT) $(PATH_FIND_INDEL_GROUPS) $(WD) \
 	    $(PATH_LCR_FILE) \
 	    $(AMIN) $(AMAX) $(ADMIN) $(ADMAX) $(NDAMIN) $(MINFLANK) $(OVERLAP_REMOVAL) \
-	    $(PATH_OVERLAPPING_INDELS_FILE) $(PATH_NONOVERLAPPING_INDELS_FILE) \
+	    $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) $(PATH_NONOVERLAPPING_INDEL_GROUPS_FILE) \
 	    $(GENOME_LETTERS_SQUISHED) $(INVESTIGATE_ANALYZELCRS) \
 	    $(IDLEN_FILES) $(REDIR)
 	@echo "Finished."
 
 ################################################################################
-# getDNAseqs: Extract DNA sequence around indels, for making primers.
+# getDNAseqs: Extract DNA sequence around Indel Groups, for making primers.
 ################################################################################
 
 # A list of all FASTA files already defined above: FASTA_FILES
@@ -637,14 +637,14 @@ endif
 # Here, % is a genome number.
 
 $(DNA_SEQ_FILES) : $(PFX_GENOME_DATA_FILE)%.dnaseqs : $$(PATH_GENOME_FASTA_$$*) \
-        $(PFX_GENOME_DATA_FILE)$$*.contigs $(PATH_OVERLAPPING_INDELS_FILE) | \
+        $(PFX_GENOME_DATA_FILE)$$*.contigs $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) | \
         $(DIR_IGGPIPE_OUT) $(DIR_GENOME_OUT_DATA) \
         $(PATH_RSCRIPT) $(PATH_GET_DNA_SEQS) $(PATH_GET_SEQS_FASTA)
 	@echo
 	@echo "*** getDNAseqs PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
-	@echo "Extract DNA sequence around indels and write to $@"
+	@echo "Extract DNA sequence around Indel Groups and write to $@"
 	$(TIME) $(PATH_RSCRIPT) $(PATH_GET_DNA_SEQS) $(WD) \
-	    $(PATH_OVERLAPPING_INDELS_FILE) $* \
+	    $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) $* \
 	    $@ \
 		$(DIR_GENOME_OUT_DATA) $(EXTENSION_LEN) \
 		$(PATH_PERL) $(PATH_GET_SEQS_FASTA) \
@@ -653,7 +653,7 @@ $(DNA_SEQ_FILES) : $(PFX_GENOME_DATA_FILE)%.dnaseqs : $$(PATH_GENOME_FASTA_$$*) 
 	@echo "Finished."
 
 ################################################################################
-# findPrimers: Run primer3 to search for primers around indels.
+# findPrimers: Run primer3 to search for primers around Indel Groups.
 ################################################################################
 
 # A list of all .dnaseqs files is already defined above: DNA_SEQ_FILES
@@ -671,13 +671,13 @@ endif
 
 # PATH_MARKER_DATA_FILE target.
 
-$(PATH_MARKER_DATA_FILE) : $(PATH_OVERLAPPING_INDELS_FILE) $(DNA_SEQ_FILES) | $(PATH_RSCRIPT) \
+$(PATH_MARKER_DATA_FILE) : $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) $(DNA_SEQ_FILES) | $(PATH_RSCRIPT) \
         $(DIR_PRIMER_DATA) $(PATH_FIND_PRIMERS) $(PATH_PRIMER3CORE) $(PATH_PRIMER3_SETTINGS)
 	@echo
 	@echo "*** findPrimers PARAMS=$(PARAMS) $(CLEAN) ***"
-	@echo "Find primers around indels in $< and write to $@"
+	@echo "Find primers around Indel Groups in $< and write to $@"
 	$(TIME) $(PATH_RSCRIPT) $(PATH_FIND_PRIMERS) $(WD) \
-		$(PATH_OVERLAPPING_INDELS_FILE) \
+		$(PATH_OVERLAPPING_INDEL_GROUPS_FILE) \
 		$(PFX_GENOME_DATA_FILE) \
 		$(PATH_MARKER_DATA_FILE) \
 		$(PATH_PRIMER3CORE) $(PATH_PRIMER3_SETTINGS) \

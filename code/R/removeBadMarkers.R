@@ -75,8 +75,8 @@ if (length(args) < NexpectedMin)
         "Arguments:",
         "   <wd>                 : Path of R working directory, specify other file paths relative to this.",
         "   <minMax>             : Either MIN or MAX to indicate the method to be used to remove overlapping",
-        "                          indels.  MIN means that the smallest indels are retained over larger ones,",
-        "                          while MAX means the larger are retained.",
+        "                          Indel Groups.  MIN means that the smallest Indel Groups are retained over",
+        "                          larger ones, while MAX means the larger are retained.",
         "   <tsvMarkerFile>      : Input file containing the candidate markers with primer pairs.",
         "   <badMarkerPfx>       : Prefix, including directory, of input files containing bad markers to",
         "                           be removed.  The filename suffix is '_<genome letter>.bad.tsv'.",
@@ -202,7 +202,7 @@ catnow(nrow(dfMarkers), "overlapping markers output to file:\n", overlappingFile
 
 ########################################
 # Remove overlapping markers, guided by the value of minMax, which is either
-# MIN or MAX.  This is a copy of the same code from findINDELs.R.
+# MIN or MAX.  This is a copy of the same code from findIndelGroups.R.
 ########################################
 
 inv(nrow(dfMarkers), "Number of markers including overlapping markers")
@@ -216,7 +216,7 @@ for (genome in genomeLtrs)
     pos1.Col = ampPos1Col[genome]
     pos2.Col = ampPos2Col[genome]
 
-    # Refer to more comments in findINDELs.R for more information.
+    # Refer to more comments in findIndelGroups.R for more information.
 
     # Loop until no more markers are found to overlap in this genome.
     while (TRUE)

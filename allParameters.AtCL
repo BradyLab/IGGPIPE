@@ -190,7 +190,7 @@ DIR_R := code/R
 
 PATH_SPLIT_KMERS := $(DIR_R)/splitKmers.R
 PATH_FIND_LCRS := $(DIR_R)/findLCRs.R
-PATH_FIND_INDELS := $(DIR_R)/findINDELs.R
+PATH_FIND_INDEL_GROUPS := $(DIR_R)/findIndelGroups.R
 PATH_GET_DNA_SEQS := $(DIR_R)/getDNAseqs.R
 PATH_FIND_PRIMERS := $(DIR_R)/findPrimers.R
 PATH_EPCR_TESTING := $(DIR_R)/ePCRtesting.R
@@ -457,11 +457,11 @@ PFX_SPLIT_UNIQ_KMERS_FILE := $(DIR_SPLIT_KMERS)/Split_
 # markers created.  Smaller values make more LCRs and increase computation
 # time.  Since e-PCR testing will validate all candidate markers, there is
 # no reason not to set this to its minimum of 2 if you are only making
-# markers.  If you want LCRs for another purpose such as a reliable indel
-# list or for doing whole genome alignment, a larger value is advised.
+# markers.  If you want LCRs for another purpose such as a reliable Indel
+# Group list or for doing whole genome alignment, a larger value is advised.
 # This should be at least two more than twice MINFLANK (defined below),
 # since that is the minimum number of k-mers in an LCB that could result
-# in in indel call.
+# in an Indel Group call.
 ### THIS IS A REASONABLE VALUE FOR THIS PARAMETER.
 
 # Since Col-0 and Ler-0 are so similar, it should be easy to get large numbers
@@ -490,9 +490,10 @@ DMIN := 30
 
 # Maximum distance in bp between two adjacent k-mers in an LCR.  If two adjacent
 # k-mers are farther apart than this, the k-mers serve to split the LCR into two
-# LCRs at that point.  An indel or marker is found on a single LCR, so this value
-# limits the maximum indel and amplicon size.  This is normally equal to the
-# maximum acceptable amplicon size AMAX (defined below), although it could be larger.
+# LCRs at that point.  An Indel Group or marker is found on a single LCR, so this
+# value limits the maximum Indel Group and amplicon size.  This is normally equal
+# to the maximum acceptable amplicon size AMAX (defined below), although it could
+# be larger.
 ### YOU PROBABLY WANT TO SET THIS EQUAL TO YOUR MAXIMUM ACCEPTABLE DESIRED
 ### AMPLICON LENGTH.
 
@@ -506,7 +507,7 @@ AMIN := 400
 
 
 # Maximum IGG marker amplicon size in any genome.  The amplicon size will always
-# be less than DMAX also.  This also limits the maximum indel size.
+# be less than DMAX also.  This also limits the maximum Indel Group size.
 ### SET THIS EQUAL TO YOUR MAXIMUM ACCEPTABLE AMPLICON LENGTH.
 
 AMAX := 1500
@@ -516,8 +517,8 @@ AMAX := 1500
 # minimum ADDITIONAL bp's of size required for the next larger amplicon.  If
 # there are only two genomes or if NDAMIN is 2 (defined below), then if one
 # genome's amplicon size is AMIN, the other's must be at least AMIN+ADMIN.
-# For the purpose of finding indels only, this is the minimum indel size that
-# will ever be found.
+# For the purpose of finding Indel Groups only, this is the minimum Indel
+# Group size that will ever be found.
 ### SET THIS EQUAL TO YOUR MINIMUM ACCEPTABLE DIFFERENCE IN AMPLICON LENGTHS WHEN
 ### ONE AMPLICON'S LENGTH IS EQUAL TO AMIN AND ANOTHER IS AMIN+ADMIN.
 
@@ -538,7 +539,7 @@ ADMIN := 50
 # size that they can be easily distinguished on a gel, but that required size
 # difference may scale up as the amplicon sizes grow.
 #
-# For the purpose of finding indels only, this should be set equal to ADMIN.
+# For the purpose of finding Indel Groups only, this should be set equal to ADMIN.
 ### SET THIS EQUAL TO YOUR MAXIMUM ACCEPTABLE DIFFERENCE IN AMPLICON LENGTHS WHEN
 ### ONE AMPLICON'S LENGTH IS EQUAL TO AMAX AND ANOTHER IS AMAX-ADMAX.
 
@@ -559,17 +560,17 @@ ADMAX := 300
 NDAMIN := 2
 
 
-# Minimum number of k-mers to the left of the left-side indel k-mer and to the
-# right of the right-side indel k-mer.  May be 0 for none.  The indel k-mers are
-# the two common unique k-mers, one on each end of an indel, at which primers
-# are designed.  An indel can require only those two k-mers, if MINFLANK is 0.
-# The number of k-mers that must be present in the LCR to create a candidate
-# marker is at least 2+2*MINFLANK.  By setting this to a value larger than 0,
-# you might decrease the odds that a single random common unique k-mer on the
-# LCB could trigger creation of an IGG marker, but since e-PCR testing of
-# candidate primers will reject bad random markers, there is no reason not to
-# leave this set to 0.  For the purpose of finding indels only, you may want
-# to use a larger value than 0.
+# Minimum number of k-mers to the left of the left-side Indel Group k-mer and to
+# the right of the right-side Indel Group k-mer.  May be 0 for none.  The Indel
+# Group k-mers are the two common unique k-mers, one on each end of an Indel
+# Group, at which primers are designed.  An Indel Group can require only those
+# two k-mers, if MINFLANK is 0.  The number of k-mers that must be present in
+# the LCR to create a candidate marker is at least 2+2*MINFLANK.  By setting
+# this to a value larger than 0, you might decrease the odds that a single
+# random common unique k-mer on the LCB could trigger creation of an IGG marker,
+# but since e-PCR testing of candidate primers will reject bad random markers,
+# there is no reason not to leave this set to 0.  For the purpose of finding
+# Indel Groups only, you may want to use a larger value than 0.
 ### THIS IS A REASONABLE VALUE FOR THIS PARAMETER.
 
 # Since Col-0 and Ler-0 are so similar, there will be lots of common unique k-mers
@@ -599,40 +600,41 @@ MINFLANK := 2
 EXTENSION_LEN := 20
 
 
-# Two files of indels are produced, one of overlapping indels and another of
-# non-overlapping indels.  Likewise, two files of IGG markers are produced,
-# one of overlapping markers and another of non-overlapping.  You may be
-# interested in one or the other, overlapping or non-overlapping, or perhaps
-# both.
+# Two files of Indel Groups are produced, one of overlapping Indel Groups and
+# another of non-overlapping Indel Groups.  Likewise, two files of IGG markers
+# are produced, one of overlapping markers and another of non-overlapping.
+# You may be interested in one or the other, overlapping or non-overlapping,
+# or perhaps both.
 #
-# To explain the meaning of "overlapping" in this context, consider two indels
-# or markers that follow one after another, the first bounded by k-mers A and B,
-# and the second bounded by k-mers C and D.  Suppose that both AB and CD satisfy
-# the parameters above such as AMIN and AMAX.  Now, it is entirely possible that
-# AD also satisfies those parameters.  If it does, it will be included in the
-# overlapping indel and IGG marker files along with AB and CD, even though its
-# amplicon includes both the AB and the CD amplicon regions, i.e. there is
-# redundancy in the indels and IGG markers within the overlapping files.
+# To explain the meaning of "overlapping" in this context, consider two Indel
+# Groups or markers that follow one after another, the first bounded by k-mers
+# A and B, and the second bounded by k-mers C and D.  Suppose that both AB and
+# CD satisfy the parameters above such as AMIN and AMAX.  Now, it is entirely
+# possible that AD also satisfies those parameters.  If it does, it will be
+# included in the overlapping Indel Group and IGG marker files along with AB
+# and CD, even though its amplicon includes both the AB and the CD amplicon
+# regions, i.e. there is redundancy in the Indel Groups and IGG markers within
+# the overlapping files.
 #
-# The files of non-overlapping indels and IGG markers are created by removing
-# some indels or IGG markers from the set of overlapping ones, so that after
-# removal none of the indels or IGG markers overlap.
+# The files of non-overlapping Indel Groups and IGG markers are created by
+# removing some Indel Groups or IGG markers from the set of overlapping ones,
+# so that after removal none of the Indel Groups or IGG markers overlap.
 #
-# Two different methods are provided for determining which indels and markers
-# to remove, and the following parameter chooses the method.  It must be the
-# value MIN or else MAX, meaning:
-#   MIN: when a set of indels/markers overlaps, the SMALLEST indel/marker within
-#        the genome being tested is retained, and any indels/markers that overlap
-#        it are removed.
-#   MAX: when a set of indels/markers overlaps, the LARGEST indel/marker within
-#        the genome being tested is retained, and any indels/markers that overlap
-#        it are removed.
-# That removal process is repeated until no more indels/markers overlap.  It is
-# repeated for each genome as it is possible two indels/markers might overlap in
-# one genome but not another.
+# Two different methods are provided for determining which Indel Groups and
+# markers to remove, and the following parameter chooses the method.  It must
+# be the value MIN or else MAX, meaning:
+#   MIN: when a set of Indel Groups/markers overlaps, the SMALLEST Indel
+#       Group/marker within the genome being tested is retained, and any Indel
+#       Groups/markers that overlap it are removed.
+#   MAX: when a set of Indel Groups/markers overlaps, the LARGEST Indel
+#       Group/marker within the genome being tested is retained, and any Indel
+#       Groups/markers that overlap it are removed.
+# That removal process is repeated until no more Indel Groups/markers overlap.
+# It is repeated for each genome as it is possible two Indel Groups/markers
+# might overlap in one genome but not another.
 #
-# Therefore you would set this to MIN if you want to bias towards getting smaller
-# indel or marker regions, and to MAX to bias towards larger ones.
+# Therefore you would set this to MIN if you want to bias towards getting
+# smaller Indel Group or marker regions, and to MAX to bias towards larger ones.
 ### CHANGE THIS TO YOUR CHOICE OF THE TWO
 
 OVERLAP_REMOVAL := MIN
@@ -761,7 +763,7 @@ PATH_PRIMER3_OUT := $(DIR_PRIMER_DATA)/Primer3Out.txt
 # Output directory of main output files.
 ################################################################################
 
-# Path to the directory where the LCR, indel, and marker output files will
+# Path to the directory where the LCR, Indel Group, and marker output files will
 # be placed.
 ### THIS DOES NOT NEED TO BE CHANGED.
 
@@ -779,11 +781,11 @@ PFX_LCR_FILE := LCRs
 PFX_BAD_KMERS_FILE := BadKmers
 
 
-# Filename prefixes of INDELs data files.
+# Filename prefixes of Indel Groups data files.
 ### THESE DO NOT NEED TO BE CHANGED.
 
-PFX_OVERLAPPING_INDELS_FILE := IndelsOverlapping
-PFX_NONOVERLAPPING_INDELS_FILE := IndelsNonoverlapping
+PFX_OVERLAPPING_INDEL_GROUPS_FILE := IndelsOverlapping
+PFX_NONOVERLAPPING_INDEL_GROUPS_FILE := IndelsNonoverlapping
 
 
 # Filename prefix of IGG marker file, prior to e-PCR verification.
@@ -845,11 +847,11 @@ PFX_MARKER_DENSITY_FILE := MarkerDensity
 SFX_LCR_FILE := _K$(K)k$(KMIN)L$(LMIN)D$(DMIN)_$(DMAX)
 
 
-# Suffix to use for the file that holds INDEL positions.
+# Suffix to use for the file that holds Indel Group positions.
 ### THIS DOES NOT NEED TO BE CHANGED.
 
 # (This includes all of SFX_LCR_FILE and the parameter values used to find markers)
-SFX_INDELS_FILE := $(SFX_LCR_FILE)A$(AMIN)_$(AMAX)d$(ADMIN)_$(ADMAX)N$(NDAMIN)F$(MINFLANK)
+SFX_INDEL_GROUPS_FILE := $(SFX_LCR_FILE)A$(AMIN)_$(AMAX)d$(ADMIN)_$(ADMAX)N$(NDAMIN)F$(MINFLANK)
 
 
 # Suffix to use for the files containing IGG markers with primers and marker
@@ -858,7 +860,7 @@ SFX_INDELS_FILE := $(SFX_LCR_FILE)A$(AMIN)_$(AMAX)d$(ADMIN)_$(ADMAX)N$(NDAMIN)F$
 
 # (This includes all of SFX_SEQ_FILE and the parameters used when extracting DNA
 # and making primers)
-SFX_MARKER_FILE := $(SFX_INDELS_FILE)X$(EXTENSION_LEN)
+SFX_MARKER_FILE := $(SFX_INDEL_GROUPS_FILE)X$(EXTENSION_LEN)
 
 
 # Suffix to use for the files that hold candidate IGG marker primers, both
@@ -883,11 +885,11 @@ PATH_LCR_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_LCR_FILE)$(SFX_LCR_FILE).tsv
 PATH_BAD_KMERS_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_BAD_KMERS_FILE)$(SFX_LCR_FILE).tsv
 
 
-# Paths of INDELs data files.
+# Paths of Indel Groups data files.
 ### DO NOT CHANGE THESE.
 
-PATH_OVERLAPPING_INDELS_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_OVERLAPPING_INDELS_FILE)$(SFX_INDELS_FILE).tsv
-PATH_NONOVERLAPPING_INDELS_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_NONOVERLAPPING_INDELS_FILE)$(SFX_INDELS_FILE).tsv
+PATH_OVERLAPPING_INDEL_GROUPS_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_OVERLAPPING_INDEL_GROUPS_FILE)$(SFX_INDEL_GROUPS_FILE).tsv
+PATH_NONOVERLAPPING_INDEL_GROUPS_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_NONOVERLAPPING_INDEL_GROUPS_FILE)$(SFX_INDEL_GROUPS_FILE).tsv
 
 
 # Path of IGG marker file, prior to e-PCR verification.
@@ -924,37 +926,37 @@ PFX_MARKER_DENSITY_PATH := $(DIR_MAIN_OUTPUT)/$(PFX_MARKER_DENSITY_FILE)$(SFX_GO
 # individual modules.
 ################################################################################
 
-# Produce debug output whencalling LCRs.
+# Produce debug output when calling LCRs.
 ### THIS DOES NOT NEED TO BE CHANGED.
 
 INVESTIGATE_FINDLCRS := FALSE
 
 
-# Produce debug output whenanalyzing LCRs for INDELs.
+# Produce debug output when analyzing LCRs for Indel Groups.
 ### THIS DOES NOT NEED TO BE CHANGED.
 
 INVESTIGATE_ANALYZELCRS := FALSE
 
 
-# Produce debug output whengetting DNA sequences at indel k-mers.
+# Produce debug output when getting DNA sequences at Indel Group k-mers.
 ### THIS DOES NOT NEED TO BE CHANGED.
 
 INVESTIGATE_GETDNASEQS := FALSE
 
 
-# Produce debug output whenfinding primers.
+# Produce debug output when finding primers.
 ### THIS DOES NOT NEED TO BE CHANGED.
 
 INVESTIGATE_FINDPRIMERS := FALSE
 
 
-# Produce debug output whendoing e-PCR testing of marker primer pairs.
+# Produce debug output when doing e-PCR testing of marker primer pairs.
 ### THIS DOES NOT NEED TO BE CHANGED.
 
 INVESTIGATE_EPCRTESTING := FALSE
 
 
-# Produce debug output whenremoving markers identified as bad by e-PCR.
+# Produce debug output when removing markers identified as bad by e-PCR.
 ### THIS DOES NOT NEED TO BE CHANGED.
 
 INVESTIGATE_RMVBADMARKERS := FALSE

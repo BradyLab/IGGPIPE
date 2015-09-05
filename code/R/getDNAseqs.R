@@ -56,7 +56,7 @@ else
     fastaFile = ifelse(testing == 1, "testFASTA/ITAG2.4_test.fasta", "testFASTA/SpennV2.0_test.fasta")
 
     args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
-        "outTestHP11/IndelsOverlapping_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0.tsv",
+        "outTestHP11/IndelGroupsOverlapping_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0.tsv",
         testing, paste("outTestHP11/GenomeData/Genome_", testing, ".dnaseqs", sep=""),
         "outTestHP11/GenomeData", 20,
         "/Users/tedtoal/perl5/perlbrew/perls/perl-5.14.2/bin/perl",
@@ -69,7 +69,7 @@ Nexpected = 11
 if (length(args) != Nexpected)
     {
     usage = c(
-        "Read a data frame of k-mer pairs that have been identified as bounding indels,",
+        "Read a data frame of k-mer pairs that have been identified as bounding Indel Groups,",
         "then read a genomic FASTA file for one genome and extract DNA sequences at each",
         "k-mer position, and finally, write the resulting data frame to a new file.",
         "",
@@ -156,7 +156,7 @@ catnow("Preparing to retrieve k-mer-vicinity sequences from FASTA file\n")
 # Read indel k-mer pairs data.
 df = read.table(indelFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
 if (nrow(df) == 0)
-    stop("There are no INDELs.")
+    stop("There are no Indel Groups.")
 inv(dim(df), "input data dim")
 inv(colnames(df), "input data columns")
 inv(head(df), "input data head")
@@ -212,7 +212,7 @@ inv(genomeLtr, "genome letter")
 # sequence position specification, which determines whether or not it reverse-
 # complements the extracted + strand sequence.
 #
-# Many indels will share the same left-side or same right-side k-mer.
+# Many Indel Groups will share the same left-side or same right-side k-mer.
 # To reduce time required, we will not extract the same area multiple times.  We
 # will find all the unique left-side and right-side k-mers and extract sequences
 # only for those.
@@ -421,5 +421,5 @@ df = df[, colnames(df) != "ctg"]
 write.table(df, seqOutFile, row.names=FALSE, quote=FALSE, sep="\t")
 # df = read.table(seqOutFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
 
-catnow("Finished retrieving DNA sequences for indels, output file:\n", seqOutFile, "\n")
+catnow("Finished retrieving DNA sequences for Indel Groups, output file:\n", seqOutFile, "\n")
 }

@@ -45,18 +45,27 @@ objPrint = function(x, title="")
 inv = function(a, title="") { if (investigate) objPrint(a, title) }
 
 # Get arguments.
-testing = FALSE
-#testing = TRUE # For testing only.
+testing = 0
+#testing = 1 # For testing only.
+#testing = 2 # For testing only.
 {
-if (!testing)
+if (testing == 0)
     args = commandArgs(TRUE)
-else
+else if (testing == 1)
     {
     args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
-        "outTestHP11/Kmers/Split/Genome_", "HP", 2, 100, 10, 2000,
+        "outTestHP11/Kmers/Split/Split_", "HP", 2, 100, 10, 2000,
         "outTestHP11/LCRs_K11Km2Lm100Dm10Dx2000.tsv",
         "outTestHP11/BadKmers_K11Km2Lm100Dm10Dx2000.tsv", TRUE)
     }
+else if (testing == 2)
+    {
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
+        "outHP14/Kmers/Split/Split_", "HP", 2, 400, 10, 1500,
+        "outHP14/LCRs_K14k2L400D10_1500.tsv",
+        "outHP14/BadKmers_K14k2L400D10_1500.tsv", TRUE)
+    }
+else stop("Unknown value for 'testing'")
 }
 
 Nexpected = 10
@@ -162,7 +171,7 @@ allFiles = list.files(inDir)
 RE = paste("^", inPfx, "1_(.*)\\.isect.split$", sep="")
 refFiles = allFiles[grepl(RE, allFiles)]
 if (length(refFiles) == 0)
-    stop("No reference genome files found in ", inDir, ", with names starting with ", inPfx, "_1_")
+    stop("No reference genome files found in ", inDir, ", with names starting with ", inPfx, "1_")
 # Extract the reference genome IDs from the reference genome file names.
 refIDs = sub(RE, "\\1", refFiles)
 refIDs = sort(refIDs)

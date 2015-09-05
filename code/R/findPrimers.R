@@ -53,7 +53,7 @@ if (!testing)
 else
     {
     args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
-        "outTestHP11/IndelsOverlapping_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0.tsv",
+        "outTestHP11/IndelGroupsOverlapping_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0.tsv",
         "outTestHP11/GenomeData/Genome_",
         "outTestHP11/CandidateMarkers_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0XL20.tsv",
         "~/bin/primer3_core", "Primer3Settings.txt",
@@ -65,7 +65,7 @@ Nexpected = 9
 if (length(args) != Nexpected)
     {
     usage = c(
-        "Read a data frame of indels bounded by k-mer pairs and, for each genome, another data frame",
+        "Read a data frame of Indel Groups bounded by k-mer pairs and, for each genome, another data frame",
         "of genome DNA sequences around the k-mer pairs, then run Primer3 to create primers from those",
         "sequences.  Write the new candidate IGG marker data including primers to a new file.",
         "",
@@ -133,7 +133,7 @@ if (is.na(investigate))
 # Read indel k-mer pairs data, which become the initial marker candidates.
 dfMarkers = read.table(indelFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
 if (nrow(dfMarkers) == 0)
-    stop("There are no INDELs.")
+    stop("There are no Indel Groups.")
 inv(dim(dfMarkers), "input markers dim")
 inv(colnames(dfMarkers), "input markers columns")
 inv(head(dfMarkers), "input markers head")
@@ -634,5 +634,5 @@ rownames(dfMarkers) = NULL
 write.table(dfMarkers, tsvMarkerFile, col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
 # dfMarkers = read.table(tsvMarkerFile, header=TRUE, sep="\t", stringsAsFactors=FALSE)
 
-catnow("Finished adding primer sequences to indels, candidate marker output file:\n", tsvMarkerFile, "\n")
+catnow("Finished adding primer sequences to Indel Groups, candidate marker output file:\n", tsvMarkerFile, "\n")
 }
