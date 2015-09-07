@@ -1,0 +1,5 @@
+cp code/R/testOutput/ILintrogressions.gff3 annotate/HP14.savedOutput/
+cp outHP14/MarkersNonoverlapping_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.gff3 annotate/HP14.savedOutput/
+cp outHP14/MarkersNonoverlappingWithGenes_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.tsv annotate/HP14.savedOutput/
+cp outHP14/MarkersOverlapping_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.gff3 annotate/HP14.savedOutput/
+cp outHP14/MarkersOverlappingWithGenes_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.tsv annotate/HP14.savedOutput/

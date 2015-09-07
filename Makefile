@@ -778,10 +778,10 @@ $(PTN_OVERLAPPING_MARKERS_FILE) $(PTN_NONOVERLAPPING_MARKERS_FILE) : $(PATH_MARK
 # A list of all .idlens files is already defined above: IDLEN_FILES
 
 # The full name of the counts plot output file.
-MARKER_COUNTS_FILE := $(PFX_MARKER_COUNTS_PATH).pdf
+MARKER_COUNTS_FILE := $(PFX_MARKER_COUNTS_PATH).plot.pdf
 
 # A list of all .png files to be produced.
-MARKER_DENSITY_FILES := $(foreach G,$(GENOME_LETTERS),$(PFX_MARKER_DENSITY_PATH)_$(G).png)
+MARKER_DENSITY_FILES := $(foreach G,$(GENOME_LETTERS),$(PFX_MARKER_DENSITY_PATH)_$(G).plot.png)
 
 # Phony target to make or clean MARKER_COUNTS_FILE and MARKER_DENSITY_FILES files.
 ifeq ($(CLEAN),)

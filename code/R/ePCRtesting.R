@@ -46,22 +46,28 @@ inv = function(a, title="") { if (investigate) objPrint(a, title) }
 
 # Get arguments.
 testing = 0
-#testing = 1 # For testing only, genome 1.
-#testing = 2 # For testing only, genome 2.
+#testing = 1 # For testing only, outTestHP11, genome 1.
+#testing = 2 # For testing only, outTestHP11, genome 2.
 {
 if (testing == 0)
     args = commandArgs(TRUE)
-else
+else if (testing == 1)
     {
-    fastaFile = ifelse(testing == 1, "testFASTA/ITAG2.4_test.fasta", "testFASTA/Spenn2.0_test.fasta")
-
     args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
-        "outTestHP11/CandidateMarkers_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0XL20.tsv",
-        testing, paste("outTestHP11/MarkerErrors_",
-            "K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0XL20V3000W8M3G1_",
-            c("H","P")[testing], ".bad.tsv", sep=""),
-        "/Users/tedtoal/bin/e-PCR", 3000, 8, 3, 1, "outTestHP11/GenomeData", fastaFile, TRUE)
+        "outTestHP11/NonvalidatedMarkers_K11k2L100D10_2000A100_2000d10_100N2F0X20.tsv",
+        1, "outTestHP11/MarkerErrors_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1_H.bad.tsv",
+        "/Users/tedtoal/bin/e-PCR", 3000, 8, 3, 1, "outTestHP11/GenomeData",
+        "testFASTA/ITAG2.4_test.fasta", TRUE)
     }
+else if (testing == 2)
+    {
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
+        "outTestHP11/NonvalidatedMarkers_K11k2L100D10_2000A100_2000d10_100N2F0X20.tsv",
+        2, "outTestHP11/MarkerErrors_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1_P.bad.tsv",
+        "/Users/tedtoal/bin/e-PCR", 3000, 8, 3, 1, "outTestHP11/GenomeData",
+        "testFASTA/Spenn2.0_test.fasta", TRUE)
+    }
+else stop("Unknown value for 'testing'")
 }
 
 Nexpected = 12

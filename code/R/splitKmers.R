@@ -12,22 +12,24 @@
 PATHSEP = ifelse(grepl("/", Sys.getenv("HOME")), "/", "\\")
 
 # Get arguments.
-testing = FALSE ; testGenome1 = FALSE
-#testing = TRUE ; testGenome1 = TRUE # For testing only.
+testing = 0
+#testing = 1 # For testing only.
+#testing = 2 # For testing only.
 {
-if (!testing)
+if (testing == 0)
     args = commandArgs(TRUE)
-# For testing only:
-else
+else if (testing == 1)
     {
-    if (testGenome1)
-        args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
-           "outTestHP11/Kmers/Split/Genome_1_", "outTestHP11/Kmers/Genome_1.isect.kmers")
-    else
-        args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
-           "outTestHP11/Kmers/Split/Genome_2_", "outTestHP11/Kmers/Genome_2.isect.kmers",
-           "outTestHP11/Kmers/Genome_1.isect.kmers")
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
+       "outTestHP11/Kmers/Split/Genome_1_", "outTestHP11/Kmers/Genome_1.isect.kmers")
     }
+else if (testing == 2)
+    {
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
+       "outTestHP11/Kmers/Split/Genome_2_", "outTestHP11/Kmers/Genome_2.isect.kmers",
+       "outTestHP11/Kmers/Genome_1.isect.kmers")
+    }
+else stop("Unknown value for 'testing'")
 }
 
 NexpectedMin = 3

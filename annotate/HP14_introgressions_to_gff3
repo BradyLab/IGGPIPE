@@ -1,0 +1,87 @@
+################################################################################
+# Parameter file for annotateFile.R to convert a .tsv file of introgression
+# positions in S. lycopersicum x S. pennellii introgression lines into a .gff3
+# file that could be used to display markers as a browser track:
+#   1. Reads code/R/test_GFFfuncsAndMergeData/ILintrogressions.tsv
+#   2. Adds column "seqname" containing "SL2.40ch##" where ## is from "chr" column
+#   3. Adds fixed column "source" containing "ILs.SolycSopen" 
+#   4. Adds fixed column "feature" containing "introgressed_chromosome_region"
+#       (Sequence Ontology term SO:0000664)
+#   5. Adds fixed column "score" containing "." (no score)
+#   6. Adds fixed column "strand" containing "." (not stranded)
+#   7. Adds fixed column "frame" containing "." (no frame)
+#   8. Adds an "attributes" column, creating attributes from the following input
+#       data columns and using the column name as the attribute name, in this order:
+#           column          attribute name
+#           ------          --------------
+#           IL_segment      ID
+#           IL              IL
+#           start_left      up.outer
+#           start_right     up.inner
+#           end_left        down.inner
+#           end_right       down.outer
+#   9. Writes the data to .gff3 file: code/R/testOutput/ILintrogressions.gff3
+#       using data taken from these input columns:
+#           seqname: seqname
+#           source: source
+#           feature: feature
+#           start: start_right
+#           end: end_left
+#           score: score
+#           strand: strand
+#           frame: frame
+#           attributes: attributes
+#
+# This data file can be added as a track to the solgenomics.net S. lycopersicum
+# ITAG2.3 JBrowse genome browser.  Go to solgenomics.net, select Genomes, Tomato,
+# expand Download section, choose Genome Browser.  In JBrowse browser, first
+# change from ITAG2.4 to ITAG2.3 using the drop-down box labelled "Tomato SL2.50
+# ITAG2.4".  Then select File, Open, and in Local Files choose Select Files,
+# choose the output file from here, choose Open.  You should see orange bands
+# representing introgressions, spanning long regions of each chromosome.
+#
+# The output file from this is copied to annotate/HP14.savedOutput because
+# it may be useful to people.
+################################################################################
+
+################################################################################
+# inputFileT parameters.
+################################################################################
+
+# Parameters describing the first input file.  The letter "T" in the name is for
+# "target", because this input file's data is the "target" of a match and merge
+# (if one is done) and is the "target" data written to the output file.
+
+inputFileT:
+    path := "code/R/test_GFFfuncsAndMergeData/ILintrogressions.tsv"
+    type := tsv
+    quote := """  # Quotes are present in the file and without this the column names all start with X.
+    comment := ""
+    addColNames := "seqname,source,feature,score,strand,frame"
+    # Following format string for seqname manages to get 2 digits for each chromosome number.
+    addColValues := "SL2.40ch{/chr/^([0-9])$/0\1},ILs.SolycSopen,introgressed_chromosome_region,.,.,."
+
+################################################################################
+# Output file attribute creation parameters.
+################################################################################
+
+attrCreation:
+    columnsForAttrs := "IL_segment,IL,start_left,start_right,end_left,end_right"
+    newAttrNames := "ID,IL,up.outer,up.inner,down.inner,down.outer"
+    attributesColumn := attributes
+    merge := NO
+    remove := NO
+
+################################################################################
+# Output file parameters.
+################################################################################
+
+outputFile:
+    path := "code/R/testOutput/ILintrogressions.gff3"
+    type := gff3
+    outColNames := "seqname,source,feature,start_right,end_left,score,strand,frame,attributes"
+    newColNames := "seqname,source,feature,start,end,score,strand,frame,attributes"
+
+################################################################################
+# End of file.
+################################################################################

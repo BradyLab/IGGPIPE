@@ -716,14 +716,14 @@ PFX_BAD_KMERS_FILE := BadKmers
 # Filename prefixes of Indel Group data files.
 ### THESE DO NOT NEED TO BE CHANGED.
 
-PFX_OVERLAPPING_INDEL_GROUPS_FILE := IndelsOverlapping
-PFX_NONOVERLAPPING_INDEL_GROUPS_FILE := IndelsNonoverlapping
+PFX_OVERLAPPING_INDEL_GROUPS_FILE := IndelGroupsOverlapping
+PFX_NONOVERLAPPING_INDEL_GROUPS_FILE := IndelGroupsNonoverlapping
 
 
 # Filename prefix of IGG marker file, prior to e-PCR verification.
 ### THIS DOES NOT NEED TO BE CHANGED.
 
-PFX_MARKER_DATA_FILE := CandidateMarkers
+PFX_MARKER_DATA_FILE := NonvalidatedMarkers
 
 
 # Filename prefix of e-PCR bad marker file.

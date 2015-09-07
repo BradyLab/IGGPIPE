@@ -367,7 +367,7 @@ DIR_GENOME_DATA_2 := $(DIR_GENOME_DATA)/Ler
 # The ITAG2.4_genomic.fasta genome is the latest tomato genome release from solGenomics.net.
 # The Spenn.fasta genome is the recent S. pennellii genome release from solGenomics.net.
 PATH_GENOME_FASTA_1 := $(DIR_GENOME_DATA_1)/TAIR10_chr.fasta
-PATH_GENOME_FASTA_2 := $(DIR_GENOME_DATA_2)/Ler_0.v7.fasta
+PATH_GENOME_FASTA_2 := $(DIR_GENOME_DATA_2)/Ler_0.v0.7.fasta
 
 
 # Directory in which to place output files that are generated from the FASTA files.
@@ -784,14 +784,14 @@ PFX_BAD_KMERS_FILE := BadKmers
 # Filename prefixes of Indel Groups data files.
 ### THESE DO NOT NEED TO BE CHANGED.
 
-PFX_OVERLAPPING_INDEL_GROUPS_FILE := IndelsOverlapping
-PFX_NONOVERLAPPING_INDEL_GROUPS_FILE := IndelsNonoverlapping
+PFX_OVERLAPPING_INDEL_GROUPS_FILE := IndelGroupsOverlapping
+PFX_NONOVERLAPPING_INDEL_GROUPS_FILE := IndelGroupsNonoverlapping
 
 
 # Filename prefix of IGG marker file, prior to e-PCR verification.
 ### THIS DOES NOT NEED TO BE CHANGED.
 
-PFX_MARKER_DATA_FILE := CandidateMarkers
+PFX_MARKER_DATA_FILE := NonvalidatedMarkers
 
 
 # Filename prefix of e-PCR bad marker file.

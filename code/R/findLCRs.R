@@ -3,6 +3,13 @@
 # Author: Ted Toal
 # Date: 2013-2015
 # Brady Lab, UC Davis
+#
+# Possible later improvements to pipeline:
+# 1. Enhance to look for  1-2 1-3 2-3 3-3 etc. mappings.
+# 2. It would make sense for k-mers (and LCB's) to only need to be common between 2
+#   genomes rather than all.  But this is a big change to the code. Each k-mer might
+#   be NA in one or more genomes. Each LCB would essentially be between only two
+#   genomes, always.
 #######################################################################################
 
 # Enclose everything in braces so stop statements will work correctly.
@@ -55,8 +62,8 @@ else if (testing == 1)
     {
     args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
         "outTestHP11/Kmers/Split/Split_", "HP", 2, 100, 10, 2000,
-        "outTestHP11/LCRs_K11Km2Lm100Dm10Dx2000.tsv",
-        "outTestHP11/BadKmers_K11Km2Lm100Dm10Dx2000.tsv", TRUE)
+        "outTestHP11/LCRs_K11k2L100D10_2000.tsv",
+        "outTestHP11/BadKmers_K11k2L100D10_2000.tsv", TRUE)
     }
 else if (testing == 2)
     {
@@ -272,20 +279,23 @@ for (ID in refIDs)
         }
 
     # Calculate the "strand group" of each k-mer and add column "strandGroup".
-    # A strand group is a particular strand direction for each of the genomes.
+    # A strand group is the strand direction relative to the reference genome
+    # strand direction, for all genomes.
     # If there are N genomes, there are 2^(N-1) possible strand groups, since
-    # N +/-'s have 2^N possible arrangements (e.g. +++, ++-, +-+, +--, ... ---)
-    # and two arrangements that are mutual complements are strand-consistent with
-    # one another (because it does not matter if some reference genome k-mers are
-    # on one strand and some on the other, since each k-mer is on both strands.
-    # Its canonical sequence (lower in alphabetical order) is the one whose
-    # strand is given and used to form the strand groups.)  To deal with the
-    # complementary pairs, complement all strands if the reference genome is "-"
-    # strand, so that reference is always "+" strand.  We use the function xor()
-    # (exclusive-or function) to invert the strand when ref strand is '-' = 1.
-    # We form a number from the strands of each kmer using 0 for '-' strand
-    # and 1 for '+' strand, with the number being represented as a binary number.
-    # It is that binary number that is stored in column "strandGroup".
+    # we are comparing each genome's strand to the reference genome strand, so
+    # the reference genome will always match itself, while the other genomes will
+    # either match or mismatch the reference genome.
+    # Remember that in actuality each k-mer is on BOTH strands.  A k-mer's
+    # canonical sequence (the one lower in alphabetical order) is the one in the
+    # data frame row name, and its strand is in the data frame "strand" column.
+    # We compare the "strand" column of each genome to the "strand" column of the
+    # reference genome to obtain the strand group of that genome.
+    # We use the R function xor() (exclusive-or function) to invert the strand
+    # group when ref strand is '-' = 1.  We form a number from the strands of
+    # each kmer using 0 for '-' strand and 1 for '+' strand, with the number
+    # being represented as a binary number.  It is that binary number that is
+    # stored in column "strandGroup".  The reference genome strand group number
+    # is always 0.
     catnow("  Calculating strand groups\n")
     df$strandGroup = 0
     refStrands = ifelse(df[,refStrandCol] == "+", 0, 1)
@@ -295,12 +305,12 @@ for (ID in refIDs)
     # Remove k-mers so as to ensure that the difference in position of two
     # adjacent k-mers of the same LCR in ANY genome is no less than Dmin.  For
     # each genome, sort the k-mers by the strand group number, and within that
-    # by the genome contig number, and within that by the genome.  After sorting,
-    # search for adjacent k-mers with the same strand group number and same
-    # contig number (since those must be identical for all k-mers within the
-    # same LCR) that have a separation distance less than Dmin, and remove the
-    # second k-mer of all such pairs, repeating until there are no more such
-    # pairs.
+    # by the genome contig number, and within that by the genome position.
+    # After sorting, search for adjacent k-mers with the same strand group
+    # number and same contig number (since those must be identical for all
+    # k-mers within the same LCR) that have a separation distance less than
+    # Dmin, and remove the second k-mer of all such pairs, repeating until
+    # there are no more such pairs.
     catnow("  Enforcing Dmin\n")
     inv(dim(df), "dim of full data before removing < Dmin")
     for (genome in genomeLtrs)
@@ -327,20 +337,21 @@ for (ID in refIDs)
 
     ############################################################################
     # We want to identify LCRs, which are regions having these properties:
-    #   1. All k-mers in the LCR are on the same contig within each genome.
+    #   1. All the N k-mers in the LCR are on the same contig of the same
+    #       sequence ID within each genome.
     #   2. All the N k-mers of an LCR have consistent strands across genomes (e.g.
     #       if the reference genome's kmer's strands are +++-++----+, then all
-    #       other genome's kmer's are either the SAME strands or the opposite,
-    #       ---+--++++-.).
+    #       other genomes' k-mers are either the SAME strands or the opposite,
+    #       ---+--++++-.).  This is the same as saying that all the N k-mers are
+    #       in the same strand group.
     #   3. The difference in position of two adjacent k-mers in any genome of
     #       any LCR is no less than Dmin and no more than Dmax.
-    #   4. All the k-mers of each genome are at positions that are either
+    #   4. All the N k-mers of each genome are at positions that are either
     #       monotonically increasing or decreasing (may be different for
     #       different genomes).
     #   5. The difference in minimum and maximum position of the N k-mers in any
     #       genome of any LCR is at least Lmin.
-    #   6. The LCR consists of a set of N rows of df such that, within each genome,
-    #       there are N >= kmin k-mers all on the same contig.
+    #   6. The LCR consists of a set of N rows of df, and N >= kmin.
     ############################################################################
 
     # For the reference genome, we can apply the above rules easily on the k-mers,
@@ -353,27 +364,35 @@ for (ID in refIDs)
     # of k-mers that form candidate LCRs.  After that we'll process the candidate
     # LCRs using the other genomes.
     
-    # Items 1 and 3 for reference genome: Create an LCR name column in df that
-    # will provide a unique name for each LCR.  The name will incorporate the
-    # contig number, strand group number, and a number that increments each time
-    # adjacent k-mers exceed Dmax distance apart.  After forming this name and
-    # splitting the k-mers on it, the resulting groups are candidate LCRs in the
-    # reference genome.  The Dmin criteria has already been handled earlier.
+    # Items 1, 2, and 3 for reference genome: Create an LCR name column in df
+    # that will provide a unique name for each LCR.  The name will incorporate
+    # the contig number, sequence ID number (except reference genome, for which
+    # this is unnecessary since we are looping on reference genome sequence ID),
+    # strand group number, and a number that increments each time adjacent
+    # k-mers exceed Dmax distance apart.  After forming this name and splitting
+    # the k-mers on it, the resulting groups are candidate LCRs in the reference
+    # genome.  The Dmin criteria has already been handled earlier.
 
     # Item 4: this is not a consideration for the reference genome, since it is
     # already sorted by position.  Rather, the reference genome sorting creates
-    # a reference order for the candidate LCRs, which the other genomes then must
-    # conform to.
+    # a reference order for the candidate LCRs, which the other genomes then
+    # must conform to.  If the other genome has a k-mer strand the same as the
+    # reference genome, its monotonicity direction must match the reference
+    # genome direction, and if opposite, the direction must be opposite.
 
     # Items 5 and 6: these are easily handled after we create the list of
     # candidate LCRs.
 
     ############################################################################
+    # Item 1. All the N k-mers in the LCR are on the same contig and sequenc ID
+    #       within each genome.
+    # Item 2. All the N k-mers of an LCR are in the same strand group.
     # Item 3: identify k-mers that are more than Dmax distance from the preceding
-    # k-mer and split LCRs at these k-mers.  Assign each LCR a unique LCR number.
+    #       k-mer and split LCRs at these k-mers.
+    # Assign each LCR a unique LCR number.
     ############################################################################
 
-    catnow("  Enforcing Dmax on reference genome\n")
+    catnow("  Enforcing same contig, same strand group, and Dmax on reference genome\n")
 
     # Make column 'exceedsDmax' containing a number that increments at each
     # k-mer that exceeds Dmax from the preceding k-mer.
@@ -448,8 +467,9 @@ for (ID in refIDs)
     # as all the k-mers included in the LCR meet the conditions, it is a valid LCR.
     # The k-mers excluded from it may be part of a different LCR, or they may end
     # up not being part of any LCR.  A given k-mer, though, is only a member of at
-    # most one LCR.  The excluded k-mers are moved to an auxiliary LCR list and are
-    # retested by themselves to see if they satisfy the requirements of an LCR.
+    # most one LCR.  The excluded k-mers are moved to an auxiliary LCR list and
+    # and later back to the LCR pool being tested, to retest them to see if they
+    # satisfy the requirements of an LCR.
     # It may in fact possible for two LCRs to cover the same region: suppose
     # an indel is present in a region; the indel itself might be one LCR while
     # the region on both sides of it is another.  This could happen only if the
@@ -476,27 +496,30 @@ for (ID in refIDs)
     #       pattern groups.  For example, say there are three genomes and one of
     #       the three contains an inversion, so its monotonicity flips.  Those
     #       k-mers in the region where it flipped are moved to a separate group
-    #       and analyzed independently.  A challenge here is that monotonicity
-    #       flips can be created not only by inversions but also by non-inverting
-    #       translocations, which can create a single-k-mer monotonicity flip.
-    #       In such a case, we want to break the candidate LCR into two at that
-    #       flip.  Let's look more closely at this to understand it.
-    #       For simplificity, assume two genomes.  Consider 2 cases: an inversion
-    #       and a short-distance non-inverting translocation:
+    #       and analyzed independently.  *** But such an inversion would also
+    #       flip the k-mer strand, and therefore change the strand group, and so
+    #       we would already have put those k-mers in a different LCR. *** Be
+    #       that as it may, a challenge here is that monotonicity flips can be
+    #       created not only by inversions but also by non-inverting translocations,
+    #       which can create a single-k-mer monotonicity flip.  In such a case,
+    #       we want to break the candidate LCR into two at that flip.  Let's look
+    #       more closely at this to understand it.  For simplificity, assume two
+    #       genomes.  Consider 2 cases: an inversion and a short-distance
+    #       non-inverting translocation:
     #
     #         inversion:    genome 2:  . . . . F E D C B A . . . .
     #                     ref genome:  . . . . A B C D E F . . . .
     #           sign:     ref genome:   + + + + + + + + + + + + + +
     #                       genome 2:   + + + + - - - - - + + + +
     #           bigger change at:             ^           ^
-    #           what we'd like at ref: LCR1--- LCR2------- LCR1---
+    #                LCR's we'd like: LCR1--- LCR2------- LCR1---
     #
     #         non-inv xloc: genome 2:  . . . . . . . . . . A B C D E . .
     #                     ref genome:  . . A B C D E . . . . . . . . . .
     #           sign:     ref genome:   + + + + + + + + + + + + + + + +
     #                       genome 2:   + + + + + + - + + + + + + + + +
     #           bigger change at:         ^                         ^
-    #           what we'd like at ref: LCR1LCR2------LCR1---------------
+    #                LCR's we'd like: LCR1LCR2------LCR1---------------
     #       But, we don't want to get into the ugliness of trying to analyze and
     #       recognize all the possible cases.  Instead, we want a simple algorithm
     #       for identifying k-mers that clearly don't below in the current group
@@ -529,7 +552,8 @@ for (ID in refIDs)
     ############################################################################
     # Since we need to apply the discontinuity testing over and over, define a
     # function for it.  LL is a list with these members:
-    #   lcb: data frame containing k-mers being tested, all assigned to same LCR.
+    #   lcb: data frame containing k-mers being tested, all assigned to same LCR,
+    #       and sorted in reference genome order.
     #   aux: NULL or data frame of k-mers that have been removed (via previous
     #       calls to this with the same LCR number) from data frame lcb because
     #       they don't satisfy requirements, but that may form a separate LCR (or
@@ -540,7 +564,7 @@ for (ID in refIDs)
     # placed into either LL$aux or LL$discarded.
     # Return value is a list with the same members and additional members:
     #   retry: TRUE if function is to be called again with same value of lcb to
-    #       retest modified candidate LCR.
+    #       retest modified candidate LCR, FALSE if finished with this LCR.
     #   reason: short word giving exit status:
     #       kmin: there were fewer than kmin k-mers, k-mers discarded
     #       Lmin: maximum base pair span was less than Lmin, k-mers discarded
@@ -650,17 +674,19 @@ for (ID in refIDs)
 
     ############################################################################
     # Now, for each candidate LCR in df, test it repeatedly, removing incompatible
-    # k-mers from it over to a holding area for creation of an auxiliary LCR,
-    # repeating until no more k-mers are removed and the LCR is known to satisfy
-    # the constraints (kMin, Lmin, Dmax, monotonicity), then incorporate the
-    # results into new result data frame lcbDf, and if some k-mers were found
-    # incompatible with the LCR and moved to an aux data frame, rbind that aux
-    # data frame back to df.  Thus, df will shrink as candidate LCRs are either
-    # verified and moved to lcbDf or discarded and moved to discardDf.
-    # This loop is slow, and in order to try to speed it up, I'm using some smaller
-    # temporary data frames to store data.  These are:
-    #   dft: k-mers of candidate LCRs from df, reloaded with k-mers for the next
-    #           N.reload candidate LCRs whenever it becomes empty.
+    # k-mers from it over to an aux data frame holding area, repeating until no
+    # more k-mers are removed and the LCR is known to satisfy the constraints
+    # (kMin, Lmin, Dmax, monotonicity), then incorporate the results into new
+    # result data frame lcbDf, and if some k-mers were found incompatible with
+    # the LCR and moved to an aux data frame, rbind that aux data frame back to
+    # df.  Thus, df will shrink as candidate LCRs are either verified and moved
+    # to lcbDf or discarded and moved to discardDf.  This loop is slow, and in
+    # order to try to speed it up, I'm using some smaller temporary data frames
+    # to store data, so we aren't passing large data frames to functions.  These
+    # are:
+    #   dft: small buffer of k-mers of candidate LCRs, reloaded with N.reloaod
+    #       k-mers from df whenever it becomes empty.  Process these k-mers,
+    #       not the ones in df.
     #   lcbDft: k-mers of newly confirmed LCRs, appended to lcbDf every reload.
     #   discardDft: k-mers incompatible with LCRs, appended to discardDf every reload.
     #   auxDft: k-mers newly added to the candidate k-mers with a new LCR number,
@@ -686,6 +712,7 @@ for (ID in refIDs)
     LCRs = unique(df$LCR)
     maxLCR = max(LCRs)
     lcbDf = NULL
+    # Loop processing one LCR at a time, the LCR whose ID (in column "LCR") is LCRs[idx].
     while (idx <= length(LCRs))
         {
         #catnow("idx = ", idx, "length(LCRs) = ", length(LCRs), "\n")

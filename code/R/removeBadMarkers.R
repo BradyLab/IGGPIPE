@@ -45,20 +45,21 @@ objPrint = function(x, title="")
 inv = function(a, title="") { if (investigate) objPrint(a, title) }
 
 # Get arguments.
-testing = FALSE
-#testing = TRUE # For testing only.
+testing = 0
+#testing = 1 # For testing only.
 {
-if (!testing)
+if (testing == 0)
     args = commandArgs(TRUE)
-else
+else if (testing == 1)
     {
     args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE", "MIN",
-        "outTestHP11/CandidateMarkers_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0XL20.tsv",
-        "outTestHP11/MarkerErrors_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0XL20V3000W8M3G1_",
-        "outTestHP11/MarkersOverlapping_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0XL20V3000W8M3G1.tsv",
-        "outTestHP11/MarkersNonoverlapping_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0XL20V3000W8M3G1.tsv",
+        "outTestHP11/NonvalidatedMarkers_K11k2L100D10_2000A100_2000d10_100N2F0X20.tsv",
+        "outTestHP11/MarkerErrors_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1_",
+        "outTestHP11/MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv",
+        "outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv",
         TRUE)
     }
+else stop("Unknown value for 'testing'")
 }
 
 NexpectedMin = 7

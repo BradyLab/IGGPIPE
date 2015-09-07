@@ -46,23 +46,36 @@ inv = function(a, title="") { if (investigate) objPrint(a, title) }
 
 # Get arguments.
 testing = 0
-#testing = 1 # For testing only, genome 1.
-#testing = 2 # For testing only, genome 2.
+#testing = 1 # For testing only, outTestHP11, genome 1.
+#testing = 2 # For testing only, outTestHP11, genome 2.
 {
 if (testing == 0)
     args = commandArgs(TRUE)
-else
+else if (testing == 1)
     {
-    fastaFile = ifelse(testing == 1, "testFASTA/ITAG2.4_test.fasta", "testFASTA/SpennV2.0_test.fasta")
+    fastaFile = 
+
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
+        "outTestHP11/IndelGroupsOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0.tsv",
+        1, "outTestHP11/GenomeData/Genome_1.dnaseqs",
+        "outTestHP11/GenomeData", 20,
+        "/Users/tedtoal/perl5/perlbrew/perls/perl-5.14.2/bin/perl",
+        "code/perl/getSeqsFromFasta.pl", "testFASTA/ITAG2.4_test.fasta",
+        "outTestHP11/GenomeData/Genome_1.contigs", TRUE)
+    }
+else if (testing == 2)
+    {
+    fastaFile = 
 
     args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
         "outTestHP11/IndelGroupsOverlapping_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0.tsv",
-        testing, paste("outTestHP11/GenomeData/Genome_", testing, ".dnaseqs", sep=""),
+        2, "outTestHP11/GenomeData/Genome_2.dnaseqs",
         "outTestHP11/GenomeData", 20,
         "/Users/tedtoal/perl5/perlbrew/perls/perl-5.14.2/bin/perl",
-        "code/perl/getSeqsFromFasta.pl", fastaFile,
-        paste("outTestHP11/GenomeData/Genome_", testing, ".contigs", sep=""), TRUE)
+        "code/perl/getSeqsFromFasta.pl", "testFASTA/SpennV2.0_test.fasta",
+        "outTestHP11/GenomeData/Genome_2.contigs", TRUE)
     }
+else stop("Unknown value for 'testing'")
 }
 
 Nexpected = 11

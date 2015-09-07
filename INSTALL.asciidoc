@@ -425,10 +425,12 @@ folder. Change into the code/cpp/findMers directory and enter the command "make"
   findMers
   cd ../../..
 
-The "make" should complete without error, and there will be a file named "findMers"
-in the directory, and when it is run with the "findMers" command shown above, it
-will display a page of usage information. The path to "findMers" is already set
-correctly in the allParameters.mytemplate file.
+The "make" should compile C++ files in the findMers folder and other in sister
+folders.  It should complete without error, and there will be a file named
+"findMers" in the directory, and when that file is run with the "findMers"
+command shown above following "make", it will display a page of usage
+information. The path to "findMers" is already set correctly in the
+allParameters.mytemplate file.
 --
 
 . *Test trashing and choose deletion method*
@@ -559,7 +561,7 @@ how long each step took to run.
 If all goes well, the pipeline will run quickly, and after four or five minutes, it
 should finish with the message *ALL files are up to date*. There should be several
 files in the output folder "outTestHP11", including files starting with the prefixes
-BadKmers_, CandidateMarkers_, IndelGroupsNonoverlapping_, IndelGroupsOverlapping_,
+BadKmers_, NonvalidatedMarkers_, IndelGroupsNonoverlapping_, IndelGroupsOverlapping_,
 LCRs_, MarkerCounts_, MarkerDensity_, MarkerErrors_, MarkersNonoverlapping_, and
 MarkersOverlapping_. The last two are the final output files containing the markers.
 The .pdf and .png files should be examined to see how they depict marker counts

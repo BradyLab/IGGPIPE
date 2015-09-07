@@ -27,19 +27,24 @@ testing = 0
 if (testing == 0)
     args = commandArgs(TRUE)
 else if (testing == 1)
+    {
     args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE", 2, 0.3,
-        "outTestHP11/MarkersOverlapping_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0XL20V3000W8M3G1.tsv",
-        "outTestHP11/MarkersNonoverlapping_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0XL20V3000W8M3G1.tsv",
-        "outTestHP11/MarkerCounts_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0XL20V3000W8M3G1",
-        "outTestHP11/MarkerDensity_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0XL20V3000W8M3G1",
+        "outTestHP11/MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv",
+        "outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv",
+        "outTestHP11/MarkerCounts_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1",
+        "outTestHP11/MarkerDensity_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1",
         "outTestHP11/GenomeData/Genome_1.idlens", "outTestHP11/GenomeData/Genome_2.idlens")
+    }
 else if (testing == 2)
+    {
     args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE", 2, 0.25,
-        "outHP14/MarkersOverlapping_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.tsv",
-        "outHP14/MarkersNonoverlapping_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.tsv",
+        "outHP14/MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv",
+        "outHP14/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv",
         "outHP14/MarkerCounts_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1",
         "outHP14/MarkerDensity_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1",
         "outHP14/GenomeData/Genome_1.idlens", "outHP14/GenomeData/Genome_2.idlens")
+    }
+else stop("Unknown value for 'testing'")
 }
 
 NexpectedMin = 9

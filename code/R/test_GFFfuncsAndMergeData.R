@@ -1,6 +1,10 @@
 #######################################################################################
 # Perform extensive testing of functions in Include_GFFfuncs.R and
 # Include_MergeDataUsingPosition.R, using test data in folder test_GFFfuncsAndMergeData.
+#
+# This requires the person running this to know what is being done and examine output
+# for correctness.
+#
 # Author: Ted Toal
 # Date: 2015
 # Brady Lab, UC Davis

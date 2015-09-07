@@ -249,7 +249,7 @@ other things.
 Several other ".tsv" tab-separated output files exist:
 
 .. MarkerErrors_*.tsv contains candidate markers rejected because e-PCR failed
-.. CandidateMarkers_*.tsv contains candidate markers not yet subjected to e-PCR
+.. NonvalidatedMarkers_*.tsv contains candidate markers not yet subjected to e-PCR
 .. IndelGroupsOverlapping_*.tsv contains overlapping regions of LCRs satisfying parameters for a possible IGG marker
 .. IndelGroupsNonoverlapping_*.tsv is like above but non-overlapping regions as per parameter OVERLAP_REMOVAL
 .. LCRs_*.tsv contains common unique k-mers assigned to locally conserved regions (LCRs)
@@ -353,7 +353,7 @@ other way to send them.
 *Tables*
 --------
 
-.Columns in MarkersOverlapping_, MarkersNonoverlapping_, CandidateMarkers_ files; X,Y=chosen genome letters
+.Columns in MarkersOverlapping_, MarkersNonoverlapping_, NonvalidatedMarkers_ files; X,Y=chosen genome letters
 [cols="^1,9",options="header"]
 |===================================================
 |Column|Description

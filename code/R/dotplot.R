@@ -19,16 +19,14 @@ library("methods")
 ################################################################################
 
 # Get arguments.
-testing = FALSE
-#testing = TRUE # For testing only.
+testing = 0
+#testing = 1 # For testing only.
 {
-if (!testing)
+if (testing == 0)
     args = commandArgs(TRUE)
-# For testing only:
-else
-    {
+else if (testing == 1)
     args = "dotplot.template"
-    }
+else stop("Unknown value for 'testing'")
 }
 
 Nexpected = 1

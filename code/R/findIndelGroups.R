@@ -45,21 +45,33 @@ objPrint = function(x, title="")
 inv = function(a, title="") { if (investigate) objPrint(a, title) }
 
 # Get arguments.
-testing = FALSE
-#testing = TRUE # For testing only.
+testing = 0
+#testing = 1 # For testing only.
+#testing = 2 # For testing only.
 {
-if (!testing)
+if (testing == 0)
     args = commandArgs(TRUE)
-else
+else if (testing == 1)
     {
     args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
-        "outTestHP11/LCRs_K11Km2Lm100Dm10Dx2000.tsv", 100, 2000, 10, 100, 2, 0,
+        "outTestHP11/LCRs_K11k2L100D10_2000.tsv", 100, 2000, 10, 100, 2, 0,
         "MAX",
-        "outTestHP11/IndelGroupsOverlapping_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0.tsv",
-        "outTestHP11/IndelGroupsNonoverlapping_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0.tsv",
+        "outTestHP11/IndelGroupsOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0.tsv",
+        "outTestHP11/IndelGroupsNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0.tsv",
         "HP", TRUE,
         "outTestHP11/GenomeData/Genome_1.idlens", "outTestHP11/GenomeData/Genome_2.idlens")
     }
+else if (testing == 2)
+    {
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
+        "outHP14/LCRs_K14k2L400D10_1500.tsv", 100, 2000, 10, 100, 2, 0,
+        "MAX",
+        "outHP14/IndelGroupsOverlapping_K14k2L400D10_1500A400_1500d50_300N2F0.tsv",
+        "outHP14/IndelGroupsNonoverlapping_K14k2L400D10_1500A400_1500d50_300N2F0.tsv",
+        "HP", TRUE,
+        "outHP14/GenomeData/Genome_1.idlens", "outHP14/GenomeData/Genome_2.idlens")
+    }
+else stop("Unknown value for 'testing'")
 }
 
 NexpectedMin = 15
