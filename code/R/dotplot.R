@@ -21,11 +21,17 @@ library("methods")
 # Get arguments.
 testing = 0
 #testing = 1 # For testing only.
+#testing = 2 # For testing only.
+#testing = 3 # For testing only.
 {
 if (testing == 0)
     args = commandArgs(TRUE)
 else if (testing == 1)
     args = "dotplot.template"
+else if (testing == 2)
+    args = "dotplot/dotplot.wheatBD"
+else if (testing == 3)
+    args = "dotplot/dotplot.HsSl15_chr1"
 else stop("Unknown value for 'testing'")
 }
 
@@ -43,7 +49,7 @@ if (length(args) != 1)
         "Usage: Rscript dotplot.R <paramFile>",
         "",
         "Arguments:",
-        "   <paramFile> : Path of parameter file, see example parameter file dotplot.template.",
+        "   <paramFile> : Path of parameter file, see example parameter file dotplot.template."
         )
     for (S in usage)
         cat(S, "\n", sep="")
@@ -218,6 +224,7 @@ L = as.list(S)
 # Expected parameters and their types.
 expected = c(
     LCR.file="character",
+    PLOT.genomes="character",
     PLOT.file="character",
     X.idlens="character",
     Y.idlens="character",
@@ -297,6 +304,9 @@ for (n in names(L))
 if (!file.exists(L$LCR.file))
     stop("File ", L$LCR.file, " does not exist")
 
+if (nchar(L$PLOT.genomes) != 2)
+    stop("Must specify exactly two characters for PLOT.genomes, got: ", L$PLOT.genomes)
+
 if (!file.exists(L$X.idlens))
     stop("File ", L$X.idlens, " does not exist")
 
@@ -321,9 +331,19 @@ df = read.table(L$LCR.file, header=TRUE, sep="\t", row.names=1, stringsAsFactors
 catnow("\n")
 if (nrow(df) == 0) stop("Error reading ", L$LCR.file, ", no data found")
 rownames(df) = NULL
-# Drop unwanted columns.
-df = df[, grepl("(\\.seqID|\\.pos|LCR)$", colnames(df)), drop=FALSE]
-colnames(df) = c("id1", "x", "id2", "y", "LCR")
+# Change LCR to concatenation of reference genome ID and LCR so it is unique
+# among all reference IDs.
+df$LCR = paste(df[, which(grepl(".seqID", colnames(df)))[1]], df$LCR, sep="_")
+# Drop unwanted columns.  We want X.seqID and X.pos columns where X is specified
+# by PLOT.genomes.  Rename those columns "id.x", "x", "id.y", "y".
+genomeLtrs = unlist(strsplit(L$PLOT.genomes, "", fixed=TRUE))
+wantCols = c(paste(genomeLtrs, ".seqID", sep=""), paste(genomeLtrs, ".pos", sep=""), "LCR")
+if (!all(wantCols %in% colnames(df)))
+    stop("Expected columns '", paste(wantCols, collapse=","), "' but got columns '",
+        paste(colnames(df), collapse=","), "'")
+df = df[, wantCols]
+colnames(df) = c("id.x", "id.y", "x", "y", "LCR")
+catnow("Number of points in file: ", nrow(df), "\n")
 # Convert the x and y positions to Mbp.
 df$x = df$x*scaleToMbp
 df$y = df$y*scaleToMbp
@@ -414,14 +434,15 @@ ylim = c(ylim.start, ylim.end)
 ################################################################################
 
 # Get only the k-mer data we need to plot.
-df = df[df$id1 %in% L$X.plot.seqids & df$id2 %in% L$Y.plot.seqids,]
+df = df[df$id.x %in% L$X.plot.seqids & df$id.y %in% L$Y.plot.seqids,]
 
 # Map the data x and y positions from sequence-relative to axis-origin-relative.
-df$x = df$x + genome1SeqStart[df$id1] - xlim[1]
-df$y = df$y + genome2SeqStart[df$id2] - ylim[1]
+df$x = df$x + genome1SeqStart[df$id.x] - xlim[1]
+df$y = df$y + genome2SeqStart[df$id.y] - ylim[1]
 
 # Remove any data not strictly within plotting limits.
 df = df[df$x >= xlim[1] & df$x <= xlim[2] & df$y >= ylim[1] & df$y <= ylim[2],]
+catnow("Number of points to plot: ", nrow(df), "\n")
 
 ################################################################################
 # Now plot the data.
@@ -434,6 +455,7 @@ png(L$PLOT.file, width=L$PLOT.width, height=L$PLOT.height, antialias="none", bg=
 
 # Set margins and default colors.
 par(mai=c(L$PLOT.margin.bottom, L$PLOT.margin.left, L$PLOT.margin.top, L$PLOT.margin.right))
+par(bg=L$BKGD.color)
 par(col=L$FGND.color)
 par(col.axis=L$FGND.color)
 par(col.lab=L$FGND.color)
@@ -556,13 +578,13 @@ if (L$Y.grid.lines.per.seqid > 0)
 
 if (nrow(df) > 0)
     {
-    catnow("Plotting dots...")
+    catnow("Plotting", nrow(df), "dots...")
     col = addAlpha(L$PTLINE.color, L$PTLINE.alpha)
 
     if (L$PLOT.which == "points")
         points(df$x, df$y, cex=L$POINT.SIZE, pch=20, col=col)
     else
-        x = tapply(1:nrow(df), list(df$id1, df$LCR), function(ii) lines(df$x[ii], df$y[ii], lwd=L$LINE.width, col=col))
+        x = tapply(1:nrow(df), list(df$id.x, df$LCR), function(ii) lines(df$x[ii], df$y[ii], lwd=L$LINE.width, col=col))
     catnow("\n")
     }
 

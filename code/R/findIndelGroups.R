@@ -206,10 +206,10 @@ minAmplDiff = function(Asize) par.m*Asize+par.b # Asize can be a vector.
 
 # Read LCR k-mer data.
 {
-if (testing)
-    df = read.table(inFile, header=TRUE, nrows=100000, row.names=1, sep="\t", stringsAsFactors=FALSE)
-else
+if (testing == 0)
     df = read.table(inFile, header=TRUE, row.names=1, sep="\t", stringsAsFactors=FALSE)
+else
+    df = read.table(inFile, header=TRUE, nrows=100000, row.names=1, sep="\t", stringsAsFactors=FALSE)
 }
 inv(dim(df), "input data dim")
 inv(colnames(df), "input data columns")
@@ -433,7 +433,7 @@ inv(length(unique(df$LCRname)), "Number of LCRs after removing those with too li
 
 rightSideKmers = (1:nrow(df))[df$NkmerFromLCRstart > minFlank+1 & df$NkmerFromLCRend > minFlank]
 leftSideKmers = rightSideKmers-1
-if (testing && FALSE)
+if (testing != 0 && FALSE)
     {
     x = sample(1:length(rightSideKmers), 200)
     rightSideKmers = rightSideKmers[x]

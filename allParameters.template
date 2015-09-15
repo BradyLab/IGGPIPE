@@ -141,6 +141,15 @@ PATH_PRIMER3CORE := ~/src/primer3-2.3.6/primer3_core
 PATH_EPCR := ~/src/e-PCR-2.3.12/e-PCR
 
 
+# Path to the file that is the 'MUSCLE' multiple alignment program file.  Set
+# this to the executable MUSCLE program file in the directory where you copied
+# or downloaded it, such as a bin directory.
+### CHANGE THIS TO YOUR PATH.
+
+# In this example, I downloading the MUSCLE file to my ~/bin folder.
+PATH_ALIGNER := ~/bin/muscle3.8.31_i86darwin64
+
+
 ################################################################################
 # Paths of software that is part of the pipeline software, and commands for
 # running it.
@@ -197,6 +206,8 @@ PATH_FIND_PRIMERS := $(DIR_R)/findPrimers.R
 PATH_EPCR_TESTING := $(DIR_R)/ePCRtesting.R
 PATH_RMV_BAD_MARKERS := $(DIR_R)/removeBadMarkers.R
 PATH_PLOT_MARKERS := $(DIR_R)/plotMarkers.R
+PATH_ALIGN_AND_GET_INDELS := $(DIR_R)/alignAndGetIndels.R
+PATH_PLOT_INDELS := $(DIR_R)/plotIndels.R
 
 
 ################################################################################
@@ -263,7 +274,7 @@ TIME_CMDS := YES
 # letter K here.
 ################################################################################
 
-### CHANGE THIS TO THE VALUE OF K THAT YOU WANT.  THIS VALUE USUALLY WORKS WELL.
+### CHANGE THIS TO THE VALUE OF K THAT YOU WANT.  A VALUE OF 14 OFTEN WORKS WELL.
 K := 14
 
 
@@ -410,7 +421,7 @@ DIR_KMERS := $(DIR_IGGPIPE_OUT)/Kmers
 # 3. a list of SORTED unique k-mers in the genome:
 #       <this prefix><genome_number>.isect.sorted
 # 4. A list of positions of unique k-mers in the genome:
-#       <this prefix><genome_number>.isect
+#       <this prefix><genome_number>.isect.unique
 ### THIS DOES NOT NEED TO BE CHANGED.
 
 PFX_KMERS_DATA_FILE := $(DIR_KMERS)/Kmers_
@@ -914,6 +925,41 @@ PFX_MARKER_COUNTS_PATH := $(DIR_MAIN_OUTPUT)/$(PFX_MARKER_COUNTS_FILE)$(SFX_GOOD
 PFX_MARKER_DENSITY_PATH := $(DIR_MAIN_OUTPUT)/$(PFX_MARKER_DENSITY_FILE)$(SFX_GOOD_MARKER_FILE)
 
 
+# Path of input file for aligning LCRs or IndelGroups or Markers and locating the
+# InDels in the alignment.  Used only if 'make InDels' command is run.  This path
+# can be any of three different files, shown here commented out: the LCRs file,
+# the non-overlapping IndelGroups file, or the non-overlapping markers file.
+# The output file containing the InDel positions is the same name as the input
+# file with the .suffix replaced with the suffix ".indels.tsv".
+# Copy and uncomment the ONE you want to use to find InDels if you intend to run
+# 'make InDels'.
+### THESE DO NOT NEED TO BE CHANGED.
+
+#PATH_INDELS_INPUT_FILE := $(PATH_LCR_FILE)
+#PATH_INDELS_INPUT_FILE := $(PATH_NONOVERLAPPING_INDEL_GROUPS_FILE)
+#PATH_INDELS_INPUT_FILE := $(PATH_NONOVERLAPPING_MARKERS_FILE)
+# Let's use the markers file.
+PATH_INDELS_INPUT_FILE := $(PATH_NONOVERLAPPING_MARKERS_FILE)
+
+
+# Path of InDels output file, used only if 'make InDels' command is run to find
+# actual InDel positions.
+### THIS DOES NOT NEED TO BE CHANGED.
+
+# Replace the ".<suffix>" on PATH_INDELS_INPUT_FILE with ".indels.<suffix>" to
+# form the output file name.
+PATH_INDELS_OUTPUT_FILE := $(basename $(PATH_INDELS_INPUT_FILE)).indels$(suffix $(PATH_INDELS_INPUT_FILE))
+
+
+# Path of InDels plot file, used only if 'make plotInDels' command is run to plot
+# InDel data.
+### THIS DOES NOT NEED TO BE CHANGED.
+
+# Replace the ".<suffix>" on PATH_INDELS_OUTPUT_FILE with ".<pdf>" to form the
+# plot file name.
+PATH_INDELS_PLOT_FILE := $(basename $(PATH_INDELS_OUTPUT_FILE)).pdf
+
+
 ################################################################################
 # Paths of debugging settings.  Set these TRUE to turn on debug output from
 # individual modules.
@@ -953,6 +999,12 @@ INVESTIGATE_EPCRTESTING := FALSE
 ### THIS DOES NOT NEED TO BE CHANGED.
 
 INVESTIGATE_RMVBADMARKERS := FALSE
+
+
+# Produce debug output when extracting and aligning sequences and locating InDels.
+### THIS DOES NOT NEED TO BE CHANGED.
+
+INVESTIGATE_ALIGN_AND_GET_INDELS := FALSE
 
 
 ################################################################################

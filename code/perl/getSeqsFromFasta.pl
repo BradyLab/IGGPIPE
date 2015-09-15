@@ -18,7 +18,7 @@ my %options;
 GetOptions(\%options,
     'h', 'help', 'c|contains', 'a|anywhere', 'e|end', 'i|idfile=s', 'o|output=s',
     'p|prefix=s', 's|suffix=s', 'r|revComp', 'R=s', 'O|omit', 'n|name=s',
-    't=s', 'U=s', 'u=s', 'q|qual', 'd', 'delete=s', 'l|lineSize=i');
+    't=s', 'U=s', 'u=s', 'q|qual', 'd', 'delete=s', 'l|lineSize=i', 'v|verbose');
 
 # Compact help text.
 my $S0 = basename($0);
@@ -53,7 +53,8 @@ my @compactHelpText = (
 	"  -q or --qual           : Sequence is quality values rather than base values.",
 	"  -d                     : Delete all '*' characters from the sequence.",
 	"  --delete=ch            : Delete all ch characters from the sequence.",
-	"  -l=# or --lineSize=#   : Number of sequence characters per sequence line in output.",
+	"  -l=# or --lineSize=#   : Number of sequence characters per line in output, 0=all 1 line.",
+	"  -v or -verbose         : Verbose debug output.",
 	"Example: perl $S0 ../ITAG2.3_cdna.fa Solyc04g064820:2500..3000 -o=G64820.fa",
 	""
     );
@@ -136,7 +137,9 @@ my @longHelpText = (
 	"  -d                     : Delete all '*' characters from the sequence",
 	"  -sdelete=ch            : Delete all ch characters from the sequence",
 	"  -l=# or --lineSize=#   : Number of sequence characters per sequence line in output,",
-	"    or, for -q quality files, number of quality values per line in output.",
+	"    or, for -q quality files, number of quality values per line in output.  Use 0 to",
+	"    put all sequence characters or values on one line.",
+	"  -v or -verbose         : Verbose debug output.",
 	"Example 1: perl $S0 ../ITAG2.3_cdna.fa '!Solyc04g064820' -s=.fa",
 	"Example 2: perl $S0 ../ITAG2.3_cdna.fa Solyc04g064820:2500..3000 -s=.fa",
 	"Example 3: perl $S0 -nM82 Pseudo_M82.fasta -r -s=.rev.fa",
@@ -154,6 +157,9 @@ my ($inputFastaFile, @seqs) = @ARGV;
  
 # Number of sequence characters on a sequence line in FASTA file.
 my $numSeqValsPerLine = (exists($options{l}) ? $options{l} : 60);
+
+# Verbose flag.
+my $verbose = exists($options{v});
 
 # Is this a sequence quality scores file?
 my $qual = exists($options{q});
@@ -175,6 +181,7 @@ if (exists($options{u})) {
 # Read -i file if any specified, and append sequence Ids to seqs list.
 if (exists($options{i}) && $options{i}) {
     my $seqFileName = $options{i};
+    if ($verbose) { print("Reading input file $seqFileName\n"); }
     open(my $seqFile, "<", $seqFileName) or die("Can't open -i file '$seqFileName': $!");
     my $line;
     while (defined($line = <$seqFile>)) {
@@ -195,6 +202,7 @@ if (exists($options{i}) && $options{i}) {
 # Note that the same seqid might be specified more than once!  We use start=end=0
 # to mean the entire sequence is to be output.
 my %seqs;
+if ($verbose) { print("Parsing sequence IDs\n"); }
 foreach my $seq (@seqs) {
     my ($rev, $reqSeqId, $subSeq) = ($seq =~ m/^(!?)([^:]+)(:[0-9]+..[0-9]+)?$/);
     #if (!defined($reqSeqId)) { print("seq=$seq rev=$rev reqSeqId=$reqSeqId subSeq=$subSeq\n"); }
@@ -227,24 +235,30 @@ if (exists($options{o})) {
 
 # Loop reading sequences and outputting any in the requested sequence name list to an
 # output file.
-my ($seqId, $seqArgs, $sequence, $seqNext);
+my ($seqId, $seqArgs, $seqRef, $seqNext, $seqLen);
 $seqNext = <$inputFasta>;
 my $numOutSeqs = 0;
+if ($verbose) { print("Starting read of FASTA file $inputFastaFile\n"); }
 while (1) {
-    ($seqId, $seqArgs, $sequence, $seqNext) = readFastaSeq($inputFasta, $seqNext, $qual);
+    ($seqId, $seqArgs, $seqRef, $seqNext, $seqLen) = readFastaSeq($inputFasta, $seqNext, $qual);
     if (!defined($seqId)) { last; }
+    if ($verbose) { print("Processing sequence ID $seqId\n"); }
+
     # Set $outputSeq true if we decide the sequence is to be output.
     my $outputSeq = 0;
+
     # Recall from above that the %seqs hash contains the sequences requested by the user.
     # See comments above for description of the sub-keys of %seqs.  Below we will assign
     # to %subseqs the %seqs member corresponding to $seqId when $outputSeq is true.  (It
     # is plural %subseqs instead of %subseq only because the "seq", "start", "end", and
     # "revcomp" key values are arrays).
     my %subseqs;
+
     # Output the sequence (and/or sub-sequences of it) to a file if all sequences are to
     # be extracted, or if an exact match was requested and the sequence name is in the
     # hash of sequence names, or if no exact match and the sequence name matches any of
     # the specified names.
+    if ($verbose) { print("Checking to see which requested sequences are in this sequence ID\n"); }
     if ($extractAllSeqs) {
         $outputSeq = 1;
         $subseqs{revcomp}->[0] = ""; # Don't reverse complement it.
@@ -276,68 +290,86 @@ while (1) {
             }
         }
     }
+
     # If the sequence (and/or sub-sequences of it) is to be output, do it.
-    if ($outputSeq) {
+    if (!$outputSeq) {
+        if ($verbose) { print("No sequences to output\n"); }
+    } else {
+        if ($verbose) { print("Outputting requested sequence IDs\n"); }
         my $originalSeqLine = $seqId . $seqArgs;
+
+        # Get global reverse complement flag, for all subsequences of this sequence.
+        my $revCompAll = (exists($options{r})) || (exists($options{R}) && $originalSeqLine =~ m/$options{R}/);
+
         # Get the default value for %ISID% replacement in the template.
         my $ISID = $seqId;
+
         # Change it according to -t and -n options.
         if (exists($options{t})) { $ISID =~ s/$options{t}/$1/; }
         if (exists($options{n})) { $ISID = $options{n}; }
+
+        # Replace %ISID% and %ISARGS% in template.
+        my $templatePartiallySubstituted = $template;
+        $templatePartiallySubstituted =~ s/%ISID%/$ISID/;
+        $templatePartiallySubstituted =~ s/%ISARGS%/$seqArgs/;
+
+        # Determine whether or not %SEQ5, %REVCOMP%, and %SUBRGN% occur in the
+        # template, so we can skip the search/replace if it isn't necessary.  We
+        # may be doing this on many thousands of strings, it can be slow.
+        my $Replace_SEQ = ($templatePartiallySubstituted =~ m/%SEQ%/);
+        my $Replace_REVCOMP = ($templatePartiallySubstituted =~ m/%REVCOMP%/);
+        my $Replace_SUBRGN = ($templatePartiallySubstituted =~ m/%SUBRGN%/);
+
         # Delete * (e.g. STOP at end), or whatever user wants deleted.
-        if (exists($options{d})) { $sequence =~ s/\*//g; }
-        if (exists($options{delete})) { $sequence =~ s/$options{delete}//g; }
+        if (exists($options{d})) { $$seqRef =~ s/\*//g; }
+        if (exists($options{delete})) { $$seqRef =~ s/$options{delete}//g; }
+
         # Loop for each subsequence to be output.
         my $numSubseqs = @{$subseqs{revcomp}};
+        if ($verbose) { print("Outputting $numSubseqs subsequences\n"); }
         for (my $i = 0; $i < $numSubseqs; $i++) {
-            # Get the value for %ISARGS% replacement in the template.
-            my $ISARGS = $seqArgs;
-            # Get the value for %SEQ% replacement in the template.
-            my $SEQ = $subseqs{seq};
-            # Get the default value for %REVCOMP% replacement in the template.
-            my $REVCOMP = " revcomp:no";
+            if ($verbose) { print("Outputting subsequence $i\n"); }
             # Get the default value for %SUBRGN% replacement in the template.
             my $SUBRGN = "";
-            # Get the sequence to be output.
-            my $thisSequence = $sequence;
             # Get the individual output filename.
             my $individualOutFilename = $seqId;
             # Get start and end positions and length.
             my ($start, $end) = ($subseqs{start}->[$i], $subseqs{end}->[$i]);
             my $sublen = $end - $start + 1;
-            # If this is a quality score file, subsequent processing is different.
+            # Get reverse complement flag for this subsequence.
+            my $doRev = ($subseqs{revcomp}->[$i]) || $revCompAll;
+            # Get the default value for %REVCOMP% replacement in the template.
+            my $REVCOMP = " revcomp:no";
+            if ($doRev) { $REVCOMP = " revcomp:yes"; }
+            # Sequence to be output.  Don't initialize to $$seqRef, which might be very long.
+            my $thisSequence;
+
+            # If not a quality score file, do basic processing.
             if (!$qual) {
                 # Extract sub-sequence if requested.
                 if ($start > 0) {
-                    my $len = length($thisSequence);
+                    my $len = $seqLen;
                     if ($len < $end) {
                         if (exists($options{e})) { die("Sequence $seqId length $len is shorter than requested end position $end"); }
-                    $end = $len;
-                    my $sublen = $end - $start + 1;
+                        $end = $len;
+                        my $sublen = $end - $start + 1;
                     }
-                    $thisSequence = substr($thisSequence, $start-1, $sublen);
+                    $thisSequence = substr($$seqRef, $start-1, $sublen);
                     # Include sub-range in sequence args.
                     $SUBRGN = " sub_region:$start-$end";
                     $individualOutFilename = $individualOutFilename . "_" . $start . "_" . $end;
-                }
+                } else { $thisSequence = $$seqRef; }
+
                 # Reverse complement the sequence if unconditional -r or if the specified -r
                 # pattern matches or if the reversal [^] flag was specified for the sequence.
-                my $doRev = ($subseqs{revcomp}->[$i]) ||
-                    (exists($options{r})) ||
-                    (exists($options{R}) && $originalSeqLine =~ m/$options{R}/);
-                if ($doRev) {
-                    $thisSequence = reverseComplement($thisSequence);
-                    $REVCOMP = " revcomp:yes";
-                }
+                if ($doRev) { $thisSequence = reverseComplement($thisSequence); }
                 # Perform replacements in the template string.
                 my $outseqIDline;
                 if (!exists($options{O})) {
-                    $outseqIDline = $template;
-                    $outseqIDline =~ s/%ISID%/$ISID/;
-                    $outseqIDline =~ s/%ISARGS%/$ISARGS/;
-                    $outseqIDline =~ s/%SEQ%/$SEQ/;
-                    $outseqIDline =~ s/%REVCOMP%/$REVCOMP/;
-                    $outseqIDline =~ s/%SUBRGN%/$SUBRGN/;
+                    $outseqIDline = $templatePartiallySubstituted;
+                    if ($Replace_SEQ) { $outseqIDline =~ s/%SEQ%/$subseqs{seq}->[$i]/; }
+                    if ($Replace_REVCOMP) { $outseqIDline =~ s/%REVCOMP%/$REVCOMP/; }
+                    if ($Replace_SUBRGN) { $outseqIDline =~ s/%SUBRGN%/$SUBRGN/; }
                     # See http://stackoverflow.com/questions/392643/how-to-use-a-variable-in-the-replacement-side-of-the-perl-substitution-operator
                     if (exists($options{u})) {
                         $outseqIDline =~ s/$templateSearch/$templateReplace/ee;
@@ -354,8 +386,12 @@ while (1) {
                 }
                 # Output the sequence.
                 if (!exists($options{O})) { print(OUTFILE ">" . $outseqIDline . "\n"); }
-                for (my $i = 0; $i < length($thisSequence); $i += $numSeqValsPerLine) {
-                    print(OUTFILE substr($thisSequence, $i, $numSeqValsPerLine), "\n");
+                if ($numSeqValsPerLine < 1) {
+                    print(OUTFILE $thisSequence, "\n");
+                } else {
+                    for (my $i = 0; $i < length($thisSequence); $i += $numSeqValsPerLine) {
+                        print(OUTFILE substr($thisSequence, $i, $numSeqValsPerLine), "\n");
+                    }
                 }
                 $numOutSeqs++;
                 # Close the file if individual files per sequence.
@@ -363,15 +399,17 @@ while (1) {
                     close(OUTFILE);
                     print("Created file $outFilename1 containing sequence for $seqId\n");
                 }
+
+            # If this is a quality score file, subsequent processing is different.
             } else {
                 # Split the sequence string into an array of quality score strings.
-                my @arrSeq = split(" ", $thisSequence);
+                my @arrSeq = split(" ", $$seqRef);
                 # Extract sub-sequence if requested.
                 if ($start > 0) {
                     my $len = scalar(@arrSeq);
                     if ($len < $end) {
                         if (exists($options{e})) { die("Sequence $seqId length $len is shorter than requested end position $end"); }
-                    $end = $len;
+                        $end = $len;
                     }
                     @arrSeq = @arrSeq[$start-1 .. $end-1];
                     # Include sub-range in sequence args.
@@ -380,22 +418,14 @@ while (1) {
                 }
                 # Reverse the scores if unconditional -r or if the specified -r
                 # pattern matches or if the reversal [^] flag was specified for the sequence.
-                my $doRev = ($subseqs{revcomp}->[$i]) ||
-                    (exists($options{r})) ||
-                    (exists($options{R}) && $originalSeqLine =~ m/$options{R}/);
-                if ($doRev) {
-                    @arrSeq = reverse(@arrSeq);
-                    $REVCOMP = " revcomp:yes";
-                }
+                if ($doRev) { @arrSeq = reverse(@arrSeq); }
                 # Perform replacements in the template string.
                 my $outseqIDline;
                 if (!exists($options{O})) {
-                    $outseqIDline = $template;
-                    $outseqIDline =~ s/%ISID%/$ISID/;
-                    $outseqIDline =~ s/%ISARGS%/$ISARGS/;
-                    $outseqIDline =~ s/%SEQ%/$SEQ/;
-                    $outseqIDline =~ s/%REVCOMP%/$REVCOMP/;
-                    $outseqIDline =~ s/%SUBRGN%/$SUBRGN/;
+                    $outseqIDline = $templatePartiallySubstituted;
+                    if ($Replace_SEQ) { $outseqIDline =~ s/%SEQ%/$subseqs{seq}->[$i]/; }
+                    if ($Replace_REVCOMP) { $outseqIDline =~ s/%REVCOMP%/$REVCOMP/; }
+                    if ($Replace_SUBRGN) { $outseqIDline =~ s/%SUBRGN%/$SUBRGN/; }
                     if (!exists($options{u})) {
                         $outseqIDline =~ s/$templateSearch/$templateReplace/;
                     }
@@ -411,11 +441,15 @@ while (1) {
                 }
                 # Output the sequence.
                 if (!exists($options{O})) { print(OUTFILE ">" . $outseqIDline . "\n"); }
-                for (my $i = 0; $i < scalar(@arrSeq); $i += $numSeqValsPerLine) {
-                    my $j = $i+$numSeqValsPerLine-1;
-                    if ($j >= scalar(@arrSeq)) { $j = scalar(@arrSeq)-1; }
-                    $thisSequence = join(" ", @arrSeq[$i..$j]);
-                    print(OUTFILE $thisSequence, "\n");
+                if ($numSeqValsPerLine < 1) {
+                    print(OUTFILE join(" ", @arrSeq), "\n");
+                } else {
+                    for (my $i = 0; $i < scalar(@arrSeq); $i += $numSeqValsPerLine) {
+                        my $j = $i+$numSeqValsPerLine-1;
+                        if ($j >= scalar(@arrSeq)) { $j = scalar(@arrSeq)-1; }
+                        $thisSequence = join(" ", @arrSeq[$i..$j]);
+                        print(OUTFILE $thisSequence, "\n");
+                    }
                 }
                 $numOutSeqs++;
                 # Close the file if individual files per sequence.
@@ -433,6 +467,7 @@ if ($outFilename ne "") {
     print("Created file $outFilename containing $numOutSeqs sequences\n");
 }
 
+if ($verbose) { print("Checking for sequence IDs not found.\n"); }
 foreach my $seqId (keys(%hSeqFound)) {
     if (!$hSeqFound{$seqId}) {
         print("***** NOT FOUND: $seqId\n");

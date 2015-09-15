@@ -187,28 +187,71 @@ After the allParameters.XY file is edited and ready to go, *run the IGGPIPE pipe
 from the IGGPIPE directory as follows*:
 
   cd ~/Documents/IGGPIPE    (or whatever is appropriate for your system)
-  make PARAMS=allParameters.XY ALL    (replacing XY with your genome letters)
+  make PARAMS=allParameters.XY ALL    (replacing with your allParameters name)
 
 If "make" stops with the message *ALL files are up to date*, it has completed
 the analysis successfully. Otherwise, look for an error message and try to
-diagnose it. I am available to a limited extent via email, for a while, to try
-to assist in diagnosing problems.  If you fix something and want to retry running
-IGGPIPE, all you have to do is enter the same "make" command again.  The "make"
-program automatically skips pipeline steps that don't need to be repeated because
-the input files for those steps have not changed, and the output files were made
-with success previously.  Therefore, it will normally resume by repeating the
-same step that failed and caused it to halt with an error.  If the error still
-exists, it will halt again with the same error message.  Otherwise, it will
-continue until it reaches the end successfully, or until another error happens.
-Therefore, each time you try to re-run the pipeline, you are just entering the
-command:
+diagnose it.  You should first check to see if the common unique k-mers file
+named 'isect.kmers' was created in the 'Kmers' subfolder of the output subfolder.
+This is created early in the pipeline, and you should always check it to see how
+many common unique k-mers were found.  This can be done with the 'wc -l' command,
+which counts lines in a file, since the 'isect.kmers' file contains one unique
+k-mer per line.  The command line would look like this:
 
-  make PARAMS=allParameters.XY ALL    (replacing XY with your genome letters)
+     wc -l myOutFolder/Kmers/isect.kmers
+
+If you have plenty of k-mers (say around 8 million or more) but not too many (say
+40 million or more), that is good. If you feel you have too few k-mers, then you
+should increase K by 1 and try again, and if you have too many, decrease it by 1
+and try again. You can run the pipeline only up until isect.kmers is created by
+using this command:
+
+     make PARAMS=myFilename kmerIsect
+
+If there are plenty of common unique k-mers, you should next check the number
+of LCRs detected next, which you can again do with 'wc -l', since the LCRs_* file
+contains one LCR per line.  The command line would look like this:
+
+     wc -l myOutFolder/LCR_*
+
+If you had too few common k-mers you might also have too few LCRs.  A million or
+more LCRs would be nice.  The fewer you have, the fewer markers you are likely to
+get.  If there are too few, check the log file output when findLCRs ran.  It will
+show the number of common unique k-mers for each sequence ID, then the number
+remaining after it enforces Dmin, Lmin, and kMin on the reference genome.  If
+these numbers fall dramatically towards 0, it indicates that either there are
+no good LCRs between the two genomes, or the parameters are too strict.
+
+If there were plenty of LCRs, you should next check the number of non-overlapping
+IndelGroups found, which you can again do with 'wc -l', since the IndelGroupsNonoverlapping_*
+file contains one Indel Group per line.  The command line would look like this:
+
+     wc -l myOutFolder/IndelGroupsNonoverlapping_*
+
+Several thousand IndelGroups is nice to have.
+
+If you run into problems, determine which step failed and check the input file(s)
+for that step to make sure everything looks ok.
+
+If you fix something and want to retry running IGGPIPE, all you have to do is
+enter the same "make" command again.  The "make" program automatically skips
+pipeline steps that don't need to be repeated because the input files for those
+steps have not changed, and the output files were made with success previously.
+Therefore, it will normally resume by repeating the same step that failed and
+caused it to halt with an error.  If the error still exists, it will halt again
+with the same error message.  Otherwise, it will continue until it reaches the
+end successfully, or until another error happens. Therefore, each time you try
+to re-run the pipeline, you are just entering the command:
+
+  make PARAMS=allParameters.XY ALL    (replacing with your allParameters name)
+
+Please email me with any bugs you find and perhaps fix. I am available to a
+limited extent via email, for a while, to try to assist in diagnosing problems.
 
 If at any point you want to remove all files already generated and start anew,
 you can do that with this command:
 
-  make PARAMS=allParameters.XY CLEAN=1 ALL    (replacing XY with your genome letters)
+  make PARAMS=allParameters.XY CLEAN=1 ALL    (replacing with your allParameters name)
 
 You can also run individual steps of the pipeline.  To see how, use this command
 to get more complete usage information for running "make":
@@ -257,10 +300,52 @@ Several other ".tsv" tab-separated output files exist:
 
 Tables describing each column in each file type are at the end of this
 document.
+
+Besides the sample parameter file "allParameters.template", there are several more
+sample "allParameters" parameter files in the subfolder "allParameters".  These
+were used for testing IGGPIPE with various genomes.  The subfolder "allParameters"
+was made to keep the files better organized and keep the root folder less messy.
+You may want to adopt the same strategy and put your "allParameters" files in the
+"allParameters" subfolder or in a subfolder you make yourself.  When you do that,
+you run "make" by specifying the full path to the file, e.g.:
+
+  make PARAMS=myParamFolder/allParameters.XY ALL
 --
 
 *Post-processing tools*
 -----------------------
+
+. *Finding InDels*
++
+--
+An R program that is NOT run as part of the pipeline when the 'make ... ALL' target
+is built, but which can be run using 'make ... InDels', is able to read a file of LCRs,
+non-overlapping InDelGroups, or non-overlapping Markers, extract the DNA sequences
+from the genomes in each LCR or Marker region and align them, then locate all
+InDels in the aligned sequences and write their positions to a file. The program
+is called alignAndGetIndels.R. You should already have set its input file name in
+your "allParameters" parameter file. Run it as follows:
+
+  make PARAMS=allParameters.XY InDels    (replacing with your allParameters name)
+
+This produces a file in your output folder whose name ends with "indels.tsv",
+containing a table of all InDels found in the LCR or marker regions.
+--
+
+. *Plotting InDel information*
++
+--
+Another R program that is NOT run as part of the pipeline when the 'make ... ALL' target
+is built, but which can be run using 'make ... plotInDels', reads the InDels file produced
+by 'make ... InDels' and plots information from it in a pdf file. The program is called
+plotIndels.R. Run it as follows:
+
+  make PARAMS=allParameters.XY plotInDels    (replacing with your allParameters name)
+
+This produces a file in your output folder whose name ends with "indels.pdf",
+containing plots of various InDel information.  Examine it to see the plots it
+contains.
+--
 
 . *Dot plots*
 +
@@ -285,6 +370,12 @@ settings to explore different regions of the genomes in greater resolution.
 
 The "dotplot.template" file is configured for generating a dot plot file
 using the LCRs generated via the allParameters.test.template configuration file.
+
+Besides the sample parameter file "dotplot.template" (which has settings for
+testing the IGGPIPE installation), there are several more sample "dotplot" parameter
+files in the subfolder "dotplot", that were used for plotting data from various
+genomes that IGGPIPE was tested with.  You may want to put your own "dotplot"
+parameter files in subfolder "dotplot" or your own subfolder to keep them organized.
 --
 
 . *Annotating marker files with other position data and producing GFF3 and GTF files*
@@ -319,10 +410,12 @@ When it finishes running, the output files can be found in the place(s) and unde
 the name(s) specified in the parameter file.
 
 Besides the sample parameter file "annotate.template" (which has settings for
-testing the IGGPIPE installation), there are several more sample parameter files in
-the folder "annotate", with file names hinting at what they do, and comments at
+testing the IGGPIPE installation), there are several more sample "annotate"
+parameter files in
+the subfolder "annotate", with file names hinting at what they do, and comments at
 the start of each file describing what it does.  It may be easier to copy one of
-these and modify it.
+these and modify it.  You may want to put your own "annotate"
+parameter files in subfolder "annotate" or your own subfolder to keep them organized.
 
 So, the idea is to use multiple parameter files with different settings to do
 different types of annotation and file conversion.
@@ -447,5 +540,30 @@ if amplicon in X and Y genomes run in the same direction, > if opposite directio
 |Y.strand|Genome Y k-mer strand, "+" or "-"
 |Y.contig|Genome Y contig number within sequence X.seqID sequence of contig containing the k-mer
 |Y.contigPos|Genome Y position of upstream end of k-mer on "+" strand relative to start of Y.contig
-|LCR|Integer LCR number to which this k-mer is assigned
+|LCR|Integer LCR number to which this k-mer is assigned, must be concatenated with reference genome X.seqID to be unique
+|===================================================
+
+.Columns in *.indels.tsv files; X,Y=chosen genome letters
+[cols="^1,9",options="header"]
+|===================================================
+|Column|Description
+|ID|Unique ID tying row back to originating input file row. LCR input files: refID_LCRnumber.
+InDelGroup and Markers files: refID_refPos1_refPos2.
+|phases|Phase of each genome incl. ref. genome, relative to ref. genome, string of +/- chars,
++ : same direction, - : opposite direction.",
+|idx|Starts at 1 and counts each InDel within an ID. For given ID (input row), number of InDels
+in that region is max idx value. If more than two genomes, entire region where alignment has a
+gap in one or more genomes is counted as one InDel even if multiple gap regions occur in different
+genomes.  
+|Xdel,Ydel|Total number of deleted bps within the InDel in genomes X,Y. With 2 genomes, del = 0
+in genome with insertion (no gaps), del > 0 in genome with deletion (gaps). With >2 genomes, del
+can be non-zero for all genomes. A genome has only insertions in the InDel if del is 0, and it has
+only deletions if end-start-1 = 0, and otherwise it has a mixture of at least one insertion and
+one deletion within the InDel interval.
+|Xid,Yid|Sequence ID of the InDel in genomes X,Y.
+|Xstart,Xend,Ystart,Yend|Overall InDel starting and ending position in genomes X,Y.
+start/end are positions of bps just BEFORE first and AFTER last InDel gap in any genome,
+so they refer to the same two bps in all genomes. Always start < end. If '-' phase,
+start is bp just AFTER, end is bp just BEFORE, opposite of '+'. Length of the InDel region
+in each genome is end-start-1.
 |===================================================

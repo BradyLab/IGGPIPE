@@ -288,14 +288,21 @@ foundMultiple = foundMultiple[rmvMarker]
 foundOnceIdWrong = foundOnceIdWrong[rmvMarker]
 foundOncePosLwrong = foundOncePosLwrong[rmvMarker]
 foundOncePosRwrong = foundOncePosRwrong[rmvMarker]
-dfRemove = data.frame(reasonDiscarded="unknown", dfRemove, stringsAsFactors=FALSE)
-dfRemove$reasonDiscarded[foundZero] = "not found"
-dfRemove$reasonDiscarded[foundMultiple] = "found multiple"
-dfRemove$reasonDiscarded[foundOnceIdWrong] = "wrong seq id"
-dfRemove$reasonDiscarded[!foundOnceIdWrong & foundOncePosLwrong & foundOncePosRwrong] = "wrong pos"
-dfRemove$reasonDiscarded[!foundOnceIdWrong & foundOncePosLwrong & !foundOncePosRwrong] = "wrong posL"
-dfRemove$reasonDiscarded[!foundOnceIdWrong & !foundOncePosLwrong & foundOncePosRwrong] = "wrong posR"
-
+if (nrow(dfRemove) > 0)
+    {
+    dfRemove = data.frame(reasonDiscarded="unknown", dfRemove, stringsAsFactors=FALSE)
+    dfRemove$reasonDiscarded[foundZero] = "not found"
+    dfRemove$reasonDiscarded[foundMultiple] = "found multiple"
+    dfRemove$reasonDiscarded[foundOnceIdWrong] = "wrong seq id"
+    dfRemove$reasonDiscarded[!foundOnceIdWrong & foundOncePosLwrong & foundOncePosRwrong] = "wrong pos"
+    dfRemove$reasonDiscarded[!foundOnceIdWrong & foundOncePosLwrong & !foundOncePosRwrong] = "wrong posL"
+    dfRemove$reasonDiscarded[!foundOnceIdWrong & !foundOncePosLwrong & foundOncePosRwrong] = "wrong posR"
+    }
+else
+    {
+    catnow("No bad markers to be removed.\n")
+    dfRemove = data.frame(reasonDiscarded=character(), df[c(),], stringsAsFactors=FALSE)
+    }
 # Write the data frame to the output file.
 write.table(dfRemove, badMarkerFile, row.names=FALSE, quote=FALSE, sep="\t")
 # dfRemove = read.table(badMarkerFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)

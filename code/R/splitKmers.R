@@ -21,13 +21,13 @@ if (testing == 0)
 else if (testing == 1)
     {
     args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
-       "outTestHP11/Kmers/Split/Genome_1_", "outTestHP11/Kmers/Genome_1.isect.kmers")
+       "outTestHP11/Kmers/Split/Genome_1_", "outTestHP11/Kmers/Genome_1.isect.unique")
     }
 else if (testing == 2)
     {
     args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
-       "outTestHP11/Kmers/Split/Genome_2_", "outTestHP11/Kmers/Genome_2.isect.kmers",
-       "outTestHP11/Kmers/Genome_1.isect.kmers")
+       "outTestHP11/Kmers/Split/Genome_2_", "outTestHP11/Kmers/Genome_2.isect.unique",
+       "outTestHP11/Kmers/Genome_1.isect.unique")
     }
 else stop("Unknown value for 'testing'")
 }
@@ -65,7 +65,7 @@ if (length(args) < NexpectedMin)
         "                 to this is the sequence ID followed by '.isect.split'.",
         "   <kmersFile> : Pathname of input k-mer file to be split, listing k-mers with position.",
         "   <guideKmersFile> : (optional) Pathname of another input k-mer file, to be used",
-        "                      to guide the sorting of <kmersFile> lines to output files.",
+        "                      to guide the sorting of <kmersFile> lines to output files."
         )
     for (S in usage)
         cat(S, "\n", sep="")
@@ -124,7 +124,7 @@ if (!is.null(guideKmersFile))
     if (any(colnames(df) != expectedColNames))
         stop("Actual column names in input file ", guideKmersFile, " are not as expected.")
 
-    # Loop reading data from the input file and saving data in kmerSeqIDs.
+    # Loop reading data from the input file and saving data in dfKmerSeqIDs.
     N = 0 # Count lines.
     dfKmerSeqIDs = NULL
     while (nrow(df) != 0)

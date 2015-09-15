@@ -10,23 +10,35 @@ allParameters.test.template to allParameters.test and editing it, searching for
 It should run through to completion fairly quickly with no errors.  When it is
 finished, compare files X and Y with the command 'diff X Y', where X and Y are:
 X = outTestHP10/MarkersOverlapping_K10Km4Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF1XL15DT10.tsv
-Y = MarkersOverlapping_test.tsv
+Y = MarkersOverlapping.test.tsv
 (relative to IGGPIPE directory).  There should be no differences between them.
 BTW, the resulting IGG markers are useless since they are based on only part of
 the genome.
 
 To run the entire pipeline on your own data, invoke 'make' as follows:
 
-     make PARAMS=filename ALL | tee logFiles/makeLog.txt
+     make PARAMS=myFilename ALL | tee logFiles/makeLog.txt
 
-Here, 'filename' is the name of the parameter file you want to use to run the
+Here, 'myFilename' is the name of the parameter file you want to use to run the
 pipeline.  This file would be an edited copy of allParameters.template, such as
 'allParameters.XY' if for example you were using genomes X and y and named your
 edited file with XY in the name.)  'ALL' is called the make 'target'.
 
+There is a subdirectory named 'allParameters' containing a bunch of parameter
+files I've tested.  You may want to put your own parameter files in here too, or
+in a separate subdirectory you create.  If you do that, specify the full pathname
+to 'make', e.g.:
+
+     make PARAMS=allParameters/myFilename ALL | tee logFiles/makeLog.txt
+
 Note that it may take many hours to run everything through to completion.  If an
 error occurs, try to find the cause and fix it, then rerun the same 'make' command.
 All steps that have already completed successfully are not re-run.
+
+Also note that '| tee logFiles/makeLog.txt' causes all 'make' output to be written
+to text file 'makeLog.txt' in the 'logFiles' directory, so you have a record of
+it, in addition to writing it to the console.  To view the log you could use a
+command such as 'less logFiles/makeLog.txt'.
 
 Rather than running the entire pipeline all at once as shown above, you may
 choose to run one pipeline step at a time and inspect its output before going
@@ -34,21 +46,21 @@ on to the next step.  To do this, run the following 'make' commands in the
 order shown.  Each step specifies a different target name, and each one will
 show the names of file(s) that are produced.
 
-     make PARAMS=filename getSeqInfo    GENOME=ALL
-     make PARAMS=filename getContigFile GENOME=ALL
-     make PARAMS=filename getKmers      GENOME=ALL
-     make PARAMS=filename kmerStats     GENOME=ALL
-     make PARAMS=filename sortKmers     GENOME=ALL
-     make PARAMS=filename kmerIsect
-     make PARAMS=filename getGenomicPos GENOME=ALL
-     make PARAMS=filename splitKmers    GENOME=ALL
-     make PARAMS=filename findLCRs
-     make PARAMS=filename findIndelGroups
-     make PARAMS=filename getDNAseqs    GENOME=ALL
-     make PARAMS=filename findPrimers
-     make PARAMS=filename ePCRtesting   GENOME=ALL
-     make PARAMS=filename removeBadMarkers
-     make PARAMS=filename plotMarkers
+     make PARAMS=myFilename getSeqInfo    GENOME=ALL
+     make PARAMS=myFilename getContigFile GENOME=ALL
+     make PARAMS=myFilename getKmers      GENOME=ALL
+     make PARAMS=myFilename kmerStats     GENOME=ALL
+     make PARAMS=myFilename sortKmers     GENOME=ALL
+     make PARAMS=myFilename kmerIsect
+     make PARAMS=myFilename getGenomicPos GENOME=ALL
+     make PARAMS=myFilename splitKmers    GENOME=ALL
+     make PARAMS=myFilename findLCRs
+     make PARAMS=myFilename findIndelGroups
+     make PARAMS=myFilename getDNAseqs    GENOME=ALL
+     make PARAMS=myFilename findPrimers
+     make PARAMS=myFilename ePCRtesting   GENOME=ALL
+     make PARAMS=myFilename removeBadMarkers
+     make PARAMS=myFilename plotMarkers
 
 Several steps must be repeated for EACH GENOME.  In those steps, the genome
 number is specified using GENOME=# on the command line, with # varying from 1
@@ -56,9 +68,35 @@ to N_GENOMES.  Or, use GENOME=ALL as shown above to automatically repeat the
 step for all genomes at one time.  You could start with GENOME=ALL, but if you
 have trouble, try doing it with GENOME=1 first.
 
-Note that '| tee logFiles/makeLog.txt' causes all 'make' output to be written to
-text file 'makeLog.txt' in the 'logFiles' directory, so you have a record of it,
-in addition to writing it to the console.
+You may want to run the first several steps, then check the number of common
+unique k-mers to make sure you have plenty (say 8 million or more) but not too
+many (say 40 million or more). You can run those steps and check the k-mer count
+with:
+
+     make PARAMS=myFilename kmerIsect
+     wc -l myOutFolder/Kmers/isect.kmers
+
+The 'wc' command shows a line count of file 'isect.kmers', which contains one
+unique k-mer per line.  If you have too few k-mers you should increase K by 1
+and try again, and if you have too many, decrease it by 1 and try again.
+
+You might then choose to run several more steps and then check the number of
+LCRs obtained, using these commands:
+
+     make PARAMS=myFilename findLCRs
+     wc -l myOutFolder/LCR_*
+
+The 'LCR_*' file contains LCRs, one per line.  If you had too few common k-mers
+you might also have too few LCRs.  A million or more would be nice.  The fewer
+you have, the fewer markers you are likely to get.
+
+You might then choose to run the pipeline through to completion, then check the
+number of non-overlapping markers obtained, using these commands:
+
+     make PARAMS=myFilename ALL
+     wc -l myOutFolder/MarkersNonoverlapping_*
+
+Take a look at the plots in the .pdf and .png files.
 
 For unexpected errors you can't fix, I may be able to help: twtoal@ucdavis.edu
 
@@ -68,18 +106,25 @@ To force 'make' to re-run a step, you must either delete the files created by
 that step, or use the CLEAN=1 argument to tell 'make' to delete the files.  An
 example of this is:
 
-     make PARAMS=filename CLEAN=1 findLCRs
+     make PARAMS=myFilename CLEAN=1 findLCRs
 
 This deletes files created by the 'findLCRs' step.  If 'make' is re-run, with
 the 'findLCRs' or 'ALL' target for example, it will rebuild those files and all
 other files that were derived from them.  To delete ALL files that were built
 by the pipeline, use this command:
 
-     make PARAMS=filename CLEAN=1 ALL
+     make PARAMS=myFilename CLEAN=1 ALL
 
 If you want to delete all files in the output directory, regardless of their
 names and whether or not they were built using the current parameter settings,
 use this command (the output directory that is cleaned is defined in the PARAMS
 file as DIR_IGGPIPE_OUT):
 
-     make PARAMS=filename CLEAN_OUT_DIR=1 ALL
+     make PARAMS=myFilename CLEAN_OUT_DIR=1 ALL
+
+If you want to analyze an output file for InDels (parameters should have already
+been set in the allParameters file), then use these commands to analyze for
+InDels and to plot InDel information:
+
+     make PARAMS=myFilename InDels
+     make PARAMS=myFilename plotInDels

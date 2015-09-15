@@ -261,6 +261,10 @@ for (ID in refIDs)
     inv(dim(df), "All genome data dim")
     inv(colnames(df), "All genome data columns")
     inv(head(df), "All genome data head")
+    catnow("  ", nrow(df), "common unique k-mers\n")
+    # If there are no k-mers for this ID, continue with next ID.
+    if (nrow(df) == 0)
+        next
 
     # Find out just what k is, i.e. how big are the k-mers?
     k = nchar(rownames(df)[1])
@@ -331,6 +335,10 @@ for (ID in refIDs)
             }
         }
     inv(dim(df), "dim of full data after removing < Dmin")
+    catnow("   ", nrow(df), " k-mers remaining\n")
+    # If none left, move on to next ID.
+    if (nrow(df) == 0)
+        next
 
     # Sort by reference genome position.
     df = df[order(df[,refPosCol]),]
@@ -425,9 +433,8 @@ for (ID in refIDs)
     # Items 5 and 6: Discard candidate LCR k-mers that don't satisfy kMin and Lmin.
     ############################################################################
 
-    catnow("  Enforcing kMin and Lmin on reference genome\n")
-
     # Save all discarded k-mers in data frame discardDf.
+    catnow("  Enforcing LMin on reference genome\n")
     discardDf = NULL
     tooSmall = tapply(df[,refPosCol], df$LCR, function(refPos) return(diff(range(refPos)) < Lmin))
     tooSmall = names(tooSmall)[tooSmall]
@@ -439,6 +446,12 @@ for (ID in refIDs)
         }
     inv(dim(df), "dim of full data after removing < Lmin")
     inv(dim(discardDf), "dim of discarded k-mers")
+    catnow("   ", nrow(df), " k-mers remaining\n")
+    # If none left, move on to next ID.
+    if (nrow(df) == 0)
+        next
+
+    catnow("  Enforcing kMin on reference genome\n")
     tooFewKmers = tapply(1:nrow(df), df$LCR, function(ii) length(ii) < kmin)
     tooFewKmers = names(tooFewKmers)[tooFewKmers]
     inv(length(tooFewKmers), "number of candidate LCRs with < kmin k-mers")
@@ -449,6 +462,10 @@ for (ID in refIDs)
         }
     inv(dim(df), "dim of full data after removing < kmin")
     inv(dim(discardDf), "dim of discarded k-mers")
+    catnow("   ", nrow(df), " k-mers remaining\n")
+    # If none left, move on to next ID.
+    if (nrow(df) == 0)
+        next
 
     ############################################################################
     # Reference genome finished, we have candidate LCRs in the reference genome.
@@ -467,7 +484,7 @@ for (ID in refIDs)
     # as all the k-mers included in the LCR meet the conditions, it is a valid LCR.
     # The k-mers excluded from it may be part of a different LCR, or they may end
     # up not being part of any LCR.  A given k-mer, though, is only a member of at
-    # most one LCR.  The excluded k-mers are moved to an auxiliary LCR list and
+    # most one LCR.  The excluded k-mers are moved to a deferred k-mers list and
     # and later back to the LCR pool being tested, to retest them to see if they
     # satisfy the requirements of an LCR.
     # It may in fact possible for two LCRs to cover the same region: suppose
@@ -482,94 +499,149 @@ for (ID in refIDs)
     # majority of problems, but there will still be problem areas left where the
     # genomes have diverged.  The following properties must still be tested for
     # each genome in "otherGenomes", for all candidate LCRs:
+    #
     #   1. If the number of k-mers in a candidate LCR group is less than kmin,
     #       discard that candidate LCR.
+    #
     #   2. If the difference in minimum and maximum position of the candidate LCR
     #       k-mers in any genome of any LCR is less than Lmin, discard it.
-    #   3. If the difference in position of two adjacent k-mers of the candidate
+    #
+    #   3. The k-mers are in monotonically increasing order by reference genome
+    #       position because we sorted them that way.  In the other genomes, the
+    #       k-mers had also better be monotonically increasing OR decreasing, if
+    #       the k-mers are to be a valid LCR.  If the k-mer strand of the genome
+    #       in question matches the k-mer strand of the reference genome, then
+    #       the genome in question should also be monotonically increasing.  If
+    #       they mismatch, it should be monotonically decreasing.  It doesn't
+    #       matter which k-mer's strand is tested for this, since all k-mers of
+    #       the LCR are part of the same strand group and so have the same
+    #       relationship to the reference k-mer strand.
+    #
+    #       Suppose the monotonicity is incorrect for two adjacent k-mers of the
+    #       candidate LCR in any genome.  Note that when an inversion occurs,
+    #       the strand of the k-mers inverts, so we would already have separated
+    #       those k-mers based on strand group.  But monotonicity can also be
+    #       wrong when a non-inverting translocation occurs.  Let's look more
+    #       closely at this to understand it.  For simplificity, assume two
+    #       genomes:
+    #
+    #         non-inv xloc: genome 2:  a b c d e f g h i j A B C D E k l
+    #                     ref genome:  a b A B C D E c d e f g h i j k l
+    #           sign:     ref genome:   + + + + + + + + + + + + + + + +
+    #   genome 2 in ref genome order:   + + + + + + - + + + + + + + + +
+    #           bigger change at:         ^                         ^
+    #
+    #       Here, the + and - for genome 2 are taking consecutive k-mer pairs
+    #       as the k-mers are shown in the ref genome line, and asking the
+    #       question, what is their position difference IN GENOME 2, which
+    #       can be determined by looking at where they lie in the genome 2 row.
+    #       We see only a single place where two adjacent k-mers have the wrong
+    #       monotonicity.  There are two other places where the size of the
+    #       change may be large, and may be larger than Dmax.  That case is
+    #       handled in the next step, 4, which comes after this because our
+    #       resolution of monotonicity may fix the large position difference.
+    #
+    #       Now consider the case where the direction of movement was the
+    #       opposite:
+    #
+    #         non-inv xloc: genome 2:  a b A B C D E c d e f g h i j k l
+    #                     ref genome:  a b c d e f g h i j A B C D E k l
+    #           sign:     ref genome:   + + + + + + + + + + + + + + + +
+    #   genome 2 in ref genome order:   + + + + + + + + + - + + + + + +
+    #           bigger change at:         ^                         ^
+    #
+    #       We see a similar situation, but the position of the monotonicity
+    #       error is at the start rather than end of the translocated sequence.
+    #
+    #       Now, what should we do?  Monotonicity is funny in that it depends on
+    #       two k-mers, not just one.  So, a k-mer involved in wrong monotonicity
+    #       in one context may not be that way in another.  We need to be careful
+    #       though, about not setting such k-mers aside and trying them later, ad
+    #       infinitum.  This can be avoided by ensuring that we never recycle ALL
+    #       of the k-mers of the LCR.  We will choose to keep the k-mer on the
+    #       left side of the monotonicity problem, so at least one k-mer will be
+    #       processed through to the end, reducing overall k-mer count by at least
+    #       one.
+    #
+    #       Again, what to do?  In the above cases it is clear that setting a
+    #       single k-mer aside is insufficient.  We need a simple solution that
+    #       may not be best in all cases.  If we analyze from the first right-side
+    #       k-mer of a monotonicity error rightwards, looking for the first k-mer
+    #       that will not cause a monotonicity error, we would do this:
+    #
+    #         non-inv xloc: genome 2:  a b c d e f g h i j A B C D E k l
+    #                     ref genome:  a b A B C D E c d e f g h i j k l
+    #           sign:     ref genome:   + + + + + + + + + + + + + + + +
+    #   genome 2 in ref genome order:   + + + + + + - + + + + + + + + +
+    #           bigger change at:         ^                         ^
+    #         set aside these k-mers:                c d e f g h i j
+    #
+    #         non-inv xloc: genome 2:  a b A B C D E c d e f g h i j k l
+    #                     ref genome:  a b c d e f g h i j A B C D E k l
+    #           sign:     ref genome:   + + + + + + + + + + + + + + + +
+    #   genome 2 in ref genome order:   + + + + + + + + + - + + + + + +
+    #           bigger change at:         ^                         ^
+    #         set aside these k-mers:                      A B C D E
+    #
+    #       In both cases that is a satisfactory solution.  There are some cases
+    #       though where we can do better.  It will often be the case that a
+    #       single wacky k-mer causes a monotonicity problem.  In that case,
+    #       removing that k-mer will fix the problem.  With the above solution,
+    #       we will do exactly that IF the right-side k-mer is the wacky one,
+    #       but not if the left side is.  So, suppose we ALSO check to see if
+    #       removal of the left-side k-mer would remove the monotonicity problem,
+    #       and if so, defer that k-mer and RECHECK the remaining k-mers.  We'll
+    #       do that first, and if removal of the left-side k-mer doesn't fix the
+    #       problem, we'll use the above solution.
+    #
+    #       In the second part of the solution where we look to the right, set
+    #       those k-mers aside in the a deferred k-mers list, then RECHECK the
+    #       remaining k-mers for a good LCR.
+    #
+    #       Suppose there are a bunch of k-mers that were just random common unique
+    #       k-mers and their monotonicity is willy-nilly?  It doesn't really matter,
+    #       we will still be tearing out some troublesome k-mers each time, retrying
+    #       until either successful or the LCR becomes empty, then retrying the
+    #       troublesome k-mers in the same manner.  They may cause computation to
+    #       take longer, but they will eventually get kicked out.
+    #
+    #   4. If the difference in position of two adjacent k-mers of the candidate
     #       LCR in any genome is more than Dmax, move the right k-mer, plus any
     #       immediately following k-mers that are also more than Dmax away from
-    #       the left k-mer, to an auxiliary LCR to be processed subsequently
-    #       (see discussion in next item).
-    #   4. Identify places where monotonicity changes in a genome, and in the same
-    #       way as with strand consistency, separate the k-mers into monotonicity
-    #       pattern groups.  For example, say there are three genomes and one of
-    #       the three contains an inversion, so its monotonicity flips.  Those
-    #       k-mers in the region where it flipped are moved to a separate group
-    #       and analyzed independently.  *** But such an inversion would also
-    #       flip the k-mer strand, and therefore change the strand group, and so
-    #       we would already have put those k-mers in a different LCR. *** Be
-    #       that as it may, a challenge here is that monotonicity flips can be
-    #       created not only by inversions but also by non-inverting translocations,
-    #       which can create a single-k-mer monotonicity flip.  In such a case,
-    #       we want to break the candidate LCR into two at that flip.  Let's look
-    #       more closely at this to understand it.  For simplificity, assume two
-    #       genomes.  Consider 2 cases: an inversion and a short-distance
-    #       non-inverting translocation:
+    #       the left k-mer, to a deferred k-mers list to be processed subsequently.
+    #       This was made step 4, because in step 3 some large changes in position
+    #       will be eliminated when monotonicity problems are corrected.
     #
-    #         inversion:    genome 2:  . . . . F E D C B A . . . .
-    #                     ref genome:  . . . . A B C D E F . . . .
-    #           sign:     ref genome:   + + + + + + + + + + + + + +
-    #                       genome 2:   + + + + - - - - - + + + +
-    #           bigger change at:             ^           ^
-    #                LCR's we'd like: LCR1--- LCR2------- LCR1---
-    #
-    #         non-inv xloc: genome 2:  . . . . . . . . . . A B C D E . .
-    #                     ref genome:  . . A B C D E . . . . . . . . . .
-    #           sign:     ref genome:   + + + + + + + + + + + + + + + +
-    #                       genome 2:   + + + + + + - + + + + + + + + +
-    #           bigger change at:         ^                         ^
-    #                LCR's we'd like: LCR1LCR2------LCR1---------------
-    #       But, we don't want to get into the ugliness of trying to analyze and
-    #       recognize all the possible cases.  Instead, we want a simple algorithm
-    #       for identifying k-mers that clearly don't below in the current group
-    #       and eliminating them.  A different monotonicity group (here, the - signs)
-    #       clearly should be separated out.  But in the non-inverting translocation,
-    #       removing the one '-' will cause a new '-' to appear at the following k-mer.
-    #       Also, if the first bigger-change + marked with ^ has a change bigger
-    #       than Dmin and we move all following k-mers to a different LCR, the '-'
-    #       will bring the following k-mers back so that a big change no longer
-    #       occurs from the first LCR, and so the k-mers following the '-' should
-    #       really remain part of the first LCR.  This is what makes this tough.
-    #       This method works: when a discontinuity such as change of monotonicity
-    #       or gap > Dmin occurs, don't split the LCR at that point, but instead,
-    #       move that single disrupting k-mer out of the LCR to be handled in a
-    #       new auxiliary LCR, and RECHECK for discontinuities.  By this means
-    #       successive k-mers will be moved to the auxiliary LCR until either all
-    #       remaining k-mers of the main LCR have been moved, or until a k-mer is
-    #       reached at which there is no longer a discontinuity.
-    #       Let's use an improved version of that technique: if montonicity
-    #       sign changes, move the k-mer at the sign change, and all immediately
-    #       following k-mers that would also introduce a sign change, to the
-    #       auxiliary LCR and then RECHECK remaining k-mers for discontinuities.
-    #   5. Repeat steps 1-4 over and over with each candidate LCR (including the
-    #       auxiliary LCRs created in the process).  Each time an LCR is modified
-    #       by moving a k-mer to the auxiliary LCR, restart at step 1 for that LCR.
-    #       When all steps 1-4 are executed with no change, the LCR is good and is
-    #       accepted and a sequential LCR number is assigned to it.
+    #   5. Repeat steps 1-4 over and over with the k-mers of each candidate LCR
+    #       (recycling the deferred k-mers created in the process into new candidate
+    #       LCRs).  Each time an LCR is modified by moving a k-mer to the auxiliary
+    #       LCR, restart at step 1 for that LCR.  When all steps 1-4 are executed
+    #       with no change, the LCR is good and is accepted and a sequential LCR
+    #       number is assigned to it.
     ############################################################################
 
     ############################################################################
-    # Since we need to apply the discontinuity testing over and over, define a
-    # function for it.  LL is a list with these members:
-    #   lcb: data frame containing k-mers being tested, all assigned to same LCR,
+    # Define a function to apply the discontinuity testing.  LL is a list with
+    # these members:
+    #   lcr: data frame containing k-mers being tested, all assigned to same LCR,
     #       and sorted in reference genome order.
-    #   aux: NULL or data frame of k-mers that have been removed (via previous
-    #       calls to this with the same LCR number) from data frame lcb because
-    #       they don't satisfy requirements, but that may form a separate LCR (or
-    #       more than one).
+    #   deferred: NULL or data frame of k-mers that have been removed (via
+    #       previous calls to this with the same LCR number) from data frame lcr
+    #       because they don't satisfy requirements, but that may form a separate
+    #       LCR (or more than one).
     #   discarded: NULL or data frame of k-mers that have been rejected as members
-    #       of an LCR and removed from data frame lcb.
-    # On return, LL$lcb has been modified, with non-compatible k-mers removed and
-    # placed into either LL$aux or LL$discarded.
+    #       of an LCR and removed from data frame lcr.
+    # On return, LL$lcr has been modified, with non-compatible k-mers removed and
+    # placed into either LL$deferred or LL$discarded.
     # Return value is a list with the same members and additional members:
-    #   retry: TRUE if function is to be called again with same value of lcb to
+    #   retry: TRUE if function is to be called again with same value of lcr to
     #       retest modified candidate LCR, FALSE if finished with this LCR.
     #   reason: short word giving exit status:
     #       kmin: there were fewer than kmin k-mers, k-mers discarded
     #       Lmin: maximum base pair span was less than Lmin, k-mers discarded
-    #       Dmax: adjacent k-mer distance was greater than Dmax, moved to aux
-    #       monotonicity: k-mer monotonicity change, moved to aux
+    #       monotonicity1: single k-mer monotonicity wrong, moved to deferred
+    #       monotonicity2: k-mer monotonicity error, one or more moved to deferred
+    #       Dmax: adjacent k-mer distance was greater than Dmax, moved to deferred
     #       okay: no problems detected
     # Note that even though we already tested the reference genome above, we must
     # retest it here because we keep reforming the candidate LCRs with subsets of
@@ -578,15 +650,15 @@ for (ID in refIDs)
     testCandidateLCR = function(LL)
         {
         LL$retry = FALSE
-        Nkmers = nrow(LL$lcb)
+        Nkmers = nrow(LL$lcr)
         #catnow("Nkmers = ", Nkmers, "\n")
 
         #   1. If the number of k-mers in a candidate LCR group is less than kmin,
         #       discard that candidate LCR.
         if (Nkmers < kmin)
             {
-            LL$discarded = rbind(LL$discarded, LL$lcb)
-            LL$lcb = NULL
+            LL$discarded = rbind(LL$discarded, LL$lcr)
+            LL$lcr = NULL
             LL$reason = "kmin"
             return(LL)
             }
@@ -594,103 +666,133 @@ for (ID in refIDs)
         #   2. If the difference in minimum and maximum position of the candidate LCR
         #       k-mers in any genome of any LCR is less than Lmin, discard it.
         for (genome in genomeLtrs)
-            if (diff(range(LL$lcb[,contigPosCol[genome]])) < Lmin)
+            if (diff(range(LL$lcr[,contigPosCol[genome]])) < Lmin)
                 {
-                LL$discarded = rbind(LL$discarded, LL$lcb)
-                LL$lcb = NULL
+                LL$discarded = rbind(LL$discarded, LL$lcr)
+                LL$lcr = NULL
                 LL$reason = "Lmin"
                 return(LL)
                 }
 
-        #   3. If the difference in position of two adjacent k-mers of the candidate
-        #       LCR in any genome is more than Dmax, move the right k-mer, and any
-        #       following k-mers that are also more than Dmax from the left k-mer,
-        #       to the auxiliary LCR to be processed subsequently.
+        #   3. Identify places where monotonicity is incorrect in a genome, and
+        #       check to see if removal of the left-side k-mer at that position
+        #       fixes the problem, and if so, discard that k-mer and retry.  If
+        #       not, move the first k-mer on the right side of the monotonicity
+        #       error, and all immediately following ones which would also lead
+        #       to a monotonicity error if the k-mers to its left were removed,
+        #       to the deferred k-mers list to be processed subsequently.
+        #       The expected monotonicity direction is increasing if the genome
+        #       strand matches the reference genome strand, and decreasing if not.
+        #       Since monotonicity is a property of two adjacent k-mers, there is
+        #       one fewer monotonicity error flags than there are k-mers.
         for (genome in otherGenomes)
             {
-            tooBig = which(abs(LL$lcb[, posCol[genome]][-1] - LL$lcb[, posCol[genome]][-Nkmers]) > Dmax)
+            expectedMonotonicity = (LL$lcr[1, strandCol[genome]] == LL$lcr[1, refStrandCol])
+            actualKmerMonotonicity =
+                (LL$lcr[-1, posCol[genome]] > LL$lcr[-Nkmers, posCol[genome]])
+            kmerMonotonicityError = (actualKmerMonotonicity != expectedMonotonicity)
+            if (any(kmerMonotonicityError))
+                {
+                leftKmer = which(kmerMonotonicityError)[1]
+                rightKmer = leftKmer + 1
+                # Does removal of leftKmer fix the problem?
+                leftFix = FALSE
+                if (Nkmers < 3)
+                    leftFix = TRUE
+                else if (leftKmer == 1)
+                    {
+                    akm = (LL$lcr[3, posCol[genome]] > LL$lcr[2, posCol[genome]])
+                    if (akm == expectedMonotonicity)
+                        leftFix = TRUE
+                    }
+                else
+                    {
+                    akm = (LL$lcr[3, posCol[genome]] > LL$lcr[1, posCol[genome]])
+                    if (akm == expectedMonotonicity)
+                        leftFix = TRUE
+                    }
+                if (leftFix)
+                    {
+                    LL$deferred = rbind(LL$deferred, LL$lcr[leftKmer,])
+                    LL$lcr = LL$lcr[-leftKmer,]
+                    LL$retry = TRUE
+                    LL$reason = "monotonicity1"
+                    #cat("Monotonicity error 1: ", genome, " ", leftKmer, "\n", sep="")
+                    return(LL)
+                    }
+
+                # Calculate monotonicity error of every k-mer to the right of leftKmer
+                # as if that k-mer is the next k-mer after leftKmer.
+                akm = (LL$lcr[(rightKmer:Nkmers), posCol[genome]] > LL$lcr[leftKmer, posCol[genome]])
+                kme = (akm != expectedMonotonicity)
+
+                # What is the first one that is not in error, if any?
+                firstRight = leftKmer + match(FALSE, kme)
+                if (is.na(firstRight))
+                    lastWrong = Nkmers
+                else
+                    lastWrong = firstRight - 1
+                #if (!expectedMonotonicity && lastWrong-rightKmer > 5 && leftKmer > 1) stop("check monotonicity error processing")
+                LL$deferred = rbind(LL$deferred, LL$lcr[(rightKmer:lastWrong),])
+                LL$lcr = LL$lcr[-(rightKmer:lastWrong),]
+                LL$retry = TRUE
+                LL$reason = "monotonicity2"
+                #cat("Monotonicity error 2: ", genome, " ", rightKmer, ":", lastWrong, "\n", sep="")
+                return(LL)
+                }
+            }
+
+        #   4. If the difference in position of two adjacent k-mers of the candidate
+        #       LCR in any genome is more than Dmax, move the right k-mer, and any
+        #       following k-mers that are also more than Dmax from the left k-mer,
+        #       to the deferred k-mers list to be processed subsequently.
+        for (genome in otherGenomes)
+            {
+            tooBig = which(abs(LL$lcr[, posCol[genome]][-1] - LL$lcr[, posCol[genome]][-Nkmers]) > Dmax)
             if (length(tooBig) > 0)
                 {
                 leftKmer = tooBig[1]
                 rightKmer = leftKmer + 1
                 # Calculate difference in position of every k-mer to the right of leftKmer
                 # as if that k-mer is the next k-mer after leftKmer.
-                isTooBig = (abs(LL$lcb[rightKmer:Nkmers, posCol[genome]] -
-                        LL$lcb[leftKmer, posCol[genome]]) > Dmax)
+                isTooBig = (abs(LL$lcr[rightKmer:Nkmers, posCol[genome]] -
+                        LL$lcr[leftKmer, posCol[genome]]) > Dmax)
                 firstNotTooBig = leftKmer + match(FALSE, isTooBig)
                 if (is.na(firstNotTooBig))
                     lastTooBig = Nkmers
                 else
                     lastTooBig = firstNotTooBig - 1
-                LL$aux = rbind(LL$aux, LL$lcb[rightKmer:lastTooBig,])
-                LL$lcb = LL$lcb[-(rightKmer:lastTooBig),]
+                LL$deferred = rbind(LL$deferred, LL$lcr[rightKmer:lastTooBig,])
+                LL$lcr = LL$lcr[-(rightKmer:lastTooBig),]
                 LL$retry = TRUE
                 LL$reason = "Dmax"
                 return(LL)
                 }
             }
 
-        #   4. Identify places where monotonicity changes in a genome, and move
-        #       the first inconsistent k-mer, and all immediately following
-        #       inconsistent ones, to the auxiliary LCR to be processed subsequently.
-        #       We define a monotonicity group much like the strand group above.
-        #       Each genome is a binary digit position, and each binary digit is 0
-        #       if genome position is increasing, 1 if decreasing (and the ref genome
-        #       is always increasing since we started with it sorted, and have not
-        #       changed the sort order since, so it acts as a reference).  Since
-        #       monotonicity is a property of two adjacent k-mers, there are one
-        #       fewer group numbers than there are k-mers.
-        monotonicityGroup = rep(0, Nkmers-1)
-        for (genome in otherGenomes)
-            monotonicityGroup = 2*monotonicityGroup +
-                ((LL$lcb[-1,posCol[genome]] - LL$lcb[-Nkmers,posCol[genome]]) < 0)
-        montonicityTbl = table(monotonicityGroup)
-        if (length(montonicityTbl) > 1)
-            {
-            mostCommonGroup = names(which.max(montonicityTbl))[1]
-            leftKmer = which(monotonicityGroup != mostCommonGroup)[1]
-            rightKmer = leftKmer + 1
-            # Calculate monotonicity group of every k-mer to the right of leftKmer
-            # as if that k-mer is the next k-mer after leftKmer.
-            mg = rep(0, Nkmers-leftKmer)
-            for (genome in otherGenomes)
-                mg = 2*mg +
-                    ((LL$lcb[(rightKmer:Nkmers),posCol[genome]] - LL$lcb[leftKmer,posCol[genome]]) < 0)
-            # What is the first one that is equal to mostCommonGroup, if any?
-            firstRight = leftKmer + match(mostCommonGroup, mg)
-            if (is.na(firstRight))
-                lastWrong = Nkmers
-            else
-                lastWrong = firstRight - 1
-            LL$aux = rbind(LL$aux, LL$lcb[(rightKmer:lastWrong),])
-            LL$lcb = LL$lcb[-(rightKmer:lastWrong),]
-            LL$retry = TRUE
-            LL$reason = "monotonicity"
-            return(LL)
-            }
         LL$reason = "okay"
         return(LL)
         }
 
     ############################################################################
     # Now, for each candidate LCR in df, test it repeatedly, removing incompatible
-    # k-mers from it over to an aux data frame holding area, repeating until no
+    # k-mers from it over to a deferred k-mers data frame, repeating until no
     # more k-mers are removed and the LCR is known to satisfy the constraints
     # (kMin, Lmin, Dmax, monotonicity), then incorporate the results into new
-    # result data frame lcbDf, and if some k-mers were found incompatible with
-    # the LCR and moved to an aux data frame, rbind that aux data frame back to
-    # df.  Thus, df will shrink as candidate LCRs are either verified and moved
-    # to lcbDf or discarded and moved to discardDf.  This loop is slow, and in
-    # order to try to speed it up, I'm using some smaller temporary data frames
-    # to store data, so we aren't passing large data frames to functions.  These
-    # are:
+    # result data frame lcrDf, and if some k-mers were found incompatible with
+    # the LCR and moved to the deferred k-mers data frame, rbind that deferred
+    # k-mers data frame back to df.  Thus, df will shrink as candidate LCRs are
+    # either verified and moved to lcrDf or discarded and moved to discardDf.
+    # This loop is slow, and in order to try to speed it up, I'm using some
+    # smaller temporary data frames to store data, so we aren't passing large
+    # data frames to functions.  These are:
     #   dft: small buffer of k-mers of candidate LCRs, reloaded with N.reloaod
     #       k-mers from df whenever it becomes empty.  Process these k-mers,
     #       not the ones in df.
-    #   lcbDft: k-mers of newly confirmed LCRs, appended to lcbDf every reload.
+    #   lcrDft: k-mers of newly confirmed LCRs, appended to lcrDf every reload.
     #   discardDft: k-mers incompatible with LCRs, appended to discardDf every reload.
-    #   auxDft: k-mers newly added to the candidate k-mers with a new LCR number,
-    #       appended to df every reload.
+    #   deferredDft: k-mers that have been deferred and have a new LCR number,
+    #       and will be appended to df every reload.
     # Keep track of stats in stats vector.
     ############################################################################
 
@@ -703,15 +805,16 @@ for (ID in refIDs)
     logEveryN = 500
     lastLog = 0
     dft = df[integer(0),]
-    lcbDft = NULL
+    lcrDft = NULL
     discardDft = NULL
-    auxDft = NULL
+    deferredDft = NULL
     #
     idx = 1
     stats = integer()
     LCRs = unique(df$LCR)
+    catnow("  Number of LCRs: ", length(LCRs), "\n")
     maxLCR = max(LCRs)
-    lcbDf = NULL
+    lcrDf = NULL
     # Loop processing one LCR at a time, the LCR whose ID (in column "LCR") is LCRs[idx].
     while (idx <= length(LCRs))
         {
@@ -722,27 +825,31 @@ for (ID in refIDs)
             lenLCRs = length(LCRs)
             if (lenLCRs - lastLog >= logEveryN)
                 {
-                catnow("    At candidate LCR #", idx, " Total # of candidate LCRs to be tested: ", lenLCRs, "\n")
+                catnow("    At candidate LCR #", idx, " Have", nrow(lcrDf), " good LCRs.", " Total # of candidate LCRs to be tested: ", lenLCRs, "\n")
                 lastLog = lenLCRs
                 }
-            df = rbind(df, auxDft)
-            auxDft = NULL
+            df = rbind(df, deferredDft)
+            # df must be sorted again!!!
+            # Sort by reference genome position.
+            df = df[order(df[,refPosCol]),]
+            deferredDft = NULL
             discardDf = rbind(discardDf, discardDft)
             discardDft = NULL
-            lcbDf = rbind(lcbDf, lcbDft)
-            lcbDft = NULL
+            lcrDf = rbind(lcrDf, lcrDft)
+            lcrDft = NULL
             lastIdx = idx+N.reload-1
             if (lastIdx > length(LCRs))
                 lastIdx = length(LCRs)
             xferKmers = (df$LCR %in% LCRs[idx:lastIdx])
             dft = df[xferKmers,]
             df = df[!xferKmers,]
+            if (nrow(dft) > 0 && any(order(dft[,refPosCol]) != 1:nrow(dft))) stop("Order")
             }
         # Get candidate LCR k-mers into list LL and remove them from df.
         #catnow("Get LCR\n")
-        lcbKmers = (dft$LCR == LCRs[idx])
-        LL = list(lcb=dft[lcbKmers,], aux=NULL, discarded=NULL)
-        dft = dft[!lcbKmers,]
+        lcrKmers = (dft$LCR == LCRs[idx])
+        LL = list(lcr=dft[lcrKmers,], deferred=NULL, discarded=NULL)
+        dft = dft[!lcrKmers,]
         #catnow("Loop calling testCandidateLCR\n")
         repeat
             {
@@ -758,20 +865,20 @@ for (ID in refIDs)
             if (!LL$retry)
                 break
             }
-        # If the candidate k-mer list is not NULL, append it to lcbDft.
-        if (!is.null(LL$lcb))
+        # If the candidate k-mer list is not NULL, append it to lcrDft.
+        if (!is.null(LL$lcr))
             {
-            #catnow(" lcbDft\n")
-            lcbDft = rbind(lcbDft, LL$lcb)
+            #catnow(" lcrDft\n")
+            lcrDft = rbind(lcrDft, LL$lcr)
             }
-        # If some k-mers appear in aux, append them to auxDft using a new LCR number.
-        if (!is.null(LL$aux))
+        # If some k-mers appear in deferred, append them to deferredDft using a new LCR number.
+        if (!is.null(LL$deferred))
             {
-            #catnow(" auxDft\n")
+            #catnow(" deferredDft\n")
             maxLCR = maxLCR+1
             LCRs = c(LCRs, maxLCR)
-            LL$aux$LCR = maxLCR
-            auxDft = rbind(auxDft, LL$aux)
+            LL$deferred$LCR = maxLCR
+            deferredDft = rbind(deferredDft, LL$deferred)
             }
         # If some k-mers were discarded, append them to discardDft.
         if (!is.null(LL$discarded))
@@ -787,18 +894,20 @@ for (ID in refIDs)
     # Append final results from temporary data frames to permanent ones.
     if (nrow(dft) != 0) stop("Expected empty dft")
     if (nrow(df) != 0) stop("Expected empty df")
-    if (!is.null(auxDft)) stop("Expected null auxDft")
+    if (!is.null(deferredDft)) stop("Expected null deferredDft")
     discardDf = rbind(discardDf, discardDft)
-    lcbDf = rbind(lcbDf, lcbDft)
-    rm(dft, lcbDft, discardDft)
+    lcrDf = rbind(lcrDf, lcrDft)
+    rm(dft, lcrDft, discardDft)
 
-    catnow("\nFor reference ID", ID, "found", length(unique(lcbDf$LCR)), "LCRs containing", nrow(lcbDf), "k-mers\n")
+    catnow("\nFor reference ID", ID, "found", length(unique(lcrDf$LCR)), "LCRs containing", nrow(lcrDf), "k-mers\n")
 
     # Accumulate results.
-    cumLcbDf = rbind(cumLcbDf, lcbDf)
+    cumLcbDf = rbind(cumLcbDf, lcrDf)
     cumDiscardDf = rbind(cumDiscardDf, discardDf)
-    rm(df, lcbDf, discardDf)
+    rm(df, lcrDf, discardDf)
     }
+if (nrow(cumLcbDf) == 0)
+    stop("No LCRs found.")
 
 ################################################################################
 # Write results to files.

@@ -38,8 +38,8 @@ else if (testing == 1)
 else if (testing == 2)
     {
     args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE", 2, 0.25,
-        "outHP14/MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv",
-        "outHP14/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv",
+        "outHP14/MarkersOverlapping_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.tsv",
+        "outHP14/MarkersNonoverlapping_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.tsv",
         "outHP14/MarkerCounts_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1",
         "outHP14/MarkerDensity_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1",
         "outHP14/GenomeData/Genome_1.idlens", "outHP14/GenomeData/Genome_2.idlens")
@@ -52,9 +52,10 @@ if (length(args) < NexpectedMin)
     {
     usage = c(
         "Read a data frame of good candidate IGG markers that have passed all tests, and make",
-        "marker bar plots and density plots showing numbers of markers on each chromosome.",
+        "marker bar plots and density plots showing numbers of markers on each chromosome and",
+        "distribution of amplicon size differences.",
         "",
-        "Usage: Rscript findPrimers.R <wd> <plotNDAmin> <alpha> <overlappingFile> <nonoverlappingFile> \\",
+        "Usage: Rscript plotMarkers.R <wd> <plotNDAmin> <alpha> <overlappingFile> <nonoverlappingFile> \\",
         "           <pdfCountsFilePfx> <pngDensityFilePfx> <idlensFile1> ...",
         "",
         "Arguments:",
@@ -64,8 +65,8 @@ if (length(args) < NexpectedMin)
         "   <overlappingFile>    : Input file containing overlapping markers with e-PCR-checked primers.",
         "   <nonoverlappingFile> : Input file containing non-overlapping markers with e-PCR-checked primers.",
         "   <pdfCountsFilePfx>   : Prefix, including path, of output .pdf file to write, containing plots of",
-        "                          number of markers per seq ID.  The suffix '.plot.pdf' is appended to this",
-        "                          prefix to form the full file name.",
+        "                          number of markers per seq ID and histogram of marker amplicon size differences.",
+        "                          The suffix '.plot.pdf' is appended to this prefix to form the full file name.",
         "   <pngDensityFilePfx>  : Prefix, including path, of output .png files to write, containing plots of",
         "                          density of markers per seq ID.  A separate .png file is produced for each",
         "                          genome, appending '_<genome letter>.plot.png' to this prefix to form the",
@@ -78,7 +79,7 @@ if (length(args) < NexpectedMin)
     stop("Try again with correct number of arguments")
     }
 
-catnow("findPrimers.R arguments:\n")
+catnow("plotMarkers.R arguments:\n")
 workingDirectory = args[1]
 catnow("  workingDirectory: ", workingDirectory, "\n")
 if (!dir.exists(workingDirectory))
@@ -157,6 +158,8 @@ ampPos1Col = makeColVec("ampPos1")
 refAmpPos1Col = ampPos1Col[refGenomeLtr]
 ampPos2Col = makeColVec("ampPos2")
 refAmpPos2Col = ampPos2Col[refGenomeLtr]
+ampDifCol = makeColVec(paste(refGenomeLtr, "dif", sep=""))
+ampDifCol = ampDifCol[names(ampDifCol) != refGenomeLtr]
 
 catnow("Number of overlapping markers:", nrow(dfMarkers), "\n")
 
@@ -203,13 +206,17 @@ dfMarkers = dfMarkers[dfMarkers$NDA >= plotNDAmin,]
 dfNoOverlaps = dfNoOverlaps[dfNoOverlaps$NDA >= plotNDAmin,]
 
 ########################################
-# Plot counts of markers on chromosomes as either a bar or line plot.
+# Create pdf file.
 ########################################
 
 pdfCountsFile = paste(pdfCountsFilePfx, ".plot.pdf", sep="")
 pdf(pdfCountsFile, height=8, width=11)
 par(mar=par("mar")+c(4,2,0,0))
 par(mgp=c(3,1,1))
+
+########################################
+# Plot counts of markers on chromosomes as either a bar or line plot.
+########################################
 
 for (genome in genomeLtrs)
     {
@@ -246,6 +253,25 @@ for (genome in genomeLtrs)
         legend("topleft", c("All markers", "Non-overlapping markers"), lwd=2, col=c("black", "blue"), cex=1.5)
         }
     }
+
+########################################
+# Plot histogram of amplicon size differences.
+########################################
+
+ampDifs = integer()
+for (genome in otherGenomeLtrs)
+    ampDifs = c(ampDifs, dfNoOverlaps[,ampDifCol[genome]])
+maxDif = max(abs(ampDifs))
+xpretty = pretty(c(-maxDif, +maxDif), 20)
+xlim = range(xpretty)
+par(mgp=c(3,1,0))
+hist(ampDifs, xlim=xlim, breaks=50,
+    xlab=paste("Amplicon length difference from genome", refGenomeLtr, sep=""),
+    main="Distribution of amplicon length differences")
+
+########################################
+# Close pdf file.
+########################################
 
 dev.off()
 catnow("Finished making plots of counts of number of good candidate markers, output file:\n", pdfCountsFile, "\n")

@@ -38,10 +38,19 @@ include $(PARAMS)
 
 ################################################################################
 # Default make target.
-# If variable PARAMS is not defined, show basic usage info, else set target ALL.
+# If variable PARAMS is not defined, show basic usage info, else make target ALL.
 ################################################################################
 ifeq ($(PARAMS),)
-all:
+all: basic_usage
+else
+all: ALL
+endif
+
+################################################################################
+# 'basic_usage' target, show basic usage info.
+################################################################################
+ifeq ($(PARAMS),)
+basic_usage:
 	@echo
 	@echo "For basic usage info, use this make command:"
 	@echo
@@ -53,8 +62,6 @@ all:
 	@echo 
 	@echo "$(INDENT)make PARAMS=allParameters.test ALL"
 	@echo 
-else
-all: ALL
 endif
 
 ################################################################################
@@ -112,9 +119,10 @@ endif
 
 # Target for running or cleaning entire pipeline or cleaning entire output directory.
 ifneq ($(CLEAN_OUT_DIR),1)
-ALL: all_getSeqInfo all_getKmers all_kmerStats all_sortKmers all_getContigFile \
-    kmerIsect all_getGenomicPos all_splitKmers findLCRs findIndelGroups \
-    all_getDNAseqs findPrimers all_ePCRtesting removeBadMarkers plotMarkers
+ALL: plotMarkers
+#all_getSeqInfo all_getKmers all_kmerStats all_sortKmers all_getContigFile \
+#    kmerIsect all_getGenomicPos all_splitKmers findLCRs findIndelGroups \
+#    all_getDNAseqs findPrimers all_ePCRtesting removeBadMarkers plotMarkers
 	@echo
 ifeq ($(CLEAN),)
 	@echo "ALL files are up to date"
@@ -429,7 +437,7 @@ kmerIsect:
 	@echo "kmerIsect output files removed."
 endif
 
-# .isect target.
+# PATH_ISECT_KMERS target.
 
 $(PATH_ISECT_KMERS) : $(SORTED_KMERS_FILES) | $(DIR_KMERS) $(PATH_PERL) $(PATH_KMER_ISECT)
 	@echo
@@ -444,14 +452,14 @@ $(PATH_ISECT_KMERS) : $(SORTED_KMERS_FILES) | $(DIR_KMERS) $(PATH_PERL) $(PATH_K
 
 # A list of all FASTA files already defined above: FASTA_FILES
 
-# A list of all .isect files to be produced.
-ISECT_KMER_FILES := $(foreach G,$(GENOME_NUMBERS),$(PFX_KMERS_DATA_FILE)$(G).isect)
+# A list of all .isect.unique files to be produced.
+ISECT_KMER_FILES := $(foreach G,$(GENOME_NUMBERS),$(PFX_KMERS_DATA_FILE)$(G).isect.unique)
 
-# Target .isect file(s) for genome GENOME.
+# Target .isect.unique file(s) for genome GENOME.
 ifeq ($(GENOME),ALL)
 TARGET_ISECT := $(ISECT_KMER_FILES)
 else
-TARGET_ISECT := $(PFX_KMERS_DATA_FILE)$(GENOME).isect
+TARGET_ISECT := $(PFX_KMERS_DATA_FILE)$(GENOME).isect.unique
 endif
 
 # Phony target to make or clean TARGET_ISECT file(s).
@@ -468,7 +476,7 @@ endif
 # ISECT_KMER_FILES is multiple targets, one per genome.
 # Here, % is a genome number.
 
-$(ISECT_KMER_FILES) : $(PFX_KMERS_DATA_FILE)%.isect : $(PATH_ISECT_KMERS) $$(PATH_GENOME_FASTA_$$*) | \
+$(ISECT_KMER_FILES) : $(PFX_KMERS_DATA_FILE)%.isect.unique : $(PATH_ISECT_KMERS) $$(PATH_GENOME_FASTA_$$*) | \
         $(DIR_KMERS) $(PATH_FINDMERS)
 	@echo
 	@echo "*** getGenomicPos PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
@@ -511,12 +519,12 @@ endif
 # These variables' values are expanded (deferred) when used in the recipe below.
 
 OUT_PREFIX = $(PFX_SPLIT_UNIQ_KMERS_FILE)$*_
-GUIDE_FILE = $(if $(findstring 1,$*),$(EMPTY),$(PFX_KMERS_DATA_FILE)1.isect)
+GUIDE_FILE = $(if $(findstring 1,$*),$(EMPTY),$(PFX_KMERS_DATA_FILE)1.isect.unique)
 
 # SPLIT_KMER_EMPTY_TARGET is multiple targets, one per genome.
 # Here, % is a genome number.
 
-$(SPLIT_KMER_EMPTY_TARGET) : $(PFX_SPLIT_UNIQ_KMERS_FILE)%.isect.split : $(PFX_KMERS_DATA_FILE)%.isect | \
+$(SPLIT_KMER_EMPTY_TARGET) : $(PFX_SPLIT_UNIQ_KMERS_FILE)%.isect.split : $(PFX_KMERS_DATA_FILE)%.isect.unique | \
         $(DIR_SPLIT_KMERS) $(PATH_RSCRIPT) $(PATH_SPLIT_KMERS)
 	@echo
 	@echo "*** splitKmers PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
@@ -557,7 +565,7 @@ $(PTN_LCR_FILE) $(PTN_BAD_KMERS_FILE) : $(SPLIT_KMER_EMPTY_TARGET) | \
         $(DIR_IGGPIPE_OUT) $(PATH_RSCRIPT) $(PATH_FIND_LCRS)
 	@echo
 	@echo "*** findLCRs PARAMS=$(PARAMS) $(CLEAN) ***"
-	@echo "Finding locally conserved regions using common unique $(K)-mers from .isect files into $@"
+	@echo "Finding locally conserved regions using common unique $(K)-mers from .isect.unique files into $@"
 	$(TIME) $(PATH_RSCRIPT) $(PATH_FIND_LCRS) $(WD) $(PFX_SPLIT_UNIQ_KMERS_FILE) \
 	    $(GENOME_LETTERS_SQUISHED) $(KMIN) $(LMIN) $(DMIN) $(DMAX) \
 	    $(PATH_LCR_FILE) \
@@ -639,7 +647,7 @@ endif
 $(DNA_SEQ_FILES) : $(PFX_GENOME_DATA_FILE)%.dnaseqs : $$(PATH_GENOME_FASTA_$$*) \
         $(PFX_GENOME_DATA_FILE)$$*.contigs $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) | \
         $(DIR_IGGPIPE_OUT) $(DIR_GENOME_OUT_DATA) \
-        $(PATH_RSCRIPT) $(PATH_GET_DNA_SEQS) $(PATH_GET_SEQS_FASTA)
+        $(PATH_RSCRIPT) $(PATH_GET_DNA_SEQS) $(PATH_PERL) $(PATH_GET_SEQS_FASTA)
 	@echo
 	@echo "*** getDNAseqs PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
 	@echo "Extract DNA sequence around Indel Groups and write to $@"
@@ -813,6 +821,81 @@ $(PTN_COUNTS_FILE) $(PTN_DENSITY_FILES) : $(PATH_OVERLAPPING_MARKERS_FILE) $(PAT
 		$(PFX_MARKER_COUNTS_PATH) \
 		$(PFX_MARKER_DENSITY_PATH) \
 		$(IDLEN_FILES) $(REDIR)
+	@echo "Finished."
+
+################################################################################
+# InDels: Read input file and perform alignments, then search them for InDels.
+################################################################################
+
+# A list of all FASTA files already defined above: FASTA_FILES
+
+# Phony target to make or clean PATH_INDELS_OUTPUT_FILE file.
+# If variable PARAMS is not defined, show basic usage info, else make InDels
+# output file target.
+ifeq ($(PARAMS),)
+InDels:
+	@echo
+	@echo "You must specify a PARAMS file:"
+	@echo
+	@echo "$(INDENT)make PARAMS=<allParametersFile> InDels"
+	@echo 
+else ifeq ($(CLEAN),)
+InDels: $(PATH_INDELS_OUTPUT_FILE)
+	@echo
+	@echo "InDels files are up to date."
+else
+InDels:
+	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_INDELS_OUTPUT_FILE)
+	@echo "InDels output file removed."
+endif
+
+# PATH_INDELS_OUTPUT_FILE target.
+
+$(PATH_INDELS_OUTPUT_FILE) : $(PATH_INDELS_INPUT_FILE) $(FASTA_FILES) | $(DIR_GENOME_OUT_DATA) \
+        $(PATH_RSCRIPT) $(PATH_ALIGN_AND_GET_INDELS) $(PATH_PERL) $(PATH_GET_SEQS_FASTA) $(PATH_ALIGNER)
+	@echo
+	@echo "*** InDels PARAMS=$(PARAMS) $(CLEAN) ***"
+	@echo "Align sequences of $< and find InDels and write them to $@"
+	$(TIME) $(PATH_RSCRIPT) $(PATH_ALIGN_AND_GET_INDELS) $(WD) \
+	    $(PATH_INDELS_INPUT_FILE) $(PATH_INDELS_OUTPUT_FILE) \
+	    $(DIR_GENOME_OUT_DATA) \
+		$(PATH_PERL) $(PATH_GET_SEQS_FASTA) \
+		$(PATH_ALIGNER) $(INVESTIGATE_ALIGN_AND_GET_INDELS) \
+		$(FASTA_FILES) $(REDIR)
+	@echo "Finished."
+
+################################################################################
+# plotInDels: Make plots of information about InDels found within InDel groups.
+################################################################################
+
+# Phony target to make or clean PATH_INDELS_PLOT_FILE file.
+# If variable PARAMS is not defined, show basic usage info, else make plotInDels
+# output file target.
+ifeq ($(PARAMS),)
+plotInDels:
+	@echo
+	@echo "You must specify a PARAMS file:"
+	@echo
+	@echo "$(INDENT)make PARAMS=<allParametersFile> plotInDels"
+	@echo 
+else ifeq ($(CLEAN),)
+plotInDels: $(PATH_INDELS_PLOT_FILE)
+	@echo
+	@echo "plotInDels file is up to date."
+else
+plotInDels:
+	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_INDELS_PLOT_FILE)
+	@echo "plotInDels output file removed."
+endif
+
+# PATH_INDELS_PLOT_FILE target.
+
+$(PATH_INDELS_PLOT_FILE) : $(PATH_INDELS_OUTPUT_FILE) | $(PATH_RSCRIPT) $(PATH_PLOT_INDELS)
+	@echo
+	@echo "*** plotInDels PARAMS=$(PARAMS) $(CLEAN) ***"
+	@echo "Make plots of InDel information to file $@"
+	$(TIME) $(PATH_RSCRIPT) $(PATH_PLOT_INDELS) $(WD) $(PATH_INDELS_OUTPUT_FILE) \
+	    $(PATH_INDELS_PLOT_FILE) $(REDIR)
 	@echo "Finished."
 
 ################################################################################

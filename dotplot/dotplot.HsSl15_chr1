@@ -1,0 +1,172 @@
+################################################################################
+# This is a parameter file for running the R program dotplot.R.  It is
+# currently configured for a dot plot of human chromosome 1 vs tomato chromosome
+# 1.
+################################################################################
+
+# Path of the "LCRs_*.tsv" file to use as input for the dot plot.  This path
+# should be specified relative to the main IGGPIPE directory, assuming that the
+# dotplot.R program is run after changing to that directory.
+
+LCR.file := "outHumanTomato_15/LCRs_K15k2L250D5_1500.tsv"
+
+# The two letters assigned to the two genomes that are to be plotted.  The data
+# for the genome of the first letter specified is plotted on the x-axis and the
+# second letter is for the y-axis.
+
+PLOT.genomes := HT # Change here.
+
+
+# Path of the dot plot output file, which is a .png file.
+
+PLOT.file := "outHumanTomato_15/LCRs_K15k2L250D5_1500.chr1.png" # Change here.
+
+
+# Output file resolution in pixels.
+PLOT.width := 2000
+PLOT.height := 2000
+
+
+# Plot margins in inches.
+PLOT.margin.top := 0.5
+PLOT.margin.bottom := 2.25
+PLOT.margin.left := 2.25
+PLOT.margin.right := 0.5
+
+
+# Background color of dot plot, using color names from R ("white", "black", "blue",
+# etc. or HTML #xxxxxx hex RGB colors such "#FF0080" or two additional hex digits
+# specifying the alpha channel in addition to RGB (such as "#FF008055").
+BKGD.color := black
+
+
+# Foreground color for plotting things like axes and labels.
+FGND.color := white
+
+
+# Plot points (one at each common unique k-mer) or lines (connecting all
+# common unique k-mers of an LCR).
+PLOT.which := lines   # Else points
+
+
+# Point size and line width, may be fractional.
+POINT.size := 0.05
+LINE.width := 2
+
+
+# Point or line color, and amount of alpha channel (transparency) in the color,
+# with 0 meaning completely transparent and 1 meaning completely solid.  As
+# points or lines pile up on top of each other, the color gets less transparent.
+PTLINE.color := white
+PTLINE.alpha := 1
+
+
+# If X.grid.lines.per.seqid/y is not 0, grid lines are drawn.  Each chromosome
+# or sequence ID that is plotted (see X.PLOT.seqids/Y.PLOT.seqids below) has
+# X.grid.lines.per.seqid/y grid lines drawn on it.  The lines are spaced evenly
+# throughout the length of the chromosome.  If X.grid.lines.per.seqid/y is 1,
+# the single grid line is placed at the center of each chromosome.  Otherwise,
+# there will be one grid line at the start and one at the end of each chromosome,
+# with the rest spaced evenly between.
+# Also defined here is the grid line color and line width.
+X.grid.lines.per.seqid := 3
+Y.grid.lines.per.seqid := 3
+GRID.line.color := darkslategray
+GRID.line.width := 1
+
+
+# GRID label color, size, and x- and y- position.  For no grid labels, set
+# GRID.label.size to 0.  Position is 0 for neutral, negative for inward, positive
+# for outward.
+X.grid.label.position := -3.5
+Y.grid.label.position := -4
+GRID.label.color := lightgray
+GRID.label.size := 1.5
+
+
+# All remaining parameters come in pairs, one for the x-axis (genome 1) and one
+# for the y-axis (genome 2).
+
+
+# Names of .idlens files containing IDs and lengths of each sequence in each
+# genome's FASTA file.  These files are made by IGGPIPE when it is run.  They
+# can be found in the GenomeData subfolder within the output folder for that
+# IGGPIPE run.  They are normally named "Genome_1.idlens", "Genome_2.idlens",
+# "Genome_3.idlens", etc. for however many genomes there were.
+X.idlens := "outHumanTomato_15/GenomeData/Genome_1.idlens" # Change here.
+Y.idlens := "outHumanTomato_15/GenomeData/Genome_2.idlens" # Change here.
+
+
+# Which sequence IDs should be plotted in each genome?  Leave these lists empty
+# to plot ALL sequence IDs, otherwise list the sequence IDs with commas separating
+# them.  The spelling must be exact on each one.
+X.plot.seqids := "chr1"    # Use "" for all
+Y.plot.seqids := "SL2.50ch01"    # Use "" for all
+
+
+# What should be the starting and ending plot position on the sequence ID when
+# X.plot.seqids/Y.plot.seqids is just a SINGLE sequence ID?  Set start and end
+# to 0 to cause the entire sequence ID to be plotted.  These values are in Mbp.
+X.plot.start := 0
+Y.plot.start := 0
+X.plot.end := 0
+Y.plot.end := 0
+
+
+# Color, width, and inter-chromosome spacing of chromosome lines.  (Or whatever
+# kind of sequence the sequence IDs represent).  Width is in arbitrary units.
+# Spacing is in Mbp since axes are plotted in genome Mbp position.
+X.chr.color := white
+Y.chr.color := white
+X.chr.width := 10
+Y.chr.width := 10
+X.chr.spacing := 5
+Y.chr.spacing := 5
+
+
+# Should a chromosome label be plotted for each chromosome or sequence ID?
+PLOT.chr.label := TRUE    # Else FALSE
+
+
+# If PLOT.chr.label is TRUE, chromosome label position, color, and size.
+# Position is 0 for neutral, negative for inward, positive for outward.
+# If PLOT.chr.label is FALSE, these are ignored but still must  be present
+# in this file.
+X.chr.label.position := 2
+Y.chr.label.position := 1
+X.chr.label.color := white
+Y.chr.label.color := white
+X.chr.label.size := 3
+Y.chr.label.size := 3
+
+
+# If PLOT.chr.label is TRUE, the sequence ID can be edited to extract just the
+# portion to be placed on the label, since the entire ID may be lengthy.  Define
+# a regular expression to match a sequence ID, and a replacement expression to
+# replace the matched text.  If you don't know what regular expressions and
+# their replacement expressions look like, either get someone to help, or you
+# simply specify for the RE the fixed text sequence you would like removed from
+# the ID ("" to leave the ID as it is), and set RE.replace to "".  If RE is "",
+# the sequence IDs are plotted as they are.  If PLOT.chr.label is FALSE, these
+# are ignored but still must be present in this file.
+X.chr.label.RE := "chr"
+X.chr.label.replace := ""
+Y.chr.label.RE := "SL2.50"
+Y.chr.label.replace := ""
+
+
+# Axis label text, position, color, and size.  If text is "", no label is plotted.
+# Position is 0 for neutral, negative for inward, positive for outward.  If the
+# text is "", the related values are ignored but still must be present in this file.
+X.axis.label.text := "H. sapiens" # Change here.
+Y.axis.label.text := "S. lycopersicum" # Change here.
+X.axis.label.position := 6
+Y.axis.label.position := 4
+X.axis.label.color := white
+Y.axis.label.color := white
+X.axis.label.size := 5
+Y.axis.label.size := 5
+
+################################################################################
+# End of file.
+################################################################################

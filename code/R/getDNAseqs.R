@@ -53,8 +53,6 @@ if (testing == 0)
     args = commandArgs(TRUE)
 else if (testing == 1)
     {
-    fastaFile = 
-
     args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
         "outTestHP11/IndelGroupsOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0.tsv",
         1, "outTestHP11/GenomeData/Genome_1.dnaseqs",
@@ -65,8 +63,6 @@ else if (testing == 1)
     }
 else if (testing == 2)
     {
-    fastaFile = 
-
     args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
         "outTestHP11/IndelGroupsOverlapping_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0.tsv",
         2, "outTestHP11/GenomeData/Genome_2.dnaseqs",
@@ -271,7 +267,7 @@ df = df[!duplicated(df$kmer),]
 inv(nrow(df), "after removing duplicate k-mer rows") 
 
 ############################################################################
-# Create a extraction positions data frame dfXP.
+# Create an extraction positions data frame dfXP.
 # Columns:
 #   pos.left, pos.right: left and right genome positions for k-mer extraction
 #   pos.recomp: whether to extract the - strand, i.e. reverse-complement the
@@ -340,7 +336,7 @@ dfXP$pos.right = dfXP$pos.right - dfXP$pos.Rcut
 # Put sequence extraction strings in vector seqExtStrs and write it to a text file.
 #
 # A command line to run getSeqsFromFasta.pl for hypothetical genome G looks like this:
-#   perl blah/getSeqsFromFasta.pl blah/genome.fasta -i extractDir/extractG.txt -o=extractDir/seqsG.txt
+#   perl blah/getSeqsFromFasta.pl blah/genome.fasta -i extractDir/extractG.txt -o extractDir/seqsG.txt
 ########################################
 
 if (!file.exists(extractDir))
@@ -368,7 +364,6 @@ inv(seqFile, "DNA sequence file")
 
 catnow("Running command to retrieve k-mer-vicinity sequences from FASTA file\n")
 catnow("   ", cmdLine, "\n")
-catnow(" (expect this to take a long time)\n")
 system(cmdLine)
 
 ########################################
@@ -396,7 +391,6 @@ seqs = seqs[seqExtStrs]
 
 # Append the sequences to the df data frame.
 df = data.frame(df, seq=seqs, stringsAsFactors=FALSE)
-colnames(df)[ncol(df)] = "seq"
 rownames(df) = NULL
 
 ########################################

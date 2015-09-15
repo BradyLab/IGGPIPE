@@ -93,6 +93,7 @@ http://www.barebones.com/products/textwrangler
 .. R V3 or later (V3.2.1 works) (https://www.r-project.org)
 .. Primer3 (V2.3.6 works) (http://sourceforge.net/projects/primer3)
 .. NCBI e-PCR (V2.3.12 works) (http://www.ncbi.nlm.nih.gov/tools/epcr)
+.. MUSCLE (V3.8.31 works) (http://www.drive5.com/muscle/downloads.htm)
 --
 
 . *Some of the above will require compilation and build on your computer using "make":*
@@ -342,7 +343,7 @@ it. Look for it here:
   http://sourceforge.net/projects/primer3
 
 It comes pre-built for OSX, so make sure you download the OSX version. Put the
-downloaded directory whereever you want on your computer. The file named
+downloaded directory wherever you want on your computer. The file named
 primer3_core in the root directory of the downloaded package is the executable
 program file. The allParameters.mytemplate file must have the path to primer3_core
 included in it. Assign the path to the parameter "PATH_PRIMER3CORE". For example,
@@ -366,7 +367,7 @@ fine. To install e-PCR, look for it here:
 
 The download link uses FTP protocol. Log in as user GUEST with no password.
 Look for the latest .zip version and copy the zip file to your computer and unzip
-it.  Put the unzipped directory whereever you want on your computer.
+it.  Put the unzipped directory wherever you want on your computer.
 
 It is now necessary to run "make" to compile and build the program. Version 2.3.12
 had two problems with it that required editing of the source code in order for the
@@ -405,6 +406,30 @@ maybe you unzipped the zip file in your Documents folder and you set the paramet
 as follows:
 
   PATH_EPCR := ~/Documents/e-PCR-2.3.12/e-PCR
+--
+
+. *Install MUSCLE and set its path*
++
+--
+MUSCLE is an open-domain multiple sequence aligner.  It is used by IGGPIPE only
+if you choose to search markers or LCRs for InDels by using the 'make InDels'
+command, so if you don't do that you can skip this step, although you may as
+well install it. This version of IGGPIPE was tested with MUSCLE version v.8.31,
+although later versions will probably be fine. To install MUSCLE, look for it
+here:
+
+  http://www.drive5.com/muscle/downloads.htm
+
+The executable images are already built, so choose the correct download for your
+system and download the file, putting it wherever you want on your computer, such
+as a bin folder.
+
+Now the allParameters.mytemplate file must have the path to MUSCLE included in it.
+Assign the path to the parameter "PATH_ALIGNER". For example, maybe you put the
+downloaded file in a 'bin' folder in your user directory and you set the parameter
+as follows:
+
+  PATH_ALIGNER := ~/bin/muscle3.8.31_i86darwin64
 --
 
 . *Build findMers*
@@ -574,6 +599,41 @@ directory:
   diff MarkersOverlapping.test.tsv outTestHP11/MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv
 
 This command should not produce any output, indicating the two files are identical.
+
+Note that there are other sample "allParameters" files in subdirectory "allParameters"
+which have been used for testing IGGPIPE on various genomes.
+--
+
+. *Run 'make InDels' to align markers and find InDels*
++
+--
+An R program that is NOT run as part of the pipeline when the 'make ... ALL' target
+is built, but which can be run using 'make ... InDels', is able to read a file of LCRs,
+non-overlapping InDelGroups, or non-overlapping Markers, extract the DNA sequences
+from the genomes in each LCR or Marker region and align them, then locate all
+InDels in the aligned sequences and write their positions to a file.  The program
+is called alignAndGetIndels.R. Run it as follows:
+
+  make PARAMS=allParameters.test InDels
+
+This produces file outTestHP11/
+MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv
+--
+
+. *Run 'make plotInDels' to plot InDel information*
++
+--
+Another R program that is NOT run as part of the pipeline when the 'make ... ALL' target
+is built, but which can be run using 'make ... plotInDels', reads the InDels file produced
+by 'make ... InDels' and plots information from it in a pdf file. The program is called
+plotIndels.R. Run it as follows:
+
+  make PARAMS=allParameters.test plotInDels
+
+This produces file outTestHP11/
+MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.pdf
+
+Examine it to see the plots it contains.
 --
 
 . *Run dotplot.R to make a dot plot*
@@ -589,6 +649,9 @@ the test data just produced. Run dotplot.R as follows:
 
 This produces file outTestHP11/LCRs_K11k2L100D10_2000.dotplot.png, an image file.
 Examine it (e.g. in the Preview app) to see the dot plot.
+
+There are other sample parameter files in subdirectory "dotplot", although the
+parameter file is fairly straightforward and you probably don't need other examples.
 --
 
 . *Run annotateFile.R to make new files containing annotated marker data in different formats*
@@ -604,14 +667,15 @@ to .gff3 or .gtf for adding the markers to a browser track. All this can be done
 the R program annotateFile.R that is provided with IGGPIPE. It is driven by a parameter
 file, a sample of which has been provided, annotate.template, that is set for using
 the test data just produced along with additional annotation test data in folder
-testAnnotation. Run annotateFile.R as follows:
+code/R/test_GFFfuncsAndMergeData. Run annotateFile.R as follows:
 
   Rscript code/R/annotateFile.R annotate.template
 
-This produces these files in folder outTestHP11: MarkersWithILs.tsv, MarkersWithGenes.tsv,
-MarkersWithGenes.gff3, and MarkersWithGenes.gtf. You can examine these files with
-a text editor, or load the .gff3 file into the tomato JBrowse genome browser at
-solgenomics.net. (How?)
+This produces this new file in the root IGGPIPE folder: MarkersAnnotated.test.tsv
+You can examine this file with a text editor or Excel to see the new column.
+
+There are other sample parameter files in subdirectory "annotate" which produce
+other types of files or do other types of file data manipulation.
 --
 
 *That completes the installation of IGGPIPE.*

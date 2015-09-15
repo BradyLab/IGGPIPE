@@ -1,9 +1,6 @@
 allParameters.test
 logFiles/**
-outCL13/**
-outHP14/**
-outHPT14/**
-outTestHP11/**
+out*/**
 code/R/testOutput
 primer3Settings.txt
 saveOutputFiles/**

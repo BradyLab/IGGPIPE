@@ -11,8 +11,8 @@
 # set the parameters for your own dot plot.
 ################################################################################
 
-# Many parameters come in pairs, one for the x-axis (genome 1) and one for the
-# y-axis (genome 2).
+# Many parameters come in pairs, one for the x-axis (first genome) and one for
+# the y-axis (second genome).
 
 
 # Path of the "LCRs_*.tsv" file to use as input for the dot plot.  This path
@@ -20,6 +20,13 @@
 # dotplot.R program is run after changing to that directory.
 
 LCR.file := "outTestHP11/LCRs_K11k2L100D10_2000.tsv"
+
+
+# The two letters assigned to the two genomes that are to be plotted.  The data
+# for the genome of the first letter specified is plotted on the x-axis and the
+# second letter is for the y-axis.
+
+PLOT.genomes := HP
 
 
 # Path of the dot plot output file, which is a .png file.
@@ -30,7 +37,8 @@ PLOT.file := "outTestHP11/LCRs_K11k2L100D10_2000.dotplot.png"
 # Names of .idlens files containing IDs and lengths of each sequence in each
 # genome's FASTA file.  These files are made by IGGPIPE when it is run.  They
 # can be found in the GenomeData subfolder within the output folder for that
-# IGGPIPE run.  They are normally named "Genome_1.idlens", "Genome_2.idlens".
+# IGGPIPE run.  They are normally named "Genome_1.idlens", "Genome_2.idlens",
+# "Genome_3.idlens", etc. for however many genomes there were.
 X.idlens := "outTestHP11/GenomeData/Genome_1.idlens"
 Y.idlens := "outTestHP11/GenomeData/Genome_2.idlens"
 

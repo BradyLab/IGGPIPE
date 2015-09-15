@@ -112,17 +112,17 @@ $header = replaceWords($header, \%headerReplaceHash);
 print(OUTFILE "$header\n");
 
 # Loop reading sequences and outputting one text line for each one.
-my ($seqName, $seqArgs, $seq, $seqNext);
+my ($seqName, $seqArgs, $seqRef, $seqNext, $seqLen);
 $seqNext = <$inputFasta>;
 while (1) {
-    ($seqName, $seqArgs, $seq, $seqNext) = readFastaSeq($inputFasta, $seqNext);
+    ($seqName, $seqArgs, $seqRef, $seqNext, $seqLen) = readFastaSeq($inputFasta, $seqNext);
     if (!defined($seqName)) { last; }
     my $s = replaceRegexps($data, $seqName);
     $dataReplaceHash{id} = $seqName;
-    $dataReplaceHash{len} = length($seq);
-    $dataReplaceHash{end} = length($seq)-1;
+    $dataReplaceHash{len} = $seqLen;
+    $dataReplaceHash{end} = $seqLen-1;
     $dataReplaceHash{args} = $seqArgs;
-    $dataReplaceHash{seq} = $seq;
+    $dataReplaceHash{seq} = $$seqRef;
     $s = replaceWords($s, \%dataReplaceHash);
     print(OUTFILE "$s\n");
 }

@@ -1387,8 +1387,10 @@ sub readGenBankFile_countCodons {
 #       end of file reached.
 #   $seqArgs: Other arguments following sequence identifier, which is taken to end at a
 #       space, tab, or | character.
-#   $seq: Sequence itself.  For a quality score file, this is a concatenation of all quality scores.
+#   $seq: REFERENCE to the sequence itself.  For a quality score file, this is a
+#       reference to the concatenation of all quality scores.
 #   $nextLine: The next line from the file, or undef if none.
+#   $seqLen: length of $seq.
 ###############################################################################
 sub readFastaSeq {
     my $file = shift;
@@ -1407,7 +1409,7 @@ sub readFastaSeq {
         if ($qual) { $seq .= " "; }
         $seq .= $nextLine;
     }
-	return($seqName, $seqArgs, $seq, $nextLine);
+	return($seqName, $seqArgs, \$seq, $nextLine, length($seq));
 }
 
 ###############################################################################
