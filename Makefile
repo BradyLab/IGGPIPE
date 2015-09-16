@@ -114,18 +114,7 @@ endif
 ################################################################################
 
 # Target for running or cleaning entire pipeline or cleaning entire output directory.
-ifneq ($(CLEAN_OUT_DIR),1)
-ALL: plotMarkers
-#all_getSeqInfo all_getKmers all_kmerStats all_sortKmers all_getContigFile \
-#    kmerIsect all_getGenomicPos all_mergeKmers findLCRs findIndelGroups \
-#    all_getDNAseqs findPrimers all_ePCRtesting removeBadMarkers plotMarkers
-	@echo
-ifeq ($(CLEAN),)
-	@echo "ALL files are up to date"
-else
-	@echo "ALL files are cleaned"
-endif
-else
+ifeq ($(CLEAN_OUT_DIR),1)
 ALL:
 	@echo
 	@echo "Removing all files from the output directory."
@@ -137,8 +126,20 @@ ALL:
 	-$(CMD_DELETE_WHEN_CLEANING) $(DIR_IGGPIPE_OUT)/*
 	-$(CMD_DELETE_WHEN_CLEANING) $(DIR_IGGPIPE_OUT)
 	@echo "Removed all files from the output directory."
-endif
 	@echo
+else ifeq ($(CLEAN),1)
+ALL: all_getSeqInfo all_getKmers all_kmerStats all_sortKmers all_getContigFile \
+    kmerIsect all_getGenomicPos all_mergeKmers findLCRs findIndelGroups \
+    all_getDNAseqs findPrimers all_ePCRtesting removeBadMarkers plotMarkers
+	@echo
+	@echo "ALL files are cleaned"
+	@echo
+else
+ALL: plotMarkers
+	@echo
+	@echo "ALL files are up to date"
+	@echo
+endif
 
 # Target for getting or cleaning sequence info for all genomes.
 all_getSeqInfo:
