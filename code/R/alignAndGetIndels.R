@@ -454,7 +454,7 @@ if (!file.exists(extractDir))
     dir.create(extractDir)
 
 # Create filenames for extraction position files.
-extractPosFiles = paste(extractDir, paste("extract_Regions", genomeLtrs, ".txt", sep=""), sep=PATHSEP)
+extractPosFiles = paste(extractDir, paste("extract_Regions", 1:Ngenomes, ".txt", sep=""), sep=PATHSEP)
 names(extractPosFiles) = genomeLtrs
 
 # Put sequence extraction strings in list seqExtStrs, with one vector of strings
@@ -477,7 +477,7 @@ for (genome in genomeLtrs)
 ################################################################################
 # A command line to run getSeqsFromFasta.pl for hypothetical genome G and put
 # the entire extracted sequence on one line looks like this:
-#   perl blah/getSeqsFromFasta.pl -l 0 blah/genome.fasta -i extractDir/extractG.txt -o extractDir/seqsG.txt
+#   perl blah/getSeqsFromFasta.pl -l 0 blah/genome.fasta -i extractDir/extract1.txt -o extractDir/seqs1.txt
 #
 # Create the command line for each genome, then run them one genome at a time.
 # This can take a long time, because the genome sequence file is very large,
@@ -485,7 +485,7 @@ for (genome in genomeLtrs)
 # entire sequence into memory before processing it.
 ################################################################################
 
-seqFiles = paste(extractDir, paste("seqs_Regions", genomeLtrs, ".txt", sep=""), sep=PATHSEP)
+seqFiles = paste(extractDir, paste("seqs_Regions", 1:Ngenomes, ".txt", sep=""), sep=PATHSEP)
 names(seqFiles) = genomeLtrs
 cmdLines = paste(perlPath, getSeqsFromFasta, fastaFiles, "-l 0", "-i", extractPosFiles, "-o", seqFiles)
 names(cmdLines) = genomeLtrs

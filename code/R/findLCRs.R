@@ -61,14 +61,14 @@ if (testing == 0)
 else if (testing == 1)
     {
     args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
-        "outTestHP11/Kmers/Split/Split_", "HP", 2, 100, 10, 2000,
+        "outTestHP11/Kmers/common.unique.kmers", "HP", 2, 100, 10, 2000,
         "outTestHP11/LCRs_K11k2L100D10_2000.tsv",
         "outTestHP11/BadKmers_K11k2L100D10_2000.tsv", TRUE)
     }
 else if (testing == 2)
     {
     args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
-        "outHP14/Kmers/Split/Split_", "HP", 2, 400, 10, 1500,
+        "outHP14/Kmers/common.unique.kmers", "HP", 2, 400, 10, 1500,
         "outHP14/LCRs_K14k2L400D10_1500.tsv",
         "outHP14/BadKmers_K14k2L400D10_1500.tsv", TRUE)
     }
@@ -84,12 +84,13 @@ if (length(args) != Nexpected)
         "on the same contig and near and contiguous to one another in each genome, and call",
         "these 'LCRs' or 'locally contiguous regions'.  Write them out to a file.",
         "",
-        "Usage: Rscript findLCRs.R <wd> <inPfx> <ltrs> <kmin> <Lmin> <Dmin> <Dmax> \\",
+        "Usage: Rscript findLCRs.R <wd> <inKmerFile> <ltrs> <kmin> <Lmin> <Dmin> <Dmax> \\",
         "       <outLcbFile> <outBadKmers> <investigate>",
         "",
         "Arguments:",
         "   <wd>    : Path of R working directory, specify other file paths relative to this.",
-        "   <inPfx> : Prefix, including directory, of input files of k-mers and their positions.",
+        "   <inKmerFile> : Path of common unique k-mers file with positions of k-mers within",
+        "                  each genome, sorted by reference genome position.",
         "   <ltrs>  : String of genome designator letters, one letter each, first letter is",
         "             for genome 1, the reference genome, second letter for genome 2, etc.",
         "   <kmin>  : Minimum number of sequential k-mers to create an LCR.",
@@ -113,8 +114,10 @@ if (!dir.exists(workingDirectory))
     stop("Directory doesn't exist: ", workingDirectory)
 setwd(workingDirectory)
 
-inPfx = args[2]
-catnow("  inPfx: ", inPfx, "\n")
+inKmerFile = args[2]
+catnow("  inKmerFile: ", inKmerFile, "\n")
+if (!file.exists(inKmerFile))
+    stop("File doesn't exist: ", inKmerFile)
 
 genomeLtrs = args[3]
 catnow("  genomeLtrs: ", genomeLtrs, "\n")
@@ -165,32 +168,11 @@ if (Ngenomes < 2)
 refGenome = genomeLtrs[1]
 otherGenomes = genomeLtrs[-1]
 
-# Split the inPfx argument into a directory name and a filename prefix.
-inDir = sub("/[^/]*$", "", inPfx)
-inPfx = sub("^.*/([^/]*$)", "\\1", inPfx)
-inv(inDir, "inDir")
-inv(inPfx, "inPfx")
-
-# Get a list of all filenames in the input directory whose names begin with the
-# input prefix followed by genome number 1 (=reference genome), "_", a sequence
-# ID name, and finally end in ".isect.split".
-allFiles = list.files(inDir)
-RE = paste("^", inPfx, "1_(.*)\\.isect.split$", sep="")
-refFiles = allFiles[grepl(RE, allFiles)]
-if (length(refFiles) == 0)
-    stop("No reference genome files found in ", inDir, ", with names starting with ", inPfx, "1_")
-# Extract the reference genome IDs from the reference genome file names.
-refIDs = sub(RE, "\\1", refFiles)
-refIDs = sort(refIDs)
-
-# For each reference ID, make a vector of input filenames, one per genome, in the
-# same order as the 'genomeLtrs' vector, with the reference genome first.
-inFiles = list()
-for (ID in refIDs)
-    {
-    inFiles[[ID]] = paste(inDir, PATHSEP, inPfx, 1:Ngenomes, "_", ID, ".isect.split", sep="")
-    names(inFiles[[ID]]) = genomeLtrs
-    }
+# Make column names to use for the common unique k-mer file.  The column names
+# have the genome name prepended, with a "." separator.
+colNames = c()
+for (genome in genomeLtrs)
+    colNames = c(colNames, paste(genome, c(".seqID", ".pos", ".strand", ".contig", ".contigPos"), sep=""))
 
 # Create vectors of column names in df, indexed by genome letter, for the .seqID, .pos,
 # .strand, .contig, and .contigPos columns.
@@ -215,56 +197,109 @@ refContigPosCol = contigPosCol[refGenome]
 # Find LCRs.
 ########################################
 
-# Loop for each reference sequence ID, read the data files, and find LCRs.
+# Smallest number of common unique k-mers to process at one time.  We do not
+# process all of them at once because the memory requirements may be too intensive.
+# However, we must process all k-mers of a given contig together.  We will do even
+# more than that, and process all k-mers of a given reference genome sequence ID
+# together.  The input common unique k-mer file is sorted by reference genome
+# sequence ID and position.  Therefore, we will read in MIN_KMERS_AT_ONCE
+# common unique k-mers from this file, then continue reading in MIN_KMERS_AT_ONCE
+# additional k-mers at a time, until we encounter the next sequence ID.  Then, we
+# will process all k-mers prededing that next sequence ID, then move on to repeat
+# the process.
+MIN_KMERS_AT_ONCE = 500000
+
+# Open the input file and read the first MIN_KMERS_AT_ONCE k-mers.
+inFile = file(inKmerFile, open="r")
+kmerBufferDf = read.table(inFile, header=FALSE, row.names=1, sep="\t", nrows=MIN_KMERS_AT_ONCE, stringsAsFactors=FALSE)
+if (nrow(kmerBufferDf) == 0)
+    stop("No k-mer data in file ", inKmerFile)
+if (ncol(kmerBufferDf) != length(colNames))
+    stop("findLCRs expected ", length(colNames), " columns but found ", ncol(kmerBufferDf), ": ",
+        paste(colNames, collapse=","), " vs. ", paste(colnames(kmerBufferDf), collapse=",")) 
+colnames(kmerBufferDf) = colNames
+NkmersRead = nrow(kmerBufferDf)
+
+# Loop until there are no more k-mers, read additional k-mers from the input file
+# until we have one or more complete sequence IDs and at least MIN_KMERS_AT_ONCE
+# k-mers to process, or until the end of the input file is reach.  Find LCRs using
+# those k-mers.
 # Accumulate results in data frames cumLcbDf and cumDiscardDf.
 cumLcbDf = NULL
 cumDiscardDf = NULL
-for (ID in refIDs)
+isEOF = FALSE
+while (nrow(kmerBufferDf) > 0)
     {
-    catnow("\nDoing reference ID", ID, "\n")
+    catnow("Reading data...")
 
-    # Read k-mer data for each genome for this ID into data frames and bind them
-    # together column-wise to create data frame df.  Make sure each genome has
-    # exactly the same list of k-mers in it.  The column names have the genome
-    # name prepended, with a "." separator.
-    catnow("  Reading data\n")
-    df = NULL
-    for (genome in genomeLtrs)
+    # Read more k-mers, we need at least one in kmerBufferDf after we move at
+    # least MIN_KMERS_AT_ONCE to df.  After this, kmerBufferBf has MORE THAN
+    # MIN_KMERS_AT_ONCE rows, unless end of file.
+    if (!isEOF)
         {
-        inv(genome, "Genome")
-        filename = inFiles[[ID]][[genome]]
-        inv(filename, "Input file")
-        dfTmp = read.table(filename, header=TRUE, row.names=1, sep="\t", stringsAsFactors=FALSE)
-        # Sort the rows by k-mer sequence, which are the row names.
-        dfTmp = dfTmp[order(rownames(dfTmp)),]
-        inv(dim(dfTmp), "input data dim")
-        inv(colnames(dfTmp), "input data columns")
-        inv(head(dfTmp), "input data head")
-        colnames(dfTmp) = paste(genome, colnames(dfTmp), sep=".")
-        if (genome == refGenome)
-            {
-            saveDim = dim(dfTmp)
-            df = dfTmp
-            }
+        cat("Read: NkmersRead=", NkmersRead, "\n")
+        tdf = read.table(inFile, header=FALSE, row.names=1, sep="\t", nrows=MIN_KMERS_AT_ONCE,
+            col.names=colNames, stringsAsFactors=FALSE)
+        if (nrow(tdf) == 0)
+            isEOF = TRUE
         else
             {
-            if (any(dim(dfTmp) != saveDim))
-                stop("Genome ", genome, " data not same size as reference genome as expected")
-            if (any(rownames(df) != rownames(dfTmp)))
-                stop("Genome ", genome, " kmer row names not same as reference genome as expected")
-            df = data.frame(df, dfTmp, stringsAsFactors=FALSE)
+            colnames(tdf) = colNames
+            NkmersRead = NkmersRead + nrow(tdf)
+            kmerBufferDf = rbind(kmerBufferDf, tdf)
+            rm(tdf)
             }
-        rm(dfTmp)
-        # Note: row names are k-mers, column names are:
-        # "seqID"     "pos"       "strand"    "contig"    "contigPos"
         }
-    inv(dim(df), "All genome data dim")
-    inv(colnames(df), "All genome data columns")
-    inv(head(df), "All genome data head")
-    catnow("  ", nrow(df), "common unique k-mers\n")
-    # If there are no k-mers for this ID, continue with next ID.
-    if (nrow(df) == 0)
-        next
+
+    # Move at least MIN_KMERS_AT_ONCE k-mers from kmerBufferDf to df, but be sure
+    # to move ALL k-mers of a sequence ID.  The only time kmerBufferDf becomes
+    # empty here is when we reached the end of the file
+    N = nrow(kmerBufferDf)
+    if (N <= MIN_KMERS_AT_ONCE)
+        {
+        if (!isEOF) stop("findLCRs expected to be at end of file")
+        df = kmerBufferDf
+        kmerBufferDf = kmerBufferDf[c(),]
+        }
+    else
+        {
+        # Find next sequence ID and transfer k-mers preceding it to df.  If no more
+        # sequence IDs, read more lines until end of file or we find the next one.
+        lastID = kmerBufferDf[MIN_KMERS_AT_ONCE, refIdCol]
+        nextIDidx = match(FALSE, lastID == kmerBufferDf[(MIN_KMERS_AT_ONCE+1):N, refIdCol])
+        while (!isEOF && is.na(nextIDidx))
+            {
+            cat("Read: NkmersRead=", NkmersRead, "\n")
+            tdf = read.table(inFile, header=FALSE, row.names=1, sep="\t", nrows=MIN_KMERS_AT_ONCE,
+                col.names=colNames, stringsAsFactors=FALSE)
+            if (nrow(tdf) == 0)
+                isEOF = TRUE
+            else
+                {
+                colnames(tdf) = colNames
+                NkmersRead = NkmersRead + nrow(tdf)
+                kmerBufferDf = rbind(kmerBufferDf, tdf)
+                rm(tdf)
+                nextIDidx = match(FALSE, lastID == kmerBufferDf[(N+1):nrow(tdf), refIdCol])
+                }
+            }
+        # If nextIDidx is still NA, we reached end of file, so process all remaining k-mers.
+        if (is.na(nextIDidx))
+            {
+            df = kmerBufferDf
+            kmerBufferDf = kmerBufferDf[c(),]
+            }
+        # Otherwise, take all k-mers preceding nextIDidx.
+        else
+            {
+            df = kmerBufferDf[1:(nextIDidx-1),]
+            kmerBufferDf = kmerBufferDf[nextIDidx,]
+            }
+        }
+    catnow(NkmersRead, "Common unique k-mers read so far\n")
+    inv(dim(df), "Common unique k-mers dim")
+    inv(head(df), "Common unique k-mers head")
+    catnow("  Processing", nrow(df), "common unique k-mers\n")
 
     # Find out just what k is, i.e. how big are the k-mers?
     k = nchar(rownames(df)[1])
@@ -336,7 +371,7 @@ for (ID in refIDs)
         }
     inv(dim(df), "dim of full data after removing < Dmin")
     catnow("   ", nrow(df), " k-mers remaining\n")
-    # If none left, move on to next ID.
+    # If none left, move on to read more k-mers.
     if (nrow(df) == 0)
         next
 
@@ -392,7 +427,7 @@ for (ID in refIDs)
     # candidate LCRs.
 
     ############################################################################
-    # Item 1. All the N k-mers in the LCR are on the same contig and sequenc ID
+    # Item 1. All the N k-mers in the LCR are on the same contig and sequence ID
     #       within each genome.
     # Item 2. All the N k-mers of an LCR are in the same strand group.
     # Item 3: identify k-mers that are more than Dmax distance from the preceding
@@ -447,7 +482,7 @@ for (ID in refIDs)
     inv(dim(df), "dim of full data after removing < Lmin")
     inv(dim(discardDf), "dim of discarded k-mers")
     catnow("   ", nrow(df), " k-mers remaining\n")
-    # If none left, move on to next ID.
+    # If none left, move on to read more k-mers.
     if (nrow(df) == 0)
         next
 
@@ -463,7 +498,7 @@ for (ID in refIDs)
     inv(dim(df), "dim of full data after removing < kmin")
     inv(dim(discardDf), "dim of discarded k-mers")
     catnow("   ", nrow(df), " k-mers remaining\n")
-    # If none left, move on to next ID.
+    # If none left, move on to read more k-mers.
     if (nrow(df) == 0)
         next
 
@@ -899,13 +934,18 @@ for (ID in refIDs)
     lcrDf = rbind(lcrDf, lcrDft)
     rm(dft, lcrDft, discardDft)
 
-    catnow("\nFor reference ID", ID, "found", length(unique(lcrDf$LCR)), "LCRs containing", nrow(lcrDf), "k-mers\n")
+    catnow("\n  Found", length(unique(lcrDf$LCR)), "LCRs containing", nrow(lcrDf), "k-mers\n")
 
     # Accumulate results.
     cumLcbDf = rbind(cumLcbDf, lcrDf)
     cumDiscardDf = rbind(cumDiscardDf, discardDf)
     rm(df, lcrDf, discardDf)
     }
+
+# Close the input file.
+close(inFile)
+
+# Check LCR count.
 if (nrow(cumLcbDf) == 0)
     stop("No LCRs found.")
 

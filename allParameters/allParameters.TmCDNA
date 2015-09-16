@@ -199,7 +199,6 @@ DIR_R := code/R
 # Path of the pipeline R scripts.
 ### THESE DO NOT NEED TO BE CHANGED.
 
-PATH_SPLIT_KMERS := $(DIR_R)/splitKmers.R
 PATH_FIND_LCRS := $(DIR_R)/findLCRs.R
 PATH_FIND_INDEL_GROUPS := $(DIR_R)/findIndelGroups.R
 PATH_GET_DNA_SEQS := $(DIR_R)/getDNAseqs.R
@@ -423,23 +422,12 @@ PFX_KMERS_DATA_FILE := $(DIR_KMERS)/Kmers_
 PATH_ISECT_KMERS := $(DIR_KMERS)/isect.kmers
 
 
-# Directory in which to place per-sequence-ID split-up versions of the PATH_POS_KMERS_
-# files, N_GENOMES files per distinct sequence ID in the reference genome.  This
-# directory will be created if it doesn't exist.
+# Path of the k-mer text file containing the common unique k-mers with genomic
+# positions in each genome, sorted by reference genome position.  This file will
+# be created.
 ### THIS DOES NOT NEED TO BE CHANGED.
 
-DIR_SPLIT_KMERS := $(DIR_KMERS)/Split
-
-
-# Prefix, including directory, of output files that are portions of the above
-# unique k-mer position files for each genome, each portion containing the data
-# for k-mers located along one sequence ID of the REFERENCE genome.  The number
-# of files created for each genome is equal to the number of sequence IDs (e.g.
-# number of chromosomes) in the reference genome FASTA file.  The file names are
-# this prefix, with suffix <genome_number>_<ref_genome_sequence_ID>.isect.split
-### THIS DOES NOT NEED TO BE CHANGED.
-
-PFX_SPLIT_UNIQ_KMERS_FILE := $(DIR_SPLIT_KMERS)/Split_
+PATH_COMMON_UNIQUE_KMERS := $(DIR_KMERS)/common.unique.kmers
 
 
 ################################################################################
@@ -892,7 +880,7 @@ PATH_MARKER_DATA_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_MARKER_DATA_FILE)$(SFX_MARKER_
 
 
 # Path prefix of IGG marker e-PCR bad marker file as determined by e-PCR,
-# excluding only the suffix, which consists of "_<genome letter>.bad.tsv".
+# excluding only the suffix, which consists of "_<genome number>.bad.tsv".
 ### DO NOT CHANGE THIS.
 
 PFX_BAD_MARKER_ERROR_PATH := $(DIR_MAIN_OUTPUT)/$(PFX_BAD_MARKER_ERROR_FILE)$(SFX_GOOD_MARKER_FILE)

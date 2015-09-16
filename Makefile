@@ -90,10 +90,6 @@ $(error GENOME must be either a valid genome number (1..$(N_GENOMES)) or 'ALL'))
 endif
 endif
 
-# Define variables GENOME_x := #, where x = a genome letter, # is genome number.
-# For example, if GENOME_LETTERS are "H P" we have GENOME_H := 1, GENOME_P := 2
-$(foreach G,$(GENOME_NUMBERS),$(eval GENOME_$(word $(G),$(GENOME_LETTERS)) := $(G)))
-
 ################################################################################
 # Set variables for cleaning operations.
 ################################################################################
@@ -121,7 +117,7 @@ endif
 ifneq ($(CLEAN_OUT_DIR),1)
 ALL: plotMarkers
 #all_getSeqInfo all_getKmers all_kmerStats all_sortKmers all_getContigFile \
-#    kmerIsect all_getGenomicPos all_splitKmers findLCRs findIndelGroups \
+#    kmerIsect all_getGenomicPos all_mergeKmers findLCRs findIndelGroups \
 #    all_getDNAseqs findPrimers all_ePCRtesting removeBadMarkers plotMarkers
 	@echo
 ifeq ($(CLEAN),)
@@ -136,7 +132,6 @@ ALL:
 	@# Try to remove output directory first.  If trashing, entire thing will be in trash.
 	-$(CMD_DELETE_WHEN_CLEANING) $(DIR_IGGPIPE_OUT)
 	-$(CMD_DELETE_WHEN_CLEANING) $(DIR_GENOME_OUT_DATA)/*
-	-$(CMD_DELETE_WHEN_CLEANING) $(DIR_SPLIT_KMERS)/*
 	-$(CMD_DELETE_WHEN_CLEANING) $(DIR_KMERS)/*
 	-$(CMD_DELETE_WHEN_CLEANING) $(DIR_PRIMER_DATA)/*
 	-$(CMD_DELETE_WHEN_CLEANING) $(DIR_IGGPIPE_OUT)/*
@@ -169,9 +164,9 @@ all_sortKmers:
 all_getGenomicPos:
 	@$(MAKE) PARAMS=$(PARAMS) $(CLEAN) getGenomicPos GENOME=ALL
 
-# Target for getting or cleaning split of common unique k-mer genomic positions file for all genomes.
-all_splitKmers:
-	@$(MAKE) PARAMS=$(PARAMS) $(CLEAN) splitKmers GENOME=ALL
+# Target for merging common unique k-mer genomic positions files for all genomes.
+all_mergeKmers:
+	@$(MAKE) PARAMS=$(PARAMS) $(CLEAN) mergeKmers GENOME=ALL
 
 # Target for getting or cleaning DNA for making primers for all genomes.
 all_getDNAseqs:
@@ -203,12 +198,6 @@ $(DIR_KMERS):
 	@echo "Creating directory $(DIR_KMERS)"
 	mkdir -p $(DIR_KMERS)
 
-# Target for making the split k-mer data output directory.
-$(DIR_SPLIT_KMERS):
-	@echo
-	@echo "Creating directory $(DIR_SPLIT_KMERS)"
-	mkdir -p $(DIR_SPLIT_KMERS)
-
 # Target for making the primer data directory.
 $(DIR_PRIMER_DATA):
 	@echo
@@ -236,11 +225,11 @@ endif
 ifeq ($(CLEAN),)
 getSeqInfo: $(TARGET_IDLEN)
 	@echo
-	@echo "getSeqInfo files for genome(s) $(GENOME) are up to date."
+	@echo "getSeqInfo file(s) for genome(s) $(GENOME) are up to date."
 else
 getSeqInfo:
 	@$(CMD_DELETE_WHEN_CLEANING) $(TARGET_IDLEN)
-	@echo "getSeqInfo output files removed."
+	@echo "getSeqInfo output file(s) for genome(s) $(GENOME) removed."
 endif
 
 # IDLEN_FILES is multiple targets, one per genome.
@@ -274,11 +263,11 @@ endif
 ifeq ($(CLEAN),)
 getContigFile: $(TARGET_CONTIG)
 	@echo
-	@echo "getContigFile files for genome(s) $(GENOME) are up to date."
+	@echo "getContigFile file(s) for genome(s) $(GENOME) are up to date."
 else
 getContigFile:
 	@$(CMD_DELETE_WHEN_CLEANING) $(TARGET_CONTIG)
-	@echo "getContigFile output files removed."
+	@echo "getContigFile output file(s) for genome(s) $(GENOME) removed."
 endif
 
 # CONTIG_FILES is multiple targets, one per genome.
@@ -312,11 +301,11 @@ endif
 ifeq ($(CLEAN),)
 getKmers: $(TARGET_KMERS)
 	@echo
-	@echo "getKmers files for genome(s) $(GENOME) are up to date."
+	@echo "getKmers file(s) for genome(s) $(GENOME) are up to date."
 else
 getKmers:
 	@$(CMD_DELETE_WHEN_CLEANING) $(TARGET_KMERS)
-	@echo "getKmers output files removed."
+	@echo "getKmers output file(s) for genome(s) $(GENOME) removed."
 endif
 
 # KMERS_FILES is multiple targets, one per genome.
@@ -351,11 +340,11 @@ endif
 ifeq ($(CLEAN),)
 kmerStats: $(TARGET_STATS)
 	@echo
-	@echo "kmerStats files for genome(s) $(GENOME) are up to date."
+	@echo "kmerStats file(s) for genome(s) $(GENOME) are up to date."
 else
 kmerStats:
 	@$(CMD_DELETE_WHEN_CLEANING) $(TARGET_STATS)
-	@echo "kmerStats output files removed."
+	@echo "kmerStats output file(s) for genome(s) $(GENOME) removed."
 endif
 
 # KMERS_STATS_FILES is multiple targets, one per genome.
@@ -393,11 +382,11 @@ endif
 ifeq ($(CLEAN),)
 sortKmers: $(TARGET_SORTED_KMERS)
 	@echo
-	@echo "sortKmers files for genome(s) $(GENOME) are up to date."
+	@echo "sortKmers file(s) for genome(s) $(GENOME) are up to date."
 else
 sortKmers:
 	@$(CMD_DELETE_WHEN_CLEANING) $(TARGET_SORTED_KMERS)
-	@echo "sortKmers output files removed."
+	@echo "sortKmers output file(s) for genome(s) $(GENOME) removed."
 endif
 
 # SORTED_KMERS_FILES is multiple targets, one per genome.
@@ -411,7 +400,7 @@ $(SORTED_KMERS_FILES) : $(PFX_KMERS_DATA_FILE)%.isect.sorted : $(PFX_KMERS_DATA_
 	@echo
 	@echo "Extracting text-based $(K)-mers from binary file $< into $@.tmp"
 	$(TIME) $(PATH_JELLYFISH) dump -c -o $@.tmp $< $(REDIR)
-	@echo "Sorting text-based $(K)-mers from $@.tmp into $@.tsv.  This can take a long time."
+	@echo "Sorting text-based $(K)-mers from $@.tmp into $@.tsv."
 	$(TIME) sort $@.tmp >$@.tsv $(REDIR)
 	@echo "Removing $@.tmp"
 	$(TIME) rm $@.tmp $(REDIR)
@@ -466,11 +455,11 @@ endif
 ifeq ($(CLEAN),)
 getGenomicPos: $(TARGET_ISECT)
 	@echo
-	@echo "getGenomicPos files for genome(s) $(GENOME) are up to date."
+	@echo "getGenomicPos file(s) for genome(s) $(GENOME) are up to date."
 else
 getGenomicPos:
 	@$(CMD_DELETE_WHEN_CLEANING) $(TARGET_ISECT)
-	@echo "getGenomicPos output files removed."
+	@echo "getGenomicPos output file(s) for genome(s) $(GENOME) removed."
 endif
 
 # ISECT_KMER_FILES is multiple targets, one per genome.
@@ -481,65 +470,88 @@ $(ISECT_KMER_FILES) : $(PFX_KMERS_DATA_FILE)%.isect.unique : $(PATH_ISECT_KMERS)
 	@echo
 	@echo "*** getGenomicPos PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
 	@echo "Finding genomic positions of common unique $(K)-mers in $< into $@"
-	$(TIME) $(PATH_FINDMERS) $(ARGS_FINDMER) -v2 $(PATH_GENOME_FASTA_$*) $< $@ $(REDIR)
+	@echo
+	@echo "Adding genomic positions to common unique $(K)-mers from $< into $@.tmp"
+	$(TIME) $(PATH_FINDMERS) $(ARGS_FINDMER) -v2 $(PATH_GENOME_FASTA_$*) $< $@.tmp $(REDIR)
+	@echo "Sorting by $(K)-mer from $@.tmp into $@, removing header line"
+	$(TIME) tail -n +2 $@.tmp | sort >$@ $(REDIR)
+	@echo "Removing $@.tmp"
+	$(TIME) rm $@.tmp $(REDIR)
 	@echo "Finished."
 
 ################################################################################
-# splitKmers: Get genomic position of common unique k-mers.  Argument: GENOME
+# mergeKmers: Merge files of common unique k-mers having genomic positions into
+# a single file containing the data for all genomes.  Argument: GENOME
 ################################################################################
 
-# A list of all FASTA files already defined above: FASTA_FILES
+# This is problematic because the 'join' command can only join two files, but we
+# have as many files to be joined as we have genomes.  We will join one genome
+# at a time to the previously joined file, starting by joining the second genome
+# k-mer positions file to the reference genome k-mer positions file.  When this
+# is called with GENOME=1 (reference genome), we will just COPY the reference
+# genome positions file to a new file which will be the join file for the second
+# genome.
 
-# This is problematic because the output file names include the sequence IDs,
-# which we don't know here.  So, what we will do is make an empty target file
-# with suffix <genome>.isect.split using 'touch' to record the time we finished
-# creating the actual split k-mer output files.
+# A list of all .isect.merge files to be produced.
+MERGE_KMER_FILES := $(foreach G,$(GENOME_NUMBERS),$(PFX_KMERS_DATA_FILE)$(G).isect.merge)
 
-SPLIT_KMER_EMPTY_TARGET := $(foreach G,$(GENOME_NUMBERS),$(PFX_SPLIT_UNIQ_KMERS_FILE)$(G).isect.split)
-SPLIT_KMER_ALL_TARGETS := $(foreach G,$(GENOME_NUMBERS),$(PFX_SPLIT_UNIQ_KMERS_FILE)$(G)_*.isect.split)
-
-# Target .isect.split file(s) for genome GENOME.
+# Target .isect.merge file(s) for genome GENOME.
 ifeq ($(GENOME),ALL)
-TARGET_SPLIT := $(SPLIT_KMER_EMPTY_TARGET)
+TARGET_MERGE := $(MERGE_KMER_FILES)
 else
-TARGET_SPLIT := $(PFX_SPLIT_UNIQ_KMERS_FILE)$(GENOME).isect.split
+TARGET_MERGE := $(PFX_KMERS_DATA_FILE)$(GENOME).isect.merge
 endif
 
-# Phony target to make or clean TARGET_SPLIT file(s).
+# Phony target to make or clean TARGET_MERGE file(s).
 ifeq ($(CLEAN),)
-splitKmers: $(TARGET_SPLIT)
+mergeKmers: $(TARGET_MERGE)
 	@echo
-	@echo "splitKmers files for genome(s) $(GENOME) are up to date."
+	@echo "mergeKmers files for genome(s) $(GENOME) are up to date."
 else
-splitKmers:
-	@$(CMD_DELETE_WHEN_CLEANING) $(TARGET_SPLIT) $(SPLIT_KMER_ALL_TARGETS)
-	@echo "splitKmers output files removed."
+mergeKmers:
+	@$(CMD_DELETE_WHEN_CLEANING) $(TARGET_MERGE)
+	@echo "mergeKmers output file for genome(s) $(GENOME) removed."
 endif
 
-# These variables' values are expanded (deferred) when used in the recipe below.
+# Define the target file recipe for genome 1 separately, it is different.
+TARGET_MERGE_1 := $(word 1,$(MERGE_KMER_FILES))
 
-OUT_PREFIX = $(PFX_SPLIT_UNIQ_KMERS_FILE)$*_
-GUIDE_FILE = $(if $(findstring 1,$*),$(EMPTY),$(PFX_KMERS_DATA_FILE)1.isect.unique)
+$(TARGET_MERGE_1) : $(PFX_KMERS_DATA_FILE)1.isect.unique
+	@echo
+	@echo "*** mergeKmers PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
+	@echo "Copy common unique $(K)-mers for genome 1 from $< to $@"
+	$(TIME) cp $< $@ $(REDIR)
+	@echo "Finished."
 
-# SPLIT_KMER_EMPTY_TARGET is multiple targets, one per genome.
+# Define the target files for all other genomes, they are done the same way.
+TARGET_MERGE_OTHERS := $(filter-out $(TARGET_MERGE_1),$(MERGE_KMER_FILES))
+
+# Define variable G_PREV to be equal to GENOME_NUMBERS with an extra "0" prepended
+# to the beginning, so that $(word $(GENOME),$(G_PREV)) will give the number of the
+# genome PRECEDING genome $(GENOME).
+G_PREV := 0 $(GENOME_NUMBERS)
+
+# MERGE_KMER_FILES is multiple targets, one per genome, but we EXCLUDE GENOME 1.
 # Here, % is a genome number.
 
-$(SPLIT_KMER_EMPTY_TARGET) : $(PFX_SPLIT_UNIQ_KMERS_FILE)%.isect.split : $(PFX_KMERS_DATA_FILE)%.isect.unique | \
+$(TARGET_MERGE_OTHERS) : $(PFX_KMERS_DATA_FILE)%.isect.merge : $(PFX_KMERS_DATA_FILE)%.isect.unique \
+        $(PFX_KMERS_DATA_FILE)$$(word %,$$(G_PREV)).isect.unique | \
         $(DIR_SPLIT_KMERS) $(PATH_RSCRIPT) $(PATH_SPLIT_KMERS)
 	@echo
-	@echo "*** splitKmers PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
-	@echo "Splitting $(K)-mer position file $< into files $(PFX_SPLIT_UNIQ_KMERS_FILE)$*_<refSeqID>.isect.split"
-	$(TIME) $(PATH_RSCRIPT) $(PATH_SPLIT_KMERS) $(WD) $(OUT_PREFIX) $< $(GUIDE_FILE) $(REDIR)
-	@touch $@
+	@echo "*** mergeKmers PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
+	@echo "Merge common unique $(K)-mers for genomes $(word $*,$(G_PREV)) and $* to $@"
+	$(TIME) join -t '	' $(PFX_KMERS_DATA_FILE)$(word $*,$(G_PREV)).isect.unique $< >$@ $(REDIR)
 	@echo "Finished."
 
 ################################################################################
-# findLCRs: Find locally conserved regions using common unique k-mers that have
-# been split into separate files based on genome for which the k-mer position
-# data applies and sequence ID within that genome.
+# findLCRs: Find locally conserved regions using common unique k-mers with
+# genomic positions that have been merged into a single file sorted by reference
+# genome position.
 ################################################################################
 
-# A list of all split k-mer empty-target files is already defined above: SPLIT_KMER_EMPTY_TARGET
+# The last file in the chain of merged files from the merge operation preceding this.
+# This file is the dependent file we use as input to findLCRs (after sorting it).
+UNSORTED_COMMON_UNIQUE_KMERS := $(PFX_KMERS_DATA_FILE)$(N_GENOMES).isect.merge
 
 # Phony target to make or clean PATH_LCR_FILE and PATH_BAD_KMERS_FILE files.
 ifeq ($(CLEAN),)
@@ -560,17 +572,26 @@ endif
 PTN_LCR_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_LCR_FILE)%
 PTN_BAD_KMERS_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_BAD_KMERS_FILE)%
 
-# Use the patterns in a pattern target.
-$(PTN_LCR_FILE) $(PTN_BAD_KMERS_FILE) : $(SPLIT_KMER_EMPTY_TARGET) | \
+# Use the patterns in a pattern target.  Dependent file is the SORTED version of
+# the common unique k-mers file.
+$(PTN_LCR_FILE) $(PTN_BAD_KMERS_FILE) : $(PATH_COMMON_UNIQUE_KMERS) | \
         $(DIR_IGGPIPE_OUT) $(PATH_RSCRIPT) $(PATH_FIND_LCRS)
-	@echo
 	@echo "*** findLCRs PARAMS=$(PARAMS) $(CLEAN) ***"
-	@echo "Finding locally conserved regions using common unique $(K)-mers from .isect.unique files into $@"
-	$(TIME) $(PATH_RSCRIPT) $(PATH_FIND_LCRS) $(WD) $(PFX_SPLIT_UNIQ_KMERS_FILE) \
+	@echo
+	@echo "Find locally conserved regions using common unique $(K)-mers from $< into $@"
+	$(TIME) $(PATH_RSCRIPT) $(PATH_FIND_LCRS) $(WD) $(PATH_COMMON_UNIQUE_KMERS) \
 	    $(GENOME_LETTERS_SQUISHED) $(KMIN) $(LMIN) $(DMIN) $(DMAX) \
 	    $(PATH_LCR_FILE) \
 	    $(PATH_BAD_KMERS_FILE) \
 	    $(INVESTIGATE_FINDLCRS) $(REDIR)
+	@echo "Finished."
+
+# Target for the sorted common unique k-mers file.
+$(PATH_COMMON_UNIQUE_KMERS) : $(UNSORTED_COMMON_UNIQUE_KMERS)
+	@echo "*** findLCRs PARAMS=$(PARAMS) $(CLEAN) ***"
+	@echo
+	@echo "Sort merged common unique $(K)-mers by reference genome position from $< into $(PATH_COMMON_UNIQUE_KMERS)"
+	$(TIME) sort -k 2,2 -k 5,5n -k 3,3n $< >$(PATH_COMMON_UNIQUE_KMERS) $(REDIR)
 	@echo "Finished."
 
 ################################################################################
@@ -634,11 +655,11 @@ endif
 ifeq ($(CLEAN),)
 getDNAseqs: $(TARGET_DNASEQ)
 	@echo
-	@echo "getDNAseqs files for genome(s) $(GENOME) are up to date."
+	@echo "getDNAseqs file(s) for genome(s) $(GENOME) are up to date."
 else
 getDNAseqs:
 	@$(CMD_DELETE_WHEN_CLEANING) $(TARGET_DNASEQ) $(DIR_GENOME_OUT_DATA)/extract*.txt $(DIR_GENOME_OUT_DATA)/seqs*.txt
-	@echo "getDNAseqs output files removed."
+	@echo "getDNAseqs output file(s) for genome(s) $(GENOME) removed."
 endif
 
 # DNA_SEQ_FILES is multiple targets, one per genome.
@@ -700,41 +721,40 @@ $(PATH_MARKER_DATA_FILE) : $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) $(DNA_SEQ_FILES
 # A list of all FASTA files already defined above: FASTA_FILES
 
 # A list of all .bad.tsv files to be produced.
-BAD_MARKER_FILES := $(foreach G,$(GENOME_LETTERS),$(PFX_BAD_MARKER_ERROR_PATH)_$(G).bad.tsv)
+BAD_MARKER_FILES := $(foreach G,$(GENOME_NUMBERS),$(PFX_BAD_MARKER_ERROR_PATH)_$(G).bad.tsv)
 
 # Target .bad.tsv file(s) for genome GENOME.
 ifeq ($(GENOME),ALL)
 TARGET_BAD_MARKER := $(BAD_MARKER_FILES)
 else
-TARGET_BAD_MARKER := $(PFX_BAD_MARKER_ERROR_PATH)_$(word $(GENOME),$(GENOME_LETTERS)).bad.tsv
+TARGET_BAD_MARKER := $(PFX_BAD_MARKER_ERROR_PATH)_$(word $(GENOME),$(GENOME_NUMBERS)).bad.tsv
 endif
 
 # Phony target to make or clean TARGET_BAD_MARKER file(s).
 ifeq ($(CLEAN),)
 ePCRtesting: $(TARGET_BAD_MARKER)
 	@echo
-	@echo "ePCRtesting files for genome(s) $(GENOME) are up to date."
+	@echo "ePCRtesting file(s) for genome(s) $(GENOME) are up to date."
 else
 ePCRtesting:
 	@$(CMD_DELETE_WHEN_CLEANING) $(TARGET_BAD_MARKER) $(DIR_GENOME_OUT_DATA)/*.sts $(DIR_GENOME_OUT_DATA)/*.epcr.out
-	@echo "ePCRtesting output files removed."
+	@echo "ePCRtesting output file(s) for genome(s) $(GENOME) removed."
 endif
 
 # BAD_MARKER_FILES is multiple targets, one per genome.
-# Here, % is a genome letter, which is a pain in the ass to convert back to a genome number.
+# Here, % is a genome number.
 
-$(BAD_MARKER_FILES) : $(PFX_BAD_MARKER_ERROR_PATH)_%.bad.tsv : $$(PATH_GENOME_FASTA_$$(GENOME_$$*)) \
+$(BAD_MARKER_FILES) : $(PFX_BAD_MARKER_ERROR_PATH)_%.bad.tsv : $$(PATH_GENOME_FASTA_$$*) \
         $(PATH_MARKER_DATA_FILE) | $(DIR_IGGPIPE_OUT) $(DIR_GENOME_OUT_DATA) $(DIR_PRIMER_DATA) \
         $(PATH_RSCRIPT) $(PATH_EPCR_TESTING) $(PATH_EPCR)
 	@echo
 	@echo "*** ePCRtesting PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
 	@echo "Use e-PCR to test marker primer pairs and write errors to $@"
 	$(TIME) $(PATH_RSCRIPT) $(PATH_EPCR_TESTING) $(WD) \
-	    $(PATH_MARKER_DATA_FILE) $(GENOME_$*) \
-	    $@ \
+	    $(PATH_MARKER_DATA_FILE) $* $@ \
 	    $(DIR_GENOME_OUT_DATA) $(PATH_EPCR) \
 	    $(EPCR_MAX_DEV) $(EPCR_WORD_SIZE) $(EPCR_MAX_MISMATCH) $(EPCR_MAX_GAPS) \
-		$(PATH_GENOME_FASTA_$(GENOME_$*)) $(INVESTIGATE_EPCRTESTING) $(REDIR)
+		$(PATH_GENOME_FASTA_$*) $(INVESTIGATE_EPCRTESTING) $(REDIR)
 	@echo "Finished."
 
 ################################################################################
