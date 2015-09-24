@@ -51,7 +51,7 @@ References
 .*IGG markers and the IGGPIPE software are described in:*
 
 [bibliography]
-- Toal, T., Burkart-Waco, D., and Brady, S.M. 'IGGPIPE: In silico K-mer-based Pipeline Finds Candidate
-IGG Genomic Markers and PCR Primers using NGS Data and Tomato/Potato/Pennellii
-Test Case'
+- Toal, T.W., Burkart-Waco, D., Kuppu, S., Chetelat, R., and Brady, S.M. 'InDel
+Group in Genomes (IGG): Molecular Genetic Markers Between Multiple Species Identified
+within Next Generation Sequencing Data by an in silico K-mer-based Pipeline'
 (Publication in process)
