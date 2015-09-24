@@ -1068,7 +1068,11 @@ contains one LCR per line.  The command line would look like this:</p></div>
 </div></div>
 <div class="paragraph"><p>If you had too few common k-mers you might also have too few LCRs.  A million or
 more LCRs would be nice.  The fewer you have, the fewer markers you are likely to
-get.</p></div>
+get.  If there are too few, check the log file output when findLCRs ran.  It will
+show the number of common unique k-mers for each sequence ID, then the number
+remaining after it enforces Dmin, Lmin, and kMin on the reference genome.  If
+these numbers fall dramatically towards 0, it indicates that either there are
+no good LCRs between the two genomes, or the parameters are too strict.</p></div>
 <div class="paragraph"><p>If there were plenty of LCRs, you should next check the number of non-overlapping
 IndelGroups found, which you can again do with <em>wc -l</em>, since the IndelGroupsNonoverlapping_*
 file contains one Indel Group per line.  The command line would look like this:</p></div>
@@ -1138,12 +1142,12 @@ MarkerDensity_*.plot.png is a png image file showing plots of marker density and
 </li>
 <li>
 <p>
-MarkerOverlapping_*.tsv is a tab-separated file containing the candidate IGG markers
+MarkerOverlapping_*.tsv is a tab-separated file containing the candidate IGG markers, Table 1
 </p>
 </li>
 <li>
 <p>
-MarkerNonoverlapping_*.tsv is a tab-separated file containing a non-overlapping version of the above
+MarkerNonoverlapping_*.tsv is a tab-separated file containing a non-overlapping version of the above, Table 1
 </p>
 </li>
 </ol></div>
@@ -1157,32 +1161,32 @@ other things.</p></div>
 <div class="olist loweralpha"><ol class="loweralpha">
 <li>
 <p>
-MarkerErrors_*.tsv contains candidate markers rejected because e-PCR failed
+MarkerErrors_*.tsv contains candidate markers rejected because e-PCR failed, Tables 1, 2
 </p>
 </li>
 <li>
 <p>
-NonvalidatedMarkers_*.tsv contains candidate markers not yet subjected to e-PCR
+NonvalidatedMarkers_*.tsv contains candidate markers not yet subjected to e-PCR, Table 1
 </p>
 </li>
 <li>
 <p>
-IndelGroupsOverlapping_*.tsv contains overlapping regions of LCRs satisfying parameters for a possible IGG marker
+IndelGroupsOverlapping_*.tsv contains overlapping regions of LCRs satisfying parameters for a possible IGG marker, Table 3
 </p>
 </li>
 <li>
 <p>
-IndelGroupsNonoverlapping_*.tsv is like above but non-overlapping regions as per parameter OVERLAP_REMOVAL
+IndelGroupsNonoverlapping_*.tsv is like above but non-overlapping regions as per parameter OVERLAP_REMOVAL, Table 3
 </p>
 </li>
 <li>
 <p>
-LCRs_*.tsv contains common unique k-mers assigned to locally conserved regions (LCRs)
+LCRs_*.tsv contains common unique k-mers assigned to locally conserved regions (LCRs), Table 4
 </p>
 </li>
 <li>
 <p>
-BadKmers_*.tsv contains common unique k-mers rejected from assignment to any LCR
+BadKmers_*.tsv contains common unique k-mers rejected from assignment to any LCR, Table 4
 </p>
 </li>
 </ol></div>
@@ -1226,7 +1230,8 @@ your "allParameters" parameter file. Run it as follows:</p></div>
 <pre><code>make PARAMS=allParameters.XY InDels    (replacing with your allParameters name)</code></pre>
 </div></div>
 <div class="paragraph"><p>This produces a file in your output folder whose name ends with "indels.tsv",
-containing a table of all InDels found in the LCR or marker regions.</p></div>
+containing a table of all InDels found in the LCR or marker regions.  Examine it
+to see the data it contains (see Table 5 of column descriptions).</p></div>
 </div></div>
 </li>
 <li>
@@ -1365,7 +1370,7 @@ Contact me, Ted Toal, <a href="mailto:twtoal@ucdavis.edu">twtoal@ucdavis.edu</a>
 width="100%"
 frame="border"
 cellspacing="0" cellpadding="4">
-<caption class="title">Table 1. Columns in MarkersOverlapping_, MarkersNonoverlapping_, NonvalidatedMarkers_ files; X,Y=chosen genome letters</caption>
+<caption class="title">Table 1. Columns in MarkersOverlapping_, MarkersNonoverlapping_, NonvalidatedMarkers_, MarkerErrors_ files; X,Y=chosen genome letters</caption>
 <col width="10%" />
 <col width="90%" />
 <thead>
@@ -1704,7 +1709,7 @@ cellspacing="0" cellpadding="4">
 </tr>
 <tr>
 <td align="center" valign="top"><p class="table">LCR</p></td>
-<td align="left" valign="top"><p class="table">Integer LCR number to which this k-mer is assigned, must be concatenated with reference genome X.seqID to be unique</p></td>
+<td align="left" valign="top"><p class="table">Integer LCR number to which this k-mer is assigned, each LCR has a unique LCR number assigned to it</p></td>
 </tr>
 </tbody>
 </table>
@@ -1726,7 +1731,7 @@ cellspacing="0" cellpadding="4">
 <tbody>
 <tr>
 <td align="center" valign="top"><p class="table">ID</p></td>
-<td align="left" valign="top"><p class="table">Unique ID tying row back to originating input file row. LCR input files: refID_LCRnumber.
+<td align="left" valign="top"><p class="table">Unique ID tying row back to originating input file row. LCR input files: LCRnumber.
 InDelGroup and Markers files: refID_refPos1_refPos2.</p></td>
 </tr>
 <tr>
@@ -1770,7 +1775,7 @@ in each genome is end-start-1.</p></td>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-09-13 13:18:53 PDT
+Last updated 2015-09-20 14:31:09 PDT
 </div>
 </div>
 </body>

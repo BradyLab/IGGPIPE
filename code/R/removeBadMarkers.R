@@ -168,7 +168,7 @@ ampPos2Col = makeColVec("ampPos2")
 reasonCounts = list() # Indexed by reasonDiscarded column value.
 for (i in 1:Ngenomes)
     {
-    badMarkerFile = paste(badMarkerPfx, "_", genomeLtrs[i], ".bad.tsv", sep="")
+    badMarkerFile = paste(badMarkerPfx, "_", i, ".bad.tsv", sep="")
     df = read.table(badMarkerFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
     reasons = unique(df$reasonDiscarded)
     reasonCounts[setdiff(reasons, names(reasonCounts))] = 0

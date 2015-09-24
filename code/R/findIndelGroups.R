@@ -102,7 +102,9 @@ if (length(args) < NexpectedMin)
         "   <minFlank>  : Minimum number of common unique LCR k-mers to the left of left-side marker anchor k-mer and to the",
         "                 right of the right-side marker anchor k-mer.  May be 0 for none.",
         "   <minMax>    : Either MIN or MAX to indicate the method to be used to remove overlapping Indel Groups.  MIN means",
-        "                 that the smallest Indel Groups are retained over larger ones; MAX means the larger are retained.",
+        "                 that the Indel Groups with shortest total length are retained over longer ones; MAX means the ones",
+        "                 with longer total length are retained.  The tests are applied within each genome.  The total length",
+        "                 corresponds to the amplicon size.",
         "   <outOverlappingIndelGroups>    : Name of output file to which overlapping Indel Groups are to be written.",
         "   <outNonoverlappingIndelGroups> : Name of output file to which non-overlapping Indel Groups are to be written.",
         "   <ltrs>        : String of genome designator letters, one letter each in same order as genomes were specified for input file.",
@@ -260,20 +262,13 @@ refContigPosCol = contigPosCol[refGenome]
 # Find Indel Groups.
 ########################################
 
-# Assign a name that will be different for each candidate LCR.  The LCRs are
-# assigned numbers (LCR column), but the reference genome ID must be included
-# because the same set of numbers is reused for each different reference ID.
-# Remove the LCR column because it is now useless and even dangerous.
-df$LCRname = paste(df[,refIdCol], df$LCR, sep="_")
-df = df[, colnames(df) != "LCR"]
-
 # Sort df by the name column so that all k-mers of a candidate LCR will be
 # adjacent to one another.
-df = df[order(df$LCRname),]
+df = df[order(df$LCR),]
 
 # Add column NkmerFromLCRstart containing the number of this k-mer from the START
 # of the LCR, the first one being 1.
-numKmersInLCR = tapply(1:nrow(df), df$LCRname, length)
+numKmersInLCR = tapply(1:nrow(df), df$LCR, length)
 # Following needs unlist() and c() depending on whether all elements of numKmersInLCR are equal
 df$NkmerFromLCRstart = unlist(c(sapply(numKmersInLCR, function(N) 1:N)))
 
@@ -307,15 +302,15 @@ for (genome in otherGenomes)
     }
 
 # Remove candidate LCRs that don't have at least 2*minFlank+2 k-mers in them.
-inv(length(unique(df$LCRname)), "Number of LCRs before removing those with too few k-mers")
-numKmersInLCR = tapply(1:nrow(df), df$LCRname, length)
+inv(length(unique(df$LCR)), "Number of LCRs before removing those with too few k-mers")
+numKmersInLCR = tapply(1:nrow(df), df$LCR, length)
 keepLCRs = names(numKmersInLCR)[numKmersInLCR >= 2*minFlank+2]
-df = df[df$LCRname %in% keepLCRs,]
-inv(length(unique(df$LCRname)), "Number of LCRs after removing those with too few k-mers")
+df = df[df$LCR %in% keepLCRs,]
+inv(length(unique(df$LCR)), "Number of LCRs after removing those with too few k-mers")
 
 # Also get rid of candidate LCRs that have insufficient total distance polymorphism
 # between the k-mers, excluding the minFlank k-mers on each side.
-inv(length(unique(df$LCRname)), "Number of LCRs before removing those with too little polymorphism")
+inv(length(unique(df$LCR)), "Number of LCRs before removing those with too little polymorphism")
 for (genome in otherGenomes)
     {
     # We will avoid slow tapply() and instead use cumsum() on the difDif columns.
@@ -331,11 +326,11 @@ for (genome in otherGenomes)
     cumSumThruStartKmer = cumSum[df$NkmerFromLCRstart == minFlank+1]
     cumSumThruEndKmer = cumSum[df$NkmerFromLCRend == minFlank+1]
     cumSumLCRs = cumSumThruEndKmer - cumSumThruStartKmer + difDifAtStartKmer
-    tooLittleChangeLCRs = df$LCRname[df$NkmerFromLCRend == 1][cumSumLCRs < ADmin]
+    tooLittleChangeLCRs = df$LCR[df$NkmerFromLCRend == 1][cumSumLCRs < ADmin]
     #cat("Number of LCRs of genome", genome, "with too little polymorphism:", length(tooLittleChangeLCRs), "\n")
-    df = df[!df$LCRname %in% tooLittleChangeLCRs,,drop=FALSE]
+    df = df[!df$LCR %in% tooLittleChangeLCRs,,drop=FALSE]
     }
-inv(length(unique(df$LCRname)), "Number of LCRs after removing those with too little polymorphism")
+inv(length(unique(df$LCR)), "Number of LCRs after removing those with too little polymorphism")
 
 # Locate ALL pairs of k-mers that satisfy the requirements for an IGG marker
 # (Amin, Amax, ADmin, ADmax).
@@ -650,8 +645,8 @@ inv(numPerRefSeqId, "Number of Indel Groups per reference genome sequence ID")
 
 ########################################
 # Remove overlapping Indel Groups, guided by the value of minMax, which is either
-# MIN or MAX.  If MIN, retain smallest Indel Groups of each group of overlapping
-# ones, and if MAX, retain largest.
+# MIN or MAX.  If MIN, retain shortest Indel Groups of each group of overlapping
+# ones, and if MAX, retain longest.
 ########################################
 
 inv(nrow(dfIGs), "Number of Indel Groups including overlapping ones")
@@ -678,8 +673,8 @@ for (genome in genomes)
     #       in that row index range which has the smallest (MIN) or largest (MAX)
     #       length.
     #   4. Again for each such start and end index, remove all Indel Groups in
-    #       that index range which overlap with the one with the smallest or
-    #       largest length.
+    #       that index range which overlap with the one with the shortest or
+    #       longest length.
     #   5. Repeat steps 1-4 until there are no more overlaps.
 
     # Loop until no more Indel Groups are found to overlap in this genome.
@@ -742,9 +737,9 @@ for (genome in genomes)
         endOverlap = which(df$overlap & !c(df$overlap[-1], FALSE))
         if (length(startOverlap) != length(endOverlap)) stop("Expected equal start/end overlap vectors")
 
-        # Find the index within each group of the Indel Group with the smallest
-        # or largest length.  Then get the indexes within the group of the Indel
-        # Groups that overlap that Indel Group with the smallest or largest length.
+        # Find the index within each group of the Indel Group with the shortest
+        # or longest length.  Then get the indexes within the group of the Indel
+        # Groups that overlap that Indel Group with the shortest or longest length.
         idxsToRemove = sapply(1:length(startOverlap), function(i)
             {
             idxs = startOverlap[i]:endOverlap[i]

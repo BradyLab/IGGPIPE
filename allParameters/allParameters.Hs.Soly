@@ -299,9 +299,9 @@ GENOME_NUMBERS := 1 2
 # Letters to assign to genomes.  Choose one UPPER CASE letter to represent each
 # genome.  The first genome, referred to as genome 1, is the REFERENCE GENOME.
 # The reference genome can be chosen at random if there is not one genome that
-# is the obvious one.  It would be best to choose one with as few sequence IDs
-# as possible, so if one genome has chromosome IDs (i.e. pseudomolecules) and
-# the other(s) have scaffolds, choose the one with chromosomes as the reference.
+# is the obvious one.  It would be best to choose one with few sequence IDs, so
+# if one genome has chromosome IDs (i.e. pseudomolecules) and the other(s) have
+# scaffolds, choose the one with chromosomes as the reference.
 #
 # Genome 1 data columns will appear first in output files, genome 2 data columns
 # second, and so on.
@@ -463,13 +463,12 @@ DMIN := 5
 
 
 # Maximum distance in bp between two adjacent k-mers in an LCR.  If two adjacent
-# k-mers are farther apart than this, the k-mers serve to split the LCR into two
-# LCRs at that point.  An Indel Group or marker is found on a single LCR, so this
-# value limits the maximum Indel Group and amplicon size.  This is normally equal
-# to the maximum acceptable amplicon size AMAX (defined below), although it could
-# be larger.
-### YOU PROBABLY WANT TO SET THIS EQUAL TO YOUR MAXIMUM ACCEPTABLE DESIRED
-### AMPLICON LENGTH.
+# k-mers are farther apart than this in any genome, the k-mers serve to split the
+# LCR into two LCRs at that point.  This value limits the maximum length of one
+# indel within an InDel Group or LCR.  This is normally set equal to the maximum
+# acceptable amplicon size AMAX (defined below), although it could be larger.
+### YOU PROBABLY WANT TO SET THIS EQUAL TO YOUR MAXIMUM ACCEPTABLE AMPLICON
+### LENGTH.
 
 DMAX := 1500
 
@@ -595,18 +594,18 @@ EXTENSION_LEN := 20
 # Two different methods are provided for determining which Indel Groups and
 # markers to remove, and the following parameter chooses the method.  It must
 # be the value MIN or else MAX, meaning:
-#   MIN: when a set of Indel Groups/markers overlaps, the SMALLEST Indel
+#   MIN: when a set of Indel Groups/markers overlaps, the SHORTEST Indel
 #       Group/marker within the genome being tested is retained, and any Indel
-#       Groups/markers that overlap it are removed.
-#   MAX: when a set of Indel Groups/markers overlaps, the LARGEST Indel
+#       Groups/markers that overlap it are removed.  (I.e. shortest amplicons).
+#   MAX: when a set of Indel Groups/markers overlaps, the LONGEST Indel
 #       Group/marker within the genome being tested is retained, and any Indel
-#       Groups/markers that overlap it are removed.
+#       Groups/markers that overlap it are removed.  (I.e. longest amplicons).
 # That removal process is repeated until no more Indel Groups/markers overlap.
 # It is repeated for each genome as it is possible two Indel Groups/markers
 # might overlap in one genome but not another.
 #
 # Therefore you would set this to MIN if you want to bias towards getting
-# smaller Indel Group or marker regions, and to MAX to bias towards larger ones.
+# shorter amplicons, and to MAX to bias towards longer ones.
 ### CHANGE THIS TO YOUR CHOICE OF THE TWO
 
 OVERLAP_REMOVAL := MIN
@@ -722,7 +721,7 @@ DIR_PRIMER_DATA := $(DIR_IGGPIPE_OUT)/Primers
 # when designing primers.
 ### THIS DOES NOT NEED TO BE CHANGED.
 
-PATH_PRIMER3_DATA := $(DIR_PRIMER_DATA)/Primer3Data.txt
+PATH_PRIMER3_IN := $(DIR_PRIMER_DATA)/Primer3In.txt
 
 
 # Path of data file to be created by primer3 containing primer design results.

@@ -331,9 +331,6 @@ df = read.table(L$LCR.file, header=TRUE, sep="\t", row.names=1, stringsAsFactors
 catnow("\n")
 if (nrow(df) == 0) stop("Error reading ", L$LCR.file, ", no data found")
 rownames(df) = NULL
-# Change LCR to concatenation of reference genome ID and LCR so it is unique
-# among all reference IDs.
-df$LCR = paste(df[, which(grepl(".seqID", colnames(df)))[1]], df$LCR, sep="_")
 # Drop unwanted columns.  We want X.seqID and X.pos columns where X is specified
 # by PLOT.genomes.  Rename those columns "id.x", "x", "id.y", "y".
 genomeLtrs = unlist(strsplit(L$PLOT.genomes, "", fixed=TRUE))

@@ -53,7 +53,8 @@ show the names of file(s) that are produced.
      make PARAMS=myFilename sortKmers     GENOME=ALL
      make PARAMS=myFilename kmerIsect
      make PARAMS=myFilename getGenomicPos GENOME=ALL
-     make PARAMS=myFilename splitKmers    GENOME=ALL
+     make PARAMS=myFilename mergeKmers    GENOME=ALL
+     make PARAMS=myFilename getCommonUniqueKmers
      make PARAMS=myFilename findLCRs
      make PARAMS=myFilename findIndelGroups
      make PARAMS=myFilename getDNAseqs    GENOME=ALL

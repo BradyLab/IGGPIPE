@@ -279,8 +279,8 @@ again assuming you didn't change their names in the parameter file, are:
 
 .. MarkerCounts_*.plot.pdf is a pdf file showing plots of marker counts on chromosomes
 .. MarkerDensity_*.plot.png is a png image file showing plots of marker density and position
-.. MarkerOverlapping_*.tsv is a tab-separated file containing the candidate IGG markers
-.. MarkerNonoverlapping_*.tsv is a tab-separated file containing a non-overlapping version of the above
+.. MarkerOverlapping_*.tsv is a tab-separated file containing the candidate IGG markers, Table 1
+.. MarkerNonoverlapping_*.tsv is a tab-separated file containing a non-overlapping version of the above, Table 1
 
 Examine the .pdf and .png files.  The .tsv files can be loaded into Excel to look at
 the markers, and they can also be post-processed (see below) to change them into other
@@ -291,12 +291,12 @@ other things.
 
 Several other ".tsv" tab-separated output files exist:
 
-.. MarkerErrors_*.tsv contains candidate markers rejected because e-PCR failed
-.. NonvalidatedMarkers_*.tsv contains candidate markers not yet subjected to e-PCR
-.. IndelGroupsOverlapping_*.tsv contains overlapping regions of LCRs satisfying parameters for a possible IGG marker
-.. IndelGroupsNonoverlapping_*.tsv is like above but non-overlapping regions as per parameter OVERLAP_REMOVAL
-.. LCRs_*.tsv contains common unique k-mers assigned to locally conserved regions (LCRs)
-.. BadKmers_*.tsv contains common unique k-mers rejected from assignment to any LCR
+.. MarkerErrors_*.tsv contains candidate markers rejected because e-PCR failed, Tables 1, 2
+.. NonvalidatedMarkers_*.tsv contains candidate markers not yet subjected to e-PCR, Table 1
+.. IndelGroupsOverlapping_*.tsv contains overlapping regions of LCRs satisfying parameters for a possible IGG marker, Table 3
+.. IndelGroupsNonoverlapping_*.tsv is like above but non-overlapping regions as per parameter OVERLAP_REMOVAL, Table 3
+.. LCRs_*.tsv contains common unique k-mers assigned to locally conserved regions (LCRs), Table 4
+.. BadKmers_*.tsv contains common unique k-mers rejected from assignment to any LCR, Table 4
 
 Tables describing each column in each file type are at the end of this
 document.
@@ -329,7 +329,8 @@ your "allParameters" parameter file. Run it as follows:
   make PARAMS=allParameters.XY InDels    (replacing with your allParameters name)
 
 This produces a file in your output folder whose name ends with "indels.tsv",
-containing a table of all InDels found in the LCR or marker regions.
+containing a table of all InDels found in the LCR or marker regions.  Examine it
+to see the data it contains (see Table 5 of column descriptions).
 --
 
 . *Plotting InDel information*
@@ -446,7 +447,7 @@ other way to send them.
 *Tables*
 --------
 
-.Columns in MarkersOverlapping_, MarkersNonoverlapping_, NonvalidatedMarkers_ files; X,Y=chosen genome letters
+.Columns in MarkersOverlapping_, MarkersNonoverlapping_, NonvalidatedMarkers_, MarkerErrors_ files; X,Y=chosen genome letters
 [cols="^1,9",options="header"]
 |===================================================
 |Column|Description
@@ -540,14 +541,14 @@ if amplicon in X and Y genomes run in the same direction, > if opposite directio
 |Y.strand|Genome Y k-mer strand, "+" or "-"
 |Y.contig|Genome Y contig number within sequence X.seqID sequence of contig containing the k-mer
 |Y.contigPos|Genome Y position of upstream end of k-mer on "+" strand relative to start of Y.contig
-|LCR|Integer LCR number to which this k-mer is assigned, must be concatenated with reference genome X.seqID to be unique
+|LCR|Integer LCR number to which this k-mer is assigned, each LCR has a unique LCR number assigned to it
 |===================================================
 
 .Columns in *.indels.tsv files; X,Y=chosen genome letters
 [cols="^1,9",options="header"]
 |===================================================
 |Column|Description
-|ID|Unique ID tying row back to originating input file row. LCR input files: refID_LCRnumber.
+|ID|Unique ID tying row back to originating input file row. LCR input files: LCRnumber.
 InDelGroup and Markers files: refID_refPos1_refPos2.
 |phases|Phase of each genome incl. ref. genome, relative to ref. genome, string of +/- chars,
 + : same direction, - : opposite direction.",

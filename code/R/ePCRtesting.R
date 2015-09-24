@@ -56,7 +56,7 @@ else if (testing == 1)
     args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
         "outTestHP11/NonvalidatedMarkers_K11k2L100D10_2000A100_2000d10_100N2F0X20.tsv",
         1, "outTestHP11/MarkerErrors_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1_H.bad.tsv",
-        "/Users/tedtoal/bin/e-PCR", 3000, 8, 3, 1, "outTestHP11/GenomeData",
+        "outTestHP11/GenomeData", "/Users/tedtoal/bin/e-PCR", 3000, 8, 3, 1,
         "testFASTA/ITAG2.4_test.fasta", TRUE)
     }
 else if (testing == 2)
@@ -64,7 +64,7 @@ else if (testing == 2)
     args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
         "outTestHP11/NonvalidatedMarkers_K11k2L100D10_2000A100_2000d10_100N2F0X20.tsv",
         2, "outTestHP11/MarkerErrors_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1_P.bad.tsv",
-        "/Users/tedtoal/bin/e-PCR", 3000, 8, 3, 1, "outTestHP11/GenomeData",
+        "outTestHP11/GenomeData", "/Users/tedtoal/bin/e-PCR", 3000, 8, 3, 1,
         "testFASTA/Spenn2.0_test.fasta", TRUE)
     }
 else stop("Unknown value for 'testing'")
@@ -177,17 +177,18 @@ inv(kmerLen, "k")
 
 # Get the genome letter for this genome.
 genomeLtr = substr(colnames(df)[grepl("^.id$", colnames(df))], 1, 1)
-if (length(genomeLtr) < 2)
+Ngenomes = length(genomeLtr)
+if (Ngenomes < 2)
     stop("Expected at least two id columns in <tsvMarkerFile>")
 refGenomeLtr = genomeLtr[1]
-if (genomeNum > length(genomeLtr))
+if (genomeNum > Ngenomes)
     stop("genome number is larger than the number of genomes in <tsvMarkerFile>")
 genomeLtr = genomeLtr[genomeNum]
 inv(genomeLtr, "genome letter")
 
 ############################################################################
-# Create a ".sts" tab-separated text file to use as input to e-PCR, giving
-# the primer pairs to be tested.  Example:
+# Create a ".epcr.in" tab-separated text file to use as input to e-PCR,
+# giving the primer pairs to be tested.  Example:
 #
 # 1 TGAAGATTACGACTTGAAGCTCC TGCTCACGAGTTCAGGAGAT    1506    H=1506,P=691
 #
@@ -205,8 +206,9 @@ dfEPCR = data.frame(rowNum=1:nrow(df), prmSeqL=df$prmSeqL, prmSeqR=df$prmSeqR,
     ampLen=df[, ampCol], info=apply(dfInfo, 1, paste, collapse=","),
     stringsAsFactors=FALSE)
 
-ePCRinputFile = paste(genomeLtr, ".sts", sep="")
+ePCRinputFile = paste("Genome_", genomeNum, ".epcr.in", sep="")
 ePCRinputFile = paste(pcrInfoDir, ePCRinputFile, sep=PATHSEP)
+cat("ePCRinputFile='", ePCRinputFile, "'\n", sep="")
 write.table(dfEPCR, ePCRinputFile, row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 
 ########################################
@@ -214,7 +216,7 @@ write.table(dfEPCR, ePCRinputFile, row.names=FALSE, col.names=FALSE, quote=FALSE
 # file must be read and searched for each primer.
 ########################################
 
-ePCRoutputFile = paste(genomeLtr, ".epcr.out", sep="")
+ePCRoutputFile = paste("Genome_", genomeNum, ".epcr.out", sep="")
 ePCRoutputFile = paste(pcrInfoDir, ePCRoutputFile, sep=PATHSEP)
 cmdLine = paste(ePCRpath, "-v+", "-p+", "-t3",
     paste("-m", maxDeviation, sep=""),

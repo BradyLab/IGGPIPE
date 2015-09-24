@@ -346,10 +346,10 @@ seqExtStrs = paste(c("", "!")[1+dfXP$pos.revcomp], df$id,
     ":", as.integer(dfXP$pos.left),
     "..", as.integer(dfXP$pos.right), sep="")
 
-extractPosFile = paste(extractDir, paste("extract_KmerRgn", genomeNum, ".txt", sep=""), sep=PATHSEP)
+extractPosFile = paste(extractDir, paste("extract_KmerRgns_", genomeNum, ".txt", sep=""), sep=PATHSEP)
 writeLines(seqExtStrs, extractPosFile)
 
-seqFile = paste(extractDir, paste("seqs_KmerRgn", genomeNum, ".txt", sep=""), sep=PATHSEP)
+seqFile = paste(extractDir, paste("seqs_KmerRgns_", genomeNum, ".txt", sep=""), sep=PATHSEP)
 cmdLine = paste(perlPath, getSeqsFromFasta, fastaFile, "-i", extractPosFile, "-o", seqFile)
 
 inv(length(seqExtStrs), "length(seqExtStrs)")

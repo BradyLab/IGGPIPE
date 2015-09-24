@@ -618,6 +618,8 @@ is called alignAndGetIndels.R. Run it as follows:
 
 This produces file outTestHP11/
 MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv
+
+Examine it to see the InDel data it contains.
 --
 
 . *Run 'make plotInDels' to plot InDel information*

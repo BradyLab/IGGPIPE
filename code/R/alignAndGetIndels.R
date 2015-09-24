@@ -104,10 +104,9 @@ if (length(args) < NexpectedMin)
         "minimum size.  Write a new file containing the InDel positions, with columns 'ID',",
         "'phases', 'idx', 'Xdel', 'Xid', 'Xstart', and 'Xend', and with one row per InDel.",
         "The 'ID' column contains a unique ID that ties the row back to the input file row(s)",
-        "from which it originated.  For LCR input files, the ID is the reference genome ID",
-        "followed by '_' and the LCR number.  For InDel group and marker input files, the ID",
-        "is the reference genome ID followed by '_', the reference genome 'pos1' number, an",
-        "'_', and the reference genome 'pos2' number.",
+        "from which it originated.  For LCR input files, the ID is the LCR number.  For InDel",
+        "group and marker input files, the ID is the reference genome ID followed by '_', the",
+        "reference genome 'pos1' number, an '_', and the reference genome 'pos2' number.",
         "The 'phases' column gives the 'phase' of each genome including the reference genome,",
         "relative to the reference genome, as a string of '+' and '-' characters, where '+'",
         "means the sequences in the two genomes run in the same direction, and '-' means they",
@@ -262,9 +261,8 @@ if (any(colnames(df) == "LCR"))
     names(idCols) = genomeLtrs
     names(posCols) = genomeLtrs
     names(strandCols) = genomeLtrs
-    # Create ID column and remove LCR column.
-    df$ID = paste(df[,idCols[1]], df$LCR, sep="_")
-    df = df[, colnames(df) != "LCR"]
+    # Rename LCR column to ID column.
+    colnames(df) = sub("^LCR$", "ID", colnames(df))
 
     # Merge: collapse all the identical ID rows together, compute correct Xpos1,
     # Xpos2, and phase.  Add phases column.
@@ -454,7 +452,7 @@ if (!file.exists(extractDir))
     dir.create(extractDir)
 
 # Create filenames for extraction position files.
-extractPosFiles = paste(extractDir, paste("extract_Regions", 1:Ngenomes, ".txt", sep=""), sep=PATHSEP)
+extractPosFiles = paste(extractDir, paste("extract_IndelGroupRgns_", 1:Ngenomes, ".txt", sep=""), sep=PATHSEP)
 names(extractPosFiles) = genomeLtrs
 
 # Put sequence extraction strings in list seqExtStrs, with one vector of strings
@@ -485,7 +483,7 @@ for (genome in genomeLtrs)
 # entire sequence into memory before processing it.
 ################################################################################
 
-seqFiles = paste(extractDir, paste("seqs_Regions", 1:Ngenomes, ".txt", sep=""), sep=PATHSEP)
+seqFiles = paste(extractDir, paste("seqs_IndelGroupRgns_", 1:Ngenomes, ".txt", sep=""), sep=PATHSEP)
 names(seqFiles) = genomeLtrs
 cmdLines = paste(perlPath, getSeqsFromFasta, fastaFiles, "-l 0", "-i", extractPosFiles, "-o", seqFiles)
 names(cmdLines) = genomeLtrs

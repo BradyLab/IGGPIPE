@@ -31,10 +31,11 @@
 #           attributes: attributes
 #
 # This data file can be added as a track to the solgenomics.net S. lycopersicum
-# ITAG2.4 JBrowse genome browser.  Go to solgenomics.net, select Genomes, Tomato,
-# and in the Download section, choose Genome Browser.  In JBrowse browser, select
+# ITAG2.4 JBrowse genome browser.  Suggestion: rename the file to what you want
+# the track named.  Then, go to solgenomics.net, select Genomes, Tomato, and
+# in the Download section, choose Genome Browser.  In JBrowse browser, select
 # File, Open, and in Local Files choose Select Files, choose the output file
-# from here, choose Open.  In the browser make sure "GFF3 Markers" and "ITAG2.4
+# from here, choose Open.  In the browser make sure you track and "ITAG2.4
 # gene models" tracks are selected at the left.  In the drop-down box choose
 # chromosome 1 (SL2.50ch01) and enter "SL2.50ch01:39198..43998" in the position
 # box.  You should see orange bands representing markers, labelled ID_0_001 etc.

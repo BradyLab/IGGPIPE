@@ -129,13 +129,17 @@ ALL:
 	@echo
 else ifeq ($(CLEAN),1)
 ALL: all_getSeqInfo all_getKmers all_kmerStats all_sortKmers all_getContigFile \
-    kmerIsect all_getGenomicPos all_mergeKmers findLCRs findIndelGroups \
-    all_getDNAseqs findPrimers all_ePCRtesting removeBadMarkers plotMarkers
+    kmerIsect all_getGenomicPos all_mergeKmers getCommonUniqueKmers findLCRs \
+    findIndelGroups all_getDNAseqs findPrimers all_ePCRtesting removeBadMarkers \
+    plotMarkers
 	@echo
 	@echo "ALL files are cleaned"
 	@echo
 else
-ALL: plotMarkers
+ALL: all_getSeqInfo all_getKmers all_kmerStats all_sortKmers all_getContigFile \
+    kmerIsect all_getGenomicPos all_mergeKmers getCommonUniqueKmers findLCRs \
+    findIndelGroups all_getDNAseqs findPrimers all_ePCRtesting removeBadMarkers \
+    plotMarkers
 	@echo
 	@echo "ALL files are up to date"
 	@echo
@@ -424,7 +428,7 @@ kmerIsect: $(PATH_ISECT_KMERS)
 else
 kmerIsect:
 	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_ISECT_KMERS)
-	@echo "kmerIsect output files removed."
+	@echo "kmerIsect output file(s) removed."
 endif
 
 # PATH_ISECT_KMERS target.
@@ -485,13 +489,20 @@ $(ISECT_KMER_FILES) : $(PFX_KMERS_DATA_FILE)%.isect.unique : $(PATH_ISECT_KMERS)
 # a single file containing the data for all genomes.  Argument: GENOME
 ################################################################################
 
+# We want to join corresponding lines of multiple genome files, with the k-mer
+# in the first column being the join key (the files are sorted by k-mer, so we
+# are actually just joining the lines together, except that the k-mer appears
+# only one time as the first column).  The files to be joined have suffix
+# ".isect.unique", and the joined files have suffix ".isect.merge".
 # This is problematic because the 'join' command can only join two files, but we
 # have as many files to be joined as we have genomes.  We will join one genome
 # at a time to the previously joined file, starting by joining the second genome
 # k-mer positions file to the reference genome k-mer positions file.  When this
 # is called with GENOME=1 (reference genome), we will just COPY the reference
-# genome positions file to a new file which will be the join file for the second
-# genome.
+# genome positions file (_1.isect.unique) to a new file (_1.isect.merge), which
+# will be the join file for the second genome.  The second join joins the
+# _1.isect.merge file and the _2.isect.unique file to form the _2.isect.merge
+# file, etc.
 
 # A list of all .isect.merge files to be produced.
 MERGE_KMER_FILES := $(foreach G,$(GENOME_NUMBERS),$(PFX_KMERS_DATA_FILE)$(G).isect.merge)
@@ -511,7 +522,7 @@ mergeKmers: $(TARGET_MERGE)
 else
 mergeKmers:
 	@$(CMD_DELETE_WHEN_CLEANING) $(TARGET_MERGE)
-	@echo "mergeKmers output file for genome(s) $(GENOME) removed."
+	@echo "mergeKmers output file(s) for genome(s) $(GENOME) removed."
 endif
 
 # Define the target file recipe for genome 1 separately, it is different.
@@ -536,12 +547,39 @@ G_PREV := 0 $(GENOME_NUMBERS)
 # Here, % is a genome number.
 
 $(TARGET_MERGE_OTHERS) : $(PFX_KMERS_DATA_FILE)%.isect.merge : $(PFX_KMERS_DATA_FILE)%.isect.unique \
-        $(PFX_KMERS_DATA_FILE)$$(word %,$$(G_PREV)).isect.unique | \
-        $(DIR_SPLIT_KMERS) $(PATH_RSCRIPT) $(PATH_SPLIT_KMERS)
+        $(PFX_KMERS_DATA_FILE)$$(word %,$$(G_PREV)).isect.merge | $(PATH_RSCRIPT)
 	@echo
 	@echo "*** mergeKmers PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
 	@echo "Merge common unique $(K)-mers for genomes $(word $*,$(G_PREV)) and $* to $@"
-	$(TIME) join -t '	' $(PFX_KMERS_DATA_FILE)$(word $*,$(G_PREV)).isect.unique $< >$@ $(REDIR)
+	$(TIME) join -t '	' $(PFX_KMERS_DATA_FILE)$(word $*,$(G_PREV)).isect.merge $< >$@ $(REDIR)
+	@echo "Finished."
+
+################################################################################
+# getCommonUniqueKmers: Sort merged kmers file to obtain sorted common unique
+# k-mers file.
+################################################################################
+
+# The last file in the chain of merged files from the merge operation preceding this.
+# This file is the dependent file we use as input to findLCRs (after sorting it).
+UNSORTED_COMMON_UNIQUE_KMERS := $(PFX_KMERS_DATA_FILE)$(N_GENOMES).isect.merge
+
+# Phony target to make or clean PATH_COMMON_UNIQUE_KMERS file.
+ifeq ($(CLEAN),)
+getCommonUniqueKmers: $(PATH_COMMON_UNIQUE_KMERS)
+	@echo
+	@echo "Common unique k-mers file is up to date."
+else
+getCommonUniqueKmers:
+	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_COMMON_UNIQUE_KMERS)
+	@echo "Common unique k-mers file removed."
+endif
+
+# Target for the sorted common unique k-mers file.
+$(PATH_COMMON_UNIQUE_KMERS) : $(UNSORTED_COMMON_UNIQUE_KMERS)
+	@echo "*** findLCRs PARAMS=$(PARAMS) $(CLEAN) ***"
+	@echo
+	@echo "Sort merged common unique $(K)-mers by reference genome position from $< into $(PATH_COMMON_UNIQUE_KMERS)"
+	$(TIME) sort -k 2,2 -k 5,5n -k 3,3n $< >$(PATH_COMMON_UNIQUE_KMERS) $(REDIR)
 	@echo "Finished."
 
 ################################################################################
@@ -549,10 +587,6 @@ $(TARGET_MERGE_OTHERS) : $(PFX_KMERS_DATA_FILE)%.isect.merge : $(PFX_KMERS_DATA_
 # genomic positions that have been merged into a single file sorted by reference
 # genome position.
 ################################################################################
-
-# The last file in the chain of merged files from the merge operation preceding this.
-# This file is the dependent file we use as input to findLCRs (after sorting it).
-UNSORTED_COMMON_UNIQUE_KMERS := $(PFX_KMERS_DATA_FILE)$(N_GENOMES).isect.merge
 
 # Phony target to make or clean PATH_LCR_FILE and PATH_BAD_KMERS_FILE files.
 ifeq ($(CLEAN),)
@@ -562,7 +596,7 @@ findLCRs: $(PATH_LCR_FILE) $(PATH_BAD_KMERS_FILE)
 else
 findLCRs:
 	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_LCR_FILE) $(PATH_BAD_KMERS_FILE)
-	@echo "findLCRs output files removed."
+	@echo "findLCRs output file(s) removed."
 endif
 
 # PATH_LCR_FILE and PATH_BAD_KMERS_FILE targets are built at the same time.
@@ -587,16 +621,8 @@ $(PTN_LCR_FILE) $(PTN_BAD_KMERS_FILE) : $(PATH_COMMON_UNIQUE_KMERS) | \
 	    $(INVESTIGATE_FINDLCRS) $(REDIR)
 	@echo "Finished."
 
-# Target for the sorted common unique k-mers file.
-$(PATH_COMMON_UNIQUE_KMERS) : $(UNSORTED_COMMON_UNIQUE_KMERS)
-	@echo "*** findLCRs PARAMS=$(PARAMS) $(CLEAN) ***"
-	@echo
-	@echo "Sort merged common unique $(K)-mers by reference genome position from $< into $(PATH_COMMON_UNIQUE_KMERS)"
-	$(TIME) sort -k 2,2 -k 5,5n -k 3,3n $< >$(PATH_COMMON_UNIQUE_KMERS) $(REDIR)
-	@echo "Finished."
-
 ################################################################################
-# findINDELS: Analyze locally conserved regions to find insertions/deletions.
+# findIndelGroups: Analyze locally conserved regions to find insertions/deletions.
 ################################################################################
 
 # A list of all .idlens files is already defined above: IDLEN_FILES
@@ -609,7 +635,7 @@ findIndelGroups: $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) $(PATH_NONOVERLAPPING_IND
 else
 findIndelGroups:
 	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) $(PATH_NONOVERLAPPING_INDEL_GROUPS_FILE)
-	@echo "findIndelGroups output files removed."
+	@echo "findIndelGroups output file(s) removed."
 endif
 
 # PATH_OVERLAPPING_INDEL_GROUPS_FILE and PATH_NONOVERLAPPING_INDEL_GROUPS_FILE targets are built at the same time.
@@ -695,8 +721,8 @@ findPrimers: $(PATH_MARKER_DATA_FILE)
 	@echo "findPrimers files are up to date."
 else
 findPrimers:
-	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_MARKER_DATA_FILE) $(PATH_PRIMER3_DATA) $(PATH_PRIMER3_OUT)
-	@echo "findPrimers output files removed."
+	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_MARKER_DATA_FILE) $(PATH_PRIMER3_IN) $(PATH_PRIMER3_OUT)
+	@echo "findPrimers output file(s) removed."
 endif
 
 # PATH_MARKER_DATA_FILE target.
@@ -711,7 +737,7 @@ $(PATH_MARKER_DATA_FILE) : $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) $(DNA_SEQ_FILES
 		$(PFX_GENOME_DATA_FILE) \
 		$(PATH_MARKER_DATA_FILE) \
 		$(PATH_PRIMER3CORE) $(PATH_PRIMER3_SETTINGS) \
-		$(PATH_PRIMER3_DATA) $(PATH_PRIMER3_OUT) \
+		$(PATH_PRIMER3_IN) $(PATH_PRIMER3_OUT) \
 		$(INVESTIGATE_FINDPRIMERS) $(REDIR)
 	@echo "Finished."
 
@@ -738,7 +764,7 @@ ePCRtesting: $(TARGET_BAD_MARKER)
 	@echo "ePCRtesting file(s) for genome(s) $(GENOME) are up to date."
 else
 ePCRtesting:
-	@$(CMD_DELETE_WHEN_CLEANING) $(TARGET_BAD_MARKER) $(DIR_GENOME_OUT_DATA)/*.sts $(DIR_GENOME_OUT_DATA)/*.epcr.out
+	@$(CMD_DELETE_WHEN_CLEANING) $(TARGET_BAD_MARKER) $(DIR_GENOME_OUT_DATA)/*.epcr.in $(DIR_GENOME_OUT_DATA)/*.epcr.out
 	@echo "ePCRtesting output file(s) for genome(s) $(GENOME) removed."
 endif
 
@@ -774,7 +800,7 @@ removeBadMarkers: $(PATH_OVERLAPPING_MARKERS_FILE) $(PATH_NONOVERLAPPING_MARKERS
 else
 removeBadMarkers:
 	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_OVERLAPPING_MARKERS_FILE) $(PATH_NONOVERLAPPING_MARKERS_FILE)
-	@echo "removeBadMarkers output files removed."
+	@echo "removeBadMarkers output file(s) removed."
 endif
 
 # PATH_OVERLAPPING_MARKERS_FILE and PATH_NONOVERLAPPING_MARKERS_FILE targets are built at the same time.
@@ -820,7 +846,7 @@ plotMarkers: $(MARKER_COUNTS_FILE) $(MARKER_DENSITY_FILES)
 else
 plotMarkers:
 	@$(CMD_DELETE_WHEN_CLEANING) $(MARKER_COUNTS_FILE) $(MARKER_DENSITY_FILES)
-	@echo "plotMarkers output files removed."
+	@echo "plotMarkers output file(s) removed."
 endif
 
 # MARKER_COUNTS_FILE and MARKER_DENSITY_FILES targets are built at the same time.
@@ -867,7 +893,7 @@ InDels: $(PATH_INDELS_OUTPUT_FILE)
 else
 InDels:
 	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_INDELS_OUTPUT_FILE)
-	@echo "InDels output file removed."
+	@echo "InDels output file(s) removed."
 endif
 
 # PATH_INDELS_OUTPUT_FILE target.
@@ -906,7 +932,7 @@ plotInDels: $(PATH_INDELS_PLOT_FILE)
 else
 plotInDels:
 	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_INDELS_PLOT_FILE)
-	@echo "plotInDels output file removed."
+	@echo "plotInDels output file(s) removed."
 endif
 
 # PATH_INDELS_PLOT_FILE target.

@@ -901,6 +901,11 @@ Primer3 (V2.3.6 works) (<a href="http://sourceforge.net/projects/primer3">http:/
 NCBI e-PCR (V2.3.12 works) (<a href="http://www.ncbi.nlm.nih.gov/tools/epcr">http://www.ncbi.nlm.nih.gov/tools/epcr</a>)
 </p>
 </li>
+<li>
+<p>
+MUSCLE (V3.8.31 works) (<a href="http://www.drive5.com/muscle/downloads.htm">http://www.drive5.com/muscle/downloads.htm</a>)
+</p>
+</li>
 </ol></div>
 </div></div>
 </li>
@@ -1216,7 +1221,7 @@ it. Look for it here:</p></div>
 <pre><code>http://sourceforge.net/projects/primer3</code></pre>
 </div></div>
 <div class="paragraph"><p>It comes pre-built for OSX, so make sure you download the OSX version. Put the
-downloaded directory whereever you want on your computer. The file named
+downloaded directory wherever you want on your computer. The file named
 primer3_core in the root directory of the downloaded package is the executable
 program file. The allParameters.mytemplate file must have the path to primer3_core
 included in it. Assign the path to the parameter "PATH_PRIMER3CORE". For example,
@@ -1246,7 +1251,7 @@ fine. To install e-PCR, look for it here:</p></div>
 </div></div>
 <div class="paragraph"><p>The download link uses FTP protocol. Log in as user GUEST with no password.
 Look for the latest .zip version and copy the zip file to your computer and unzip
-it.  Put the unzipped directory whereever you want on your computer.</p></div>
+it.  Put the unzipped directory wherever you want on your computer.</p></div>
 <div class="paragraph"><p>It is now necessary to run "make" to compile and build the program. Version 2.3.12
 had two problems with it that required editing of the source code in order for the
 "make" operation to complete successfully. Perhaps these problems will have been
@@ -1298,6 +1303,35 @@ as follows:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>PATH_EPCR := ~/Documents/e-PCR-2.3.12/e-PCR</code></pre>
+</div></div>
+</div></div>
+</li>
+<li>
+<p>
+<strong>Install MUSCLE and set its path</strong>
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>MUSCLE is an open-domain multiple sequence aligner.  It is used by IGGPIPE only
+if you choose to search markers or LCRs for InDels by using the <em>make InDels</em>
+command, so if you don&#8217;t do that you can skip this step, although you may as
+well install it. This version of IGGPIPE was tested with MUSCLE version v.8.31,
+although later versions will probably be fine. To install MUSCLE, look for it
+here:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>http://www.drive5.com/muscle/downloads.htm</code></pre>
+</div></div>
+<div class="paragraph"><p>The executable images are already built, so choose the correct download for your
+system and download the file, putting it wherever you want on your computer, such
+as a bin folder.</p></div>
+<div class="paragraph"><p>Now the allParameters.mytemplate file must have the path to MUSCLE included in it.
+Assign the path to the parameter "PATH_ALIGNER". For example, maybe you put the
+downloaded file in a <em>bin</em> folder in your user directory and you set the parameter
+as follows:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>PATH_ALIGNER := ~/bin/muscle3.8.31_i86darwin64</code></pre>
 </div></div>
 </div></div>
 </li>
@@ -1494,6 +1528,48 @@ directory:</p></div>
 <pre><code>diff MarkersOverlapping.test.tsv outTestHP11/MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv</code></pre>
 </div></div>
 <div class="paragraph"><p>This command should not produce any output, indicating the two files are identical.</p></div>
+<div class="paragraph"><p>Note that there are other sample "allParameters" files in subdirectory "allParameters"
+which have been used for testing IGGPIPE on various genomes.</p></div>
+</div></div>
+</li>
+<li>
+<p>
+<strong>Run <em>make InDels</em> to align markers and find InDels</strong>
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>An R program that is NOT run as part of the pipeline when the <em>make &#8230; ALL</em> target
+is built, but which can be run using <em>make &#8230; InDels</em>, is able to read a file of LCRs,
+non-overlapping InDelGroups, or non-overlapping Markers, extract the DNA sequences
+from the genomes in each LCR or Marker region and align them, then locate all
+InDels in the aligned sequences and write their positions to a file.  The program
+is called alignAndGetIndels.R. Run it as follows:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>make PARAMS=allParameters.test InDels</code></pre>
+</div></div>
+<div class="paragraph"><p>This produces file outTestHP11/
+MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv</p></div>
+<div class="paragraph"><p>Examine it to see the InDel data it contains.</p></div>
+</div></div>
+</li>
+<li>
+<p>
+<strong>Run <em>make plotInDels</em> to plot InDel information</strong>
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>Another R program that is NOT run as part of the pipeline when the <em>make &#8230; ALL</em> target
+is built, but which can be run using <em>make &#8230; plotInDels</em>, reads the InDels file produced
+by <em>make &#8230; InDels</em> and plots information from it in a pdf file. The program is called
+plotIndels.R. Run it as follows:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>make PARAMS=allParameters.test plotInDels</code></pre>
+</div></div>
+<div class="paragraph"><p>This produces file outTestHP11/
+MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.pdf</p></div>
+<div class="paragraph"><p>Examine it to see the plots it contains.</p></div>
 </div></div>
 </li>
 <li>
@@ -1513,6 +1589,8 @@ the test data just produced. Run dotplot.R as follows:</p></div>
 </div></div>
 <div class="paragraph"><p>This produces file outTestHP11/LCRs_K11k2L100D10_2000.dotplot.png, an image file.
 Examine it (e.g. in the Preview app) to see the dot plot.</p></div>
+<div class="paragraph"><p>There are other sample parameter files in subdirectory "dotplot", although the
+parameter file is fairly straightforward and you probably don&#8217;t need other examples.</p></div>
 </div></div>
 </li>
 <li>
@@ -1531,15 +1609,15 @@ to .gff3 or .gtf for adding the markers to a browser track. All this can be done
 the R program annotateFile.R that is provided with IGGPIPE. It is driven by a parameter
 file, a sample of which has been provided, annotate.template, that is set for using
 the test data just produced along with additional annotation test data in folder
-testAnnotation. Run annotateFile.R as follows:</p></div>
+code/R/test_GFFfuncsAndMergeData. Run annotateFile.R as follows:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>Rscript code/R/annotateFile.R annotate.template</code></pre>
 </div></div>
-<div class="paragraph"><p>This produces these files in folder outTestHP11: MarkersWithILs.tsv, MarkersWithGenes.tsv,
-MarkersWithGenes.gff3, and MarkersWithGenes.gtf. You can examine these files with
-a text editor, or load the .gff3 file into the tomato JBrowse genome browser at
-solgenomics.net. (How?)</p></div>
+<div class="paragraph"><p>This produces this new file in the root IGGPIPE folder: MarkersAnnotated.test.tsv
+You can examine this file with a text editor or Excel to see the new column.</p></div>
+<div class="paragraph"><p>There are other sample parameter files in subdirectory "annotate" which produce
+other types of files or do other types of file data manipulation.</p></div>
 </div></div>
 </li>
 </ol></div>
@@ -1578,7 +1656,7 @@ Contact me, Ted Toal, <a href="mailto:twtoal@ucdavis.edu">twtoal@ucdavis.edu</a>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-09-07 08:06:53 PDT
+Last updated 2015-09-19 14:56:44 PDT
 </div>
 </div>
 </body>

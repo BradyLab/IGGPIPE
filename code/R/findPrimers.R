@@ -57,7 +57,7 @@ else if (testing == 1)
         "outTestHP11/GenomeData/Genome_",
         "outTestHP11/NonvalidatedMarkers_K11k2L100D10_2000A100_2000d10_100N2F0X20.tsv",
         "~/bin/primer3_core", "Primer3Settings.txt",
-        "outTestHP11/Primers/Primer3Data.txt", "outTestHP11/Primers/Primer3Out.txt", TRUE)
+        "outTestHP11/Primers/Primer3In.txt", "outTestHP11/Primers/Primer3Out.txt", TRUE)
     }
 else stop("Unknown value for 'testing'")
 }
