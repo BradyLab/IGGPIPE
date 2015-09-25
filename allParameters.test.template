@@ -508,28 +508,6 @@ NDAMIN := 2
 MINFLANK := 0
 
 
-# Number of base pairs of additional sequence to retrieve on each side of each
-# of the two anchor k-mers of an IGG marker, for the purpose of designing
-# primers.  Primer parameters such as minimum and maximum size, and all other
-# parameters, are set in a parameter file used by primer3 to design the primer.
-# The value 2*EXTENSION_LEN + k is the maximum possible primer length.  Set
-# EXTENSION_LEN large enough that you create multiple sites at which primers
-# could possibly be found.  The maximum allowed setting for this is 50.  If
-# this is >= minimum primer length, then it is possible a primer will be made
-# in the extension region and not including ANY of the unique k-mer bases.
-# This might make the primer less likely to be unique, but the e-PCR testing
-# of the primers will catch those situations and reject those primers.  A
-# value of 20 with k=14 provides 54 base-pairs of sequence in which to design
-# a primer.  Note that N's are placed at positions where genomes differ in the
-# extended regions on either side of the k-mer, so that primer3 will not design
-# a primer on that position.  This means many candidate markers will fail to get
-# a primer designed and so will be rejected.  All bases of the k-mer are of
-# course identical across all genomes.
-### THIS IS A REASONABLE VALUE FOR THIS PARAMETER.
-
-EXTENSION_LEN := 20
-
-
 # Two files of Indel Groups are produced, one of overlapping Indel Groups and
 # another of non-overlapping Indel Groups.  Likewise, two files of IGG markers
 # are produced, one of overlapping markers and another of non-overlapping.
@@ -568,6 +546,28 @@ EXTENSION_LEN := 20
 ### CHANGE THIS TO YOUR CHOICE OF THE TWO
 
 OVERLAP_REMOVAL := MIN
+
+
+# Number of base pairs of additional sequence to retrieve on each side of each
+# of the two anchor k-mers of an IGG marker, for the purpose of designing
+# primers.  Primer parameters such as minimum and maximum size, and all other
+# parameters, are set in a parameter file used by primer3 to design the primer.
+# The value 2*EXTENSION_LEN + k is the maximum possible primer length.  Set
+# EXTENSION_LEN large enough that you create multiple sites at which primers
+# could possibly be found.  The maximum allowed setting for this is 50.  If
+# this is >= minimum primer length, then it is possible a primer will be made
+# in the extension region and not including ANY of the unique k-mer bases.
+# This might make the primer less likely to be unique, but the e-PCR testing
+# of the primers will catch those situations and reject those primers.  A
+# value of 20 with k=14 provides 54 base-pairs of sequence in which to design
+# a primer.  Note that N's are placed at positions where genomes differ in the
+# extended regions on either side of the k-mer, so that primer3 will not design
+# a primer on that position.  This means many candidate markers will fail to get
+# a primer designed and so will be rejected.  All bases of the k-mer are of
+# course identical across all genomes.
+### THIS IS A REASONABLE VALUE FOR THIS PARAMETER.
+
+EXTENSION_LEN := 20
 
 
 # Maximum deviation in base pairs from expected amplicon size of off-target

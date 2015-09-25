@@ -812,12 +812,14 @@ are required.</p></div>
 <div class="paragraph"><p>Most work here is done from the command line, by opening the Terminal application.
 Commands will be shown here and you may be able to get by with no knowledge of the
 command line, other than knowing how to start it (by starting the Terminal app
-on the Mac). However, if you to familiarize yourself with some of the basic
-command line commands, you may want to take a look at a short tutorial such as
-one of these:</p></div>
+on the Mac). However, ideally you should be familiar with some basic command
+line commands such as <em>cd</em>, <em>ls</em>, <em>cp</em>, <em>rm</em>, <em>mv</em>, <em>sudo</em>, <em>less</em> or <em>more</em>,
+<em>head</em> and <em>tail</em>, <em>man</em>, and <em>mkdir</em>. If you do not know how to use the command
+line or don&#8217;t know these basic commands, you may want to take some time to learn
+a bit. Here are two short tutorial web sites:</p></div>
 <div class="paragraph"><p><a href="http://www.davidbaumgold.com/tutorials/command-line">http://www.davidbaumgold.com/tutorials/command-line</a></p></div>
 <div class="paragraph"><p><a href="http://mac.appstorm.net/how-to/utilities-how-to/how-to-use-terminal-the-basics">http://mac.appstorm.net/how-to/utilities-how-to/how-to-use-terminal-the-basics</a></p></div>
-<div class="paragraph"><p>Or a longer tutorial such as this one from UC Davis:</p></div>
+<div class="paragraph"><p>Here is a longer tutorial from UC Davis:</p></div>
 <div class="paragraph"><p><a href="http://korflab.ucdavis.edu/Unix_and_Perl/current.html">http://korflab.ucdavis.edu/Unix_and_Perl/current.html</a></p></div>
 </div></div>
 </li>
@@ -895,6 +897,12 @@ for X and Y), using either the Mac&#8217;s Finder or via the command line. For e
 <pre><code>cd ~/Documents/IGGPIPE    (or whatever is appropriate for your system)
 cp allParameters.mytemplate allParameters.HP    (here, X=H, Y=P)</code></pre>
 </div></div>
+<div class="paragraph"><p>Besides the sample parameter file "allParameters.mytemplate", there are several more
+sample "allParameters" parameter files in the subfolder <em>allParameters</em>.  These
+were used for testing IGGPIPE with various genomes.  The subfolder <em>allParameters</em>
+was made to keep the files better organized and keep the root folder less messy.
+You may want to adopt the same strategy and put your "allParameters" files in the
+<em>allParameters</em> subfolder or in a subfolder you make yourself.</p></div>
 </div></div>
 </li>
 <li>
@@ -1008,7 +1016,7 @@ version).</p></div>
 </li>
 <li>
 <p>
-<strong>Run IGGPIPE with the command "make PARAMS=allParameters.XY ALL"</strong>
+<strong>Understand use of <em>make</em> and "Makefile" for running IGGPIPE</strong>
 </p>
 <div class="openblock">
 <div class="content">
@@ -1017,101 +1025,271 @@ analyze the genome sequence data and eventually produce candidate IGG marker
 primers. The task of running all this software has been automated using a
 "Makefile", which is a file with that name containing commands formatted correctly
 for reading the allParameters.XY parameter file and running the software applications.
-The Makefile is applied by using the application named "make", which was installed
+The Makefile is applied by using the application named <em>make</em>, which was installed
 when IGGPIPE was installed, if it didn&#8217;t already exist.</p></div>
-<div class="paragraph"><p>A big advantage of using "Makefile" and "make" is that if something goes wrong
-(and unfortunately, it probably will), the portion of the work successfully completed
-is not lost, and does not need to be repeated. This is important because it can take
-quite a long time to run genomes all the way through the IGGPIPE software. Depending
-on your computer speed and memory, it can take hours or even days.</p></div>
-<div class="paragraph"><p>You run "make" from the command line to run IGGPIPE. If an error occurs, "make" will
-stop, and an error message should be visible. If you are lucky, you will have no
-errors. I do not yet have enough experience running IGGPIPE on different genomes to
-anticipate how often errors will occur, or what will cause them. Please email me
-with information about errors, and their resolution if you were able to resolve
-them. I&#8217;ll try to make improvements to IGGPIPE in error handling and in its input
-data format flexibility to try to prevent errors.</p></div>
-<div class="paragraph"><p>After the allParameters.XY file is edited and ready to go, <strong>run the IGGPIPE pipeline
-from the IGGPIPE directory as follows</strong>:</p></div>
+<div class="paragraph"><p>A big advantage of using "Makefile" and <em>make</em> is that if something goes wrong
+(and by Murphy&#8217;s law, it probably will), the portion of the work successfully
+completed is not lost, and does not need to be repeated. This is important because
+it can take quite a long time to run genomes all the way through the IGGPIPE
+software. Depending on your computer speed and memory, it can take hours or even
+days. If an error occurs, <em>make</em> will stop, and an error message should be visible
+on the terminal. After fixing the error, all you have to do resume the pipeline
+commands from the last successful step is re-enter the same <em>make</em> command.</p></div>
+<div class="paragraph"><p>You must finish editing the allParameters.XY file before trying to run the pipeline
+using <em>make</em>. If that file is ready to go, you can start running IGGPIPE using the
+command <em>make</em> from the command line, with additional command arguments. The first
+argument that is required is of the form "PARAMS=&lt;allParameters filename&gt;". For
+example, if your allParameters file is named "allParameters.XY", then the <em>make</em>
+command starts out as <em>make PARAMS=allParameters.XY</em>.</p></div>
+<div class="paragraph"><p>The remaining command arguments for the <em>make</em> command tell which part of the
+pipeline to run. If the argument is <em>ALL</em>, the entire pipeline is run (or as
+much of it as is needed to resume where a previous error had halted). However,
+since the choice of some of the parameters, especially the value of K, can have
+a strong influence on the number of markers found, it is best to run IGGPIPE a
+few steps at a time and check the output after those steps before proceeding
+further. The following sections will guide you in this.</p></div>
+<div class="paragraph"><p>Use this command to get a listing of complete usage information for running
+<em>make</em>:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>cd ~/Documents/IGGPIPE    (or whatever is appropriate for your system)
-make PARAMS=allParameters.XY ALL    (replacing with your allParameters name)</code></pre>
+<pre><code>make usage</code></pre>
 </div></div>
-<div class="paragraph"><p>If "make" stops with the message <strong>ALL files are up to date</strong>, it has completed
-the analysis successfully. Otherwise, look for an error message and try to
-diagnose it.  You should first check to see if the common unique k-mers file
-named <em>isect.kmers</em> was created in the <em>Kmers</em> subfolder of the output subfolder.
-This is created early in the pipeline, and you should always check it to see how
-many common unique k-mers were found.  This can be done with the <em>wc -l</em> command,
-which counts lines in a file, since the <em>isect.kmers</em> file contains one unique
-k-mer per line.  The command line would look like this:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>wc -l myOutFolder/Kmers/isect.kmers</code></pre>
-</div></div>
-<div class="paragraph"><p>If you have plenty of k-mers (say around 8 million or more) but not too many (say
-40 million or more), that is good. If you feel you have too few k-mers, then you
-should increase K by 1 and try again, and if you have too many, decrease it by 1
-and try again. You can run the pipeline only up until isect.kmers is created by
-using this command:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>make PARAMS=myFilename kmerIsect</code></pre>
-</div></div>
-<div class="paragraph"><p>If there are plenty of common unique k-mers, you should next check the number
-of LCRs detected next, which you can again do with <em>wc -l</em>, since the LCRs_* file
-contains one LCR per line.  The command line would look like this:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>wc -l myOutFolder/LCR_*</code></pre>
-</div></div>
-<div class="paragraph"><p>If you had too few common k-mers you might also have too few LCRs.  A million or
-more LCRs would be nice.  The fewer you have, the fewer markers you are likely to
-get.  If there are too few, check the log file output when findLCRs ran.  It will
-show the number of common unique k-mers for each sequence ID, then the number
-remaining after it enforces Dmin, Lmin, and kMin on the reference genome.  If
-these numbers fall dramatically towards 0, it indicates that either there are
-no good LCRs between the two genomes, or the parameters are too strict.</p></div>
-<div class="paragraph"><p>If there were plenty of LCRs, you should next check the number of non-overlapping
-IndelGroups found, which you can again do with <em>wc -l</em>, since the IndelGroupsNonoverlapping_*
-file contains one Indel Group per line.  The command line would look like this:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>wc -l myOutFolder/IndelGroupsNonoverlapping_*</code></pre>
-</div></div>
-<div class="paragraph"><p>Several thousand IndelGroups is nice to have.</p></div>
-<div class="paragraph"><p>If you run into problems, determine which step failed and check the input file(s)
-for that step to make sure everything looks ok.</p></div>
-<div class="paragraph"><p>If you fix something and want to retry running IGGPIPE, all you have to do is
-enter the same "make" command again.  The "make" program automatically skips
-pipeline steps that don&#8217;t need to be repeated because the input files for those
-steps have not changed, and the output files were made with success previously.
-Therefore, it will normally resume by repeating the same step that failed and
-caused it to halt with an error.  If the error still exists, it will halt again
-with the same error message.  Otherwise, it will continue until it reaches the
-end successfully, or until another error happens. Therefore, each time you try
-to re-run the pipeline, you are just entering the command:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>make PARAMS=allParameters.XY ALL    (replacing with your allParameters name)</code></pre>
-</div></div>
-<div class="paragraph"><p>Please email me with any bugs you find and perhaps fix. I am available to a
-limited extent via email, for a while, to try to assist in diagnosing problems.</p></div>
-<div class="paragraph"><p>If at any point you want to remove all files already generated and start anew,
+<div class="paragraph"><p>That command will use the <em>more</em> command to display file <em>help.txt</em>. Press the
+space bar to move through the text, or press <em>q</em> to exit from the help text.</p></div>
+<div class="paragraph"><p>If at any point you want to remove ALL files already generated and start anew,
 you can do that with this command:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>make PARAMS=allParameters.XY CLEAN=1 ALL    (replacing with your allParameters name)</code></pre>
 </div></div>
-<div class="paragraph"><p>You can also run individual steps of the pipeline.  To see how, use this command
-to get more complete usage information for running "make":</p></div>
+<div class="paragraph"><p>Running IGGPIPE with a <em>make</em> command will usually produce a lot of output on
+the terminal, and some of this output may be important to examine, especially
+if an error occurs. Since the output might scroll off the screen and be
+unavailable, it is a good idea to save it, and this can be done by using
+the <em>tee</em> command along with the <em>make</em> command. The <em>tee</em> command can write
+everything that is displayed on the terminal to a file also. You might want to
+make a folder to contain these "log" files:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make usage</code></pre>
+<pre><code>mkdir logFiles</code></pre>
 </div></div>
-<div class="paragraph"><p>Again, your final goal is to have "make" stop with the message <strong>ALL files are up
-to date</strong></p></div>
+<div class="paragraph"><p>To use <em>tee</em>, choose a log file name, let&#8217;s say <em>make_kmerIsect_HP14.txt</em>,
+and then add at the end of your <em>make</em> command line the extra
+commands <em>| tee logFiles/make_kmerIsect_HP14.txt</em>, as in this example:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>make PARAMS=allParameters.XY kmerIsect | tee logFiles/make_kmerIsect_HP14.txt</code></pre>
+</div></div>
+<div class="paragraph"><p>Then, after <em>make</em> finishes, you can examine that log file at any time to see
+what the pipeline output was. You should use the <em>tee</em> command each time you
+run the pipeline unless you are sure you won&#8217;t want to reexamine the output
+later. We will not show the <em>tee</em> command in the instructions below, however.
+It is up to you to decide whether to use it.</p></div>
+<div class="paragraph"><p>We have run IGGPIPE on several different genomes to try to anticipate unusual
+problems and handle them without error, but there are probably many situations
+that we haven&#8217;t yet encountered. If you email us with information about errors
+and their resolution if you were able to resolve them, we&#8217;ll try to make
+improvements to IGGPIPE in error handling and in its input data format
+flexibility to help future users that encounter the error.</p></div>
+</div></div>
+</li>
+<li>
+<p>
+<strong>Run IGGPIPE with the command "make PARAMS=allParameters.XY kmerIsect"</strong>
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>The first several steps in the pipeline extract unique k-mers from the FASTA
+files of the genomes, and intersect these to produce a list of common unique
+k-mers. To run these steps, use this command:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>cd ~/Documents/IGGPIPE    (or whatever is appropriate for your system)
+make PARAMS=allParameters.XY kmerIsect    (replacing with your allParameters name)</code></pre>
+</div></div>
+<div class="paragraph"><p>If it completes successfully, the end of the command output will show the message:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>kmerIsect files are up to date.</code></pre>
+</div></div>
+<div class="paragraph"><p>If it says something else, indicating an error occurred, examine the output
+carefully and try to diagnose and fix the error, then enter the above <em>make</em>
+command again to retry the failed step.</p></div>
+<div class="paragraph"><p>Assuming the first steps completed successfully, count the number of k-mers in
+the common unique k-mer file, which is located in the <em>Kmers</em> subfolder of the
+output folder you specified in your allParameters file for parameter DIR_IGGPIPE_OUT.
+The name of the file is <em>isect.kmers</em> and it is a text file containing one k-mer
+per line and nothing else. You can look at it with the <em>more</em> or <em>less</em> command
+if you want to. To count the number of k-mers in it, use the <em>wc -l</em>
+command, which counts lines in a file, like this (replacing <em>outFolderForMyProject</em>
+with your output folder name):</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>wc -l outFolderForMyProject/Kmers/isect.kmers</code></pre>
+</div></div>
+<div class="paragraph"><p>If it shows that you have, say, several million or more, that is good. A few
+million or less might be too few to generate enough markers. Tens of millions
+might be too many and cause subsequent pipeline steps to take a very long time.
+The number of k-mers is influenced by both the value of K in the parameter file
+and by how different the genomes are. Very similar genomes might never have
+several millions of k-mers. The number of common unique k-mers increases as K
+is increased, up to a point, then starts to decrease. For similar genomes, you
+might need to edit the parameter file and decrease K by 1. With the tomato/pennellii
+genomes, K=14 was a
+good number. With Arabidopsis thaliana Col-0 and Ler-0 accessions, which were
+much more similar to one another than tomato/pennellii, a value of K=13 worked
+better. For very large genomes, you might need to increase K by 1. Since the
+number of k-mers goes up dramatically with increasing K, you probably will never
+raise K above 15, perhaps 16. The default setting in the parameter file for the
+output directory parameter DIR_IGGPIPE_OUT is to include the value of K in the
+directory name. This means you can run IGGPIPE with one value of K, then change
+it and run it again and the output will go into a new directory.</p></div>
+<div class="paragraph"><p>If you feel you have too few or too many k-mers, then you should increase or
+decrease K by 1 and try again. Try both an increase and a decrease in K to see
+how the number of k-mers is affected. Set the parameter file to the value of K
+that seems best to you for proceeding with additional pipeline steps.</p></div>
+</div></div>
+</li>
+<li>
+<p>
+<strong>Run IGGPIPE with the command "make PARAMS=allParameters.XY findLCRs"</strong>
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>The next few steps of the pipeline analyze the common unique k-mers to find
+locally conserved regions (LCRs). To run these steps, use this command:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>make PARAMS=allParameters.XY findLCRs    (replacing with your allParameters name)</code></pre>
+</div></div>
+<div class="paragraph"><p>If it completes successfully, the end of the command output will show the message:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>findLCRs files are up to date.</code></pre>
+</div></div>
+<div class="paragraph"><p>If it says something else, indicating an error occurred, examine the output
+carefully and try to diagnose and fix the error, then enter the above <em>make</em>
+command again to retry the failed step.</p></div>
+<div class="paragraph"><p>Assuming the steps completed successfully, count the number of LCRs in the LCRs
+output file, which is located in the main output directory (set with the DIR_IGGPIPE_OUT
+parameter). Its name starts with <em>LCRs_</em>, and with many command line interfaces
+you don&#8217;t need to enter the full name in a command, but can instead enter <em>LCRs_*</em>.
+The LCRs file has one LCR per line. You can look at the first few lines with the
+<em>head</em> command or load the file into Excel or a text editor to examine it, if you
+want. The command line to count the LCRs would look like this:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>wc -l outFolderForMyProject/LCR_*</code></pre>
+</div></div>
+<div class="paragraph"><p>If you had too few common k-mers you might also have too few LCRs.  A million or
+more LCRs would be nice. The fewer you have, the fewer markers you are likely to
+get.  If there seem to be too few, check the pipeline output.  It will show the
+number of common unique k-mers it processes (it processes them in batches), and
+the number remaining after it enforces DMIN, LMIN, and KMIN on the reference
+genome. If these numbers fall dramatically towards 0, it indicates that either
+there are no good LCRs between the two genomes, or the parameters DMIN, LMIN, and/or
+KMIN might be too strict. However, expect a pretty big drop with the LMIN step,
+because typically a large fraction of the common unique k-mers are too close
+together, with too much separation from the next k-mer, to form a useful LCR.</p></div>
+<div class="paragraph"><p>If you feel you have too few LCRs, then you should try editing the parameter file
+and changing the DMIN, LMIN,
+and/or KMIN parameters and try again. The default value for the LCRs_ filename,
+set by the parameters SFX_LCR_FILE and PATH_LCR_FILE, includes the values of
+DMIN, LMIN, and KMIN in the filename, so if you change the values, you can
+simply re-run the pipeline with the same <em>make</em> command, and it will generate a
+new LCRs_ file with a different name, without repeating preceding pipeline steps
+that do not need to be repeated.</p></div>
+<div class="paragraph"><p>Set the parameter file to the values for DMIN, LMIN, and KMIN that seem best to
+you before proceeding with additional pipeline steps.</p></div>
+</div></div>
+</li>
+<li>
+<p>
+<strong>Run IGGPIPE with the command "make PARAMS=allParameters.XY InDels"</strong>
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>The next step of the pipeline analyzes the LCRs to find InDel Groups that satisfy
+the parameters AMIN, AMAX, ADMIN, ADMAX, NDAMIN, and MINFLANK. To run these steps,
+use this command:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>make PARAMS=allParameters.XY findIndelGroups    (replacing with your allParameters name)</code></pre>
+</div></div>
+<div class="paragraph"><p>If it completes successfully, the end of the command output will show the message:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>InDels files are up to date.</code></pre>
+</div></div>
+<div class="paragraph"><p>If it says something else, indicating an error occurred, then as usual, examine
+the output carefully and try to diagnose and fix the error, then enter the
+above <em>make</em> command again to retry the failed step.</p></div>
+<div class="paragraph"><p>Assuming the step completed successfully, count the number of Indel Groups in the
+two output files. One output file includes all InDel Groups found, even when they
+overlap one another. The other output file includes only non-overlapping InDel
+Groups, which were determined based on the setting of the parameter OVERLAP_REMOVAL.
+The output files are located in the main output directory and their names start
+with <em>IndelGroups</em> followed by <em>Overlapping_</em> and <em>Nonoverlapping_</em>.
+You can look at the first few lines with the <em>head</em> command or
+load the files into Excel or a text editor to examine them, if you want.
+The command line to count the Indel Groups in both files would look like this:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>wc -l outFolderForMyProject/IndelGroups*</code></pre>
+</div></div>
+<div class="paragraph"><p>The number of Indel Groups is of the same order of magnitude as the number of
+markers you will obtain, so pay close attention to the count. If you had too
+few LCRs you might also have too few markers. Tens of thousands of overlapping
+markers and thousands of non-overlapping ones are nice numbers to have. If
+there seem to be too few, you may want to experiment with different values for
+the AMIN, AMAX, ADMIN, ADMAX, NDAMIN, and MINFLANK parameters. As with the LCRs,
+these values are normally part of the IndelGroups output file filenames, so if
+you edit the parameter file and change the values, then re-run the pipeline by
+entering the same <em>make</em> command above, new file are produced with new names.</p></div>
+<div class="paragraph"><p>Set the parameter file to the values for the parameters that seem best to
+you before proceeding with remaining pipeline steps.</p></div>
+</div></div>
+</li>
+<li>
+<p>
+<strong>Run IGGPIPE with the command "make PARAMS=allParameters.XY ALL"</strong>
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>After you have a sufficient number of Indel Groups, you can run the rest of the
+pipeline to finish up. That is done with this command:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>make PARAMS=allParameters.XY ALL    (replacing with your allParameters name)</code></pre>
+</div></div>
+<div class="paragraph"><p>This same command could have been used from the very start, to simply run the
+entire pipeline. It can be used at any time to re-run the pipeline, and it will
+re-run starting at any step where an error occurred, but if the pipeline was
+previously run successfully to completion, then re-running it will simply
+produce a series of messages saying that the various files from each pipeline
+step are up to date, followed by a final message, which says:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>ALL files are up to date</code></pre>
+</div></div>
+<div class="paragraph"><p>This is the message you want to see to know that the pipeline has completed
+successfully.</p></div>
+<div class="paragraph"><p>If you edit the parameter file and change parameters (so that the names of the
+files that are produced are also changed, since the parameter values are contained
+within the file names), then when you use the above <em>make</em> command, the pipeline
+re-runs starting at whatever step uses the changed parameters, so you can easily
+make parameter changes and try again.</p></div>
+<div class="paragraph"><p>Sometimes you may want to force the pipeline to re-run starting at a certain
+step. For example, maybe you want to re-run the pipeline starting at the <em>findLCRs</em>
+step. To do this, you can either delete the output files that use those parameters,
+or use this command to do delete them:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>make PARAMS=allParameters.XY CLEAN=1 findLCRs    (replacing 'findLCRs' with whatever step you want)</code></pre>
+</div></div>
+<div class="paragraph"><p>After that, you can re-run the pipeline with <em>make</em> commands to generate the files anew.</p></div>
+<div class="paragraph"><p>When finished running the entire pipeline, proceed to the next step and examine
+the marker output files carefully.</p></div>
 </div></div>
 </li>
 <li>
@@ -1120,15 +1298,15 @@ to date</strong></p></div>
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>Unless you specifically changed the parameters otherwise, you will find the output
-files from the IGGPIPE run in a subdirectory of the IGGPIPE directory named something
-like outXY14, where XY are the genome letters you chose, and 14 is the value of K
-for the k-mer size, which was one of the parameters in the parameter file.</p></div>
-<div class="paragraph"><p>Within that output subdirectory, you will find a number of files. Unless you changed
-the parameter settings otherwise, the file names are very long and cumbersome, because
-they include parameter values in them. You may want to copy files to a shorter name
-to work with them. The main ones of interest (using "*" in place of the long text),
-again assuming you didn&#8217;t change their names in the parameter file, are:</p></div>
+<div class="paragraph"><p>There are two marker output files, one containing all markers discovered, even if
+they overlap, and the other containing non-overlapping markers that were determined
+based on the setting of the parameter OVERLAP_REMOVAL. The marker output files are
+located in the main output directory (DIR_IGGPIPE_OUT), and their names start with
+<em>Markers</em> followed by <em>Overlapping_</em> or <em>Nonoverlapping_</em>.</p></div>
+<div class="paragraph"><p>The marker file names and other file names of files in the main output directory
+are very long and cumbersome, because they include parameter values in them. You
+may want to copy files to a shorter name to work with them. The main ones of
+interest (using "*" in place of the long text) are:</p></div>
 <div class="olist loweralpha"><ol class="loweralpha">
 <li>
 <p>
@@ -1153,7 +1331,7 @@ MarkerNonoverlapping_*.tsv is a tab-separated file containing a non-overlapping 
 </ol></div>
 <div class="paragraph"><p>Examine the .pdf and .png files.  The .tsv files can be loaded into Excel to look at
 the markers, and they can also be post-processed (see below) to change them into other
-formats. The meaning of "overlapping" and "non-overlapping" should be clear from the
+formats. The meaning of <em>overlapping</em> and <em>non-overlapping</em> should be clear from the
 explanation of the parameter OVERLAP_REMOVAL in the comments in allParameters.XY.
 The two .tsv files contain the IGG marker positions and primer sequences, among
 other things.</p></div>
@@ -1190,19 +1368,7 @@ BadKmers_*.tsv contains common unique k-mers rejected from assignment to any LCR
 </p>
 </li>
 </ol></div>
-<div class="paragraph"><p>Tables describing each column in each file type are at the end of this
-document.</p></div>
-<div class="paragraph"><p>Besides the sample parameter file "allParameters.template", there are several more
-sample "allParameters" parameter files in the subfolder "allParameters".  These
-were used for testing IGGPIPE with various genomes.  The subfolder "allParameters"
-was made to keep the files better organized and keep the root folder less messy.
-You may want to adopt the same strategy and put your "allParameters" files in the
-"allParameters" subfolder or in a subfolder you make yourself.  When you do that,
-you run "make" by specifying the full path to the file, e.g.:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>make PARAMS=myParamFolder/allParameters.XY ALL</code></pre>
-</div></div>
+<div class="paragraph"><p>Tables describing each column in each file type are at the end of this document.</p></div>
 </div></div>
 </li>
 </ol></div>
@@ -1280,9 +1446,9 @@ settings to explore different regions of the genomes in greater resolution.</p><
 using the LCRs generated via the allParameters.test.template configuration file.</p></div>
 <div class="paragraph"><p>Besides the sample parameter file "dotplot.template" (which has settings for
 testing the IGGPIPE installation), there are several more sample "dotplot" parameter
-files in the subfolder "dotplot", that were used for plotting data from various
+files in the subfolder <em>dotplot</em>, that were used for plotting data from various
 genomes that IGGPIPE was tested with.  You may want to put your own "dotplot"
-parameter files in subfolder "dotplot" or your own subfolder to keep them organized.</p></div>
+parameter files in subfolder <em>dotplot</em> or your own subfolder to keep them organized.</p></div>
 </div></div>
 </li>
 <li>
@@ -1321,20 +1487,20 @@ the name(s) specified in the parameter file.</p></div>
 <div class="paragraph"><p>Besides the sample parameter file "annotate.template" (which has settings for
 testing the IGGPIPE installation), there are several more sample "annotate"
 parameter files in
-the subfolder "annotate", with file names hinting at what they do, and comments at
+the subfolder <em>annotate</em>, with file names hinting at what they do, and comments at
 the start of each file describing what it does.  It may be easier to copy one of
 these and modify it.  You may want to put your own "annotate"
-parameter files in subfolder "annotate" or your own subfolder to keep them organized.</p></div>
+parameter files in subfolder <em>annotate</em> or your own subfolder to keep them organized.</p></div>
 <div class="paragraph"><p>So, the idea is to use multiple parameter files with different settings to do
 different types of annotation and file conversion.</p></div>
 <div class="paragraph"><p>Some of the sample parameter files generate .gff3 files that can be added as a
 track to a genome browser, to display markers in the browser.  Instructions for
 adding the track are given in comments at the start of the parameter file.  Two
-marker files, one for Arabidopsis thaliana Col-0 vs. Ler-0 ecotypes, and the
+marker files, one for Arabidopsis thaliana Col-0 vs. Ler-0 accessions, and the
 other for Solanum lycopersicum vs. Solanum pennellii genomes, were created to
 test IGGPIPE, and the marker files were converted to .gff3 files suitable for
-making a browser track.  These files can be found in subdirectories of the
-"annotate" directory.</p></div>
+making a browser track.  These files can be found in subfolders of the
+<em>annotate</em> folder.</p></div>
 <div class="paragraph"><p>File formats can be finicky, especially .gff3 files.  An incorrectly formatted
 file will cause problems with annotateFile.R.  When you have problems, if you
 can submit an issue to the GitHub repository named "BradyLab/IGGPIPE", and attach
@@ -1775,7 +1941,7 @@ in each genome is end-start-1.</p></td>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-09-20 14:31:09 PDT
+Last updated 2015-09-25 08:31:56 PDT
 </div>
 </div>
 </body>

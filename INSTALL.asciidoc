@@ -13,7 +13,7 @@ put it on your computer.
 . Rename the unzipped folder from "IGGPIPE-master" to just "IGGPIPE".
 . If you are a GitHub user and wish to use the IGGPIPE GitHub repository directly,
 instead of the above steps, you can fork the IGGPIPE repository and work on your own
-copy. The "work" branch is where I do work. The "master" branch is where the
+copy. The 'work' branch is where I do work. The 'master' branch is where the
 releases reside, each tagged with a version number. You can create a branch whose
 contents are the same as a tagged version with the command:
 +
@@ -51,11 +51,12 @@ has been adequate.
 +
 --
 Most work here is done from the command line, by opening the Terminal application.
-You should be familiar with some basic command line commands such as "cd", "ls",
-"cp", "rm", "mv", "sudo", "less" or "more", "man", and "mkdir".  If you do not
-know how to use the command line or don't know these basic commands, take time
-to learn a bit. A suggested tutorial (on the long side, but spend as little or
-as much time as you need to feel you can get started here) from UC Davis is at:
+You should be familiar with some basic command line commands such as 'cd', 'ls',
+'cp', 'rm', 'mv', 'sudo', 'less' or 'more', 'head' and 'tail', 'man', and 'mkdir'.
+If you do not know how to use the command line or don't know these basic commands,
+take time to learn a bit. A suggested tutorial (on the long side, but spend as
+little or as much time as you need to feel you can get started here) from UC Davis
+is at:
 
 http://korflab.ucdavis.edu/Unix_and_Perl/current.html
 --
@@ -75,7 +76,7 @@ directory with this command:
 +
 --
 You must have a plain text editor you know how to use.  If nothing else, the Mac
-"TextEdit" program will work (use Plain Text format).  The free open-source
+'TextEdit' program will work (use Plain Text format).  The free open-source
 TextWrangler program is strongly recommended, and its $50 more capable version
 called BBEdit is totally worth the money for anyone who regularly edits text files.
 TextWrangler is available from the Apple App Store (Applications, App Store) or
@@ -87,7 +88,7 @@ http://www.barebones.com/products/textwrangler
 . *The following programs/applications will be installed if they aren't already:*
 +
 --
-.. Xcode (V6.4 works) (Apple App Store; "make" and "g++")
+.. Xcode (V6.4 works) (Apple App Store; 'make' and 'g++')
 .. Jellyfish V2 or later (V2.2.3 works) (http://www.genome.umd.edu/jellyfish.html)
 .. Perl V5 or later (V5.16.0 works) (https://www.perl.org/get.html)
 .. R V3 or later (V3.2.1 works) (https://www.r-project.org)
@@ -96,7 +97,7 @@ http://www.barebones.com/products/textwrangler
 .. MUSCLE (V3.8.31 works) (http://www.drive5.com/muscle/downloads.htm)
 --
 
-. *Some of the above will require compilation and build on your computer using "make":*
+. *Some of the above will require compilation and build on your computer using 'make':*
 +
 --
 .. Jellyfish
@@ -159,14 +160,14 @@ the IGGPIPE files). For example, maybe it would look like this:
 . *Install make and g++ (Xcode in Mac OSX)*
 +
 --
-IGGPIPE makes use of a utility called "make", and also, some of the applications used
+IGGPIPE makes use of a utility called 'make', and also, some of the applications used
 by IGGPIPE are distributed as source code that must be compiled and built into a runnable
 application on the user's computer, which requires a C++ compiler (g++ utility). On
 Mac OSX, the Apple Developer Toolkit named Xcode provides these utilities, and it is
 available free from the Apple App Store (Applications, App Store).
 Xcode is a good thing to have installed anyway, for anyone doing bioinformatics work.
 If you don't have it installed already, run the App Store
-application, search for "Xcode", and double-click the "Install" button to install it,
+application, search for "Xcode", and double-click the 'Install' button to install it,
 and even if you do have it installed, make sure you are updated with the latest version.
 I used version 6.4, although later versions should work fine.
 Installation takes quite a long time, during which it appears nothing is happening.
@@ -175,7 +176,7 @@ by finding the Xcode application icon in Applications and running it.  It may th
 display a box requesting your computer administrator password so it can install
 additional components. Then, close the Xcode application and go to the command line
 and enter the following command, which checks to see if the command line tools such
-as "make" and "g++" are installed, and if not, installs them:
+as 'make' and 'g++' are installed, and if not, installs them:
 
   xcode-select --install
 
@@ -189,7 +190,7 @@ and you should see the error message "clang: error: no input files".
 . *Enable Access to FileMerge*
 +
 --
-There is a marvelous file comparison and merging tool called "FileMerge" that
+There is a marvelous file comparison and merging tool called 'FileMerge' that
 comes with Xcode. It will be handy for two subsequent steps. It is initially
 hidden within Xcode, but you can put it in your dock to make it more easily
 accessible. To run it, start Xcode, then on the menu choose Xcode,
@@ -228,7 +229,7 @@ being used. You can find the Jellyfish at:
 I chose the "latest source and binaries" link, then downloaded the .tar.gz file.
 I double-clicked this file in Finder, in the Downloads folder, and it unpacked
 to produce a jellyfish folder. I moved this folder to a directory I made named
-"src" under my user root directory:
+'src' under my user root directory:
 
   cd ~
   pwd
@@ -246,7 +247,7 @@ on your computer.  I used these commands, which worked without error:
   make
   sudo make install
 
-The "sudo" command prompts for a password, and I entered my computer's administrator
+The 'sudo' command prompts for a password, and I entered my computer's administrator
 password.  When the above commands are finished, I verified that Jellyfish was installed
 and that I could run it with these commands:
 
@@ -369,22 +370,22 @@ The download link uses FTP protocol. Log in as user GUEST with no password.
 Look for the latest .zip version and copy the zip file to your computer and unzip
 it.  Put the unzipped directory wherever you want on your computer.
 
-It is now necessary to run "make" to compile and build the program. Version 2.3.12
+It is now necessary to run 'make' to compile and build the program. Version 2.3.12
 had two problems with it that required editing of the source code in order for the
-"make" operation to complete successfully. Perhaps these problems will have been
+'make' operation to complete successfully. Perhaps these problems will have been
 fixed in the version you download. Test it by trying to build e-PCR. Change into
 the directory that you unzipped and enter the following command:
 
   cd e-PCR-2.3.12
   make LF64LDFLAGS= LF64CCFLAGS=-DNATIVE_LARGEFILES COMMON_CC_FLAGS=-w
 
-If the "make" completes without error, there will be a file named "e-PCR" in the
+If the 'make' completes without error, there will be a file named "e-PCR" in the
 directory, and if you run it, it will display a page full of usage info:
 
   e-PCR    (Run e-PCR)
 
-If you get errors from the "make" like I did, here are the changes I made that
-allowed the "make" to succeed:
+If you get errors from the 'make' like I did, here are the changes I made that
+allowed the 'make' to succeed:
 
   .. Edit file mmap.cpp and remove "//" from the start of the line that reads
         "//#include <sstream>"
@@ -394,12 +395,12 @@ allowed the "make" to succeed:
       #include <cstdlib>
       #include <sstream>
 
-Now try the "make" command again, followed by running "e-PCR":
+Now try the 'make' command again, followed by running "e-PCR":
 
   make LF64LDFLAGS= LF64CCFLAGS=-DNATIVE_LARGEFILES COMMON_CC_FLAGS=-w
   e-PCR    (Run e-PCR)
 
-The "make" should succeed and e-PCR should display its usage information, meaning
+The 'make' should succeed and e-PCR should display its usage information, meaning
 you are good to go.  Now the allParameters.mytemplate file must have the path to
 e-PCR included in it. Assign the path to the parameter "PATH_EPCR". For example,
 maybe you unzipped the zip file in your Documents folder and you set the parameter
@@ -442,18 +443,18 @@ also locate all contigs in the genome FASTA file and output a file that lists
 the starting position and length of each contig. IGGPIPE uses both of these
 functions of findMers to generate a list of common unique k-mers to be analyzed
 for LCRs (locally conserved regions). The findMers program must be compiled and
-built using "make". Its source files are located in subfolders within the code/cpp
-folder. Change into the code/cpp/findMers directory and enter the command "make":
+built using 'make'. Its source files are located in subfolders within the code/cpp
+folder. Change into the code/cpp/findMers directory and enter the command 'make':
 
   cd code/cpp/findMers
   make
   findMers
   cd ../../..
 
-The "make" should compile C++ files in the findMers folder and other in sister
+The 'make' should compile C++ files in the findMers folder and other in sister
 folders.  It should complete without error, and there will be a file named
-"findMers" in the directory, and when that file is run with the "findMers"
-command shown above following "make", it will display a page of usage
+"findMers" in the directory, and when that file is run with the 'findMers'
+command shown above following 'make', it will display a page of usage
 information. The path to "findMers" is already set correctly in the
 allParameters.mytemplate file.
 --
@@ -461,8 +462,8 @@ allParameters.mytemplate file.
 . *Test trashing and choose deletion method*
 +
 --
-IGGPIPE uses "make" to run data through its pipeline. A command can be given to
-cause "make" to delete files that it has generate by running the pipeline.
+IGGPIPE uses 'make' to run data through its pipeline. A command can be given to
+cause 'make' to delete files that it has generate by running the pipeline.
 There are two different ways it can delete files: it can actually delete them,
 or it can move them to the Mac trash can where they can be found and undeleted
 if necessary. You must choose which of these methods you want. Since the trash
@@ -578,7 +579,7 @@ To test IGGPIPE, from the command line in the IGGPIPE main directory, enter this
 
   make PARAMS=allParameters.test ALL | tee logFiles/makeLog.test.txt
 
-The "tee" command routes the piped log output from "make" to the console and to the
+The 'tee' command routes the piped log output from 'make' to the console and to the
 file logFiles/makeLog.test.txt. You can examine this file after the run to see what
 specifically happened at each step. Note that the output includes timestamps telling
 how long each step took to run.
@@ -600,7 +601,7 @@ directory:
 
 This command should not produce any output, indicating the two files are identical.
 
-Note that there are other sample "allParameters" files in subdirectory "allParameters"
+Note that there are other sample "allParameters" files in subdirectory 'allParameters'
 which have been used for testing IGGPIPE on various genomes.
 --
 
@@ -652,7 +653,7 @@ the test data just produced. Run dotplot.R as follows:
 This produces file outTestHP11/LCRs_K11k2L100D10_2000.dotplot.png, an image file.
 Examine it (e.g. in the Preview app) to see the dot plot.
 
-There are other sample parameter files in subdirectory "dotplot", although the
+There are other sample parameter files in subdirectory 'dotplot', although the
 parameter file is fairly straightforward and you probably don't need other examples.
 --
 
@@ -676,7 +677,7 @@ code/R/test_GFFfuncsAndMergeData. Run annotateFile.R as follows:
 This produces this new file in the root IGGPIPE folder: MarkersAnnotated.test.tsv
 You can examine this file with a text editor or Excel to see the new column.
 
-There are other sample parameter files in subdirectory "annotate" which produce
+There are other sample parameter files in subdirectory 'annotate' which produce
 other types of files or do other types of file data manipulation.
 --
 

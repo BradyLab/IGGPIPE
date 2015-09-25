@@ -279,7 +279,7 @@ while (nrow(kmerBufferDf) > 0)
 
     # Move at least MIN_KMERS_AT_ONCE k-mers from kmerBufferDf to candLCRdf, but
     # be sure to move ALL k-mers of a sequence ID.  The only time kmerBufferDf
-    # becomes empty here is when we reached the end of the file
+    # becomes empty here is when we reach the end of the file.
     N = nrow(kmerBufferDf)
     {
     if (N <= MIN_KMERS_AT_ONCE)
@@ -308,8 +308,8 @@ while (nrow(kmerBufferDf) > 0)
                 {
                 colnames(tdf) = colNames
                 NkmersRead = NkmersRead + nrow(tdf)
+                nextIDidx = nrow(kmerBufferDf) + match(FALSE, lastID == tdf[, refIdCol])
                 kmerBufferDf = rbind(kmerBufferDf, tdf)
-                nextIDidx = match(FALSE, lastID == kmerBufferDf[(N+1):nrow(tdf), refIdCol])
                 rm(tdf)
                 }
             cnt = cnt+1
@@ -905,7 +905,7 @@ while (nrow(kmerBufferDf) > 0)
     inv(nextLCRnum, "nextLCRnum")
 
     N.reload = 100 # Number of LCR numbers to load into dft each time.
-    logEveryN = 500
+    logEveryN = 1000
     lastLog = 0
     lcrDf = NULL # # K-mers of candidate LCRs that pass the test and are declared actual LCRs.
     dft = candLCRdf[integer(0),] # This will hold k-mers for N.reload candidate LCRs being tested.
