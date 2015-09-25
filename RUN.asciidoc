@@ -119,9 +119,16 @@ You may want to adopt the same strategy and put your "allParameters" files in th
 +
 --
 Open the new *allParameters.XY* file created above in your plain text editor
-for editing. If you are in a hurry, you don't need to read anything in the file, but
-can simply *search for "### "*, which are comment lines marking items that may need
-to be changed. Each "###" comment says whether it must be changed, might need to
+for editing. For example, you might open your text editor from the command line:
+
+  bbedit allParameters.XY
+
+If you are in a hurry, you don't need to read anything in the file, but
+can simply *search for "\#\#\# "* (that's supposed to be three hash symbols with no
+backslashes, so ignore backslashes if there are any), which are comment lines
+marking items that may need to be changed.
+
+Each "\#\#\#" comment says whether it must be changed, might need to
 be changed, or probably will never need to be changed, etc. Many of these items
 typically will never need to be changed, so the actual number of changes that need
 to be made is smaller than it might first appear. Some of the parameters have
@@ -132,10 +139,11 @@ want to know this information, at least for key parameters, to select the right
 parameter values for your needs.
 --
 
-. *Search for "### " and set parameters to desired values*
+. *Search for "\#\#\# " (ignore that backslash til I figure out how to get rid of it)
+and set parameters to desired values*
 +
 --
-Search for "### " in the allParameters.XY file and check each one to see if it
+Search for "\#\#\# " in the allParameters.XY file and check each one to see if it
 needs to be changed. If so, set it to the value you desire. Parameters you will
 definitely want to review and consider are:
 
@@ -155,7 +163,7 @@ definitely want to review and consider are:
 After finishing changes, save the modified allParameters.XY file.
 --
 
-. *Check Primer3 settings in primer3settings.txt*
+. *Check Primer3 settings in primer3settings.txt if desired*
 +
 --
 The file *primer3settings.txt* contains parameter settings for Primer3, which
@@ -254,6 +262,10 @@ k-mers. To run these steps, use this command:
 
   cd ~/Documents/IGGPIPE    (or whatever is appropriate for your system)
   make PARAMS=allParameters.XY kmerIsect    (replacing with your allParameters name)
+
+or, better yet, log to a file also:
+
+  make PARAMS=allParameters.XY kmerIsect | tee logFiles/make_kmerIsect_HP14.txt
 
 If it completes successfully, the end of the command output will show the message:
 

@@ -941,6 +941,9 @@ e-PCR
 <div class="sect1">
 <h2 id="_strong_install_iggpipe_strong"><strong>Install IGGPIPE</strong></h2>
 <div class="sectionbody">
+<div class="paragraph"><p><strong>If you want a Quick Start with minimal reading, just look for the command lines
+below and execute them, with occasional skimming of the text just above/below the
+commands.</strong></p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
@@ -974,14 +977,22 @@ can do the copying in Mac&#8217;s Finder or from the command line:</p></div>
 <div class="content">
 <div class="paragraph"><p>Open the new allParameters.mytemplate file created above in your plain text editor
 for editing. If you are in a hurry, you don&#8217;t need to read anything in the file, but
-can simply search for "# ", which are comment lines marking items that may need
-to be changed. Each "#" comment says whether it must be changed, might need to
+can simply search for "##\# " (that&#8217;s supposed to be three hash symbols with no
+backslashes, so ignore backslashes if there are any), which are comment lines
+marking items that may need
+to be changed. Each "##\#" comment says whether it must be changed, might need to
 be changed, or probably will never need to be changed, etc. Many of these items
 typically will never need to be changed, so the actual number of changes
 that need to be made is smaller than it might first appear. It is recommended that
-rather than hurrying, you take time to read through the file, as the comments
+at some point you take time to read through the file, as the comments
 explain the purpose of each parameter, and you will need to know this
-information, at least for key parameters, in order to run IGGPIPE properly.</p></div>
+information, at least for key parameters, in order to run IGGPIPE properly.
+For example, if your text editor is bbedit, you might use the command line to
+open your editor to edit the template file:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>bbedit allParameters.mytemplate</code></pre>
+</div></div>
 </div></div>
 </li>
 <li>
@@ -990,7 +1001,7 @@ information, at least for key parameters, in order to run IGGPIPE properly.</p><
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>Search for "# " in the allParameters.mytemplate file and locate the one that is
+<div class="paragraph"><p>Search for "##\# " in the allParameters.mytemplate file and locate the one that is
 followed by a line setting the value of the "WD" parameter.  It looks like:</p></div>
 <div class="literalblock">
 <div class="content">
@@ -1041,7 +1052,7 @@ as <em>make</em> and <em>g++</em> are installed, and if not, installs them:</p><
 </li>
 <li>
 <p>
-<strong>Enable Access to FileMerge</strong>
+<strong>Enable Access to FileMerge (optional, but this or any other file merge utility will be helpful later)</strong>
 </p>
 <div class="openblock">
 <div class="content">
@@ -1114,13 +1125,18 @@ and that I could run it with these commands:</p></div>
 jellyfish --version</code></pre>
 </div></div>
 <div class="paragraph"><p>Finally, the allParameters.mytemplate file must have the path to Jellyfish included in
-it. Search the files for "# " and assign the path to Jellyfish, which was shown when
+it. Search the files for "##\# " and assign the path to Jellyfish, which was shown when
 you gave the "which jellyfish" command above, to the parameter "PATH_JELLYFISH".
 The path will probably already be correct because Jellyfish usually gets installed
 in a standard location.</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>PATH_JELLYFISH := /usr/local/bin/jellyfish</code></pre>
+</div></div>
+<div class="paragraph"><p>or, if you have Jellyfish on your path, you can use simply:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>PATH_JELLYFISH := jellyfish</code></pre>
 </div></div>
 <div class="paragraph"><p>Also, set the value JELLYFISH_HASH_SIZE, which follows, to something that seems appropriate
 for your computer and its memory. Read the comments for each parameter to learn more
@@ -1167,6 +1183,11 @@ Assign the path, which was shown with the "which perl" command, to the parameter
 <div class="content">
 <pre><code>PATH_PERL := /usr/local/bin/perl</code></pre>
 </div></div>
+<div class="paragraph"><p>or if Perl is on your path, simply:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>PATH_PERL := perl</code></pre>
+</div></div>
 </div></div>
 </li>
 <li>
@@ -1202,6 +1223,11 @@ Assign the path, which was shown with the "which RScript" command, to the parame
 <div class="content">
 <pre><code>PATH_RSCRIPT := /usr/bin/Rscript</code></pre>
 </div></div>
+<div class="paragraph"><p>or, if Rscript is on your path (it may be set that way during installation), simply:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>PATH_RSCRIPT := Rscript</code></pre>
+</div></div>
 </div></div>
 </li>
 <li>
@@ -1231,6 +1257,11 @@ parameter as follows:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>PATH_PRIMER3CORE := ~/Documents/primer3-2.3.6/primer3_core</code></pre>
+</div></div>
+<div class="paragraph"><p>or, if primer3_core is on your path, simply:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>PATH_PRIMER3CORE := primer3_core</code></pre>
 </div></div>
 </div></div>
 </li>
@@ -1305,6 +1336,11 @@ as follows:</p></div>
 <div class="content">
 <pre><code>PATH_EPCR := ~/Documents/e-PCR-2.3.12/e-PCR</code></pre>
 </div></div>
+<div class="paragraph"><p>or, if e-PCR is on your path, simply:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>PATH_EPCR := e-PCR</code></pre>
+</div></div>
 </div></div>
 </li>
 <li>
@@ -1333,6 +1369,11 @@ as follows:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>PATH_ALIGNER := ~/bin/muscle3.8.31_i86darwin64</code></pre>
+</div></div>
+<div class="paragraph"><p>or, if Muscle is on your path and the binary file is named <em>muscle</em>, simply:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>PATH_ALIGNER := muscle</code></pre>
 </div></div>
 </div></div>
 </li>
@@ -1388,7 +1429,11 @@ do this, use these commands:</p></div>
 $SHELL code/shell/trash.sh junk.txt</code></pre>
 </div></div>
 <div class="paragraph"><p>Now look in the trash can to see if file "junk.txt" is there. If this doesn&#8217;t work,
-you should set the $(CMD_DELETE) method as the delete method.</p></div>
+you should set the $(CMD_DELETE) method as the delete method:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>CMD_DELETE_WHEN_CLEANING := $(CMD_DELETE)</code></pre>
+</div></div>
 </div></div>
 </li>
 <li>
@@ -1409,11 +1454,12 @@ To do this, copy primer3settings.default.txt to primer3settings.txt:</p></div>
 <div class="content">
 <pre><code>cp primer3settings.default.txt primer3settings.txt</code></pre>
 </div></div>
-<div class="paragraph"><p>Now, you can edit the new primer3settings.txt file with your text editor and make
+<div class="paragraph"><p><em>This is all you need to do, IGGPIPE should work with this version.</em></p></div>
+<div class="paragraph"><p>However, you can edit the new primer3settings.txt file with your text editor and make
 any changes that are important for your needs. For example, you might change the
-parameters that determine the acceptable range of primer Tm values. The Primer3
-user manual (<a href="http://primer3.sourceforge.net/primer3_manual.htm">http://primer3.sourceforge.net/primer3_manual.htm</a>) describes all
-the parameters. You do not need to make changes, IGGPIPE will still work.</p></div>
+parameters that determine the acceptable <em>range of primer Tm values</em>.</p></div>
+<div class="paragraph"><p>The Primer3 user manual (<a href="http://primer3.sourceforge.net/primer3_manual.htm">http://primer3.sourceforge.net/primer3_manual.htm</a>)
+describes all the parameters.</p></div>
 <div class="paragraph"><p>To see what was changed in the primer settings file, you can use FileMerge,
 introduced above. I recommend you run it now to compare primer3settings.txt
 to primer3web_v4_0_0_default_settings.txt in the Primer3 folder to see these
@@ -1445,16 +1491,28 @@ primer3web_v4_0_0_default_settings.txt.</p></div>
 </li>
 <li>
 <p>
-<strong>Copy allParameters.test.template file to new file allParameters.test and add the changes made to allParameters.mytemplate</strong>
+<strong>Copy allParameters.test.template file to new file allParameters.test and add
+the changes made to allParameters.mytemplate</strong>
 </p>
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>File allParameters.test.mytemplate is more-or-less a copy of the allParameters.template
-file, modified for testing IGGPIPE, as you saw above when initially testing FileMerge.
-You now must incorporate the same changes you just made to allParameters.mytemplate
-into allParameters.test.mytemplate. You can do this by just editing it and adding
-in the changes, but a more reliable (and fun) way to do it is to use FileMerge.
-To do this, start FileMerge and set the four file text boxes to the following files:</p></div>
+file, modified for testing IGGPIPE, as you saw above if you did testing of FileMerge.
+Copy it to a new filename, leaving off the <em>.mytemplate</em> suffix:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>cp allParameters.test.mytemplate allParameters.test</code></pre>
+</div></div>
+<div class="paragraph"><p>You now must incorporate the same changes you just made to allParameters.mytemplate
+into allParameters.test. The most straightforward way to do this it to simply edit
+it, for example:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>bbedit allParameters.test</code></pre>
+</div></div>
+<div class="paragraph"><p>and add the same changes to it that you added to allParameters.mytemplate.</p></div>
+<div class="paragraph"><p>A more reliable way to do this is to use FileMerge. To use it,
+start FileMerge and set the four file text boxes to the following files:</p></div>
 <div class="olist loweralpha"><ol class="loweralpha">
 <li>
 <p>
@@ -1509,12 +1567,13 @@ above.</p></div>
 <div class="content">
 <pre><code>make PARAMS=allParameters.test ALL | tee logFiles/makeLog.test.txt</code></pre>
 </div></div>
+<div class="paragraph"><p>If all goes well, the pipeline will run quickly, and after four or five minutes, it
+should finish with the message <strong>ALL files are up to date</strong>.</p></div>
 <div class="paragraph"><p>The <em>tee</em> command routes the piped log output from <em>make</em> to the console and to the
 file logFiles/makeLog.test.txt. You can examine this file after the run to see what
 specifically happened at each step. Note that the output includes timestamps telling
 how long each step took to run.</p></div>
-<div class="paragraph"><p>If all goes well, the pipeline will run quickly, and after four or five minutes, it
-should finish with the message <strong>ALL files are up to date</strong>. There should be several
+<div class="paragraph"><p>There should be several
 files in the output folder "outTestHP11", including files starting with the prefixes
 BadKmers_, NonvalidatedMarkers_, IndelGroupsNonoverlapping_, IndelGroupsOverlapping_,
 LCRs_, MarkerCounts_, MarkerDensity_, MarkerErrors_, MarkersNonoverlapping_, and
@@ -1549,9 +1608,14 @@ is called alignAndGetIndels.R. Run it as follows:</p></div>
 <div class="content">
 <pre><code>make PARAMS=allParameters.test InDels</code></pre>
 </div></div>
-<div class="paragraph"><p>This produces file outTestHP11/
+<div class="paragraph"><p>Check that the output file exists with:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>ls outTestHP11/Markers*.indels.tsv</code></pre>
+</div></div>
+<div class="paragraph"><p>This should list the file outTestHP11/
 MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv</p></div>
-<div class="paragraph"><p>Examine it to see the InDel data it contains.</p></div>
+<div class="paragraph"><p>You can examine it with Excel or a text editor to see the InDel data it contains.</p></div>
 </div></div>
 </li>
 <li>
@@ -1568,9 +1632,14 @@ plotIndels.R. Run it as follows:</p></div>
 <div class="content">
 <pre><code>make PARAMS=allParameters.test plotInDels</code></pre>
 </div></div>
-<div class="paragraph"><p>This produces file outTestHP11/
+<div class="paragraph"><p>Check that the output file exists with:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>ls outTestHP11/Markers*.indels.pdf</code></pre>
+</div></div>
+<div class="paragraph"><p>This should list the file outTestHP11/
 MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.pdf</p></div>
-<div class="paragraph"><p>Examine it to see the plots it contains.</p></div>
+<div class="paragraph"><p>You might want to open it and look at the plots.</p></div>
 </div></div>
 </li>
 <li>
@@ -1588,8 +1657,13 @@ the test data just produced. Run dotplot.R as follows:</p></div>
 <div class="content">
 <pre><code>Rscript code/R/dotplot.R dotplot.template</code></pre>
 </div></div>
-<div class="paragraph"><p>This produces file outTestHP11/LCRs_K11k2L100D10_2000.dotplot.png, an image file.
-Examine it (e.g. in the Preview app) to see the dot plot.</p></div>
+<div class="paragraph"><p>Check that the output file exists with:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>ls outTestHP11/LCRs_*.dotplot.png</code></pre>
+</div></div>
+<div class="paragraph"><p>This should list the file outTestHP11/LCRs_K11k2L100D10_2000.dotplot.png, an image file.
+You may want to examine it (e.g. in the OSX Preview app) to see the dot plot.</p></div>
 <div class="paragraph"><p>There are other sample parameter files in subdirectory <em>dotplot</em>, although the
 parameter file is fairly straightforward and you probably don&#8217;t need other examples.</p></div>
 </div></div>
@@ -1615,7 +1689,12 @@ code/R/test_GFFfuncsAndMergeData. Run annotateFile.R as follows:</p></div>
 <div class="content">
 <pre><code>Rscript code/R/annotateFile.R annotate.template</code></pre>
 </div></div>
-<div class="paragraph"><p>This produces this new file in the root IGGPIPE folder: MarkersAnnotated.test.tsv
+<div class="paragraph"><p>Check that the output file exists with:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>ls MarkersAnnotated.*</code></pre>
+</div></div>
+<div class="paragraph"><p>This should list file MarkersAnnotated.test.tsv in the root IGGPIPE folder.
 You can examine this file with a text editor or Excel to see the new column.</p></div>
 <div class="paragraph"><p>There are other sample parameter files in subdirectory <em>annotate</em> which produce
 other types of files or do other types of file data manipulation.</p></div>
@@ -1657,7 +1736,7 @@ Contact me, Ted Toal, <a href="mailto:twtoal@ucdavis.edu">twtoal@ucdavis.edu</a>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-09-25 07:37:11 PDT
+Last updated 2015-09-25 14:24:44 PDT
 </div>
 </div>
 </body>

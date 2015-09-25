@@ -284,7 +284,7 @@ attrExtractT:
     # attributes column in a tsv or csv file, you can extract attributes from
     # it by specifying the column name here.
 
-    attributesColumn := attributes
+    attributesColumn := ""
 
     # Feature name(s) to keep.  If this is "", all feature names in the file
     # are retained.  Otherwise, this must be a comma-separated list of one or

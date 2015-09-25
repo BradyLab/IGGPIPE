@@ -110,8 +110,6 @@ catnow("  tsvMarkerFile: ", tsvMarkerFile, "\n")
 
 primer3core = args[5]
 catnow("  primer3core: ", primer3core, "\n")
-if (!file.exists(primer3core))
-    stop("File doesn't exist: ", primer3core)
 
 primer3Settings = args[6]
 catnow("  primer3Settings: ", primer3Settings, "\n")

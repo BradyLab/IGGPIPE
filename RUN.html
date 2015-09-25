@@ -912,9 +912,16 @@ You may want to adopt the same strategy and put your "allParameters" files in th
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>Open the new <strong>allParameters.XY</strong> file created above in your plain text editor
-for editing. If you are in a hurry, you don&#8217;t need to read anything in the file, but
-can simply <strong>search for "# "</strong>, which are comment lines marking items that may need
-to be changed. Each "#" comment says whether it must be changed, might need to
+for editing. For example, you might open your text editor from the command line:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>bbedit allParameters.XY</code></pre>
+</div></div>
+<div class="paragraph"><p>If you are in a hurry, you don&#8217;t need to read anything in the file, but
+can simply <strong>search for "##\# "</strong> (that&#8217;s supposed to be three hash symbols with no
+backslashes, so ignore backslashes if there are any), which are comment lines
+marking items that may need to be changed.</p></div>
+<div class="paragraph"><p>Each "##\#" comment says whether it must be changed, might need to
 be changed, or probably will never need to be changed, etc. Many of these items
 typically will never need to be changed, so the actual number of changes that need
 to be made is smaller than it might first appear. Some of the parameters have
@@ -927,11 +934,12 @@ parameter values for your needs.</p></div>
 </li>
 <li>
 <p>
-<strong>Search for "# " and set parameters to desired values</strong>
+<strong>Search for "##\# " (ignore that backslash til I figure out how to get rid of it)
+and set parameters to desired values</strong>
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>Search for "# " in the allParameters.XY file and check each one to see if it
+<div class="paragraph"><p>Search for "##\# " in the allParameters.XY file and check each one to see if it
 needs to be changed. If so, set it to the value you desire. Parameters you will
 definitely want to review and consider are:</p></div>
 <div class="olist loweralpha"><ol class="loweralpha">
@@ -1001,7 +1009,7 @@ EPCR_MAX_MISMATCH and EPCR_MAX_GAPS
 </li>
 <li>
 <p>
-<strong>Check Primer3 settings in primer3settings.txt</strong>
+<strong>Check Primer3 settings in primer3settings.txt if desired</strong>
 </p>
 <div class="openblock">
 <div class="content">
@@ -1106,6 +1114,11 @@ k-mers. To run these steps, use this command:</p></div>
 <div class="content">
 <pre><code>cd ~/Documents/IGGPIPE    (or whatever is appropriate for your system)
 make PARAMS=allParameters.XY kmerIsect    (replacing with your allParameters name)</code></pre>
+</div></div>
+<div class="paragraph"><p>or, better yet, log to a file also:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>make PARAMS=allParameters.XY kmerIsect | tee logFiles/make_kmerIsect_HP14.txt</code></pre>
 </div></div>
 <div class="paragraph"><p>If it completes successfully, the end of the command output will show the message:</p></div>
 <div class="literalblock">
@@ -1941,7 +1954,7 @@ in each genome is end-start-1.</p></td>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-09-25 08:31:56 PDT
+Last updated 2015-09-25 14:29:27 PDT
 </div>
 </div>
 </body>

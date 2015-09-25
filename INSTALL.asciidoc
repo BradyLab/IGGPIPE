@@ -108,6 +108,12 @@ http://www.barebones.com/products/textwrangler
 
 *Install IGGPIPE*
 -----------------
+
+*If you want a Quick Start with minimal reading, just look for the command lines
+below and execute them, with occasional skimming of the text just above/below the
+commands.*
+
+
 . *Copy allParameters.template file to new file allParameters.mytemplate*
 +
 --
@@ -133,20 +139,26 @@ can do the copying in Mac's Finder or from the command line:
 --
 Open the new allParameters.mytemplate file created above in your plain text editor
 for editing. If you are in a hurry, you don't need to read anything in the file, but
-can simply search for "### ", which are comment lines marking items that may need
-to be changed. Each "###" comment says whether it must be changed, might need to
+can simply search for "\#\#\# " (that's supposed to be three hash symbols with no
+backslashes, so ignore backslashes if there are any), which are comment lines
+marking items that may need
+to be changed. Each "\#\#\#" comment says whether it must be changed, might need to
 be changed, or probably will never need to be changed, etc. Many of these items
 typically will never need to be changed, so the actual number of changes
 that need to be made is smaller than it might first appear. It is recommended that
-rather than hurrying, you take time to read through the file, as the comments
+at some point you take time to read through the file, as the comments
 explain the purpose of each parameter, and you will need to know this
 information, at least for key parameters, in order to run IGGPIPE properly.
+For example, if your text editor is bbedit, you might use the command line to
+open your editor to edit the template file:
+
+  bbedit allParameters.mytemplate
 --
 
 . *Set WD to your IGGPIPE directory in the allParameters.mytemplate file*
 +
 --
-Search for "### " in the allParameters.mytemplate file and locate the one that is
+Search for "\#\#\# " in the allParameters.mytemplate file and locate the one that is
 followed by a line setting the value of the "WD" parameter.  It looks like:
 
   WD := $(BRADYLAB)/Genomes/kmers/IGGPIPE
@@ -187,7 +199,7 @@ To verify they are installed, you can enter this command:
 and you should see the error message "clang: error: no input files".
 --
 
-. *Enable Access to FileMerge*
+. *Enable Access to FileMerge (optional, but this or any other file merge utility will be helpful later)*
 +
 --
 There is a marvelous file comparison and merging tool called 'FileMerge' that
@@ -255,12 +267,16 @@ and that I could run it with these commands:
   jellyfish --version
 
 Finally, the allParameters.mytemplate file must have the path to Jellyfish included in
-it. Search the files for "### " and assign the path to Jellyfish, which was shown when
+it. Search the files for "\#\#\# " and assign the path to Jellyfish, which was shown when
 you gave the "which jellyfish" command above, to the parameter "PATH_JELLYFISH".
 The path will probably already be correct because Jellyfish usually gets installed
 in a standard location.
 
   PATH_JELLYFISH := /usr/local/bin/jellyfish
+
+or, if you have Jellyfish on your path, you can use simply:
+
+  PATH_JELLYFISH := jellyfish
 
 Also, set the value JELLYFISH_HASH_SIZE, which follows, to something that seems appropriate
 for your computer and its memory. Read the comments for each parameter to learn more
@@ -299,6 +315,10 @@ Assign the path, which was shown with the "which perl" command, to the parameter
 "PATH_PERL". For example, maybe your path will be:
 
   PATH_PERL := /usr/local/bin/perl
+
+or if Perl is on your path, simply:
+
+  PATH_PERL := perl
 --
 
 . *Install R and set its path*
@@ -328,6 +348,10 @@ Assign the path, which was shown with the "which RScript" command, to the parame
 "PATH_RSCRIPT". For example, maybe your path will be:
 
   PATH_RSCRIPT := /usr/bin/Rscript
+
+or, if Rscript is on your path (it may be set that way during installation), simply:
+
+  PATH_RSCRIPT := Rscript
 --
 
 . *Install Primer3 and set its path*
@@ -352,6 +376,10 @@ maybe you put the downloaded folder into your Documents folder and you set the
 parameter as follows:
 
   PATH_PRIMER3CORE := ~/Documents/primer3-2.3.6/primer3_core
+
+or, if primer3_core is on your path, simply:
+
+  PATH_PRIMER3CORE := primer3_core
 --
 
 . *Install e-PCR and set its path*
@@ -407,6 +435,10 @@ maybe you unzipped the zip file in your Documents folder and you set the paramet
 as follows:
 
   PATH_EPCR := ~/Documents/e-PCR-2.3.12/e-PCR
+
+or, if e-PCR is on your path, simply:
+
+  PATH_EPCR := e-PCR
 --
 
 . *Install MUSCLE and set its path*
@@ -431,6 +463,10 @@ downloaded file in a 'bin' folder in your user directory and you set the paramet
 as follows:
 
   PATH_ALIGNER := ~/bin/muscle3.8.31_i86darwin64
+
+or, if Muscle is on your path and the binary file is named 'muscle', simply:
+
+  PATH_ALIGNER := muscle
 --
 
 . *Build findMers*
@@ -477,7 +513,9 @@ do this, use these commands:
   $SHELL code/shell/trash.sh junk.txt
 
 Now look in the trash can to see if file "junk.txt" is there. If this doesn't work,
-you should set the $(CMD_DELETE) method as the delete method.
+you should set the $(CMD_DELETE) method as the delete method:
+
+  CMD_DELETE_WHEN_CLEANING := $(CMD_DELETE)
 --
 
 . *Copy primer3settings.default.txt and edit Primer3 settings*
@@ -495,11 +533,14 @@ To do this, copy primer3settings.default.txt to primer3settings.txt:
 
   cp primer3settings.default.txt primer3settings.txt
 
-Now, you can edit the new primer3settings.txt file with your text editor and make
+'This is all you need to do, IGGPIPE should work with this version.'
+
+However, you can edit the new primer3settings.txt file with your text editor and make
 any changes that are important for your needs. For example, you might change the
-parameters that determine the acceptable range of primer Tm values. The Primer3
-user manual (http://primer3.sourceforge.net/primer3_manual.htm) describes all
-the parameters. You do not need to make changes, IGGPIPE will still work.
+parameters that determine the acceptable 'range of primer Tm values'. 
+
+The Primer3 user manual (http://primer3.sourceforge.net/primer3_manual.htm)
+describes all the parameters.
 
 To see what was changed in the primer settings file, you can use FileMerge,
 introduced above. I recommend you run it now to compare primer3settings.txt
@@ -532,15 +573,26 @@ run FileMerge to compare primer3settings.txt to Primer3's file
 primer3web_v4_0_0_default_settings.txt.
 --
 
-. *Copy allParameters.test.template file to new file allParameters.test and add the changes made to allParameters.mytemplate*
+. *Copy allParameters.test.template file to new file allParameters.test and add
+the changes made to allParameters.mytemplate*
 +
 --
 File allParameters.test.mytemplate is more-or-less a copy of the allParameters.template
-file, modified for testing IGGPIPE, as you saw above when initially testing FileMerge.
+file, modified for testing IGGPIPE, as you saw above if you did testing of FileMerge.
+Copy it to a new filename, leaving off the '.mytemplate' suffix:
+
+  cp allParameters.test.mytemplate allParameters.test
+
 You now must incorporate the same changes you just made to allParameters.mytemplate
-into allParameters.test.mytemplate. You can do this by just editing it and adding
-in the changes, but a more reliable (and fun) way to do it is to use FileMerge.
-To do this, start FileMerge and set the four file text boxes to the following files:
+into allParameters.test. The most straightforward way to do this it to simply edit
+it, for example:
+
+  bbedit allParameters.test
+
+and add the same changes to it that you added to allParameters.mytemplate.
+
+A more reliable way to do this is to use FileMerge. To use it,
+start FileMerge and set the four file text boxes to the following files:
 
   .. Left: allParameters.test.template file path
 
@@ -579,13 +631,15 @@ To test IGGPIPE, from the command line in the IGGPIPE main directory, enter this
 
   make PARAMS=allParameters.test ALL | tee logFiles/makeLog.test.txt
 
+If all goes well, the pipeline will run quickly, and after four or five minutes, it
+should finish with the message *ALL files are up to date*.
+
 The 'tee' command routes the piped log output from 'make' to the console and to the
 file logFiles/makeLog.test.txt. You can examine this file after the run to see what
 specifically happened at each step. Note that the output includes timestamps telling
 how long each step took to run.
 
-If all goes well, the pipeline will run quickly, and after four or five minutes, it
-should finish with the message *ALL files are up to date*. There should be several
+There should be several
 files in the output folder "outTestHP11", including files starting with the prefixes
 BadKmers_, NonvalidatedMarkers_, IndelGroupsNonoverlapping_, IndelGroupsOverlapping_,
 LCRs_, MarkerCounts_, MarkerDensity_, MarkerErrors_, MarkersNonoverlapping_, and
@@ -617,10 +671,14 @@ is called alignAndGetIndels.R. Run it as follows:
 
   make PARAMS=allParameters.test InDels
 
-This produces file outTestHP11/
+Check that the output file exists with:
+
+  ls outTestHP11/Markers*.indels.tsv
+
+This should list the file outTestHP11/
 MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv
 
-Examine it to see the InDel data it contains.
+You can examine it with Excel or a text editor to see the InDel data it contains.
 --
 
 . *Run 'make plotInDels' to plot InDel information*
@@ -633,10 +691,14 @@ plotIndels.R. Run it as follows:
 
   make PARAMS=allParameters.test plotInDels
 
-This produces file outTestHP11/
+Check that the output file exists with:
+
+  ls outTestHP11/Markers*.indels.pdf
+
+This should list the file outTestHP11/
 MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.pdf
 
-Examine it to see the plots it contains.
+You might want to open it and look at the plots.
 --
 
 . *Run dotplot.R to make a dot plot*
@@ -650,8 +712,12 @@ the test data just produced. Run dotplot.R as follows:
 
   Rscript code/R/dotplot.R dotplot.template
 
-This produces file outTestHP11/LCRs_K11k2L100D10_2000.dotplot.png, an image file.
-Examine it (e.g. in the Preview app) to see the dot plot.
+Check that the output file exists with:
+
+  ls outTestHP11/LCRs_*.dotplot.png
+
+This should list the file outTestHP11/LCRs_K11k2L100D10_2000.dotplot.png, an image file.
+You may want to examine it (e.g. in the OSX Preview app) to see the dot plot.
 
 There are other sample parameter files in subdirectory 'dotplot', although the
 parameter file is fairly straightforward and you probably don't need other examples.
@@ -674,7 +740,11 @@ code/R/test_GFFfuncsAndMergeData. Run annotateFile.R as follows:
 
   Rscript code/R/annotateFile.R annotate.template
 
-This produces this new file in the root IGGPIPE folder: MarkersAnnotated.test.tsv
+Check that the output file exists with:
+
+  ls MarkersAnnotated.*
+
+This should list file MarkersAnnotated.test.tsv in the root IGGPIPE folder.
 You can examine this file with a text editor or Excel to see the new column.
 
 There are other sample parameter files in subdirectory 'annotate' which produce

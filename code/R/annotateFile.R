@@ -28,24 +28,40 @@ testing = 0
 #testing = 6 # For testing only.
 {
 if (testing == 0)
-    args = commandArgs(TRUE)
-# For testing only:
-else if (testing == 1)
-    args = "annotate.template"
-else if (testing == 2)
-    args = "annotate/annotate.gff3_to_tsv"
-else if (testing == 3)
-    args = "annotate/tsv_to_gff3.markers"
-else if (testing == 4)
-    args = "annotate/HPintrogressions_to_gff3"
-else if (testing == 5)
-    args = "annotate/addILs_column.test_tsv"
-else if (testing == 6)
-    args = "annotate/add_genesColumn.test_tsv"
+    args = commandArgs(FALSE)
 else
-    stop("Unknown value for 'testing'")
+    {
+    # For testing only:
+    if (testing == 1)
+        args = "annotate.template"
+    else if (testing == 2)
+        args = "annotate/annotate.gff3_to_tsv"
+    else if (testing == 3)
+        args = "annotate/tsv_to_gff3.markers"
+    else if (testing == 4)
+        args = "annotate/HPintrogressions_to_gff3"
+    else if (testing == 5)
+        args = "annotate/addILs_column.test_tsv"
+    else if (testing == 6)
+        args = "annotate/add_genesColumn.test_tsv"
+    else
+        stop("Unknown value for 'testing'")
+
+    args = c("--file=~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE/code/R/annotateFile.R", "--args", args)
+    }
 }
 
+# Get directory where this file resides.
+XSEP = ifelse(PATHSEP == "\\", "\\\\", PATHSEP)
+RE = paste("^.*--file=(([^", XSEP, "]*", XSEP, ")*)[^", XSEP, "]+$", sep="")
+thisDir = sub(RE, "\\1", args[grepl("--file=", args)])
+args = args[-(1:which(args == "--args"))]
+
+# Source the necessary include files from the same directory containing this file.
+source(paste(thisDir, "Include_GFFfuncs.R", sep=""))
+source(paste(thisDir, "Include_MergeDataUsingPosition.R", sep=""))
+
+# Get the arguments specific to this program.
 Nexpected = 1
 if (length(args) != 1)
     {
@@ -70,16 +86,6 @@ cat("  paramFile: ", paramFile, "\n")
 if (!file.exists(paramFile))
     stop("File doesn't exist: ", paramFile)
 
-
-# Get directory where this file resides.
-XSEP = ifelse(PATHSEP == "\\", "\\\\", PATHSEP)
-RE = paste("^.*--file=(([^", XSEP, "]*", XSEP, ")*)[^", XSEP, "]+$", sep="")
-allArgs = commandArgs()
-thisDir = sub(RE, "\\1", allArgs[grepl("--file=", allArgs)])
-
-# Source the necessary include files from the same directory containing this file.
-source(paste(thisDir, "Include_GFFfuncs.R", sep=""))
-source(paste(thisDir, "Include_MergeDataUsingPosition.R", sep=""))
 
 ################################################################################
 # Functions.
