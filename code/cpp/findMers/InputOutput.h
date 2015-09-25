@@ -45,13 +45,13 @@ class OutputFile : public ofstream
     public: OutputFile(string filename) : ofstream(), fileName(filename)
         { open(filename.c_str(), ios::trunc); }
     public: bool Create(const char* filename, bool text = true)
-        { fileName = filename; open(filename, ios::trunc|(text?0:ios::binary)); return(is_open()); }
+        { fileName = filename; open(filename, (text ? ios::trunc : ios::trunc|ios::binary)); return(is_open()); }
     public: bool Create(string filename, bool text = true)
-        { fileName = filename; open(filename.c_str(), ios::trunc|(text?0:ios::binary)); return(is_open()); }
+        { fileName = filename; open(filename.c_str(), (text ? ios::trunc : ios::trunc|ios::binary)); return(is_open()); }
     public: bool OpenAppend(const char* filename, bool text = true)
-        { fileName = filename; open(filename, ios::app|(text?0:ios::binary)); return(is_open()); }
+        { fileName = filename; open(filename, (text ? ios::app : ios::app|ios::binary)); return(is_open()); }
     public: bool OpenAppend(string filename, bool text = true)
-        { fileName = filename; open(filename.c_str(), ios::app|(text?0:ios::binary)); return(is_open()); }
+        { fileName = filename; open(filename.c_str(), (text ? ios::app : ios::app|ios::binary)); return(is_open()); }
     public: void Close(void) { close(); }
     public: ~OutputFile() { close(); }
     
@@ -94,9 +94,9 @@ class InputFile : public ifstream
     public: InputFile(string filename) : ifstream(), fileName(filename)
         { open(filename.c_str()); }
     public: bool Open(const char* filename, bool text = true)
-        { fileName = filename; open(filename, (text?0:ios::binary)); return(is_open()); }
+        { fileName = filename; open(filename, (text ? ios::in : ios::in|ios::binary)); return(is_open()); }
     public: bool Open(string filename, bool text = true)
-        { fileName = filename; open(filename.c_str(), (text?0:ios::binary)); return(is_open()); }
+        { fileName = filename; open(filename.c_str(), (text ? ios::in : ios::in|ios::binary)); return(is_open()); }
     public: void Close(void) { close(); }
     public: ~InputFile() { Close(); }
     };

@@ -6,16 +6,32 @@ CC=g++
 CFLAGS= -O2
 LFLAGS= -lm -w -g
 
-INCLUDEDIRS= -I ../stdhdr -I../Strings -I../InputOutput -I .
+OBJS= findMers.o Strings.o InputOutput.o
 
-OBJS= findMers.o ../Strings/Strings.o ../InputOutput/InputOutput.o
+# Automatic dependency tracking definitions.
 
-findMers:	$(OBJS)
+DEPDIR := .d
+$(shell mkdir -p $(DEPDIR) >/dev/null)
+DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.Td
+
+COMPILE.cpp = $(CC) $(DEPFLAGS) $(CFLAGS) -c
+POSTCOMPILE = mv -f $(DEPDIR)/$*.Td $(DEPDIR)/$*.d
+
+$(DEPDIR)/%.d: ;
+
+# Targets and recipes.
+
+findMers : $(OBJS)
 	$(CC) -o findMers $(OBJS) $(LFLAGS)
 
-%.o: %.cpp
-	$(CC) $(INCLUDEDIRS) $(CFLAGS) -c $< -o $@
+%.o : %.cpp $(DEPDIR)/%.d
+	$(COMPILE.cpp) -o $@ $<
+	$(POSTCOMPILE)
 
 clean:
 	find ".." -name "*.o" -print -delete
 	rm findMers
+
+# Dependency files.
+
+include $(patsubst %,$(DEPDIR)/%.d,$(basename $(SRCS)))

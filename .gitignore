@@ -6,6 +6,7 @@ primer3Settings.txt
 saveOutputFiles/**
 findMers
 *.o
+*.d
 *.xml
 .Rapp.history
 temp.*
