@@ -179,5 +179,23 @@ rbind.fast.finish = function(df, stringsAsFactors=FALSE)
     }
 
 ################################################################################
+# Does do.call(rbind, <data frame list>) using rbind.fast to vastly speed it up.
+#
+# Arguments:
+#   L: List of data frames to be rbound.
+#   stringsAsFactors: passed to as.data.frame().
+#
+# Returns: a data frame containing all data frames in list L, bound together
+# one below the other, i.e. the number of columns stays constant.
+################################################################################
+do.call.rbind.fast = function(L, stringsAsFactors=FALSE)
+    {
+    dfAll = NULL
+    for (df in L)
+        dfAll = rbind.fast(dfAll, df)
+    return(rbind.fast.finish(dfAll, stringsAsFactors))
+    }
+
+################################################################################
 # End of file.
 ################################################################################

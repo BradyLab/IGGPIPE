@@ -1,9 +1,8 @@
 allParameters.test
 logFiles/**
-!logFiles
 out*/**
 code/R/testOutput
-primer3Settings.txt
+primer3settings.txt
 saveOutputFiles/**
 findMers
 *.o

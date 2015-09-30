@@ -33,7 +33,7 @@ else if (testing == 1)
         "outTestHP11/IndelGroupsOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0.tsv",
         "outTestHP11/GenomeData/Genome_",
         "outTestHP11/NonvalidatedMarkers_K11k2L100D10_2000A100_2000d10_100N2F0X20.tsv",
-        "~/bin/primer3_core", "Primer3Settings.txt",
+        "~/bin/primer3_core", "primer3settings.txt",
         "outTestHP11/Primers/Primer3In.txt", "outTestHP11/Primers/Primer3Out.txt", TRUE)
     }
 else stop("Unknown value for 'testing'")
@@ -48,7 +48,7 @@ if (length(args) != Nexpected)
         "sequences.  Write the new candidate IGG marker data including primers to a new file.",
         "",
         "Usage: Rscript findPrimers.R <wd> <indelFile> <seqInPfx> <tsvMarkerFile> \\",
-        "       <primer3core> <primer3Settings> <primer3DataFile> <primer3OutFile> <investigate>",
+        "       <primer3core> <primer3settings> <primer3DataFile> <primer3OutFile> <investigate>",
         "",
         "Arguments:",
         "   <wd>              : Path of R working directory, specify other file paths relative to this.",
@@ -57,7 +57,7 @@ if (length(args) != Nexpected)
         "                       suffix is the genome number followed by '.dnaseqs'",
         "   <tsvMarkerFile>   : Output file to be written containing the candidate marker k-mer pairs with DNA sequences.",
         "   <primer3core>     : Full path of the primer3_core program file",
-        "   <primer3Settings> : File containing primer3 settings edited for desired IGG marker primer characteristics.",
+        "   <primer3settings> : File containing primer3 settings edited for desired IGG marker primer characteristics.",
         "   <primer3DataFile> : File in which to place sequence data for primer3 to use to design primers.",
         "   <primer3OutFile>  : File into which primer3 should place its primer design results.",
         "   <investigate>     : FALSE for normal operation, TRUE for more verbose debugging output."
@@ -88,8 +88,8 @@ catnow("  tsvMarkerFile: ", tsvMarkerFile, "\n")
 primer3core = args[5]
 catnow("  primer3core: ", primer3core, "\n")
 
-primer3Settings = args[6]
-catnow("  primer3Settings: ", primer3Settings, "\n")
+primer3settings = args[6]
+catnow("  primer3settings: ", primer3settings, "\n")
 
 primer3DataFile = args[7]
 catnow("  primer3DataFile: ", primer3DataFile, "\n")
@@ -317,8 +317,8 @@ writeLines(records, primer3DataFile)
 # Run primer3 on the sequence data file we just created.
 ########################################
 
-if (!file.exists(primer3Settings)) stop("Primer3 settings file ", primer3Settings, " not found")
-primer3_cmd = paste(primer3core, "-p3_settings_file", primer3Settings, "<", primer3DataFile, ">", primer3OutFile)
+if (!file.exists(primer3settings)) stop("Primer3 settings file ", primer3settings, " not found")
+primer3_cmd = paste(primer3core, "-p3_settings_file", primer3settings, "<", primer3DataFile, ">", primer3OutFile)
 catnow("Running primer3 to design primers:\n   ", primer3_cmd, "\n")
 estimateTime = FALSE
 if (estimateTime)

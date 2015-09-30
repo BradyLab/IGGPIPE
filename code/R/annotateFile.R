@@ -37,7 +37,7 @@ testing = 0
 #testing = 6 # For testing only.
 {
 if (testing == 0)
-    args = commandArgs(FALSE)
+    args = commandArgs(TRUE)
 else
     {
     # For testing only:

@@ -444,7 +444,7 @@ getMatchIdxs = function(T.position, S.position, match)
                     }
                 # Convert list L of one-row data frames to a single data frame
                 # which is the new idxs.no.overlap.
-                idxs.no.overlap = do.call(rbind, L)
+                idxs.no.overlap = do.call.rbind.fast(L)
                 }
 
             # Bind idxs.overlap and idxs.no.overlap to form new idxs matrix.

@@ -660,7 +660,7 @@ for (i in 1:nrow(df))
                 dfi[, endCols[genome]] = df[i, pos2Cols[genome]] - indelBaseAfterEnd.genome + 1
                 }
             }
-        dfIndels = rbind(dfIndels, dfi)
+        dfIndels = rbind.fast(dfIndels, dfi)
         }
 
     # Logging.
@@ -668,6 +668,7 @@ for (i in 1:nrow(df))
     if (logCount %% logEveryN == 0)
         cat(" N =", logCount, "of", nrow(df), "\n")
     }
+dfIndels = rbind.fast.finish(dfIndels)
 catnow("Finished alignments.\n")
 inv(dim(dfIndels), "dim(dfIndels)")
 

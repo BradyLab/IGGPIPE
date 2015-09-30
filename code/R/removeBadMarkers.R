@@ -20,6 +20,7 @@ thisDir = sub(RE, "\\1", args[grepl("--file=", args)])
 
 # Source the necessary include files from the same directory containing this file.
 source(paste(thisDir, "Include_Common.R", sep=""))
+source(paste(thisDir, "Include_RemoveOverlapping.R", sep=""))
 
 # Get arguments.
 testing = 0
@@ -171,7 +172,7 @@ catnow("Finished removing e-PCR-identified bad markers from file\n")
 
 # Put the data frame in order by reference genome position.
 catnow("Sorting by reference genome position...")
-dfMarkers = dfMarkers[dfMarkers(dfMarkers[, idCol[refGenome]], dfMarkers[, pos1Col[refGenome]]),]
+dfMarkers = dfMarkers[order(dfMarkers[, idCol[1]], dfMarkers[, ampPos1Col[1]]),]
 rownames(dfMarkers) = NULL
 catnow("\n")
 
@@ -186,7 +187,7 @@ catnow(nrow(dfMarkers), "overlapping markers output to file:\n", overlappingFile
 
 ########################################
 # Remove overlapping markers, guided by the value of minMax, which is either
-# MIN or MAX.  This is a copy of the same code from findIndelGroups.R.
+# MIN or MAX.
 ########################################
 
 inv(nrow(dfMarkers), "Number of markers including overlapping markers")
@@ -198,128 +199,16 @@ inv(nrow(dfMarkers), "Number of markers including overlapping markers")
 # does.  The data frame will be transformed into one containing only non-overlapping
 # markers.  We no longer need the overlapping markers (except for this).
 
-# Test each genome, one by one, for marker overlaps, and remove markers to get
-# rid of them.
-for (genome in genomeLtrs)
-    {
-    inv(genome, "Remove overlaps")
-    id.Col = idCol[genome]
-    pos1.Col = ampPos1Col[genome]
-    pos2.Col = ampPos2Col[genome]
-
-    # Refer to more comments in findIndelGroups.R for more information.
-
-    # Loop until no more markers are found to overlap in this genome.
-    while (TRUE)
-        {
-        inv(nrow(dfMarkers), "Loop with # markers remaining")
-
-        # Set new column "start" to the position of the 5' end of the 5' k-mer
-        # of the amplicon, and new column "end" to the position of the 5' end of
-        # the 3' k-mer of the amplicon.  There are three issues to be dealt with:
-        #   1. The amplicon end position for "start" may be either ampPos1 or
-        #       ampPos2 depending on the strand polarity; "start" is always the
-        #       smaller of the two, "end" the larger.
-        #   2. We want "start" and "end" to be k-mer ends, not amplicon ends.
-        #       Columns kmer1offset and kmer2offset give us the offset to add,
-        #       but the sign is complicated.  These offset columns give offset
-        #       positive towards center of amplicon, negative away from center.
-        #       We need to negate the "end" offset depending on strand polarity.
-        #   3. kmer1offset and kmer2offset give offset to outside edge of the
-        #       k-mer, but we want offset to 5' side of k-mer so we may need an
-        #       additional "end" offset of kmerLen-1 depending on strand polarity.
-        dfMarkers$start = dfMarkers[, pos1.Col]
-        dfMarkers$end = dfMarkers[, pos2.Col]
-        pos2IsSmaller = (dfMarkers[,pos1.Col] > dfMarkers[,pos2.Col])
-        dfMarkers$start[pos2IsSmaller] = dfMarkers[pos2IsSmaller, pos2.Col]
-        dfMarkers$end[pos2IsSmaller] = dfMarkers[pos2IsSmaller, pos1.Col]
-        startOffset = dfMarkers$kmer1offset
-        endOffset = -dfMarkers$kmer2offset - kmerLen + 1
-        startOffset[pos2IsSmaller] = dfMarkers$kmer2offset[pos2IsSmaller]
-        endOffset[pos2IsSmaller] = -dfMarkers$kmer1offset[pos2IsSmaller] - kmerLen + 1
-        dfMarkers$start = dfMarkers$start + startOffset
-        dfMarkers$end = dfMarkers$end + endOffset
-
-        # Add new column "len" equal to length of the marker segments.
-        dfMarkers$len = dfMarkers$end - dfMarkers$start + 1
-
-        # Sort by ID and start position.
-        dfMarkers = dfMarkers[order(dfMarkers[, id.Col], dfMarkers$start),]
-        N = nrow(dfMarkers)
-
-        # Find index of marker that each marker overlaps through and put it in column thruIdx.
-        dfMarkers$thruIdx = NA
-        for (id in unique(dfMarkers[, id.Col]))
-            {
-            thisId = (dfMarkers[, id.Col] == id)
-            dfMarkers$thruIdx[thisId] = match(TRUE, thisId) - 1 + findInterval(dfMarkers$end[thisId], dfMarkers$start[thisId]+1)
-            }
-
-        # Set thruIdx of markers that do not overlap even the next marker to 0.
-        dfMarkers$thruIdx[dfMarkers$thruIdx == 1:nrow(dfMarkers)] = 0
-
-        # Get the set of indexes of all markers which overlap at least one other marker.
-        overlapIdxs = sapply(1:nrow(dfMarkers), function(i)
-            {
-            if (dfMarkers$thruIdx[i] == 0)
-                return(0)
-            return(i:dfMarkers$thruIdx[i])
-            })
-        overlapIdxs = unique(unlist(overlapIdxs))
-        # Remove index 0, which comes from non-overlapping markers.
-        overlapIdxs = overlapIdxs[overlapIdxs != 0]
-
-        # If no markers overlap, break out of loop.
-        inv(length(overlapIdxs), "Number of overlapping markers")
-        if (length(overlapIdxs) == 0)
-            break
-
-        # Set column "overlap" TRUE for each of those overlapping markers.
-        dfMarkers$overlap = FALSE
-        dfMarkers$overlap[overlapIdxs] = TRUE
-
-        # Get the start and end index of each group of mutually overlapping markers.
-        startOverlap = which(!c(FALSE, dfMarkers$overlap[-N]) & dfMarkers$overlap)
-        endOverlap = which(dfMarkers$overlap & !c(dfMarkers$overlap[-1], FALSE))
-        if (length(startOverlap) != length(endOverlap)) stop("Expected equal start/end overlap vectors")
-
-        # Find the index within each group of the marker with the smallest or largest length.
-        # Then get the indexes within the group of the markers that overlap that marker with
-        # the smallest or largest length.
-        idxsToRemove = sapply(1:length(startOverlap), function(i)
-            {
-            idxs = startOverlap[i]:endOverlap[i]
-            len.SL = ifelse(minMax == "MIN", min(dfMarkers$len[idxs]), max(dfMarkers$len[idxs]))
-            idx.SL = idxs[dfMarkers$len[idxs] == len.SL][1] # If more than one, pick the first.
-            return(idxs[!(dfMarkers$end[idxs] <= dfMarkers$start[idx.SL]) & !(dfMarkers$start[idxs] >= dfMarkers$end[idx.SL]) & idxs != idx.SL])
-            })
-        idxsToRemove = unlist(idxsToRemove)
-
-        # Remove those markers.
-        dfMarkers = dfMarkers[-idxsToRemove,]
-        inv(length(idxsToRemove), "Number of markers deleted")
-        inv(nrow(dfMarkers), "Number of markers remaining")
-        }
-    }
-dfNoOverlaps = dfNoOverlaps[, !colnames(dfNoOverlaps) %in% c("start", "end", "len", "thruIdx", "overlap")]
-inv(nrow(dfNoOverlaps), "Number of markers with overlapping markers removed")
-
-# Put the data frame in order by reference genome position.
-catnow("Sorting by reference genome position...")
-dfNoOverlaps = dfNoOverlaps[dfNoOverlaps(dfNoOverlaps[, idCol[refGenome]], dfNoOverlaps[, pos1Col[refGenome]]),]
-rownames(dfNoOverlaps) = NULL
- if (nrow(dfNoOverlaps) == 0)
-    stop("There are no markers left after removing overlapping markers!!")
-catnow("\n")
+dfMarkers = removeOverlappingRows(dfMarkers, "Marker", "genome", genomeLtrs, idCol, ampPos1Col, ampPos2Col, verbose=TRUE)
 
 ########################################
 # Write the non-overlapping markers to a file.
 ########################################
 
-rownames(dfNoOverlaps) = NULL
-write.table(dfNoOverlaps, nonoverlappingFile, col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
-# dfNoOverlaps = read.table(nonoverlappingFile, header=TRUE, sep="\t", stringsAsFactors=FALSE)
-catnow(nrow(dfNoOverlaps), "non-overlapping markers output to file:\n", nonoverlappingFile, "\n")
+rownames(dfMarkers) = NULL
+write.table(dfMarkers, nonoverlappingFile, col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
+# dfMarkers = read.table(nonoverlappingFile, header=TRUE, sep="\t", stringsAsFactors=FALSE)
+catnow(nrow(dfMarkers), "non-overlapping markers output to file:\n", nonoverlappingFile, "\n")
 
 }
 

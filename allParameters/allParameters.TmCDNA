@@ -706,7 +706,7 @@ PLOT_ALPHA := 0.5
 ################################################################################
 
 # Path of primer3 settings file.  You must create this file by copying file
-# primer3Settings.default.txt, which is a modified version of the settings file
+# primer3settings.default.txt, which is a modified version of the settings file
 # named primer3web_v4_0_0_default_settings.txt that is part of the primer3
 # V2.3.6 distribution.  The changes made to that file were:
 #   1. Changed the descriptive string P3_FILE_ID
@@ -717,7 +717,7 @@ PLOT_ALPHA := 0.5
 #       "-300", e.g. 36-300
 #   5. Changed PRIMER_NUM_RETURN from 5 to 1.
 #   6. Changed PRIMER_GC_CLAMP from 0 to 1.
-# COPY primer3Settings.default.txt to the file name given here, then EDIT it to
+# COPY primer3settings.default.txt to the file name given here, then EDIT it to
 # set PRIMER_THERMODYNAMIC_PARAMETERS_PATH to the path of the primer3_config
 # directory that was included in the primer3 distribution.  You can change any
 # other primer design parameters you want, including the above (except leave
@@ -726,7 +726,7 @@ PLOT_ALPHA := 0.5
 # IGGPIPE install instructions for more details.
 ### THIS DOES NOT NEED TO BE CHANGED BUT THE FILE MUST BE COPIED AND EDITED.
 
-PATH_PRIMER3_SETTINGS := Primer3Settings.txt # In IGGPIPE installation directory.
+PATH_PRIMER3_SETTINGS := primer3settings.txt # In IGGPIPE installation directory.
 
 
 # Directory in which to place these files.  This directory will be created if it
