@@ -1,6 +1,6 @@
 # This is an IGGPIPE parameter file example for analyzing tomato (H) and
-# S. pennellii (P) genomes.  Change these two comment lines to list YOUR
-# analyzed genomes.
+# S. pennellii (P) genomes, modified from the default allParameters.template
+# example to use a very long amplicon size.
 
 ################################################################################
 ################################################################################
@@ -472,7 +472,7 @@ KMIN := 2
 # could be larger.  Smaller values make more LCRs and increase computation time.
 ### YOU PROBABLY WANT TO SET THIS EQUAL TO YOUR MINIMUM ACCEPTABLE AMPLICON LENGTH.
 
-LMIN := 400
+LMIN := 100
 
 
 # Minimum distance in bp between two adjacent k-mers in an LCR.  If two k-mers are
@@ -481,7 +481,7 @@ LMIN := 400
 # setting or MINFLANK setting.  A value in the range of k would be reasonable.
 ### THIS IS A REASONABLE VALUE FOR THIS PARAMETER.
 
-DMIN := 10
+DMIN := 1
 
 
 # Maximum distance in bp between two adjacent k-mers in an LCR.  If two adjacent
@@ -492,20 +492,20 @@ DMIN := 10
 ### YOU PROBABLY WANT TO SET THIS EQUAL TO YOUR MAXIMUM ACCEPTABLE AMPLICON
 ### LENGTH.
 
-DMAX := 1500
+DMAX := 3000
 
 
 # Minimum IGG marker amplicon size in any genome.
 ### SET THIS EQUAL TO YOUR MINIMUM ACCEPTABLE AMPLICON LENGTH.
 
-AMIN := 400
+AMIN := 100
 
 
 # Maximum IGG marker amplicon size in any genome.  The amplicon size will always
 # be less than DMAX also.  This also limits the maximum Indel Group size.
 ### SET THIS EQUAL TO YOUR MAXIMUM ACCEPTABLE AMPLICON LENGTH.
 
-AMAX := 1500
+AMAX := 3000
 
 
 # For a given IGG marker, when the smallest amplicon size is AMIN, this is the
@@ -517,7 +517,7 @@ AMAX := 1500
 ### SET THIS EQUAL TO YOUR MINIMUM ACCEPTABLE DIFFERENCE IN AMPLICON LENGTHS WHEN
 ### ONE AMPLICON'S LENGTH IS EQUAL TO AMIN AND ANOTHER IS AMIN+ADMIN.
 
-ADMIN := 50
+ADMIN := 100
 
 
 # For a given IGG marker, when the largest amplicon size is AMAX, this is the
@@ -538,7 +538,7 @@ ADMIN := 50
 ### SET THIS EQUAL TO YOUR MAXIMUM ACCEPTABLE DIFFERENCE IN AMPLICON LENGTHS WHEN
 ### ONE AMPLICON'S LENGTH IS EQUAL TO AMAX AND ANOTHER IS AMAX-ADMAX.
 
-ADMAX := 300
+ADMAX := 100
 
 
 # Minimum number of distinct amplicon sizes for each marker.  Set this to the

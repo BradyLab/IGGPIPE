@@ -29,7 +29,6 @@
 inputFileT:
     path := "outHP14/MarkersOverlapping_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.tsv"
     type := tsv
-    type := tsv
     quote := ""
     comment := ""
     addColNames := "ID"
@@ -80,9 +79,9 @@ positionS:
 
 match:
     method := S.NEAR
+    closest := 0
     start.down := 3000
     end.up := 3000
-    closest := 0
 
 ################################################################################
 # Match and merge: columns to add and the format of the new column data.

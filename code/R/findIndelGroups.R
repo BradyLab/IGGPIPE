@@ -1,9 +1,9 @@
-#######################################################################################
+################################################################################
 # See usage below for description.
 # Author: Ted Toal
 # Date: 2013-2015
 # Brady Lab, UC Davis
-#######################################################################################
+################################################################################
 
 # Enclose everything in braces so stop statements will work correctly.
 {
@@ -11,43 +11,22 @@
 # Pathname separator.
 PATHSEP = ifelse(grepl("/", Sys.getenv("HOME")), "/", "\\")
 
-# cat() that immediately flushes to console.
-catnow = function(...)
-    {
-    cat(...)
-    flush.console()
-    return(invisible(0))
-    }
+# Get directory where this file resides.
+XSEP = ifelse(PATHSEP == "\\", "\\\\", PATHSEP)
+RE = paste("^.*--file=(([^", XSEP, "]*", XSEP, ")*)[^", XSEP, "]+$", sep="")
+args = commandArgs(FALSE)
+thisDir = sub(RE, "\\1", args[grepl("--file=", args)])
+#thisDir = "~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE/code/R/" # For testing only.
 
-# Print an R object's value.
-objPrint = function(x, title="")
-    {
-    sink("temp.txt")
-    print(x)
-    sink()
-    x.S = readLines("temp.txt")
-    x.S = sub(" $", "", x.S)
-    multiline = (length(x.S) > 1)
-    if (!multiline)
-        x.S = sub("[1] ", "", x.S, fixed=TRUE)
-    x.S = paste(x.S, collapse="\n")
-    if (title != "")
-        {
-        if (!multiline)
-            catnow(title, ": ", sep="")
-        else
-            catnow(title, ":\n", sep="")
-        }
-    catnow(x.S, "\n", sep="")
-    }
-
-# Define function to display info when investigating.
-inv = function(a, title="") { if (investigate) objPrint(a, title) }
+# Source the necessary include files from the same directory containing this file.
+source(paste(thisDir, "Include_Common.R", sep=""))
 
 # Get arguments.
 testing = 0
+testing.readPartialData = FALSE # Used when testing only.
 #testing = 1 # For testing only.
 #testing = 2 # For testing only.
+#testing = 3 # For testing only.
 {
 if (testing == 0)
     args = commandArgs(TRUE)
@@ -68,6 +47,16 @@ else if (testing == 2)
         "MAX",
         "outHP14/IndelGroupsOverlapping_K14k2L400D10_1500A400_1500d50_300N2F0.tsv",
         "outHP14/IndelGroupsNonoverlapping_K14k2L400D10_1500A400_1500d50_300N2F0.tsv",
+        "HP", TRUE,
+        "outHP14/GenomeData/Genome_1.idlens", "outHP14/GenomeData/Genome_2.idlens")
+    }
+else if (testing == 3)
+    {
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
+        "outHP14/LCRs_K14k2L100D1_3000.tsv", 100, 3000, 100, 100, 2, 0,
+        "MIN",
+        "outHP14/IndelGroupsOverlapping_K14k2L100D1_3000A100_3000d100_100N2F0.tsv",
+        "outHP14/IndelGroupsNonoverlapping_K14k2L100D1_3000A100_3000d100_100N2F0.tsv",
         "HP", TRUE,
         "outHP14/GenomeData/Genome_1.idlens", "outHP14/GenomeData/Genome_2.idlens")
     }
@@ -208,10 +197,13 @@ minAmplDiff = function(Asize) par.m*Asize+par.b # Asize can be a vector.
 
 # Read LCR k-mer data.
 {
-if (testing == 0)
-    df = read.table(inFile, header=TRUE, row.names=1, sep="\t", stringsAsFactors=FALSE)
-else
-    df = read.table(inFile, header=TRUE, nrows=100000, row.names=1, sep="\t", stringsAsFactors=FALSE)
+nrows = 100000
+if (testing == 0 || !testing.readPartialData)
+    nrows = -1
+df = read.table(inFile, header=TRUE, sep="\t", quote="", row.names=1,
+    na.strings=NULL, nrows=nrows, check.names=FALSE, fill=FALSE,
+    strip.white=FALSE, blank.lines.skip=FALSE, comment.char="",
+    allowEscapes=FALSE, flush=FALSE, stringsAsFactors=FALSE)
 }
 inv(dim(df), "input data dim")
 inv(colnames(df), "input data columns")
@@ -252,11 +244,18 @@ posCol = makeColVec(".pos")
 strandCol = makeColVec(".strand")
 contigCol = makeColVec(".contig")
 contigPosCol = makeColVec(".contigPos")
+difPosCol = makeColVec(".difPos")
+difDifCol = makeColVec(".difDif")
 refIdCol = idCol[refGenome]
 refPosCol = posCol[refGenome]
 refStrandCol = strandCol[refGenome]
 refContigCol = contigCol[refGenome]
 refContigPosCol = contigPosCol[refGenome]
+refDifPosCol = difPosCol[refGenome]
+
+# Change each of the id columns into a factor.  It will save a lot of memory.
+for (genome in genomeLtrs)
+    df[, idCol[genome]] = factor(df[, idCol[genome]], ordered=TRUE)
 
 ########################################
 # Find Indel Groups.
@@ -270,19 +269,17 @@ df = df[order(df$LCR),]
 # of the LCR, the first one being 1.
 numKmersInLCR = tapply(1:nrow(df), df$LCR, length)
 # Following needs unlist() and c() depending on whether all elements of numKmersInLCR are equal
-df$NkmerFromLCRstart = unlist(c(sapply(numKmersInLCR, function(N) 1:N)))
+df$NkmerFromLCRstart = unlist(c(sapply(numKmersInLCR, function(N) 1:N)), use.names=FALSE)
 
 # Add column NkmerFromLCRend containing the number of this k-mer from the END of
 # the LCR, the last one being 1.
 # Following needs unlist() and c() depending on whether all elements of numKmersInLCR are equal
-df$NkmerFromLCRend = unlist(c(sapply(numKmersInLCR, function(N) N:1)))
+df$NkmerFromLCRend = unlist(c(sapply(numKmersInLCR, function(N) N:1)), use.names=FALSE)
 
 # Add columns "(genome).difPos" giving absolute difference in "(genome).pos"
 # from one df row to the next, i.e. is the spacing between one k-mer and the
 # next.  All positions are either increasing or decreasing within one genome
 # of one LCR.  The first k-mer of each LCR has a value of 0 for these columns.
-difPosCol = makeColVec(".difPos")
-refDifPosCol = difPosCol[refGenome]
 for (genome in genomes)
     {
     df[,difPosCol[genome]] = abs(df[,posCol[genome]] - c(0, df[-nrow(df), posCol[genome]]))
@@ -294,7 +291,6 @@ for (genome in genomes)
 # this k-mer and the next one, in each genome compared to reference genome.  But
 # note that either genome may be the larger distance, since we are taking absolute
 # value.  The first k-mer of each LCR has a value of 0 for these columns.
-difDifCol = makeColVec(".difDif")
 for (genome in otherGenomes)
     {
     df[,difDifCol[genome]] = abs(df[,difPosCol[genome]] - df[,refDifPosCol])
@@ -307,6 +303,7 @@ numKmersInLCR = tapply(1:nrow(df), df$LCR, length)
 keepLCRs = names(numKmersInLCR)[numKmersInLCR >= 2*minFlank+2]
 df = df[df$LCR %in% keepLCRs,]
 inv(length(unique(df$LCR)), "Number of LCRs after removing those with too few k-mers")
+rm(numKmersInLCR, keepLCRs)
 
 # Also get rid of candidate LCRs that have insufficient total distance polymorphism
 # between the k-mers, excluding the minFlank k-mers on each side.
@@ -331,6 +328,7 @@ for (genome in otherGenomes)
     df = df[!df$LCR %in% tooLittleChangeLCRs,,drop=FALSE]
     }
 inv(length(unique(df$LCR)), "Number of LCRs after removing those with too little polymorphism")
+rm(cumSum, difDifAtStartKmer, cumSumThruStartKmer, cumSumThruEndKmer, cumSumLCRs, tooLittleChangeLCRs)
 
 # Locate ALL pairs of k-mers that satisfy the requirements for an IGG marker
 # (Amin, Amax, ADmin, ADmax).
@@ -439,6 +437,7 @@ progressEverySecs = 5 # Show progress every this many seconds.
 lastProgressTime = Sys.time()
 loopCount = 0
 catnow("Seeking good IGG marker candidate Indel Group regions:\n")
+initialNright = length(rightSideKmers)
 while (length(rightSideKmers) > 0)
     {
     # Calculate distance between left-side k-mer and right-side k-mer in each genome,
@@ -484,7 +483,14 @@ while (length(rightSideKmers) > 0)
         # ADmin/ADmax/NDAmin.  An easy first step that will eliminate many pairs
         # from consideration is to see which ones have at least NDAmin distinct
         # difPos values.  If they don't, we can eliminate those from consideration.
-        numDistinct = apply(tmp.difPos, 1, length)
+
+        # We can do this test much faster when there are only two genomes.
+        {
+        if (Ngenomes > 2)
+            numDistinct = apply(tmp.difPos, 1, function(V) length(unique(V)))
+        else # (Ngenomes == 2)
+            numDistinct = 1+(tmp.difPos[,1] != tmp.difPos[,2])
+        }
         atLeastNDAmin = (numDistinct >= NDAmin)
         # Remove k-mer pairs that have fewer than NDAmin distinct values.
         tmp.rightSideKmers = tmp.rightSideKmers[atLeastNDAmin]
@@ -504,14 +510,15 @@ while (length(rightSideKmers) > 0)
             # Ngenomes is small, as we expect it to usually be, we can just use
             # min() to do this.  Let's divide this up into three algorithms,
             # for when Ngenomes is 2, 3, or > 3, using pure sorting only for > 3.
-            sortCols = function(df, col1, col2)
+            sortCols = function(dft, col1, col2)
                 {
-                swapIt = (df[,col1] > df[,col2])
-                t = df[swapIt,col1]
-                df[swapIt,col1] = df[swapIt,col2]
-                df[swapIt,col2] = t
-                return(df)
+                swapIt = (dft[,col1] > dft[,col2])
+                t = dft[swapIt,col1]
+                dft[swapIt,col1] = dft[swapIt,col2]
+                dft[swapIt,col2] = t
+                return(dft)
                 }
+            {
             if (Ngenomes > 3)
                 tmp.sortedLens = t(apply(tmp.difPos, 1, sort, method="quick"))
             else if (Ngenomes == 2)
@@ -522,6 +529,7 @@ while (length(rightSideKmers) > 0)
                 tmp.sortedLens = sortCols(tmp.sortedLens, 2, 3)
                 tmp.sortedLens = sortCols(tmp.sortedLens, 1, 2)
                 }
+            }
 
             # Now that they are sorted, generate the differences of successive ones.
             # Then make sure those differences are larger than minAmplDiff(Asize),
@@ -530,13 +538,23 @@ while (length(rightSideKmers) > 0)
             # different from the following one must be at least NDAmin-1 (since
             # the last one is not considered).  Record the number in tmp.NDA,
             # where NDA = number distinct amplicons.
-            diffs = t(apply(tmp.sortedLens, 1, diff))
-            if (ncol(tmp.sortedLens) == 2)
-                diffs = t(diffs) # Note: doing it 0 times leaves it as vector, we want matrix.
-            minDiff = t(apply(tmp.sortedLens[,-ncol(tmp.sortedLens),drop=FALSE], 1, minAmplDiff))
-            if (ncol(tmp.sortedLens) == 2)
-                minDiff = t(minDiff) # Note: doing it 0 times leaves it as vector, we want matrix.
-            tmp.NDA = 1 + apply(diffs >= minDiff, 1, sum)
+
+            # We want to do this:
+            #   diffs = t(apply(tmp.sortedLens, 1, diff))
+            # However, that is VERY slow, so we'll do it OUR way.  (Also, above
+            # does funny thing with transposing result if only two columns).
+            diffs = NULL
+            for (i in 1:(Ngenomes-1))
+                diffs = cbind(diffs, tmp.sortedLens[, i+1] - tmp.sortedLens[, i])
+
+            minDiff = minAmplDiff(tmp.sortedLens[,-ncol(tmp.sortedLens),drop=FALSE])
+            x = (diffs >= minDiff)
+            # We want to do this:
+            #   tmp.NDA = 1 + apply(x, 1, sum)
+            # But it is way too slow, so we'll do it our way.
+            tmp.NDA = rep(1, nrow(x))
+            for (i in 1:(Ngenomes-1))
+                tmp.NDA = tmp.NDA + x[,i]
             enoughDistinctAmplicons = (tmp.NDA >= NDAmin)
 
             # Reduce the vectors to contain those k-mer pairs that have enough distinct amplicon sizes.
@@ -546,9 +564,10 @@ while (length(rightSideKmers) > 0)
             tmp.NDA = tmp.NDA[enoughDistinctAmplicons]
 
             # Add the successful Indel Groups to goodPairs.
-            inv(nrow(tmp.difPos), "    New Indel Groups found")
-            if (nrow(tmp.difPos) > 0)
-                goodPairs = rbind(goodPairs,
+            NnewIndelGroups = sum(enoughDistinctAmplicons)
+            inv(NnewIndelGroups, "    New Indel Groups found")
+            if (NnewIndelGroups > 0)
+                goodPairs = rbind.fast(goodPairs,
                     data.frame(left=tmp.leftSideKmers, right=tmp.rightSideKmers, NDA=tmp.NDA))
             }
         }
@@ -567,20 +586,26 @@ while (length(rightSideKmers) > 0)
     curTime = Sys.time()
     if (difftime(curTime, lastProgressTime, units="secs") >= progressEverySecs)
         {
-        catnow("Loop ", format(loopCount, width=4), "  # right-side k-mers remaining to test:",
-            format(length(rightSideKmers), width=9), "  # candidates found: ", nrow(goodPairs), "\n")
+        catnow("Loop", format(loopCount, width=4), " # right-side k-mers remaining to test:",
+            format(length(rightSideKmers), width=9), "out of", format(initialNright, width=9),
+            "  # candidates found:", attr(goodPairs, "nrow"), "\n")
         lastProgressTime = curTime
         }
     }
+goodPairs = rbind.fast.finish(goodPairs)
 inv(sum(!is.na(goodPairs)))
+catnow("Finished testing, # candidates found:", nrow(goodPairs), "\n")
 
-# Retrieve the df rows for the good left and right side k-mers into dfEL and dfER.
+# Retrieve the df rows for the good left- and right-side k-mers into dfEL and dfER.
+catnow("Merging k-mer pairs into single InDel Group rows...")
 dfEL = df[goodPairs$left,]
 dfER = df[goodPairs$right,]
 rownames(dfEL) = NULL
 rownames(dfER) = NULL
 dfEL$kmer = rownames(df)[goodPairs$left]
 dfER$kmer = rownames(df)[goodPairs$right]
+# Finished with df.
+rm(df)
 
 # Using dfEL/dfER as Indel Groups, make data frame dfIGs containing the needed paired
 # info from each of those two data frames.  Add column NDA from goodPairs.  Include
@@ -620,19 +645,33 @@ for (genome in genomes)
     dfIGs[,pctCol.I[genome]] = signif(100*dfIGs[, pos1Col.I[genome]]/dfIdLens[dfIGs[,idCol.I[genome]], "len"], 2)
     }
 rownames(dfIGs) = NULL
+rm(goodPairs, dfEL, dfER)
+catnow("\n")
 
 # Put the data frame in order by reference genome position.
+catnow("Sorting by reference genome position...")
 dfIGs = dfIGs[order(dfIGs[, idCol.I[refGenome]], dfIGs[, pos1Col.I[refGenome]]),]
 rownames(dfIGs) = NULL
 if (nrow(dfIGs) == 0)
-    stop("There are no Indel Groups.")
+    stop("There are no overlapping Indel Groups.")
+catnow("\n")
 
 ########################################
 # Write the overlapping Indel Group data to a file.
 ########################################
 
+catnow("Writing output file", outOverlappingIndelGroups, "...")
 write.table(dfIGs, outOverlappingIndelGroups, row.names=FALSE, quote=FALSE, sep="\t")
-# dfIGs = read.table(outOverlappingIndelGroups, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
+# dfIGs = read.table(outOverlappingIndelGroups, header=TRUE, sep="\t", quote="", row.names=NULL,
+#    na.strings=NULL, check.names=FALSE, fill=FALSE, strip.white=FALSE, blank.lines.skip=FALSE,
+#    comment.char="", allowEscapes=FALSE, flush=FALSE, stringsAsFactors=FALSE)
+# genomeLtrs = sub("id$", "", colnames(dfIGs)[grepl("id$", colnames(dfIGs))])
+# id.Cols = paste(genomeLtrs, "id", sep="")
+# names(id.Cols) = genomeLtrs
+# for (genome in genomeLtrs)
+#   dfIGs[,id.Cols[genome]] = factor(dfIGs[,id.Cols[genome]], ordered=TRUE)
+
+catnow("\n")
 
 catnow("\n")
 catnow("Found", nrow(dfIGs), "Indel Group region k-mer pairs with distance between", Amin, "and", Amax, "and\n")
@@ -640,132 +679,249 @@ catnow("delta distance at least", ADmin, "at distance", Amin, "and at least", AD
 catnow("in genomes", genomes, " (Indel Group regions can overlap, with each perhaps containing multiple actual Indel Groups)\n")
 catnow("\n")
 
-numPerRefSeqId = tapply(1:nrow(dfIGs), dfIGs[,idCol.I[refGenome]], length)
-inv(numPerRefSeqId, "Number of Indel Groups per reference genome sequence ID")
+inv(tapply(1:nrow(dfIGs), dfIGs[,idCol.I[refGenome]], length), "Number of Indel Groups per reference genome sequence ID")
 
 ########################################
 # Remove overlapping Indel Groups, guided by the value of minMax, which is either
 # MIN or MAX.  If MIN, retain shortest Indel Groups of each group of overlapping
-# ones, and if MAX, retain longest.
+# ones, and if MAX, retain longest.  This is done independently in each genome.
 ########################################
 
-inv(nrow(dfIGs), "Number of Indel Groups including overlapping ones")
-df = dfIGs
+catnow("Getting non-overlapping Indel Groups...")
+inv(nrow(dfIGs), "\nNumber of Indel Groups including overlapping ones")
+
+# We will use the same data frame that holds the overlapping Indel Groups, dfIGs,
+# to hold the non-overlapping InDel Groups, since there might be a LOT of them
+# (so copying the data frame would be costly) and we need to start out this algorithm
+# with the data frame containing the overlapping InDel Groups, which dfIGs already
+# does.  The data frame will be transformed into one containing only non-overlapping
+# Indel Groups.  We no longer need the overlapping groups (except for this).
+
 # Test each genome, one by one, for Indel Group overlaps, and remove Indel Groups
 # to get rid of them.
+#gcinfo(TRUE)
 for (genome in genomes)
     {
-    inv(genome, "Remove overlaps")
+    catnow("Remove overlaps for genome: ", genome, "\n")
+
+    #gc()
+
     id.Col = idCol.I[genome]
     pos1.Col = pos1Col.I[genome]
     pos2.Col = pos2Col.I[genome]
 
-    # The method will be:
-    #   1. Find, for each Indel Group X with end position X.E, the row index of
-    #       the Indel Group Y with starting position Y.S such that X.E > Y.S.
-    #       (We count X.E == Y.S as non-overlapping, i.e. Indel Group AB does
-    #       not overlap Indel Group BC).  Then, set new column "overlap" TRUE
-    #       if that row index is not equal to the row index of Indel Group X.
-    #   2. Find the start and end index of each continuous set of TRUE overlap
-    #       values, those being the start and end of a group of Indel Groups
-    #       that all overlap one another in some manner.
-    #   3. For each such start and end index, find the index of the Indel Group
-    #       in that row index range which has the smallest (MIN) or largest (MAX)
-    #       length.
-    #   4. Again for each such start and end index, remove all Indel Groups in
-    #       that index range which overlap with the one with the shortest or
-    #       longest length.
-    #   5. Repeat steps 1-4 until there are no more overlaps.
+    # The idea behind the method is: if we make a vector of all positions,
+    # whether start or end (but keeping track of which are start and which are
+    # end), and sort them by position, then do a cumulative sum (i.e. cumsum())
+    # of point == start point flags, and another cumsum of point == end point
+    # flags, then any endpoint whose cumsums are identical MUST be an endpoint
+    # preceding a break where there are no overlaps.  This is because the cumsum
+    # of endpoints gives the number of endpoints at and left of a given endpoint,
+    # and the number of start points left of it must be equal to that value, or
+    # greater.  The only way it can be greater is if a segment starts left of it
+    # and ends right of it, which means it is not a break position.
+    #
+    # Having identified break positions, the diff() of the cumsum values at the
+    # start points gives the number of line segments between each set of breaks.
+    # If that value is one, there are no overlaps to be handled between those
+    # breaks, else there are overlaps.
+    #
+    # For each region of overlaps, find the segment that is either smallest (MIN)
+    # or largest (MAX), and remove all other segments in the region that overlap
+    # that segment.  Then, repeat everything again, until there are no overlaps.
+    #
+    # It could be a problem if a start point is equal to an end point, since when
+    # we sort by position, the start point may end up before or after the end point.
+    # To force start points to sort AFTER end points, we will sort using the "start"
+    # column as the third sort key (after "id" and "pos").  This will result in
+    # us considering two segments that have an end point of one in common with the
+    # start point of the other to be non-overlapping.
+
+    # Start by preparing a data frame dfP containing a subset of the data for this
+    # genome, and with two rows for each row of dfIGs, one row containing the
+    # start position and one row containing the end position.  The data frame has
+    # these columns: id, pos, start, and idx.  The "pos" column has either a
+    # start or end position, where start position is always the lower-numbered
+    # position of the two for any given segment.  The "start" column is TRUE if
+    #  "pos" is a start position, FALSE if an end position.  The "idx" column has
+    # the row number in dfIGs of the data for that dfP row.  Additional working
+    # columns may be added below as we make use of dfP, but these are recomputed
+    # each time through the loop below.
+    # Also, we will use a factor for the id, since this array could be huge and
+    # we want to save space (should have used factors for lots of things but just
+    # haven't gotten into it yet).
+    # We build dfP by putting all the dfIGs start positions in the first N rows
+    # and all the end positions in the second N rows.  As overlapping segments
+    # are identified, their row index in dfIGs is added to vector "idxsToRemove", and
+    # they are removed from dfP, but dfIGs remains unmodified so that the "idx"
+    # column values in dfP will remain valid.  We will also remove from dfP any
+    # segments that we know don't overlap anything else.  So, dfP contains the
+    # start/end points and indexes of segments that MIGHT overlap and are being
+    # tested for overlap.  When finished testing all segments for this genome,
+    # dfIGs is modified by removing the rows given by "idxsToRemove".
+
+    # Add columns 'start', 'end', and 'len' to dfIGs, containing the start and
+    # end positions and length of each row's segment in genome 'genome'.  The
+    # 'start' and 'end' values differ from the pos1.Col and pos2.Col values
+    # because start < end, whereas pos1.Col > pos2.Col if negative strand.
+    dfIGs$start = dfIGs[, pos1.Col]
+    dfIGs$end = dfIGs[, pos2.Col]
+    swapIt = (dfIGs$start > dfIGs$end)
+    dfIGs$start[swapIt] = dfIGs[swapIt, pos2.Col]
+    dfIGs$end[swapIt] = dfIGs[swapIt, pos1.Col]
+    dfIGs$len = dfIGs$end - dfIGs$start + 1
+
+    # Create the dfP data frame.
+    N = nrow(dfIGs)
+    dfP = data.frame(
+        id=factor(c(as.character(dfIGs[,id.Col]), as.character(dfIGs[,id.Col])), ordered=TRUE),
+        pos=c(dfIGs$start, dfIGs$end), start=c(rep(TRUE, N), rep(FALSE, N)),
+        idx=c(1:N,1:N), stringsAsFactors=TRUE)
+
+    # Create empty 'idxsToRemove' vector.
+    idxsToRemove = integer()
+
+    # Sort by position, including "start" column as final key.  Once sorted, it
+    # never needs to be sorted again.
+    dfP = dfP[order(dfP$id, dfP$pos, dfP$start),]
+    rownames(dfP) = NULL
 
     # Loop until no more Indel Groups are found to overlap in this genome.
-    while (TRUE)
+    # Use dfP as described in comments above, removing elements from dpP and
+    # adding the index of elements that are to be removed from dfIGs to idxsToRemove.
+    # We know we are done when dfP becomes empty.
+    while (nrow(dfP) > 0)
         {
-        inv(nrow(df), "Loop with # Indel Groups remaining")
+        catnow("  ", nrow(dfP), "Indel Groups remaining to be tested\n")
 
-        # Copy start or end position, whichever is smaller (it varies depending on strand)
-        # into new column "start", and vice-versa, copy the larger position into new
-        # column "end".
-        df$start = df[, pos1.Col]
-        df$end = df[, pos2.Col]
-        pos2IsSmaller = (df[,pos1.Col] > df[,pos2.Col])
-        df$start[pos2IsSmaller] = df[pos2IsSmaller, pos2.Col]
-        df$end[pos2IsSmaller] = df[pos2IsSmaller, pos1.Col]
+        # Compute cumulative sum of "start" flag.  The cumulative sum of !start
+        # (i.e. of endpoint flags) is simply 1:nrow(dfP) - cumsumStart.
+        cumsumStart = cumsum(dfP$start)
 
-        # Add new column "len" equal to length of the Indel Group segments.
-        df$len = df$end - df$start + 1
+        # Get logical vector for dfP rows which are end points that precede a
+        # "break", i.e. no segments overlap the end point.  These are the points
+        # where the number of end points at or left of this end point is equal
+        # to the number of start points left of it.
+        breaksAt = (!dfP$start & (cumsumStart == (1:nrow(dfP)) - cumsumStart))
 
-        # Sort by ID and start position.
-        df = df[order(df[, id.Col], df$start),]
-        N = nrow(df)
+        # Note that since we sorted by dfP$id first, and since every row of dfIGs
+        # produced two rows of dfP (one start and one end), it MUST be true that
+        # at the endpoint of the last segment of each chromosome, a break occurs.
+        # Double-check this during debugging.
+        #lastChrEndpoint = (c(dfP$id[-1] != dfP$id[-nrow(dfP)], TRUE))
+        #sum(lastChrEndpoint)
+        #all((lastChrEndpoint & breaksAt) == lastChrEndpoint)
+        #rm(lastChrEndpoint)
 
-        # Find index of Indel Group that each Indel Group overlaps through and
-        # put it in column thruIdx.
-        df$thruIdx = NA
-        for (id in unique(df[, id.Col]))
+        # Get logical vector of dfP rows which do not overlap any other rows, i.e.
+        # those rows that are both preceded and followed by a break.
+        justOne = (diff(c(0, cumsumStart[breaksAt])) == 1) # Flags whether group just before each break in breaksAt has 1, or more, segments.
+        if (sum(justOne) > 0)
             {
-            thisId = (df[, id.Col] == id)
-            df$thruIdx[thisId] = match(TRUE, thisId) - 1 + findInterval(df$end[thisId], df$start[thisId]+1)
+            # Every group that consists of just a SINGLE segment is a non-overlapping
+            # segment.  Remove those non-overlapping rows from dfP.  We want breaksAt
+            # to still be valid, so remove them from it also.  First, get the indexes
+            # of the start and end points in dfP.
+            dfP.idx.1.end = which(breaksAt)[justOne]
+            dfP.idx.1.start = dfP.idx.1.end-1
+
+            # We need to remove TWO ENTRIES from both dfP and breaksAt for each TRUE
+            # member of justOne, because the TRUE member is for the END POINT, but the
+            # START POINT should immediately precede it.  Test that the start point
+            # DOES immediately precede the end point, during debugging.
+            #if (!all(dfP[dfP.idx.1.start, "start"] == TRUE))
+            #   stop("Point immediately preceding end point of non-overlapping segments is not always a start point")
+            #if (!all(dfP[dfP.idx.1.start, "idx"] == dfP[dfP.idx.1.end, "idx"]))
+            #   stop("Start point doesn't immediately precede end point of non-overlapping segments")
+            # Perfect!
+
+            # Ok, remove the two entries from dfP and breaksAt.
+            dfP = dfP[-c(dfP.idx.1.start, dfP.idx.1.end),]
+            breaksAt = breaksAt[-c(dfP.idx.1.start, dfP.idx.1.end)]
+            rm(dfP.idx.1.start, dfP.idx.1.end)
             }
+        rm(justOne, cumsumStart)      
 
-        # Set thruIdx of Indel Groups that do not overlap even the next Indel
-        # Group to 0.
-        df$thruIdx[df$thruIdx == 1:nrow(df)] = 0
-
-        # Get the set of indexes of all Indel Groups which overlap at least one
-        # other Indel Group.
-        overlapIdxs = sapply(1:nrow(df), function(i)
-            {
-            if (df$thruIdx[i] == 0)
-                return(0)
-            return(i:df$thruIdx[i])
-            })
-        overlapIdxs = unique(unlist(overlapIdxs))
-        # Remove index 0, which comes from non-overlapping Indel Groups.
-        overlapIdxs = overlapIdxs[overlapIdxs != 0]
-
-        # If no Indel Groups overlap, break out of loop.
-        inv(length(overlapIdxs), "Number of overlapping Indel Groups")
-        if (length(overlapIdxs) == 0)
+        # If no more Indel Groups to check for overlap, break out of loop.
+        if (nrow(dfP) == 0)
             break
 
-        # Set column "overlap" TRUE for each of those overlapping Indel Groups.
-        df$overlap = FALSE
-        df$overlap[overlapIdxs] = TRUE
+        # Define endsAt to contain indexes into dfP of last end point of each group.
+        endsAt = which(breaksAt)
+        rm(breaksAt)
 
-        # Get the start and end index of each group of mutually overlapping Indel Groups.
-        startOverlap = which(!c(FALSE, df$overlap[-N]) & df$overlap)
-        endOverlap = which(df$overlap & !c(df$overlap[-1], FALSE))
-        if (length(startOverlap) != length(endOverlap)) stop("Expected equal start/end overlap vectors")
+        # Define startsAt to contain indexes into dfP of first start point of
+        # each group.
+        startsAt = c(1, 1+endsAt[-length(endsAt)])
 
-        # Find the index within each group of the Indel Group with the shortest
-        # or longest length.  Then get the indexes within the group of the Indel
-        # Groups that overlap that Indel Group with the shortest or longest length.
-        idxsToRemove = sapply(1:length(startOverlap), function(i)
+        # Find the shortest or longest segment within each overlap group and
+        # put its dfIGs index into dfP$minmax.
+        {
+        if (minMax == "MIN")
             {
-            idxs = startOverlap[i]:endOverlap[i]
-            len.SL = ifelse(minMax == "MIN", min(df$len[idxs]), max(df$len[idxs]))
-            idx.SL = idxs[df$len[idxs] == len.SL][1] # If more than one, pick the first.
-            return(idxs[!(df$end[idxs] <= df$start[idx.SL]) & !(df$start[idxs] >= df$end[idx.SL]) & idxs != idx.SL])
-            })
-        idxsToRemove = unlist(idxsToRemove)
-
-        # Remove those Indel Groups.
-        df = df[-idxsToRemove,]
-        inv(length(idxsToRemove), "Number of Indel Groups deleted")
-        inv(nrow(df), "Number of Indel Groups remaining")
+            dfP$minmax = unlist(sapply(1:length(startsAt), function(i)
+                {
+                ii = startsAt[i]:endsAt[i]
+                idxs = dfP[ii, "idx"][dfP[ii, "start"]]
+                keep.dfIGs.idx = idxs[which.min(dfIGs[idxs, "len"])[1]] # ***** MIN *****
+                return(rep(keep.dfIGs.idx, length(ii)))
+                }), use.names=FALSE)
+            }
+        else
+            {
+            dfP$minmax = unlist(sapply(1:length(startsAt), function(i)
+                {
+                ii = startsAt[i]:endsAt[i]
+                idxs = dfP[ii, "idx"][dfP[ii, "start"]]
+                keep.dfIGs.idx = idxs[which.max(dfIGs[idxs, "len"])[1]] # ***** MAX *****
+                return(rep(keep.dfIGs.idx, length(ii)))
+                }), use.names=FALSE)
+            }
         }
+
+        # Set dfP$overlap TRUE if the dfIGs segment indexed by dfP$idx overlaps
+        # the dfIGs segment indexed by dfP$minmax.
+        dfP$overlap = !(dfIGs$end[dfP$idx] <= dfIGs$start[dfP$minmax]) &
+                !(dfIGs$start[dfP$idx] >= dfIGs$end[dfP$minmax])
+
+        # Get the set of dfIGs indexes to be discarded because they overlap.
+        # This includes all the overlaps identified above EXCEPT the minmax
+        # segments, which overlap themselves and so have the overlap flag set.
+        # Add these indexes to the idxsToRemove vector and remove them from dfS.
+        dfIGs.idxsToDiscard = setdiff(dfP$idx[dfP$overlap], dfP$minmax)
+        idxsToRemove = c(idxsToRemove, dfIGs.idxsToDiscard)
+        dfS = dfS[!dfS$idx %in% dfIGs.idxsToDiscard,]
+        cat("  Total number of Indel Groups deleted", length(idxsToRemove), "\n")
+        cat("  Total number of Indel Groups remaining:", nrow(dfIGs)-length(idxsToRemove), "\n")
+        }
+
+    # Remove the dfIGs rows indexed by 'idxsToRemove'.
+    dfIGs = dfIGs[-idxsToRemove,]
+    catnow(" Finished genome, ", nrow(dfIGs), "Indel Groups remaining.\n")
+    if (nrow(dfIGs) == 0)
+        stop("There are no non-overlapping Indel Groups.")
     }
-dfNoOverlaps = df
-dfNoOverlaps = dfNoOverlaps[, !colnames(dfNoOverlaps) %in% c("start", "end", "len", "thruIdx", "overlap")]
-inv(nrow(dfNoOverlaps), "Number of Indel Groups with overlapping Indel Groups removed")
+# Get rid of the extra columns we added to dfIGs.
+dfIGs = dfIGs[, !colnames(dfIGs) %in% c("start", "end", "len")]
+catnow("Finished all genomes, have a total of", nrow(dfIGs), "non-overlapping Indel Groups\n")
+
+# Put the data frame in order by reference genome position.
+catnow("Sorting by reference genome position...")
+dfIGs = dfIGs[order(dfIGs[, idCol.I[refGenome]], dfIGs[, pos1Col.I[refGenome]]),]
+rownames(dfIGs) = NULL
+catnow("\n")
 
 ########################################
 # Write the non-overlapping Indel Group data to a file.
 ########################################
 
-write.table(dfNoOverlaps, outNonoverlappingIndelGroups, row.names=FALSE, quote=FALSE, sep="\t")
-# dfNoOverlaps = read.table(outNonoverlappingIndelGroups, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
-
-catnow("Number of non-overlapping Indel Groups:", nrow(dfNoOverlaps), "\n")
+catnow("Writing Indel Groups to output file...")
+write.table(dfIGs, outNonoverlappingIndelGroups, row.names=FALSE, quote=FALSE, sep="\t")
+# dfIGs = read.table(outNonoverlappingIndelGroups, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
+catnow("\n")
 
 }
+
+################################################################################
+# End of file.
+################################################################################

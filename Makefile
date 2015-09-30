@@ -373,14 +373,14 @@ $(KMERS_STATS_FILES) : $(PFX_KMERS_DATA_FILE)%.stats : $(PFX_KMERS_DATA_FILE)%.k
 
 # A list of all .kmers files already defined above: KMERS_FILES
 
-# A list of all .isect.sorted files to be produced.
-SORTED_KMERS_FILES := $(foreach G,$(GENOME_NUMBERS),$(PFX_KMERS_DATA_FILE)$(G).isect.sorted)
+# A list of all .sorted files to be produced.
+SORTED_KMERS_FILES := $(foreach G,$(GENOME_NUMBERS),$(PFX_KMERS_DATA_FILE)$(G).sorted)
 
-# Target .isect.sorted file(s) for genome GENOME.
+# Target .sorted file(s) for genome GENOME.
 ifeq ($(GENOME),ALL)
 TARGET_SORTED_KMERS := $(SORTED_KMERS_FILES)
 else
-TARGET_SORTED_KMERS := $(PFX_KMERS_DATA_FILE)$(GENOME).isect.sorted
+TARGET_SORTED_KMERS := $(PFX_KMERS_DATA_FILE)$(GENOME).sorted
 endif
 
 # Phony target to make or clean TARGET_SORTED_KMERS file(s).
@@ -397,7 +397,7 @@ endif
 # SORTED_KMERS_FILES is multiple targets, one per genome.
 # Here, % is a genome number.
 
-$(SORTED_KMERS_FILES) : $(PFX_KMERS_DATA_FILE)%.isect.sorted : $(PFX_KMERS_DATA_FILE)%.kmers | \
+$(SORTED_KMERS_FILES) : $(PFX_KMERS_DATA_FILE)%.sorted : $(PFX_KMERS_DATA_FILE)%.kmers | \
         $(DIR_KMERS)
 	@echo
 	@echo "*** sortKmers PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
@@ -436,7 +436,7 @@ endif
 $(PATH_ISECT_KMERS) : $(SORTED_KMERS_FILES) | $(DIR_KMERS) $(PATH_PERL) $(PATH_KMER_ISECT)
 	@echo
 	@echo "*** kmerIsect PARAMS=$(PARAMS) $(CLEAN) ***"
-	@echo "Intersecting unique $(K)-mers from .isect.sorted files into $@"
+	@echo "Intersecting unique $(K)-mers from .sorted files into $@"
 	$(TIME) $(PATH_PERL) $(PATH_KMER_ISECT) $@ $^ $(REDIR)
 	@echo "Finished."
 
@@ -446,14 +446,14 @@ $(PATH_ISECT_KMERS) : $(SORTED_KMERS_FILES) | $(DIR_KMERS) $(PATH_PERL) $(PATH_K
 
 # A list of all FASTA files already defined above: FASTA_FILES
 
-# A list of all .isect.unique files to be produced.
-ISECT_KMER_FILES := $(foreach G,$(GENOME_NUMBERS),$(PFX_KMERS_DATA_FILE)$(G).isect.unique)
+# A list of all .isect files to be produced.
+ISECT_KMER_FILES := $(foreach G,$(GENOME_NUMBERS),$(PFX_KMERS_DATA_FILE)$(G).isect)
 
-# Target .isect.unique file(s) for genome GENOME.
+# Target .isect file(s) for genome GENOME.
 ifeq ($(GENOME),ALL)
 TARGET_ISECT := $(ISECT_KMER_FILES)
 else
-TARGET_ISECT := $(PFX_KMERS_DATA_FILE)$(GENOME).isect.unique
+TARGET_ISECT := $(PFX_KMERS_DATA_FILE)$(GENOME).isect
 endif
 
 # Phony target to make or clean TARGET_ISECT file(s).
@@ -470,7 +470,7 @@ endif
 # ISECT_KMER_FILES is multiple targets, one per genome.
 # Here, % is a genome number.
 
-$(ISECT_KMER_FILES) : $(PFX_KMERS_DATA_FILE)%.isect.unique : $(PATH_ISECT_KMERS) $$(PATH_GENOME_FASTA_$$*) | \
+$(ISECT_KMER_FILES) : $(PFX_KMERS_DATA_FILE)%.isect : $(PATH_ISECT_KMERS) $$(PATH_GENOME_FASTA_$$*) | \
         $(DIR_KMERS) $(PATH_FINDMERS)
 	@echo
 	@echo "*** getGenomicPos PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
@@ -493,25 +493,25 @@ $(ISECT_KMER_FILES) : $(PFX_KMERS_DATA_FILE)%.isect.unique : $(PATH_ISECT_KMERS)
 # in the first column being the join key (the files are sorted by k-mer, so we
 # are actually just joining the lines together, except that the k-mer appears
 # only one time as the first column).  The files to be joined have suffix
-# ".isect.unique", and the joined files have suffix ".isect.merge".
+# ".isect", and the joined files have suffix ".merge".
 # This is problematic because the 'join' command can only join two files, but we
 # have as many files to be joined as we have genomes.  We will join one genome
 # at a time to the previously joined file, starting by joining the second genome
 # k-mer positions file to the reference genome k-mer positions file.  When this
 # is called with GENOME=1 (reference genome), we will just COPY the reference
-# genome positions file (_1.isect.unique) to a new file (_1.isect.merge), which
+# genome positions file (_1.isect) to a new file (_1.merge), which
 # will be the join file for the second genome.  The second join joins the
-# _1.isect.merge file and the _2.isect.unique file to form the _2.isect.merge
+# _1.merge file and the _2.isect file to form the _2.merge
 # file, etc.
 
-# A list of all .isect.merge files to be produced.
-MERGE_KMER_FILES := $(foreach G,$(GENOME_NUMBERS),$(PFX_KMERS_DATA_FILE)$(G).isect.merge)
+# A list of all .merge files to be produced.
+MERGE_KMER_FILES := $(foreach G,$(GENOME_NUMBERS),$(PFX_KMERS_DATA_FILE)$(G).merge)
 
-# Target .isect.merge file(s) for genome GENOME.
+# Target .merge file(s) for genome GENOME.
 ifeq ($(GENOME),ALL)
 TARGET_MERGE := $(MERGE_KMER_FILES)
 else
-TARGET_MERGE := $(PFX_KMERS_DATA_FILE)$(GENOME).isect.merge
+TARGET_MERGE := $(PFX_KMERS_DATA_FILE)$(GENOME).merge
 endif
 
 # Phony target to make or clean TARGET_MERGE file(s).
@@ -528,7 +528,7 @@ endif
 # Define the target file recipe for genome 1 separately, it is different.
 TARGET_MERGE_1 := $(word 1,$(MERGE_KMER_FILES))
 
-$(TARGET_MERGE_1) : $(PFX_KMERS_DATA_FILE)1.isect.unique
+$(TARGET_MERGE_1) : $(PFX_KMERS_DATA_FILE)1.isect
 	@echo
 	@echo "*** mergeKmers PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
 	@echo "Copy common unique $(K)-mers for genome 1 from $< to $@"
@@ -546,12 +546,12 @@ G_PREV := 0 $(GENOME_NUMBERS)
 # MERGE_KMER_FILES is multiple targets, one per genome, but we EXCLUDE GENOME 1.
 # Here, % is a genome number.
 
-$(TARGET_MERGE_OTHERS) : $(PFX_KMERS_DATA_FILE)%.isect.merge : $(PFX_KMERS_DATA_FILE)%.isect.unique \
-        $(PFX_KMERS_DATA_FILE)$$(word %,$$(G_PREV)).isect.merge | $(PATH_RSCRIPT)
+$(TARGET_MERGE_OTHERS) : $(PFX_KMERS_DATA_FILE)%.merge : $(PFX_KMERS_DATA_FILE)%.isect \
+        $(PFX_KMERS_DATA_FILE)$$(word %,$$(G_PREV)).merge | $(PATH_RSCRIPT)
 	@echo
 	@echo "*** mergeKmers PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
 	@echo "Merge common unique $(K)-mers for genomes $(word $*,$(G_PREV)) and $* to $@"
-	$(TIME) join -t '	' $(PFX_KMERS_DATA_FILE)$(word $*,$(G_PREV)).isect.merge $< >$@ $(REDIR)
+	$(TIME) join -t '	' $(PFX_KMERS_DATA_FILE)$(word $*,$(G_PREV)).merge $< >$@ $(REDIR)
 	@echo "Finished."
 
 ################################################################################
@@ -561,7 +561,7 @@ $(TARGET_MERGE_OTHERS) : $(PFX_KMERS_DATA_FILE)%.isect.merge : $(PFX_KMERS_DATA_
 
 # The last file in the chain of merged files from the merge operation preceding this.
 # This file is the dependent file we use as input to findLCRs (after sorting it).
-UNSORTED_COMMON_UNIQUE_KMERS := $(PFX_KMERS_DATA_FILE)$(N_GENOMES).isect.merge
+UNSORTED_COMMON_UNIQUE_KMERS := $(PFX_KMERS_DATA_FILE)$(N_GENOMES).merge
 
 # Phony target to make or clean PATH_COMMON_UNIQUE_KMERS file.
 ifeq ($(CLEAN),)

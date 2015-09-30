@@ -8,47 +8,18 @@
 # Enclose everything in braces so stop statements will work correctly.
 {
 
-# Which aligner?  I had problems with ClustalW2, see comments later.
-useClustal = FALSE
-aligner = ifelse(useClustal,
-    "/Users/tedtoal/bin/clustalw-2.1-macosx/clustalw2",
-    "/Users/tedtoal/bin/muscle3.8.31_i86darwin64")
-
 # Pathname separator.
 PATHSEP = ifelse(grepl("/", Sys.getenv("HOME")), "/", "\\")
 
-# cat() that immediately flushes to console.
-catnow = function(...)
-    {
-    cat(...)
-    flush.console()
-    return(invisible(0))
-    }
+# Get directory where this file resides.
+XSEP = ifelse(PATHSEP == "\\", "\\\\", PATHSEP)
+RE = paste("^.*--file=(([^", XSEP, "]*", XSEP, ")*)[^", XSEP, "]+$", sep="")
+args = commandArgs(FALSE)
+thisDir = sub(RE, "\\1", args[grepl("--file=", args)])
+#thisDir = "~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE/code/R/" # For testing only.
 
-# Print an R object's value.
-objPrint = function(x, title="")
-    {
-    sink("temp.txt")
-    print(x)
-    sink()
-    x.S = readLines("temp.txt")
-    x.S = sub(" $", "", x.S)
-    multiline = (length(x.S) > 1)
-    if (!multiline)
-        x.S = sub("[1] ", "", x.S, fixed=TRUE)
-    x.S = paste(x.S, collapse="\n")
-    if (title != "")
-        {
-        if (!multiline)
-            catnow(title, ": ", sep="")
-        else
-            catnow(title, ":\n", sep="")
-        }
-    catnow(x.S, "\n", sep="")
-    }
-
-# Define function to display info when investigating.
-inv = function(a, title="") { if (investigate) objPrint(a, title) }
+# Source the necessary include files from the same directory containing this file.
+source(paste(thisDir, "Include_Common.R", sep=""))
 
 # Get arguments.
 testing = 0
@@ -56,6 +27,12 @@ testing = 0
 #testing = 2 # For testing only, outTestHP11 IndelGroupsNonoverlapping
 #testing = 3 # For testing only, outTestHP11 MarkersNonoverlapping
 {
+# Which aligner?  I had problems with ClustalW2, see comments later.
+useClustal = FALSE
+aligner = ifelse(useClustal,
+    "/Users/tedtoal/bin/clustalw-2.1-macosx/clustalw2",
+    "/Users/tedtoal/bin/muscle3.8.31_i86darwin64")
+
 if (testing == 0)
     args = commandArgs(TRUE)
 else if (testing == 1)
@@ -704,3 +681,7 @@ write.table(dfIndels, outputFile, row.names=FALSE, quote=FALSE, sep="\t")
 
 catnow("Finished aligning sequences for Indel Groups and locating InDels, output file:\n", outputFile, "\n")
 }
+
+################################################################################
+# End of file.
+################################################################################

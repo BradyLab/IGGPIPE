@@ -274,7 +274,7 @@ in a standard location.
 
   PATH_JELLYFISH := /usr/local/bin/jellyfish
 
-or, if you have Jellyfish on your path, you can use simply:
+or, if you have Jellyfish on your path, you can optionally use simply:
 
   PATH_JELLYFISH := jellyfish
 
@@ -316,7 +316,7 @@ Assign the path, which was shown with the "which perl" command, to the parameter
 
   PATH_PERL := /usr/local/bin/perl
 
-or if Perl is on your path, simply:
+or if Perl is on your path, you can optionally use simply:
 
   PATH_PERL := perl
 --
@@ -349,7 +349,8 @@ Assign the path, which was shown with the "which RScript" command, to the parame
 
   PATH_RSCRIPT := /usr/bin/Rscript
 
-or, if Rscript is on your path (it may be set that way during installation), simply:
+or, if Rscript is on your path (it may be set that way during installation), you
+can optionally use simply:
 
   PATH_RSCRIPT := Rscript
 --
@@ -377,7 +378,7 @@ parameter as follows:
 
   PATH_PRIMER3CORE := ~/Documents/primer3-2.3.6/primer3_core
 
-or, if primer3_core is on your path, simply:
+or, if primer3_core is on your path, you can optionally use simply:
 
   PATH_PRIMER3CORE := primer3_core
 --
@@ -436,7 +437,7 @@ as follows:
 
   PATH_EPCR := ~/Documents/e-PCR-2.3.12/e-PCR
 
-or, if e-PCR is on your path, simply:
+or, if e-PCR is on your path, you can optionally use simply:
 
   PATH_EPCR := e-PCR
 --
@@ -464,7 +465,8 @@ as follows:
 
   PATH_ALIGNER := ~/bin/muscle3.8.31_i86darwin64
 
-or, if Muscle is on your path and the binary file is named 'muscle', simply:
+or, if Muscle is on your path and the binary file is named 'muscle', you can
+optionally use simply:
 
   PATH_ALIGNER := muscle
 --
@@ -518,7 +520,7 @@ you should set the $(CMD_DELETE) method as the delete method:
   CMD_DELETE_WHEN_CLEANING := $(CMD_DELETE)
 --
 
-. *Copy primer3settings.default.txt and edit Primer3 settings*
+. *Copy primer3settings.default.txt and later you might edit Primer3 settings*
 +
 --
 Primer3 uses a settings file to control many of the settings it uses to generate
@@ -533,11 +535,16 @@ To do this, copy primer3settings.default.txt to primer3settings.txt:
 
   cp primer3settings.default.txt primer3settings.txt
 
-'This is all you need to do, IGGPIPE should work with this version.'
+'This is all you need to do, IGGPIPE will work with this version, which is the
+required version for running the test of IGGPIPE.'
 
-However, you can edit the new primer3settings.txt file with your text editor and make
-any changes that are important for your needs. For example, you might change the
-parameters that determine the acceptable 'range of primer Tm values'. 
+After finishing installation, and prior to any run of IGGPIPE, you can edit
+primer3settings.txt file with your text editor and make any changes that are
+important for your needs. For example, you might change the parameters that
+determine the acceptable 'range of primer Tm values'. If you have several
+different setting values you use, you will probably want to keep a directory
+of different primer3settings.txt files and copy the needed one prior to each
+run of IGGPIPE.
 
 The Primer3 user manual (http://primer3.sourceforge.net/primer3_manual.htm)
 describes all the parameters.

@@ -1,9 +1,9 @@
-#######################################################################################
+################################################################################
 # See usage below for description.
 # Author: Ted Toal
 # Date: 2015
 # Brady Lab, UC Davis
-#######################################################################################
+################################################################################
 
 # Enclose everything in braces so stop statements will work correctly.
 {
@@ -14,13 +14,15 @@ maxPlotPoints = 20000
 # Pathname separator.
 PATHSEP = ifelse(grepl("/", Sys.getenv("HOME")), "/", "\\")
 
-# cat() that immediately flushes to console.
-catnow = function(...)
-    {
-    cat(...)
-    flush.console()
-    return(invisible(0))
-    }
+# Get directory where this file resides.
+XSEP = ifelse(PATHSEP == "\\", "\\\\", PATHSEP)
+RE = paste("^.*--file=(([^", XSEP, "]*", XSEP, ")*)[^", XSEP, "]+$", sep="")
+args = commandArgs(FALSE)
+thisDir = sub(RE, "\\1", args[grepl("--file=", args)])
+#thisDir = "~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE/code/R/" # For testing only.
+
+# Source the necessary include files from the same directory containing this file.
+source(paste(thisDir, "Include_Common.R", sep=""))
 
 # Get arguments.
 testing = 0
@@ -214,3 +216,7 @@ for (i in 1:Npairs)
 dev.off()
 catnow("Finished making plots of InDel information, output file:\n", pdfPlotFile, "\n")
 }
+
+################################################################################
+# End of file.
+################################################################################

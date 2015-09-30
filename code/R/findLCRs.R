@@ -1,4 +1,4 @@
-#######################################################################################
+################################################################################
 # See usage below for description.
 # Author: Ted Toal
 # Date: 2013-2015
@@ -10,7 +10,7 @@
 #   genomes rather than all.  But this is a big change to the code. Each k-mer might
 #   be NA in one or more genomes. Each LCB would essentially be between only two
 #   genomes, always.
-#######################################################################################
+################################################################################
 
 # Enclose everything in braces so stop statements will work correctly.
 {
@@ -18,38 +18,15 @@
 # Pathname separator.
 PATHSEP = ifelse(grepl("/", Sys.getenv("HOME")), "/", "\\")
 
-# cat() that immediately flushes to console.
-catnow = function(...)
-    {
-    cat(...)
-    flush.console()
-    return(invisible(0))
-    }
+# Get directory where this file resides.
+XSEP = ifelse(PATHSEP == "\\", "\\\\", PATHSEP)
+RE = paste("^.*--file=(([^", XSEP, "]*", XSEP, ")*)[^", XSEP, "]+$", sep="")
+args = commandArgs(FALSE)
+thisDir = sub(RE, "\\1", args[grepl("--file=", args)])
+#thisDir = "~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE/code/R/" # For testing only.
 
-# Print an R object's value.
-objPrint = function(x, title="")
-    {
-    sink("temp.txt")
-    print(x)
-    sink()
-    x.S = readLines("temp.txt")
-    x.S = sub(" $", "", x.S)
-    multiline = (length(x.S) > 1)
-    if (!multiline)
-        x.S = sub("[1] ", "", x.S, fixed=TRUE)
-    x.S = paste(x.S, collapse="\n")
-    if (title != "")
-        {
-        if (!multiline)
-            catnow(title, ": ", sep="")
-        else
-            catnow(title, ":\n", sep="")
-        }
-    catnow(x.S, "\n", sep="")
-    }
-
-# Define function to display info when investigating.
-inv = function(a, title="") { if (investigate) objPrint(a, title) }
+# Source the necessary include files from the same directory containing this file.
+source(paste(thisDir, "Include_Common.R", sep=""))
 
 # Get arguments.
 testing = 0
@@ -240,8 +217,9 @@ inv(k, "k-mer size k")
 # until we have one or more complete sequence IDs and at least MIN_KMERS_AT_ONCE
 # k-mers to process, or until the end of the input file is reach.  Find LCRs using
 # those k-mers.
-# Accumulate results in data frames cumLcbDf and cumDiscardDf.
-cumLcbDf = NULL
+# Accumulate results in data frames cumLcrDf and cumDiscardDf.
+cumLcrDf = NULL
+NfoundLCRs = 0
 cumDiscardDf = NULL
 isEOF = FALSE
 nextLCRnum = 1
@@ -298,6 +276,7 @@ while (nrow(kmerBufferDf) > 0)
         nextIDidx = MIN_KMERS_AT_ONCE + match(FALSE, lastID == kmerBufferDf[(MIN_KMERS_AT_ONCE+1):N, refIdCol])
         cat("  Read...")
         cnt = 0
+        NtotalRows = nrow(kmerBufferDf)
         while (!isEOF && is.na(nextIDidx))
             {
             tdf = read.table(inFile, header=FALSE, row.names=1, sep="\t", nrows=MIN_KMERS_AT_ONCE,
@@ -308,13 +287,15 @@ while (nrow(kmerBufferDf) > 0)
                 {
                 colnames(tdf) = colNames
                 NkmersRead = NkmersRead + nrow(tdf)
-                nextIDidx = nrow(kmerBufferDf) + match(FALSE, lastID == tdf[, refIdCol])
-                kmerBufferDf = rbind(kmerBufferDf, tdf)
+                nextIDidx = NtotalRows + match(FALSE, lastID == tdf[, refIdCol])
+                kmerBufferDf = rbind.fast(kmerBufferDf, tdf)
+                NtotalRows = NtotalRows + nrow(tdf)
                 rm(tdf)
                 }
             cnt = cnt+1
             catnow(cnt, " ", sep="")
             }
+        kmerBufferDf = rbind.fast.finish(kmerBufferDf, tdf)
         cat(" NkmersRead =", NkmersRead, " isEOF =", isEOF, "\n")
         # If nextIDidx is still NA, we reached end of file, so process all remaining k-mers.
         if (is.na(nextIDidx))
@@ -532,13 +513,13 @@ while (nrow(kmerBufferDf) > 0)
 
     # Remove k-mers not satisfying Lmin.  Save all discarded k-mers in data frame discardDf.
     catnow("  Enforcing LMin on reference genome\n")
-    discardDf = NULL
     tooSmall = tapply(candLCRdf[,refPosCol], candLCRdf$LCR, function(refPos) return(diff(range(refPos)) < Lmin))
     tooSmall = names(tooSmall)[tooSmall]
     inv(length(tooSmall), "number of candidate LCRs with bp span < Lmin in ref genome")
+    discardDf = NULL
     if (length(tooSmall) > 0)
         {
-        discardDf = rbind(discardDf, candLCRdf[candLCRdf$LCR %in% tooSmall,])
+        discardDf = candLCRdf[candLCRdf$LCR %in% tooSmall,]
         candLCRdf = candLCRdf[!candLCRdf$LCR %in% tooSmall,]
         }
     inv(dim(candLCRdf), "dim of full data after removing < Lmin")
@@ -841,27 +822,17 @@ while (nrow(kmerBufferDf) > 0)
             }
 
         #   4. If the difference in position of two adjacent k-mers of the candidate
-        #       LCR in any genome is more than Dmax, move the right k-mer, and any
-        #       following k-mers that are also more than Dmax from the left k-mer,
+        #       LCR in any genome is more than Dmax, move the right k-mer, and all
+        #       following k-mers, which are also more than Dmax from the left k-mer,
         #       to the deferred k-mers list to be processed subsequently.
-        for (genome in otherGenomes)
+        for (genome in genomeLtrs)
             {
             tooBig = which(abs(LL$lcr[, posCol[genome]][-1] - LL$lcr[, posCol[genome]][-Nkmers]) > Dmax)
             if (length(tooBig) > 0)
                 {
-                leftKmer = tooBig[1]
-                rightKmer = leftKmer + 1
-                # Calculate difference in position of every k-mer to the right of leftKmer
-                # as if that k-mer is the next k-mer after leftKmer.
-                isTooBig = (abs(LL$lcr[rightKmer:Nkmers, posCol[genome]] -
-                        LL$lcr[leftKmer, posCol[genome]]) > Dmax)
-                firstNotTooBig = leftKmer + match(FALSE, isTooBig)
-                if (is.na(firstNotTooBig))
-                    lastTooBig = Nkmers
-                else
-                    lastTooBig = firstNotTooBig - 1
-                LL$deferred = rbind(LL$deferred, LL$lcr[rightKmer:lastTooBig,])
-                LL$lcr = LL$lcr[-(rightKmer:lastTooBig),]
+                rightKmer = tooBig[1] + 1
+                LL$deferred = rbind(LL$deferred, LL$lcr[rightKmer:Nkmers,])
+                LL$lcr = LL$lcr[-(rightKmer:Nkmers),]
                 LL$retry = TRUE
                 LL$reason = "Dmax"
                 return(LL)
@@ -908,14 +879,19 @@ while (nrow(kmerBufferDf) > 0)
     logEveryN = 1000
     lastLog = 0
     lcrDf = NULL # # K-mers of candidate LCRs that pass the test and are declared actual LCRs.
+    lcrDf.Nlcrs = 0
     dft = candLCRdf[integer(0),] # This will hold k-mers for N.reload candidate LCRs being tested.
     lcrDft = NULL # K-mers of candidate LCRs that pass the test and are declared actual LCRs, transferred to lcrDf at each reload.
+    lcrDft.Nlcrs = 0
     discardDft = NULL # K-mers of discarded candidate LCRs, transferred to discardDf at each reload.
     deferredDft = NULL # K-mers assigned to a new LCR ID number and awaiting reprocessing, transferred back to candLCRdf at each reload.
     stats = integer() # We'll count number of times each reason code is returned by testCandidateLCR().
     LCRs = unique(candLCRdf$LCR) # These are the LCR ID numbers in candLCRdf that we will test.  New IDs assigned to deferred LCRs are added to this.
     idx = 1 # Index of LCR ID in LCRs[] that is currently being tested.
     catnow("  Number of candidate LCRs: ", length(LCRs), " Number of k-mers: ", nrow(candLCRdf), "\n")
+
+    # In this slow loop, we will use rbind.fast as much as possible (but not with
+    # small data frames in LL).
 
     # Loop processing one LCR at a time, the LCR whose ID (in column "LCR") is LCRs[idx].
     while (idx <= length(LCRs))
@@ -928,15 +904,14 @@ while (nrow(kmerBufferDf) > 0)
             # Transfer deferred k-mers back to candLCRdf.
             candLCRdf = rbind(candLCRdf, deferredDft)
             deferredDft = NULL
-                            # candLCRdf must be sorted again!!!
-                            # Sort by reference genome position.
-                            #candLCRdf = candLCRdf[order(candLCRdf[,refPosCol]),]
             # Transfer discarded k-mers to discardDf.
-            discardDf = rbind(discardDf, discardDft)
+            discardDf = rbind.fast(discardDf, discardDft)
             discardDft = NULL
             # Transfer k-mers of validated LCRs to lcrDf.
-            lcrDf = rbind(lcrDf, lcrDft)
+            lcrDf = rbind.fast(lcrDf, lcrDft)
+            lcrDf.Nlcrs = lcrDf.Nlcrs + lcrDft.Nlcrs
             lcrDft = NULL
+            lcrDft.Nlcrs = 0
             # Compute index into LCRs[] of last LCR whose k-mers are to be loaded into dft during this round.
             lastIdx = idx+N.reload-1
             if (lastIdx > length(LCRs))
@@ -945,14 +920,14 @@ while (nrow(kmerBufferDf) > 0)
             xferKmers = (candLCRdf$LCR %in% LCRs[idx:lastIdx])
             dft = candLCRdf[xferKmers,]
             candLCRdf = candLCRdf[!xferKmers,]
-                            # if (nrow(dft) > 0 && any(order(dft[,refPosCol]) != 1:nrow(dft))) stop("Order")
+            # if (nrow(dft) > 0 && any(order(dft[,refPosCol]) != 1:nrow(dft))) stop("Order")
             # Logging.
             lenLCRs = length(LCRs)
             if (idx - lastLog >= logEveryN)
                 {
                 catnow("    At candidate LCR #", idx, " of ", lenLCRs, " leaving ",
                     lenLCRs-idx, " with ", nrow(candLCRdf)+nrow(dft), " k-mers, have ",
-                    length(unique(lcrDf$LCR)), " good LCRs with ", nrow(lcrDf), " k-mers.\n", sep="")
+                    lcrDf.Nlcrs, " good LCRs with ", attr(lcrDf, "nrow"), " k-mers.\n", sep="")
                 lastLog = idx
                 }
             }
@@ -980,7 +955,8 @@ while (nrow(kmerBufferDf) > 0)
         if (!is.null(LL$lcr))
             {
             #catnow(" lcrDft\n")
-            lcrDft = rbind(lcrDft, LL$lcr)
+            lcrDft = rbind.fast(lcrDft, LL$lcr)
+            lcrDft.Nlcrs = lcrDft.Nlcrs + length(unique(LL$lcr$LCR))
             }
         # If some k-mers appear in deferred, append them to deferredDft using a new LCR number.
         if (!is.null(LL$deferred))
@@ -988,6 +964,8 @@ while (nrow(kmerBufferDf) > 0)
             #catnow(" deferredDft\n")
             LCRs = c(LCRs, nextLCRnum)
             LL$deferred$LCR = nextLCRnum
+            # We must re-sort these k-mers by reference genome position!  (They are all the same ID, we don't need to worry about that.)
+            LL$deferred = LL$deferred[order(LL$deferred[,refPosCol]),]
             deferredDft = rbind(deferredDft, LL$deferred)
             nextLCRnum = nextLCRnum + 1
             }
@@ -995,7 +973,7 @@ while (nrow(kmerBufferDf) > 0)
         if (!is.null(LL$discarded))
             {
             #catnow(" discardDft\n")
-            discardDft = rbind(discardDft, LL$discarded)
+            discardDft = rbind.fast(discardDft, LL$discarded)
             }
         # Next LCR index.
         idx = idx + 1
@@ -1006,38 +984,46 @@ while (nrow(kmerBufferDf) > 0)
     if (nrow(dft) != 0) stop("Expected empty dft")
     if (nrow(candLCRdf) != 0) stop("Expected empty candLCRdf")
     if (!is.null(deferredDft)) stop("Expected null deferredDft")
-    discardDf = rbind(discardDf, discardDft)
-    lcrDf = rbind(lcrDf, lcrDft)
+    discardDf = rbind.fast(discardDf, discardDft)
+    lcrDf = rbind.fast(lcrDf, lcrDft)
+    lcrDf.Nlcrs = lcrDf.Nlcrs + lcrDft.Nlcrs
     rm(dft, lcrDft, discardDft)
 
-    catnow("\n  Found", length(unique(lcrDf$LCR)), "LCRs containing", nrow(lcrDf), "k-mers\n")
+    catnow("\n  Found", lcrDf.Nlcrs, "LCRs containing", attr(lcrDf, "nrow"), "k-mers\n")
 
     # Accumulate results.
-    cumLcbDf = rbind(cumLcbDf, lcrDf)
-    cumDiscardDf = rbind(cumDiscardDf, discardDf)
+    cumLcrDf = rbind.fast(cumLcrDf, lcrDf)
+    NfoundLCRs = NfoundLCRs + lcrDf.Nlcrs
+    cumDiscardDf = rbind.fast(cumDiscardDf, discardDf)
     rm(candLCRdf, lcrDf, discardDf)
-    catnow("\n  Cumulative total of", length(unique(cumLcbDf$LCR)), "LCRs containing", nrow(cumLcbDf), "k-mers\n")
+    catnow("\n  Cumulative total of", NfoundLCRs, "LCRs containing", attr(cumLcrDf, "nrow"), "k-mers\n")
     }
+cumLcrDf = rbind.fast.finish(cumLcrDf)
+cumDiscardDf = rbind.fast.finish(cumDiscardDf)
 
 # Close the input file.
 close(inFile)
 
 # Check LCR count.
-if (nrow(cumLcbDf) == 0)
+if (nrow(cumLcrDf) == 0)
     stop("No LCRs found.")
 
 # Sort by LCR number and reference genome position.
-cumLcbDf = cumLcbDf[order(cumLcbDf$LCR, cumLcbDf[, refPosCol]),]
+cumLcrDf = cumLcrDf[order(cumLcrDf$LCR, cumLcrDf[, refPosCol]),]
 
 ################################################################################
 # Write results to files.
 ################################################################################
 
-write.table(cumLcbDf, outLcbFile, quote=FALSE, sep="\t")
-# cumLcbDf = read.table(outLcbFile, header=TRUE, row.names=1, sep="\t", stringsAsFactors=FALSE)
+write.table(cumLcrDf, outLcbFile, quote=FALSE, sep="\t")
+# cumLcrDf = read.table(outLcbFile, header=TRUE, row.names=1, sep="\t", stringsAsFactors=FALSE)
 write.table(cumDiscardDf, outBadKmers, quote=FALSE, sep="\t")
 # cumDiscardDf = read.table(outBadKmers, header=TRUE, row.names=1, sep="\t", stringsAsFactors=FALSE)
 
-catnow("\nFound a total of", length(unique(cumLcbDf$LCR)), "LCRs containing",
-    nrow(cumLcbDf), "k-mers common to the ", Ngenomes, "genomes\n")
+catnow("\nFound a total of", length(unique(cumLcrDf$LCR)), "LCRs containing",
+    nrow(cumLcrDf), "k-mers common to the ", Ngenomes, "genomes\n")
 }
+
+################################################################################
+# End of file.
+################################################################################

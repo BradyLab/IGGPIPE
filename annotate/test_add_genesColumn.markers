@@ -1,6 +1,17 @@
 ################################################################################
-# Same as HP14_overlapping_add_genesColumn_tsv except the genes column is added
-# to the file of non-overlapping markers.
+# Parameter file for annotateFile.R to add a "genes" column to the IGG marker
+# test file and write the result to a new file.  The "genes" column gives the
+# genes overlapping or within 3000 bp up/downstream of each marker, and the
+# position of the gene in base-pairs from the marker.  Specifically:
+#   1. Reads MarkersOverlapping.test.tsv as inputFileT
+#   2. Reads code/R/test_GFFfuncsAndMergeData/ITAG2.4_test.gff3 as inputFileS,
+#       containing a truncated gene model list for the test data used for markers.
+#   3. Adds a new column to the inputFileS data, extracting the attribute named
+#       "Alias" from "gene" feature rows and placing it in new column "gene".
+#   4. Performs a match-and-merge operation between the two files and adds column
+#       "genes" to the inputFileT data, containing gene name, strand, and relative
+#       base pair position of the gene relative to the marker.
+#   5. Writes the new inputFileT data to file code/R/testOutput/MarkersWithGenes.test.tsv
 ################################################################################
 
 ################################################################################
@@ -8,19 +19,15 @@
 ################################################################################
 
 inputFileT:
-    path := "outHP14/MarkersNonoverlapping_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.tsv"
+    path := "MarkersOverlapping.test.tsv"
     type := tsv
-    quote := ""
-    comment := ""
-    addColNames := "ID"
-    addColValues := "ID_{/Hpct/\.[0-9]*$/}_{#3}"
 
 ################################################################################
 # inputFileS parameters.
 ################################################################################
 
 inputFileS:
-    path := "../../Soly/ITAG2.4_release/ITAG2.4_gene_models.gff3"
+    path := "code/R/test_GFFfuncsAndMergeData/ITAG2.4_test.gff3"
     type := gff3
 
 ################################################################################
@@ -82,7 +89,7 @@ mergeCols:
 ################################################################################
 
 outputFile:
-    path := "outHP14/MarkersNonoverlappingWithGenes_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.tsv"
+    path := "code/R/testOutput/MarkersWithGenes.test.tsv"
     type := tsv
     header := YES
     quote := NO

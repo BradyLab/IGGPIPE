@@ -1014,12 +1014,17 @@ EPCR_MAX_MISMATCH and EPCR_MAX_GAPS
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>The file <strong>primer3settings.txt</strong> contains parameter settings for Primer3, which
-is used to generate the actual primers. This file should have been edited
-during IGGPIPE installation to make any obvious changes you might need for
-your primers. However, it is possible that for a specific run of IGGPIPE, you
-might want to use different settings. If so, edit primer3settings.txt and
-make the desired changes. (You may want to save a backup copy of the original
-version).</p></div>
+is used to generate the actual primers. It is possible that you might want to
+use different Primer3 settings from the defaults listed in this file. If so,
+edit the file and make the desired changes. For example, you might change the
+parameters that determine the acceptable <em>range of primer Tm values</em>. If you
+have several different setting values you use, you will probably want to keep
+a directory of different primer3settings.txt files and copy the needed one
+prior to each run of IGGPIPE. When testing IGGPIPE using the allParameters.test
+file that was created during installation, always copy primer3settings.default.txt
+to primer3settings.txt.</p></div>
+<div class="paragraph"><p>The Primer3 user manual (<a href="http://primer3.sourceforge.net/primer3_manual.htm">http://primer3.sourceforge.net/primer3_manual.htm</a>)
+describes all the parameters.</p></div>
 </div></div>
 </li>
 <li>
@@ -1954,7 +1959,7 @@ in each genome is end-start-1.</p></td>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-09-25 14:29:27 PDT
+Last updated 2015-09-28 06:00:25 PDT
 </div>
 </div>
 </body>

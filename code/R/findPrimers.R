@@ -1,9 +1,9 @@
-#######################################################################################
+################################################################################
 # See usage below for description.
 # Author: Ted Toal
 # Date: 2013-2015
 # Brady Lab, UC Davis
-#######################################################################################
+################################################################################
 
 # Enclose everything in braces so stop statements will work correctly.
 {
@@ -11,38 +11,15 @@
 # Pathname separator.
 PATHSEP = ifelse(grepl("/", Sys.getenv("HOME")), "/", "\\")
 
-# cat() that immediately flushes to console.
-catnow = function(...)
-    {
-    cat(...)
-    flush.console()
-    return(invisible(0))
-    }
+# Get directory where this file resides.
+XSEP = ifelse(PATHSEP == "\\", "\\\\", PATHSEP)
+RE = paste("^.*--file=(([^", XSEP, "]*", XSEP, ")*)[^", XSEP, "]+$", sep="")
+args = commandArgs(FALSE)
+thisDir = sub(RE, "\\1", args[grepl("--file=", args)])
+#thisDir = "~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE/code/R/" # For testing only.
 
-# Print an R object's value.
-objPrint = function(x, title="")
-    {
-    sink("temp.txt")
-    print(x)
-    sink()
-    x.S = readLines("temp.txt")
-    x.S = sub(" $", "", x.S)
-    multiline = (length(x.S) > 1)
-    if (!multiline)
-        x.S = sub("[1] ", "", x.S, fixed=TRUE)
-    x.S = paste(x.S, collapse="\n")
-    if (title != "")
-        {
-        if (!multiline)
-            catnow(title, ": ", sep="")
-        else
-            catnow(title, ":\n", sep="")
-        }
-    catnow(x.S, "\n", sep="")
-    }
-
-# Define function to display info when investigating.
-inv = function(a, title="") { if (investigate) objPrint(a, title) }
+# Source the necessary include files from the same directory containing this file.
+source(paste(thisDir, "Include_Common.R", sep=""))
 
 # Get arguments.
 testing = 0
@@ -635,3 +612,7 @@ write.table(dfMarkers, tsvMarkerFile, col.names=TRUE, row.names=FALSE, quote=FAL
 
 catnow("Finished adding primer sequences to Indel Groups, candidate marker output file:\n", tsvMarkerFile, "\n")
 }
+
+################################################################################
+# End of file.
+################################################################################

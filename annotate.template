@@ -79,8 +79,8 @@ inputFileT:
 
     type := tsv
 
-    # Column names for the file, or "" if the file contains column names on the first (header) line.
-    # Ignored for .gff3 and .gtf files.
+    # Column names for the file, specified as a comma-separated list, or "" if the file
+    # contains column names on the first (header) line.  Ignored for .gff3 and .gtf files.
 
     columns := ""
 
@@ -515,14 +515,21 @@ match:
     #  S.NEAR: find rows of inputFileS whose position overlaps or is near the position of inputFileT rows
     #  T.NEAR: find rows of inputFileT whose position overlaps or is near the position of inputFileS rows
     # Details of S.NEAR and T.NEAR will become clearer with additional parameters.
+    # The S.NEAR and T.NEAR methods are almost the same.  They give the same results
+    # in most cases.  Their difference will be pointed out below.
 
     method := S.NEAR
 
-    # Indented parameters are those giving additional information for the "S.NEAR"
-    # and "T.NEAR" methods.  All other methods ignore these additional parameters.
+    # Since there can be multiple rows of inputFileS that are near an inputFileT row,
+    # another parameter, "closest", lets you select ALL of them to appear in the new
+    # inputFileT column(s), or only the NEAREST, or only the nearest UPSTREAM and
+    # nearest DOWNSTREAM.  In the case of overlaps, ALL overlaps appear in the new
+    # column(s).  Only used when method is S.NEAR.
+    #   closest := 0: all inputFileS rows that are near are added to the new column(s).
+    #   closest := 1: the NEAREST inputFileS row is added to the new column(s).
+    #   closest := 2: the nearest UPSTREAM and DOWNSTREAM rows are added to the new column(s).
 
-    # The S.NEAR and T.NEAR methods are almost the same.  They give the same results
-    # in most cases.  Their difference will be pointed out below.
+    closest := 0
 
     # The definition of "near" for the S.NEAR and T.NEAR methods is determined by
     # four parameters, start.up, start.down, end.up, and end.down:
@@ -549,17 +556,6 @@ match:
     start.down := 3000
     end.up := 3000
     end.down := ""
-
-    # Since there can be multiple rows of inputFileS that are near an inputFileT row,
-    # another parameter, "closest", lets you select ALL of them to appear in the new
-    # inputFileT column(s), or only the NEAREST, or only the nearest UPSTREAM and
-    # nearest DOWNSTREAM.  In the case of overlaps, ALL overlaps appear in the new
-    # column(s).
-    #   closest := 0: all inputFileS rows that are near are added to the new column(s).
-    #   closest := 1: the NEAREST inputFileS row is added to the new column(s).
-    #   closest := 2: the nearest UPSTREAM and DOWNSTREAM rows are added to the new column(s).
-
-    closest := 0
 
 
 ################################################################################

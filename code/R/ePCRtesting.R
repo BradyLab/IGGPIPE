@@ -1,9 +1,9 @@
-#######################################################################################
+################################################################################
 # See usage below for description.
 # Author: Ted Toal
 # Date: 2013-2015
 # Brady Lab, UC Davis
-#######################################################################################
+################################################################################
 
 # Enclose everything in braces so stop statements will work correctly.
 {
@@ -11,38 +11,15 @@
 # Pathname separator.
 PATHSEP = ifelse(grepl("/", Sys.getenv("HOME")), "/", "\\")
 
-# cat() that immediately flushes to console.
-catnow = function(...)
-    {
-    cat(...)
-    flush.console()
-    return(invisible(0))
-    }
+# Get directory where this file resides.
+XSEP = ifelse(PATHSEP == "\\", "\\\\", PATHSEP)
+RE = paste("^.*--file=(([^", XSEP, "]*", XSEP, ")*)[^", XSEP, "]+$", sep="")
+args = commandArgs(FALSE)
+thisDir = sub(RE, "\\1", args[grepl("--file=", args)])
+#thisDir = "~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE/code/R/" # For testing only.
 
-# Print an R object's value.
-objPrint = function(x, title="")
-    {
-    sink("temp.txt")
-    print(x)
-    sink()
-    x.S = readLines("temp.txt")
-    x.S = sub(" $", "", x.S)
-    multiline = (length(x.S) > 1)
-    if (!multiline)
-        x.S = sub("[1] ", "", x.S, fixed=TRUE)
-    x.S = paste(x.S, collapse="\n")
-    if (title != "")
-        {
-        if (!multiline)
-            catnow(title, ": ", sep="")
-        else
-            catnow(title, ":\n", sep="")
-        }
-    catnow(x.S, "\n", sep="")
-    }
-
-# Define function to display info when investigating.
-inv = function(a, title="") { if (investigate) objPrint(a, title) }
+# Source the necessary include files from the same directory containing this file.
+source(paste(thisDir, "Include_Common.R", sep=""))
 
 # Get arguments.
 testing = 0
@@ -186,6 +163,12 @@ if (genomeNum > Ngenomes)
 genomeLtr = genomeLtr[genomeNum]
 inv(genomeLtr, "genome letter")
 
+# Make column name vectors.
+idCol = paste(genomeLtr, "id", sep="")
+ampLenCol = paste(genomeLtr, "ampLen", sep="")
+ampPos1Col = paste(genomeLtr, "ampPos1", sep="")
+ampPos2Col = paste(genomeLtr, "ampPos2", sep="")
+
 ############################################################################
 # Create a ".epcr.in" tab-separated text file to use as input to e-PCR,
 # giving the primer pairs to be tested.  Example:
@@ -198,12 +181,11 @@ inv(genomeLtr, "genome letter")
 
 # Amplicon length columns.
 allAmpCols = colnames(df)[grepl("ampLen$", colnames(df))]
-ampCol = paste(genomeLtr, "ampLen", sep="")
 
-dfInfo = sapply(allAmpCols, function(ampCol) paste(substr(ampCol, 1, 1), df[, ampCol], sep="="))
+dfInfo = sapply(allAmpCols, function(ampLenCol) paste(substr(ampLenCol, 1, 1), df[, ampLenCol], sep="="))
 
 dfEPCR = data.frame(rowNum=1:nrow(df), prmSeqL=df$prmSeqL, prmSeqR=df$prmSeqR,
-    ampLen=df[, ampCol], info=apply(dfInfo, 1, paste, collapse=","),
+    ampLen=df[, ampLenCol], info=apply(dfInfo, 1, paste, collapse=","),
     stringsAsFactors=FALSE)
 
 ePCRinputFile = paste("Genome_", genomeNum, ".epcr.in", sep="")
@@ -218,7 +200,7 @@ write.table(dfEPCR, ePCRinputFile, row.names=FALSE, col.names=FALSE, quote=FALSE
 
 ePCRoutputFile = paste("Genome_", genomeNum, ".epcr.out", sep="")
 ePCRoutputFile = paste(pcrInfoDir, ePCRoutputFile, sep=PATHSEP)
-cmdLine = paste(ePCRpath, "-v+", "-p+", "-t3",
+cmdLine = paste(ePCRpath, "-v-", "-p+", "-t3",
     paste("-m", maxDeviation, sep=""),
     paste("-w", wordSize, sep=""),
     paste("-n", maxMismatches, sep=""),
@@ -232,7 +214,8 @@ system(cmdLine)
 
 ########################################
 # Read the output file and check to see that each pair had one and only one
-# amplicon, at the correct position.
+# amplicon, at the correct position.  For those that aren't, mark them with a
+# reason why they were bad.
 ########################################
 
 if (!file.exists(ePCRoutputFile)) stop("e-PCR output file not found: ", ePCRoutputFile)
@@ -242,69 +225,70 @@ colnames(dfAmps) = c("id", "rowNum", "strand", "posL", "posR", "lenExpLens", "mi
 # Group the results by df row number.
 L = split(1:nrow(dfAmps), dfAmps$rowNum)
 
-# Convert character row number names(L) to integers and re-order L so it can be
-# indexed by a df row number.
+# Convert character df row number names(L) to integers.
 n = as.integer(names(L))
-L = L[match(1:nrow(df), n)]
 
 # Find those found zero times, those found more than once, and those found once
 # with wrong sequence id, posL or posR.  Note: ampPos1 and ampPos2 may be in
 # reverse order so that ampPos1 > ampPos2.  However, it is always the case that
 # posL < posR.
 len = sapply(L, length)
-foundZero = (len == 0)
-foundOnce = (len == 1)
-foundMultiple = (len > 1)
-idx1 = sapply(L, '[', 1)
-idCol = paste(genomeLtr, "id", sep="")
-ampPos1Col = paste(genomeLtr, "ampPos1", sep="")
-ampPos2Col = paste(genomeLtr, "ampPos2", sep="")
-foundOnceIdWrong = (foundOnce & df[, idCol] != dfAmps$id[idx1])
-posL = df[, ampPos1Col]
-posR = df[, ampPos2Col]
+# Indexing df rows by n[] produces rows in dfAmps order.
+dfFoundZero = df[n[len == 0],]
+dfFoundOnce = df[n[len == 1],]
+dfFoundMultiple = df[n[len > 1],]
+rm(df)
+dfAmps1 = dfAmps[unlist(L[len == 1]),] # dfAmps1 is in same order as dfFoundOnce
+idWrong = (dfFoundOnce[, idCol] != dfAmps1$id)
+dfFoundOnceIdWrong = dfFoundOnce[idWrong,]
+dfFoundOnce = dfFoundOnce[!idWrong,]
+posL = dfFoundOnce[, ampPos1Col]
+posR = dfFoundOnce[, ampPos2Col]
 swap = (posL > posR)
 tmp = posL[swap]
 posL[swap] = posR[swap]
 posR[swap] = tmp
-foundOncePosLwrong = (foundOnce & posL != dfAmps$posL[idx1])
-foundOncePosRwrong = (foundOnce & posR!= dfAmps$posR[idx1])
-rmvMarker = (foundZero | foundMultiple | foundOnceIdWrong | foundOncePosLwrong | foundOncePosRwrong)
+posLwrong = (posL != dfAmps1$posL)
+posRwrong = (posR != dfAmps1$posR)
+bothPosWrong = posLwrong & posRwrong
+dfFoundOnceBothPosWrong = dfFoundOnce[bothPosWrong,]
+dfFoundOncePosLwrong = dfFoundOnce[posLwrong & !posRwrong,]
+dfFoundOncePosRwrong = dfFoundOnce[posRwrong & !posLwrong,]
+totalWrong = nrow(dfFoundZero) + nrow(dfFoundMultiple) + nrow(dfFoundOnceIdWrong) +
+    nrow(dfFoundOnceBothPosWrong) + nrow(dfFoundOncePosLwrong) + nrow(dfFoundOncePosRwrong)
 {
 cat("Number candidate markers:        ", nrow(df), "\n")
-cat("No amplicon found:               ", sum(foundZero), "\n")
-cat("Multiple amplicons found:        ", sum(foundMultiple), "\n")
-cat("One amplicon but wrong id:       ", sum(foundOnceIdWrong), "\n")
-cat("One amplicon but wrong left pos: ", sum(foundOncePosLwrong), "\n")
-cat("One amplicon but wrong right pos:", sum(foundOncePosRwrong), "\n")
+cat("No amplicon found:               ", nrow(dfFoundZero), "\n")
+cat("Multiple amplicons found:        ", nrow(dfFoundMultiple), "\n")
+cat("One amplicon but wrong id:       ", nrow(dfFoundOnceIdWrong), "\n")
+cat("One amplicon but wrong both pos: ", nrow(dfFoundOnceBothPosWrong), "\n")
+cat("One amplicon but wrong left pos: ", nrow(dfFoundOncePosLwrong), "\n")
+cat("One amplicon but wrong right pos:", nrow(dfFoundOncePosRwrong), "\n")
 cat("----------------------------\n")
-cat("Total markers to be removed:", sum(rmvMarker), "\n")
+cat("Total markers to be removed:", totalWrong, "\n")
 }
+
+if (totalWrong > 0)
+    {
+    dfFoundZero$reasonDiscarded = rep("not found", nrow(dfFoundZero))
+    dfFoundMultiple$reasonDiscarded = rep("found multiple", nrow(dfFoundMultiple))
+    dfFoundOnceIdWrong$reasonDiscarded = rep("wrong seq id", nrow(dfFoundOnceIdWrong))
+    dfFoundOnceBothPosWrong$reasonDiscarded = rep("wrong pos", nrow(dfFoundOnceBothPosWrong))
+    dfFoundOncePosLwrong$reasonDiscarded = rep("wrong posL", nrow(dfFoundOncePosLwrong))
+    dfFoundOncePosRwrong$reasonDiscarded = rep("wrong posR", nrow(dfFoundOncePosRwrong))
+    dfRemove = rbind(dfFoundZero, dfFoundMultiple, dfFoundOnceIdWrong, dfFoundOncePosLwrong, dfFoundOncePosRwrong)
+    dfRemove = dfRemove[, c("reasonDiscarded", setdiff(colnames(dfRemove), "reasonDiscarded"))]
+    }
+else
+    {
+    catnow("No bad markers to be removed.\n")
+    dfRemove = data.frame(reasonDiscarded=character(), dfFoundZero, stringsAsFactors=FALSE)
+    }
 
 ########################################
 # Write output file containing markers to be removed, with "reason" column.
 ########################################
 
-dfRemove = df[rmvMarker,]
-foundZero = foundZero[rmvMarker]
-foundMultiple = foundMultiple[rmvMarker]
-foundOnceIdWrong = foundOnceIdWrong[rmvMarker]
-foundOncePosLwrong = foundOncePosLwrong[rmvMarker]
-foundOncePosRwrong = foundOncePosRwrong[rmvMarker]
-if (nrow(dfRemove) > 0)
-    {
-    dfRemove = data.frame(reasonDiscarded="unknown", dfRemove, stringsAsFactors=FALSE)
-    dfRemove$reasonDiscarded[foundZero] = "not found"
-    dfRemove$reasonDiscarded[foundMultiple] = "found multiple"
-    dfRemove$reasonDiscarded[foundOnceIdWrong] = "wrong seq id"
-    dfRemove$reasonDiscarded[!foundOnceIdWrong & foundOncePosLwrong & foundOncePosRwrong] = "wrong pos"
-    dfRemove$reasonDiscarded[!foundOnceIdWrong & foundOncePosLwrong & !foundOncePosRwrong] = "wrong posL"
-    dfRemove$reasonDiscarded[!foundOnceIdWrong & !foundOncePosLwrong & foundOncePosRwrong] = "wrong posR"
-    }
-else
-    {
-    catnow("No bad markers to be removed.\n")
-    dfRemove = data.frame(reasonDiscarded=character(), df[c(),], stringsAsFactors=FALSE)
-    }
 # Write the data frame to the output file.
 write.table(dfRemove, badMarkerFile, row.names=FALSE, quote=FALSE, sep="\t")
 # dfRemove = read.table(badMarkerFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
@@ -312,3 +296,7 @@ write.table(dfRemove, badMarkerFile, row.names=FALSE, quote=FALSE, sep="\t")
 catnow("Finished testing primers of candidate markers for genome", genomeNum, "\n")
 catnow("Markers to remove are in file:\n", badMarkerFile, "\n")
 }
+
+################################################################################
+# End of file.
+################################################################################

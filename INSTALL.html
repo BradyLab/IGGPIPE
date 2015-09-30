@@ -1133,7 +1133,7 @@ in a standard location.</p></div>
 <div class="content">
 <pre><code>PATH_JELLYFISH := /usr/local/bin/jellyfish</code></pre>
 </div></div>
-<div class="paragraph"><p>or, if you have Jellyfish on your path, you can use simply:</p></div>
+<div class="paragraph"><p>or, if you have Jellyfish on your path, you can optionally use simply:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>PATH_JELLYFISH := jellyfish</code></pre>
@@ -1183,7 +1183,7 @@ Assign the path, which was shown with the "which perl" command, to the parameter
 <div class="content">
 <pre><code>PATH_PERL := /usr/local/bin/perl</code></pre>
 </div></div>
-<div class="paragraph"><p>or if Perl is on your path, simply:</p></div>
+<div class="paragraph"><p>or if Perl is on your path, you can optionally use simply:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>PATH_PERL := perl</code></pre>
@@ -1223,7 +1223,8 @@ Assign the path, which was shown with the "which RScript" command, to the parame
 <div class="content">
 <pre><code>PATH_RSCRIPT := /usr/bin/Rscript</code></pre>
 </div></div>
-<div class="paragraph"><p>or, if Rscript is on your path (it may be set that way during installation), simply:</p></div>
+<div class="paragraph"><p>or, if Rscript is on your path (it may be set that way during installation), you
+can optionally use simply:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>PATH_RSCRIPT := Rscript</code></pre>
@@ -1258,7 +1259,7 @@ parameter as follows:</p></div>
 <div class="content">
 <pre><code>PATH_PRIMER3CORE := ~/Documents/primer3-2.3.6/primer3_core</code></pre>
 </div></div>
-<div class="paragraph"><p>or, if primer3_core is on your path, simply:</p></div>
+<div class="paragraph"><p>or, if primer3_core is on your path, you can optionally use simply:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>PATH_PRIMER3CORE := primer3_core</code></pre>
@@ -1336,7 +1337,7 @@ as follows:</p></div>
 <div class="content">
 <pre><code>PATH_EPCR := ~/Documents/e-PCR-2.3.12/e-PCR</code></pre>
 </div></div>
-<div class="paragraph"><p>or, if e-PCR is on your path, simply:</p></div>
+<div class="paragraph"><p>or, if e-PCR is on your path, you can optionally use simply:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>PATH_EPCR := e-PCR</code></pre>
@@ -1370,7 +1371,8 @@ as follows:</p></div>
 <div class="content">
 <pre><code>PATH_ALIGNER := ~/bin/muscle3.8.31_i86darwin64</code></pre>
 </div></div>
-<div class="paragraph"><p>or, if Muscle is on your path and the binary file is named <em>muscle</em>, simply:</p></div>
+<div class="paragraph"><p>or, if Muscle is on your path and the binary file is named <em>muscle</em>, you can
+optionally use simply:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>PATH_ALIGNER := muscle</code></pre>
@@ -1438,7 +1440,7 @@ you should set the $(CMD_DELETE) method as the delete method:</p></div>
 </li>
 <li>
 <p>
-<strong>Copy primer3settings.default.txt and edit Primer3 settings</strong>
+<strong>Copy primer3settings.default.txt and later you might edit Primer3 settings</strong>
 </p>
 <div class="openblock">
 <div class="content">
@@ -1454,10 +1456,15 @@ To do this, copy primer3settings.default.txt to primer3settings.txt:</p></div>
 <div class="content">
 <pre><code>cp primer3settings.default.txt primer3settings.txt</code></pre>
 </div></div>
-<div class="paragraph"><p><em>This is all you need to do, IGGPIPE should work with this version.</em></p></div>
-<div class="paragraph"><p>However, you can edit the new primer3settings.txt file with your text editor and make
-any changes that are important for your needs. For example, you might change the
-parameters that determine the acceptable <em>range of primer Tm values</em>.</p></div>
+<div class="paragraph"><p><em>This is all you need to do, IGGPIPE will work with this version, which is the
+required version for running the test of IGGPIPE.</em></p></div>
+<div class="paragraph"><p>After finishing installation, and prior to any run of IGGPIPE, you can edit
+primer3settings.txt file with your text editor and make any changes that are
+important for your needs. For example, you might change the parameters that
+determine the acceptable <em>range of primer Tm values</em>. If you have several
+different setting values you use, you will probably want to keep a directory
+of different primer3settings.txt files and copy the needed one prior to each
+run of IGGPIPE.</p></div>
 <div class="paragraph"><p>The Primer3 user manual (<a href="http://primer3.sourceforge.net/primer3_manual.htm">http://primer3.sourceforge.net/primer3_manual.htm</a>)
 describes all the parameters.</p></div>
 <div class="paragraph"><p>To see what was changed in the primer settings file, you can use FileMerge,
@@ -1736,7 +1743,7 @@ Contact me, Ted Toal, <a href="mailto:twtoal@ucdavis.edu">twtoal@ucdavis.edu</a>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-09-25 14:24:44 PDT
+Last updated 2015-09-28 05:57:19 PDT
 </div>
 </div>
 </body>

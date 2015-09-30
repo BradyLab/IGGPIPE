@@ -1,9 +1,9 @@
-#######################################################################################
+################################################################################
 # See usage below for description.
 # Author: Ted Toal
 # Date: 2013-2015
 # Brady Lab, UC Davis
-#######################################################################################
+################################################################################
 
 # Enclose everything in braces so stop statements will work correctly.
 {
@@ -11,13 +11,15 @@
 # Pathname separator.
 PATHSEP = ifelse(grepl("/", Sys.getenv("HOME")), "/", "\\")
 
-# cat() that immediately flushes to console.
-catnow = function(...)
-    {
-    cat(...)
-    flush.console()
-    return(invisible(0))
-    }
+# Get directory where this file resides.
+XSEP = ifelse(PATHSEP == "\\", "\\\\", PATHSEP)
+RE = paste("^.*--file=(([^", XSEP, "]*", XSEP, ")*)[^", XSEP, "]+$", sep="")
+args = commandArgs(FALSE)
+thisDir = sub(RE, "\\1", args[grepl("--file=", args)])
+#thisDir = "~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE/code/R/" # For testing only.
+
+# Source the necessary include files from the same directory containing this file.
+source(paste(thisDir, "Include_Common.R", sep=""))
 
 # Get arguments.
 testing = 0
@@ -204,6 +206,10 @@ for (genome in genomeLtrs)
 
 dfMarkers = dfMarkers[dfMarkers$NDA >= plotNDAmin,]
 dfNoOverlaps = dfNoOverlaps[dfNoOverlaps$NDA >= plotNDAmin,]
+if (nrow(dfMarkers) == 0) stop("No overlapping markers.")
+if (nrow(dfNoOverlaps) == 0) stop("No non-overlapping markers.")
+catnow("After NDAmin applied, number of overlapping markers:", nrow(dfMarkers), "\n")
+catnow("After NDAmin applied, number of non-overlapping markers:", nrow(dfNoOverlaps), "\n")
 
 ########################################
 # Create pdf file.
@@ -301,6 +307,18 @@ for (genome in genomeLtrs)
     ids = rownames(idlens[[genome]])
     numIds = length(ids)
 
+    # If there are zillions of IDs, as there would be with scaffolds, we don't
+    # want to plot them all, so choose a limited number, and only the largest.
+    maxIdsToPlot = 40
+    if (numIds > maxIdsToPlot)
+        {
+        numIds = maxIdsToPlot
+        theseIdLens = idlens[[genome]][ids, "len"]
+        names(theseIdLens) = ids
+        theseIdLens = sort(theseIdLens, decreasing=TRUE)
+        ids = names(theseIdLens)[1:numIds]
+        }
+
     # Title cex expansion factor needs to be smaller if the number of IDs is small.
     cex.main = (numIds-2)/4 + 1
     if (cex.main > 3)
@@ -342,3 +360,7 @@ for (genome in genomeLtrs)
 
 catnow("Finished making chromosome density plots of good candidate markers\n")
 }
+
+################################################################################
+# End of file.
+################################################################################

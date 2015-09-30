@@ -1,4 +1,4 @@
-#######################################################################################
+################################################################################
 # Perform extensive testing of functions in Include_GFFfuncs.R and
 # Include_MergeDataUsingPosition.R, using test data in folder test_GFFfuncsAndMergeData.
 #
@@ -8,12 +8,13 @@
 # Author: Ted Toal
 # Date: 2015
 # Brady Lab, UC Davis
-#######################################################################################
+################################################################################
 
 # Set working directory.
 setwd("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE/code/R")
 
 # Source the files we are testing.
+source("Include_Common.R")
 source("Include_GFFfuncs.R")
 source("Include_MergeDataUsingPosition.R")
 
@@ -26,9 +27,9 @@ head(dfMarkers)
 dfILs = read.table("test_GFFfuncsAndMergeData/ILintrogressions.tsv", header=TRUE, sep="\t", stringsAsFactors=FALSE)
 dfILs$id = sprintf("SL2.50ch%02d", dfILs$chr)
 
-#######################################################################################
+################################################################################
 # Testing of Include_GFFfuncs.R.
-#######################################################################################
+################################################################################
 
 # Read additional test file data: a .gff3 and .gtf gene model file for Soly, truncated
 # to first 14 Mbp of ch 01 and ch 02.
@@ -93,9 +94,9 @@ df2c[1,]
 identical(df1c, dfGff)
 identical(df2c, dfGtf)
 
-#######################################################################################
+################################################################################
 # Testing of Include_MergeDataUsingPosition.R.
-#######################################################################################
+################################################################################
 
 # First test.
 T.df = dfMarkers
@@ -602,6 +603,6 @@ df.T.NEAR["4683900_4684979","genes"]
 # Is this marker the closest marker to which genes?  Apparently to 40 and 50.
 df.T.NEAR["54857_55150","genes"]
 
-#######################################################################################
+################################################################################
 # End of file.
-#######################################################################################
+################################################################################

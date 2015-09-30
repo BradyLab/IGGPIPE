@@ -2,7 +2,7 @@
 # Sample parameter file for annotateFile.R to convert a .gff3 full of gene
 # models to a .tsv with gene name and start/end position.  Specifically:
 #   1. Reads code/R/test_GFFfuncsAndMergeData/ITAG2.4_test.gff3
-#   2. Extracts attribute "Alias" into new column "gene".
+#   2. Extracts attribute "Alias" from "gene" features into new column "gene".
 #   3. Writes data to the .tsv file code/R/testOutput/genePos.tsv with columns
 #       "gene", "id", "start", "end", "strand" (the .gff3 "seqname" column is
 #       renamed to "id").

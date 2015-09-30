@@ -1,11 +1,12 @@
-#######################################################################################
-# This file contains R definitions and functions for working with .gff3 and .gtf files.
+################################################################################
+# This file contains R definitions and functions for working with .gff3 and .gtf
+# files, to be sourced by R code that needs to use it.
 # Author: Ted Toal
 # Date: 2015
 # Brady Lab, UC Davis
-#######################################################################################
+################################################################################
 
-#######################################################################################
+################################################################################
 # Read a .gff3 file.
 #
 # Arguments:
@@ -13,7 +14,7 @@
 #
 # Returns: data frame containing the data, with columns "seqname", "source", "feature",
 #   "start", "end", "score", "strand", "frame", "attributes".
-#######################################################################################
+################################################################################
 readFile_GFF3 = function(filename)
     {
     df = read.table(filename, header=FALSE, sep="\t", quote='"', comment.char="#", stringsAsFactors=FALSE)
@@ -21,7 +22,7 @@ readFile_GFF3 = function(filename)
     return(df)
     }
 
-#######################################################################################
+################################################################################
 # Read a .gtf file.
 #
 # Arguments:
@@ -29,7 +30,7 @@ readFile_GFF3 = function(filename)
 #
 # Returns: data frame containing the data, with columns "seqname", "source", "feature",
 #   "start", "end", "score", "strand", "frame", "attributes".
-#######################################################################################
+################################################################################
 readFile_GTF = function(filename)
     {
     df = read.table(filename, header=FALSE, sep="\t", quote="", comment.char="#", stringsAsFactors=FALSE)
@@ -37,7 +38,7 @@ readFile_GTF = function(filename)
     return(df)
     }
 
-#######################################################################################
+################################################################################
 # Write a .gff3 or .gtf file.
 #
 # Arguments:
@@ -45,13 +46,13 @@ readFile_GTF = function(filename)
 #   filename: Name of file to write.
 #
 # Returns: Nothing.
-#######################################################################################
+################################################################################
 writeFile_GFF3_GTF = function(df, filename)
     {
     write.table(df, file=filename, sep="\t", quote=FALSE, row.names=FALSE, col.names=FALSE)
     }
 
-#######################################################################################
+################################################################################
 # Clean up .gff3 data.  If data is .gtf, it is more .gff3 after this.
 #
 # Arguments:
@@ -71,7 +72,7 @@ writeFile_GFF3_GTF = function(df, filename)
 # Certain changes are not made here but need to be made as part of the GTF format:
 #   1. Change CDS to include stop codon bases.
 #   2. Do not allow start and stop codon features to be split by introns.
-#######################################################################################
+################################################################################
 clean_GFF3 = function(df)
     {
     df$feature[df$feature == "5UTR"] = "five_prime_UTR"
@@ -88,7 +89,7 @@ clean_GFF3 = function(df)
     return(df)
     }
 
-#######################################################################################
+################################################################################
 # Clean up .gtf data.  If data is .gff3, it is more .gtf after this.
 #
 # Arguments:
@@ -112,7 +113,7 @@ clean_GFF3 = function(df)
 #   1. Add frame field values of 0,1,2 for start/stop codons.
 #   2. Change CDS to not include stop codon bases.
 #   3. Allow start and stop codon features to be split by introns.
-#######################################################################################
+################################################################################
 clean_GTF = function(df)
     {
     df = clean_GFF3(df) # Go the other way first.
@@ -127,29 +128,29 @@ clean_GTF = function(df)
     return(df)
     }
 
-#######################################################################################
+################################################################################
 # Return a vector of the unique feature names in a .gff3 or .gtf data frame.
 #
 # Arguments:
 #   df: data frame of .gff3 or .gtf data.
 #
 # Returns: vector of features.
-#######################################################################################
+################################################################################
 getFeatures = function(df)
     {
     return(unique(df$feature))
     }
 
-#######################################################################################
-# Remove .gff3 or .gtf data from a data frame that does not belong to one of a specified
-# list of features.
+################################################################################
+# Remove .gff3 or .gtf data from a data frame that does not belong to one of a
+# specified list of features.
 #
 # Arguments:
 #   df: data frame of .gff3 or .gtf data.
 #   selectFeatures: vector of names of features to be retained, others are removed.
 #
 # Returns: modified data frame.
-#######################################################################################
+################################################################################
 selectFeatures = function(df, selectFeatures)
     {
     df = df[df$feature %in% selectFeatures,]
@@ -157,7 +158,7 @@ selectFeatures = function(df, selectFeatures)
     return(df)
     }
 
-#######################################################################################
+################################################################################
 # Convert .gff3 or .gtf attribute data to separate data frame columns.
 #
 # Arguments:
@@ -179,7 +180,7 @@ selectFeatures = function(df, selectFeatures)
 # Returns: modified data frame.
 #
 # Note: The new columns have NA for any row whose attributes did not include that column.
-#######################################################################################
+################################################################################
 convertAttrsToCols = function(df, includeAttrs=NULL, excludeAttrs=NULL, removeAttrCol=TRUE,
     attrCol="attributes", newAttrCols=NULL, missingAttrVals=NULL, maxAttrCols=100)
     {
@@ -261,7 +262,7 @@ convertAttrsToCols = function(df, includeAttrs=NULL, excludeAttrs=NULL, removeAt
     return(df)
     }
 
-#######################################################################################
+################################################################################
 # Convert separate data frame columns to attributes in the attributes column of a .gff3
 # or .gtf data frame.
 #
@@ -286,7 +287,7 @@ convertAttrsToCols = function(df, includeAttrs=NULL, excludeAttrs=NULL, removeAt
 # Note: When a column in "cols" contains NA, that attribute is not added to the
 # attributes column, and if merge is TRUE, the value of the attribute already in the
 # attributes column remains unchanged.
-#######################################################################################
+################################################################################
 convertColsToAttrs = function(df, cols, newAttrNames=NULL, noAttrValues=NULL,
     attrCol="attributes", merge=TRUE, remove=TRUE)
     {
@@ -355,11 +356,11 @@ convertColsToAttrs = function(df, cols, newAttrNames=NULL, noAttrValues=NULL,
     return(df)
     }
 
-#######################################################################################
-#######################################################################################
+################################################################################
+################################################################################
 # Example data from some .gff3 files for reference.
-#######################################################################################
-#######################################################################################
+################################################################################
+################################################################################
 
 # Arabidopsis TAIR10 gene model file example:
 #Chr3	TAIR10	gene	3026055	3027234	.	+	.	ID=AT3G09860;Note=protein_coding_gene;Name=AT3G09860
@@ -434,12 +435,12 @@ convertColsToAttrs = function(df, cols, newAttrNames=NULL, noAttrValues=NULL,
 #Spenn-ch00	AUGUSTUS	CDS	12022	12134	0.89	-	0	ID=cds:Sopen00g001020.1.2;Parent=Sopen00g001020.1;
 #Spenn-ch00	AUGUSTUS	exon	12022	12192	.	-	.	ID=exon:Sopen00g001020.1.2;Parent=Sopen00g001020.1;
 
-#######################################################################################
-#######################################################################################
+################################################################################
+################################################################################
 # GTF file format.
 # From http://mblab.wustl.edu/GTF22.html
-#######################################################################################
-#######################################################################################
+################################################################################
+################################################################################
 #
 # GTF2.2: A Gene Annotation Format (Revised Ensembl GTF)
 #
@@ -626,6 +627,6 @@ convertColsToAttrs = function(df, cols, newAttrNames=NULL, noAttrValues=NULL,
 # for checking that your GTF annotation is consistent and well-formed. Here are
 # some more useful links: GFF Specification at Sanger Brent Lab Homepage Top 
 
-#######################################################################################
+################################################################################
 # End of file.
-#######################################################################################
+################################################################################

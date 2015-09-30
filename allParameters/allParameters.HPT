@@ -423,9 +423,11 @@ DIR_KMERS := $(DIR_IGGPIPE_OUT)/Kmers
 # 2. a text file of k-mer statistics:
 #       <this prefix><genome_number>.stats
 # 3. a list of SORTED unique k-mers in the genome:
-#       <this prefix><genome_number>.isect.sorted
-# 4. A list of positions of unique k-mers in the genome:
-#       <this prefix><genome_number>.isect.unique
+#       <this prefix><genome_number>.sorted
+# 4. A list of positions of common unique k-mers in the genome:
+#       <this prefix><genome_number>.isect
+# 5. A list of common unique k-mers of these genome and preceding genomes
+#       <this prefix><genome_number>.merge
 ### THIS DOES NOT NEED TO BE CHANGED.
 
 PFX_KMERS_DATA_FILE := $(DIR_KMERS)/Kmers_

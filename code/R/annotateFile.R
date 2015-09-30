@@ -1,9 +1,9 @@
-#######################################################################################
+################################################################################
 # See usage below for description.
 # Author: Ted Toal
 # Date: 2015
 # Brady Lab, UC Davis
-#######################################################################################
+################################################################################
 
 # Enclose everything in braces so stop statements will work correctly.
 {
@@ -11,8 +11,17 @@
 # Pathname separator.
 PATHSEP = ifelse(grepl("/", Sys.getenv("HOME")), "/", "\\")
 
-# For some reason this is needed when using RScript.
-library("methods")
+# Get directory where this file resides.
+XSEP = ifelse(PATHSEP == "\\", "\\\\", PATHSEP)
+RE = paste("^.*--file=(([^", XSEP, "]*", XSEP, ")*)[^", XSEP, "]+$", sep="")
+args = commandArgs(FALSE)
+thisDir = sub(RE, "\\1", args[grepl("--file=", args)])
+#thisDir = "~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE/code/R/" # For testing only.
+
+# Source the necessary include files from the same directory containing this file.
+source(paste(thisDir, "Include_Common.R", sep=""))
+source(paste(thisDir, "Include_GFFfuncs.R", sep=""))
+source(paste(thisDir, "Include_MergeDataUsingPosition.R", sep=""))
 
 ################################################################################
 # Process program arguments.
@@ -35,31 +44,19 @@ else
     if (testing == 1)
         args = "annotate.template"
     else if (testing == 2)
-        args = "annotate/annotate.gff3_to_tsv"
+        args = "annotate/test_gff3_to_tsv.gene_positions"
     else if (testing == 3)
-        args = "annotate/tsv_to_gff3.markers"
+        args = "annotate/test_tsv_to_gff3.markers"
     else if (testing == 4)
         args = "annotate/HPintrogressions_to_gff3"
     else if (testing == 5)
-        args = "annotate/addILs_column.test_tsv"
+        args = "annotate/test_addILs_column.markers"
     else if (testing == 6)
-        args = "annotate/add_genesColumn.test_tsv"
+        args = "annotate/test_add_genesColumn.markers"
     else
         stop("Unknown value for 'testing'")
-
-    args = c("--file=~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE/code/R/annotateFile.R", "--args", args)
     }
 }
-
-# Get directory where this file resides.
-XSEP = ifelse(PATHSEP == "\\", "\\\\", PATHSEP)
-RE = paste("^.*--file=(([^", XSEP, "]*", XSEP, ")*)[^", XSEP, "]+$", sep="")
-thisDir = sub(RE, "\\1", args[grepl("--file=", args)])
-args = args[-(1:which(args == "--args"))]
-
-# Source the necessary include files from the same directory containing this file.
-source(paste(thisDir, "Include_GFFfuncs.R", sep=""))
-source(paste(thisDir, "Include_MergeDataUsingPosition.R", sep=""))
 
 # Get the arguments specific to this program.
 Nexpected = 1
@@ -85,21 +82,6 @@ paramFile = args[1]
 cat("  paramFile: ", paramFile, "\n")
 if (!file.exists(paramFile))
     stop("File doesn't exist: ", paramFile)
-
-
-################################################################################
-# Functions.
-################################################################################
-
-################################################################################
-# cat() that immediately flushes to console.
-################################################################################
-catnow = function(...)
-    {
-    cat(...)
-    flush.console()
-    return(invisible(0))
-    }
 
 ################################################################################
 # Read parameter file and extract relevant lines.
@@ -322,11 +304,11 @@ expected = list(
         ),
     match.match = list(
         method = "(OVERLAP,S.TINY,T.TINY,S.NEAR,T.NEAR)",
+        closest = "rmv.if.empty",
         start.up = "rmv.if.empty",
         start.down = "rmv.if.empty",
         end.up = "rmv.if.empty",
-        end.down = "rmv.if.empty",
-        closest = "rmv.if.empty"
+        end.down = "rmv.if.empty"
         ),
     mergeCols.match = list(
         list(
@@ -701,7 +683,7 @@ readInputFile = function(sectionName, params)
         if (params$type == "tsv")
         args$header = is.null(params$columns)
         if (!args$header)
-            args$col.names = params$columns
+            args$col.names = splitCommaList(params$columns)
         if (params$type == "tsv")
             args$sep = "\t"
         args$quote = params$quote
@@ -718,7 +700,7 @@ readInputFile = function(sectionName, params)
         # columns
         if (!is.null(params$columns))
             {
-            columns = params$columns
+            columns = splitCommaList(params$columns)
             if (length(columns) != ncol(df))
                 stop("Expected ", sectionName, " to have ", length(columns), " columns but it had ",
                     ncol(df), " which were ", paste(colnames(df), collapse=":"), call.=FALSE)

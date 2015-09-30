@@ -1,9 +1,9 @@
-#######################################################################################
+################################################################################
 # See usage below for description.
 # Author: Ted Toal
 # Date: 2013-2015
 # Brady Lab, UC Davis
-#######################################################################################
+################################################################################
 
 # Enclose everything in braces so stop statements will work correctly.
 {
@@ -11,38 +11,15 @@
 # Pathname separator.
 PATHSEP = ifelse(grepl("/", Sys.getenv("HOME")), "/", "\\")
 
-# cat() that immediately flushes to console.
-catnow = function(...)
-    {
-    cat(...)
-    flush.console()
-    return(invisible(0))
-    }
+# Get directory where this file resides.
+XSEP = ifelse(PATHSEP == "\\", "\\\\", PATHSEP)
+RE = paste("^.*--file=(([^", XSEP, "]*", XSEP, ")*)[^", XSEP, "]+$", sep="")
+args = commandArgs(FALSE)
+thisDir = sub(RE, "\\1", args[grepl("--file=", args)])
+#thisDir = "~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE/code/R/" # For testing only.
 
-# Print an R object's value.
-objPrint = function(x, title="")
-    {
-    sink("temp.txt")
-    print(x)
-    sink()
-    x.S = readLines("temp.txt")
-    x.S = sub(" $", "", x.S)
-    multiline = (length(x.S) > 1)
-    if (!multiline)
-        x.S = sub("[1] ", "", x.S, fixed=TRUE)
-    x.S = paste(x.S, collapse="\n")
-    if (title != "")
-        {
-        if (!multiline)
-            catnow(title, ": ", sep="")
-        else
-            catnow(title, ":\n", sep="")
-        }
-    catnow(x.S, "\n", sep="")
-    }
-
-# Define function to display info when investigating.
-inv = function(a, title="") { if (investigate) objPrint(a, title) }
+# Source the necessary include files from the same directory containing this file.
+source(paste(thisDir, "Include_Common.R", sep=""))
 
 # Get arguments.
 testing = 0
@@ -188,9 +165,15 @@ catnow("\n")
 catnow("Number of markers to start with:", NoriginalMarkers, "\n")
 catnow("Good markers after removing bad:", NgoodMarkers, "\n")
 catnow("\n")
- if (nrow(dfMarkers) == 0)
+if (nrow(dfMarkers) == 0)
     stop("There are no markers left after removing bad markers!!")
 catnow("Finished removing e-PCR-identified bad markers from file\n")
+
+# Put the data frame in order by reference genome position.
+catnow("Sorting by reference genome position...")
+dfMarkers = dfMarkers[dfMarkers(dfMarkers[, idCol[refGenome]], dfMarkers[, pos1Col[refGenome]]),]
+rownames(dfMarkers) = NULL
+catnow("\n")
 
 ########################################
 # Write the overlapping markers to a file.
@@ -207,7 +190,14 @@ catnow(nrow(dfMarkers), "overlapping markers output to file:\n", overlappingFile
 ########################################
 
 inv(nrow(dfMarkers), "Number of markers including overlapping markers")
-df = dfMarkers
+
+# We will use the same data frame that holds the overlapping markers, dfMarkers,
+# to hold the non-overlapping markers, since there might be a LOT of them (so
+# copying the data frame would be costly) and we need to start out this algorithm
+# with the data frame containing the overlapping markers, which dfMarkers already
+# does.  The data frame will be transformed into one containing only non-overlapping
+# markers.  We no longer need the overlapping markers (except for this).
+
 # Test each genome, one by one, for marker overlaps, and remove markers to get
 # rid of them.
 for (genome in genomeLtrs)
@@ -222,7 +212,7 @@ for (genome in genomeLtrs)
     # Loop until no more markers are found to overlap in this genome.
     while (TRUE)
         {
-        inv(nrow(df), "Loop with # markers remaining")
+        inv(nrow(dfMarkers), "Loop with # markers remaining")
 
         # Set new column "start" to the position of the 5' end of the 5' k-mer
         # of the amplicon, and new column "end" to the position of the 5' end of
@@ -238,42 +228,42 @@ for (genome in genomeLtrs)
         #   3. kmer1offset and kmer2offset give offset to outside edge of the
         #       k-mer, but we want offset to 5' side of k-mer so we may need an
         #       additional "end" offset of kmerLen-1 depending on strand polarity.
-        df$start = df[, pos1.Col]
-        df$end = df[, pos2.Col]
-        pos2IsSmaller = (df[,pos1.Col] > df[,pos2.Col])
-        df$start[pos2IsSmaller] = df[pos2IsSmaller, pos2.Col]
-        df$end[pos2IsSmaller] = df[pos2IsSmaller, pos1.Col]
-        startOffset = df$kmer1offset
-        endOffset = -df$kmer2offset - kmerLen + 1
-        startOffset[pos2IsSmaller] = df$kmer2offset[pos2IsSmaller]
-        endOffset[pos2IsSmaller] = -df$kmer1offset[pos2IsSmaller] - kmerLen + 1
-        df$start = df$start + startOffset
-        df$end = df$end + endOffset
+        dfMarkers$start = dfMarkers[, pos1.Col]
+        dfMarkers$end = dfMarkers[, pos2.Col]
+        pos2IsSmaller = (dfMarkers[,pos1.Col] > dfMarkers[,pos2.Col])
+        dfMarkers$start[pos2IsSmaller] = dfMarkers[pos2IsSmaller, pos2.Col]
+        dfMarkers$end[pos2IsSmaller] = dfMarkers[pos2IsSmaller, pos1.Col]
+        startOffset = dfMarkers$kmer1offset
+        endOffset = -dfMarkers$kmer2offset - kmerLen + 1
+        startOffset[pos2IsSmaller] = dfMarkers$kmer2offset[pos2IsSmaller]
+        endOffset[pos2IsSmaller] = -dfMarkers$kmer1offset[pos2IsSmaller] - kmerLen + 1
+        dfMarkers$start = dfMarkers$start + startOffset
+        dfMarkers$end = dfMarkers$end + endOffset
 
         # Add new column "len" equal to length of the marker segments.
-        df$len = df$end - df$start + 1
+        dfMarkers$len = dfMarkers$end - dfMarkers$start + 1
 
         # Sort by ID and start position.
-        df = df[order(df[, id.Col], df$start),]
-        N = nrow(df)
+        dfMarkers = dfMarkers[order(dfMarkers[, id.Col], dfMarkers$start),]
+        N = nrow(dfMarkers)
 
         # Find index of marker that each marker overlaps through and put it in column thruIdx.
-        df$thruIdx = NA
-        for (id in unique(df[, id.Col]))
+        dfMarkers$thruIdx = NA
+        for (id in unique(dfMarkers[, id.Col]))
             {
-            thisId = (df[, id.Col] == id)
-            df$thruIdx[thisId] = match(TRUE, thisId) - 1 + findInterval(df$end[thisId], df$start[thisId]+1)
+            thisId = (dfMarkers[, id.Col] == id)
+            dfMarkers$thruIdx[thisId] = match(TRUE, thisId) - 1 + findInterval(dfMarkers$end[thisId], dfMarkers$start[thisId]+1)
             }
 
         # Set thruIdx of markers that do not overlap even the next marker to 0.
-        df$thruIdx[df$thruIdx == 1:nrow(df)] = 0
+        dfMarkers$thruIdx[dfMarkers$thruIdx == 1:nrow(dfMarkers)] = 0
 
         # Get the set of indexes of all markers which overlap at least one other marker.
-        overlapIdxs = sapply(1:nrow(df), function(i)
+        overlapIdxs = sapply(1:nrow(dfMarkers), function(i)
             {
-            if (df$thruIdx[i] == 0)
+            if (dfMarkers$thruIdx[i] == 0)
                 return(0)
-            return(i:df$thruIdx[i])
+            return(i:dfMarkers$thruIdx[i])
             })
         overlapIdxs = unique(unlist(overlapIdxs))
         # Remove index 0, which comes from non-overlapping markers.
@@ -285,12 +275,12 @@ for (genome in genomeLtrs)
             break
 
         # Set column "overlap" TRUE for each of those overlapping markers.
-        df$overlap = FALSE
-        df$overlap[overlapIdxs] = TRUE
+        dfMarkers$overlap = FALSE
+        dfMarkers$overlap[overlapIdxs] = TRUE
 
         # Get the start and end index of each group of mutually overlapping markers.
-        startOverlap = which(!c(FALSE, df$overlap[-N]) & df$overlap)
-        endOverlap = which(df$overlap & !c(df$overlap[-1], FALSE))
+        startOverlap = which(!c(FALSE, dfMarkers$overlap[-N]) & dfMarkers$overlap)
+        endOverlap = which(dfMarkers$overlap & !c(dfMarkers$overlap[-1], FALSE))
         if (length(startOverlap) != length(endOverlap)) stop("Expected equal start/end overlap vectors")
 
         # Find the index within each group of the marker with the smallest or largest length.
@@ -299,21 +289,28 @@ for (genome in genomeLtrs)
         idxsToRemove = sapply(1:length(startOverlap), function(i)
             {
             idxs = startOverlap[i]:endOverlap[i]
-            len.SL = ifelse(minMax == "MIN", min(df$len[idxs]), max(df$len[idxs]))
-            idx.SL = idxs[df$len[idxs] == len.SL][1] # If more than one, pick the first.
-            return(idxs[!(df$end[idxs] <= df$start[idx.SL]) & !(df$start[idxs] >= df$end[idx.SL]) & idxs != idx.SL])
+            len.SL = ifelse(minMax == "MIN", min(dfMarkers$len[idxs]), max(dfMarkers$len[idxs]))
+            idx.SL = idxs[dfMarkers$len[idxs] == len.SL][1] # If more than one, pick the first.
+            return(idxs[!(dfMarkers$end[idxs] <= dfMarkers$start[idx.SL]) & !(dfMarkers$start[idxs] >= dfMarkers$end[idx.SL]) & idxs != idx.SL])
             })
         idxsToRemove = unlist(idxsToRemove)
 
         # Remove those markers.
-        df = df[-idxsToRemove,]
+        dfMarkers = dfMarkers[-idxsToRemove,]
         inv(length(idxsToRemove), "Number of markers deleted")
-        inv(nrow(df), "Number of markers remaining")
+        inv(nrow(dfMarkers), "Number of markers remaining")
         }
     }
-dfNoOverlaps = df
 dfNoOverlaps = dfNoOverlaps[, !colnames(dfNoOverlaps) %in% c("start", "end", "len", "thruIdx", "overlap")]
 inv(nrow(dfNoOverlaps), "Number of markers with overlapping markers removed")
+
+# Put the data frame in order by reference genome position.
+catnow("Sorting by reference genome position...")
+dfNoOverlaps = dfNoOverlaps[dfNoOverlaps(dfNoOverlaps[, idCol[refGenome]], dfNoOverlaps[, pos1Col[refGenome]]),]
+rownames(dfNoOverlaps) = NULL
+ if (nrow(dfNoOverlaps) == 0)
+    stop("There are no markers left after removing overlapping markers!!")
+catnow("\n")
 
 ########################################
 # Write the non-overlapping markers to a file.
@@ -325,3 +322,7 @@ write.table(dfNoOverlaps, nonoverlappingFile, col.names=TRUE, row.names=FALSE, q
 catnow(nrow(dfNoOverlaps), "non-overlapping markers output to file:\n", nonoverlappingFile, "\n")
 
 }
+
+################################################################################
+# End of file.
+################################################################################

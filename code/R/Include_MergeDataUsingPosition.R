@@ -1,12 +1,13 @@
-#######################################################################################
-# This file contains R definitions and functions for merging data frame data using
-# positional information in the data frames.
+################################################################################
+# This file contains R definitions and functions for merging data frame data
+# using positional information in the data frames, to be sourced by R code that
+# needs to use it.
 # Author: Ted Toal
 # Date: 2015
 # Brady Lab, UC Davis
-#######################################################################################
+################################################################################
 
-#######################################################################################
+################################################################################
 # A problem is that canCoerce() will return TRUE when something actually is not
 # coercible.  When you try to coerce it, it succeeds but with value NA and a warning
 # message.  We will solve the problem by making our own "coerce" function that will
@@ -28,7 +29,7 @@
 # Returns: obj coerced to type.
 #
 # Notes: This is a general-purpose function even though it is currently used only here.
-#######################################################################################
+################################################################################
 coerceObj = function(obj, type, errfunc, ..., allowNA=FALSE, name=NULL)
     {
     if (!is(obj, type))
@@ -85,7 +86,7 @@ coerceObj = function(obj, type, errfunc, ..., allowNA=FALSE, name=NULL)
     return(obj)
     }
 
-#######################################################################################
+################################################################################
 # Find the rows of df1 and df2 such that df2's position is within df1's contig.
 #
 # Arguments:
@@ -101,7 +102,7 @@ coerceObj = function(obj, type, errfunc, ..., allowNA=FALSE, name=NULL)
 #
 # This operates in time proportional to nrow(df1)*nrow(df2) and so can be very
 # slow for large data frames.  Use findContainsIdxs.recursive instead.
-#######################################################################################
+################################################################################
 findContainsIdxs = function(df1, df2)
     {
     # cat("df2$idx[1]=", df2$idx[1], "\n")
@@ -128,7 +129,7 @@ findContainsIdxs = function(df1, df2)
     return(V)
     }
 
-#######################################################################################
+################################################################################
 # Perform the same thing as findContainsIdxs(), but subdivide the problem to vastly
 # increase efficiency (provided that the contigs in df1 generally do not all overlap
 # each other).
@@ -143,7 +144,7 @@ findContainsIdxs = function(df1, df2)
 # of index pairs, do this:
 #   mtx = matrix(V, ncol=2, byrow=TRUE)
 # The first column is indexes into df1 and the second column is indexes into df2.
-#######################################################################################
+################################################################################
 findContainsIdxs.recursive = function(df1, df2, start, end)
     {
     # cat("df1$idx[1]=", df1$idx[1], " nrow(df1)=", nrow(df1),
@@ -188,7 +189,7 @@ findContainsIdxs.recursive = function(df1, df2, start, end)
     return(V)
     }
 
-#######################################################################################
+################################################################################
 # Helper function for mergeOnMatches() below.  Find the rows of df1 and df2 such that
 # df2's position is within df1's contig.
 #
@@ -200,7 +201,7 @@ findContainsIdxs.recursive = function(df1, df2, start, end)
 # Returns: a matrix with 2 columns.  The first column is row numbers of df1 and the
 # second column is row numbers of df2.  Each row of the matrix identifies a pair of
 # rows (in df1 and df2) that match.
-#######################################################################################
+################################################################################
 findContainsIdxs.rows = function(df1, df2)
     {
     df1[["idx"]] = 1:nrow(df1)
@@ -211,7 +212,7 @@ findContainsIdxs.rows = function(df1, df2)
     return(mtx)
     }
 
-#######################################################################################
+################################################################################
 # Helper function for mergeOnMatches() below.  Find matches of positions in T.position
 # and S.position according to the parameters in "match".
 #
@@ -224,7 +225,7 @@ findContainsIdxs.rows = function(df1, df2)
 # Returns: a matrix with 2 columns.  The first column is indexes of T.position rows
 # and the second column is indexes of S.position rows.  Each row of the matrix
 # identifies a pair of rows (in T.position and S.position) that match.
-#######################################################################################
+################################################################################
 getMatchIdxs = function(T.position, S.position, match)
     {
     # Combine rows of indexes in two matrices of indexes to eliminate duplicates.
@@ -460,7 +461,7 @@ getMatchIdxs = function(T.position, S.position, match)
     return(idxs)
     }
 
-#######################################################################################
+################################################################################
 # Helper function for formatData() below.  This generates strings for the format codes
 # "#T", "#S", "%T", "%S".
 #
@@ -474,7 +475,7 @@ getMatchIdxs = function(T.position, S.position, match)
 # Returns:
 #   A vector of data formatted according to "code", and of length equal to nrow(idxs),
 #   to become part of a new T.df column.
-#######################################################################################
+################################################################################
 positionString = function(code, T.position, S.position, idxs)
     {
     #       {#T} : bp position of S.start in T.df contig, as: -#, +#, or @#, see below.
@@ -533,7 +534,7 @@ positionString = function(code, T.position, S.position, idxs)
     return(S)
     }
 
-#######################################################################################
+################################################################################
 # Helper function for mergeOnMatches() below.  This parses mergeCols[[i]][["format"]]
 # strings and checks their validity, generating an error if invalid.  Optionally it
 # creates the new column values using the format string and match data.
@@ -554,7 +555,7 @@ positionString = function(code, T.position, S.position, idxs)
 # Returns:
 #   If parsing only, NULL is returned invisibly.  Otherwise, a vector of
 #   data formatted according to "format", and of length equal to nrow(idxs).
-#######################################################################################
+################################################################################
 formatData = function(format, T.colnames, S.colnames, T.df=NULL, S.df=NULL, idxs=NULL,
     T.position=NULL, S.position=NULL)
     {
@@ -703,7 +704,7 @@ formatData = function(format, T.colnames, S.colnames, T.df=NULL, S.df=NULL, idxs
     return(fmtstrs)
     }
 
-#######################################################################################
+################################################################################
 # Find position matches between rows of two different data frames, where each data
 # frame contains columns identifying a position.  Copy specified column data from the
 # matching rows of one data frame into the corresponding matching rows of the other.
@@ -866,7 +867,7 @@ formatData = function(format, T.colnames, S.colnames, T.df=NULL, S.df=NULL, idxs
 #       joinSfx: optional character string to append to the end of the joined strings when 'join' is "TRUE".
 #           Defaults to "" (nothing is appended).
 # Example: mergeCols=list(col="genes", before="", format="{+gene_id}({#S})")
-#######################################################################################
+################################################################################
 mergeOnMatches = function(T.df, S.df, T.pos, S.pos, match, mergeCols)
     {
 
@@ -1242,6 +1243,6 @@ mergeOnMatches = function(T.df, S.df, T.pos, S.pos, match, mergeCols)
     return(T.df)
     }
 
-#######################################################################################
+################################################################################
 # End of file.
-#######################################################################################
+################################################################################

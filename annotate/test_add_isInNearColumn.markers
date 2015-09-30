@@ -1,17 +1,20 @@
 ################################################################################
-# Parameter file for annotateFile.R to add a "genes" column to the IGG marker
-# test file and write the result to a new file.  The "genes" column gives the
-# genes overlapping or within 3000 bp up/downstream of each marker, and the
-# position of the gene in base-pairs from the marker.  Specifically:
-#   1. Reads MarkersOverlapping.test.tsv as inputFileT
+# Parameter file for annotateFile.R to add an "isInNear" column to the IGG
+# marker InDels test file and write the result to a new file.  The "isInNear"
+# column gives the gene features (from a gene model file) overlapping or within
+# 1000 bp up/downstream of each InDel, and the position of the feature in
+# base-pairs from the InDel.  Specifically:
+#   1. Reads as inputFileT the file in directory outTestHP11 named:
+# MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv
 #   2. Reads code/R/test_GFFfuncsAndMergeData/ITAG2.4_test.gff3 as inputFileS,
 #       containing a truncated gene model list for the test data used for markers.
 #   3. Adds a new column to the inputFileS data, extracting the attribute named
-#       "Alias" from "gene" feature rows and placing it in new column "gene".
+#       "ID" from "CDS", "intron", "five_prime_UTR", and "three_prime_UTR"
+#       feature rows and placing it in new column "ID".
 #   4. Performs a match-and-merge operation between the two files and adds column
-#       "genes" to the inputFileT data, containing gene name, strand, and relative
-#       base pair position of the gene relative to the marker.
-#   5. Writes the new inputFileT data to file code/R/testOutput/MarkersWithGenes.test.tsv
+#       "isInNear" to the inputFileT data, containing feature ID, strand, and
+#       relative base pair position of the feature relative to the marker.
+#   5. Writes the new inputFileT data to file code/R/testOutput/InDelsWithFeatures.test.tsv
 ################################################################################
 
 ################################################################################
@@ -19,7 +22,7 @@
 ################################################################################
 
 inputFileT:
-    path := "MarkersOverlapping.test.tsv"
+    path := "outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv"
     type := tsv
 
 ################################################################################
@@ -36,9 +39,8 @@ inputFileS:
 
 attrExtractS:
     attributesColumn := attributes
-    keepFeatures := gene
-    extractAttrs := Alias
-    newAttrColumns := gene
+    keepFeatures := CDS,intron,five_prime_UTR,three_prime_UTR
+    extractAttrs := ID
     missingAttrValues := ""
     removeAttrColumns := YES
 
@@ -47,8 +49,8 @@ attrExtractS:
 ################################################################################
 
 positionT:
-    start := HampPos1
-    end := HampPos2
+    start := Hstart
+    end := Hend
     id := Hid
 
 ################################################################################
@@ -67,9 +69,9 @@ positionS:
 
 match:
     method := S.NEAR
-    start.down := 3000
-    end.up := 3000
-    closest := 0
+    closest := 1
+    start.down := 1000
+    end.up := 1000
 
 ################################################################################
 # Match and merge: columns to add and the format of the new column data.
@@ -77,19 +79,19 @@ match:
 
 mergeCols:
     1:
-        col := genes
-        before := NDA
+        col := isInNear
+        before := ""
         maxMatch := 0
         join := YES
         joinSep := ","
-        format := "{+gene}({#T}:{+strand})" # E.g. "Solyc07g008570(@384:+)" means plus strand, overlaps with marker starting 384 bp after gene start.
+        format := "{+ID}({#T}:{+strand})" # E.g. "intron:Solyc07g008570(@384:+)" means plus strand, overlaps with marker starting 384 bp after intron start.
 
 ################################################################################
 # Output file parameters.
 ################################################################################
 
 outputFile:
-    path := "code/R/testOutput/MarkersWithGenes.test.tsv"
+    path := "code/R/testOutput/InDelsWithFeatures.test.tsv"
     type := tsv
     header := YES
     quote := NO
