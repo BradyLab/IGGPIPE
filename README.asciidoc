@@ -19,8 +19,9 @@ Download, Installation, and Running
 
 *Requirements*
 ~~~~~~~~~~~~~~
-* The installation instructions are for Mac OSX. For other systems you are on your own,
-but please take copious notes and send them to me, and I'll update these instructions.
+* The installation instructions are for 64-bit Mac OSX. It has also been tested on
+64-bit Linux.  It will not work on 32-bit Windows.  It has not been tested on
+64-bit Windows.
 
 *Download IGGPIPE files*
 ~~~~~~~~~~~~~~~~~~~~~~~~

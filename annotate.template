@@ -16,11 +16,11 @@
 #
 # This file is currently configured to use the MarkersOverlapping.test.tsv file
 # produced as a result of running IGGPIPE using the test parameter file named
-# allParameters.test.template.  It also uses the file ITAG2.4_test.gff3 in the
-# IGGPIPE subfolder code/R/test_GFFfuncsAndMergeData, which is a gene model file
-# in GFF3 format for the truncated chromosome data testFASTA/ITAG2.4_test.fasta
-# that is used as one of the genomes by allParameters.test.template.  This
-# parameter file configuration adds a column named "genes" to the data in file
+# allParameters.test.  It also uses the file ITAG2.4_test.gff3 in the IGGPIPE
+# subfolder code/R/test_GFFfuncsAndMergeData, which is a gene model file in
+# GFF3 format for the truncated chromosome data testFASTA/ITAG2.4_test.fasta
+# that is used as one of the genomes by allParameters.test.  This parameter
+# file configuration adds a column named "genes" to the data in file
 # MarkersOverlapping.test.tsv that contains a comma-separated list of IDs of
 # genes that overlap or are within 3K bp of the marker.  It writes the new data
 # to file MarkersAnnotated.test.tsv.

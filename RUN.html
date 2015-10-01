@@ -873,31 +873,31 @@ example, I used H=Heinz and P=pennellii for some of my testing.</p></div>
 </li>
 <li>
 <p>
-<strong>Copy allParameters.mytemplate file to new file allParameters.XY</strong>
+<strong>Copy allParameters.template file to new file allParameters.XY</strong>
 </p>
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>IGGPIPE has a number of parameters that must be set to the values you desire. These
-are contained in plain text files whose name starts with "allParameters". During
-IGGPIPE installation, a file should have been created named <strong>allParameters.mytemplate</strong>.
-This is a template containing some parameters already set correctly for your system.
-You need to copy and edit this file to change other parameters to the settings you
-want. You should make a new parameter file for each different set of settings you
+are contained in plain text files whose name starts with "allParameters". IGGPIPE
+provides a template file named <strong>allParameters.template</strong> that you copy and edit to
+create your own "allParameters" files containing the parameter settings you want.</p></div>
+<div class="paragraph"><p>You should make a new parameter file for each different set of settings you
 want to run with IGGPIPE. For example, each new set of genomes would have a different
 parameter file. Also, if you decided to make two different sets of markers from the
 same genomes, using two different parameter settings, you might make two different
 parameter files. Here, we assume to begin with that you are only running your genomes
-with a single set of parameters, and we will name the parameter file allParameters.XY
-where X and Y are the genome capital letters you chose. It is convenient to include
-those letters in the file name, to help you keep multiple parameter file straight.
-<strong>Copy allParameters.mytemplate to allParameters.XY</strong> (substituting your genome letters
+with two genomes and a single set of parameters, and we will name the parameter file
+allParameters.XY, where X and Y are capital letters you chose to represent the two
+genomes. It is convenient to include those letters in the file name, to help you
+keep multiple parameter file straight.</p></div>
+<div class="paragraph"><p><strong>Copy allParameters.template to allParameters.XY</strong> (substituting your genome letters
 for X and Y), using either the Mac&#8217;s Finder or via the command line. For example:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>cd ~/Documents/IGGPIPE    (or whatever is appropriate for your system)
-cp allParameters.mytemplate allParameters.HP    (here, X=H, Y=P)</code></pre>
+cp allParameters.template allParameters.HP    (here, X=H, Y=P)</code></pre>
 </div></div>
-<div class="paragraph"><p>Besides the sample parameter file "allParameters.mytemplate", there are several more
+<div class="paragraph"><p>Besides the sample parameter file "allParameters.template", there are several more
 sample "allParameters" parameter files in the subfolder <em>allParameters</em>.  These
 were used for testing IGGPIPE with various genomes.  The subfolder <em>allParameters</em>
 was made to keep the files better organized and keep the root folder less messy.
@@ -912,16 +912,16 @@ You may want to adopt the same strategy and put your "allParameters" files in th
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>Open the new <strong>allParameters.XY</strong> file created above in your plain text editor
-for editing. For example, you might open your text editor from the command line:</p></div>
+for editing. For example, you might open the <em>nano</em> text editor from the command
+line:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>bbedit allParameters.XY</code></pre>
+<pre><code>nano allParameters.XY</code></pre>
 </div></div>
 <div class="paragraph"><p>If you are in a hurry, you don&#8217;t need to read anything in the file, but
-can simply <strong>search for "##\# "</strong> (that&#8217;s supposed to be three hash symbols with no
-backslashes, so ignore backslashes if there are any), which are comment lines
+can simply <strong>search for "#@@"</strong>, which are comment lines
 marking items that may need to be changed.</p></div>
-<div class="paragraph"><p>Each "##\#" comment says whether it must be changed, might need to
+<div class="paragraph"><p>Each "#@@" comment says whether it must be changed, might need to
 be changed, or probably will never need to be changed, etc. Many of these items
 typically will never need to be changed, so the actual number of changes that need
 to be made is smaller than it might first appear. Some of the parameters have
@@ -934,12 +934,11 @@ parameter values for your needs.</p></div>
 </li>
 <li>
 <p>
-<strong>Search for "##\# " (ignore that backslash til I figure out how to get rid of it)
-and set parameters to desired values</strong>
+<strong>Search for "#@@" and set parameters to desired values</strong>
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>Search for "##\# " in the allParameters.XY file and check each one to see if it
+<div class="paragraph"><p>Search for "#@@" in the allParameters.XY file and check each one to see if it
 needs to be changed. If so, set it to the value you desire. Parameters you will
 definitely want to review and consider are:</p></div>
 <div class="olist loweralpha"><ol class="loweralpha">
@@ -1020,11 +1019,11 @@ edit the file and make the desired changes. For example, you might change the
 parameters that determine the acceptable <em>range of primer Tm values</em>. If you
 have several different setting values you use, you will probably want to keep
 a directory of different primer3settings.txt files and copy the needed one
-prior to each run of IGGPIPE. When testing IGGPIPE using the allParameters.test
-file that was created during installation, always copy primer3settings.default.txt
-to primer3settings.txt.</p></div>
+to "primer3settings.txt" prior to each run of IGGPIPE. When testing IGGPIPE
+using the allParameters.test file that was created during installation, always
+copy primer3settings.default.txt to primer3settings.txt first.</p></div>
 <div class="paragraph"><p>The Primer3 user manual (<a href="http://primer3.sourceforge.net/primer3_manual.htm">http://primer3.sourceforge.net/primer3_manual.htm</a>)
-describes all the parameters.</p></div>
+describes all the Primer3 settings file parameters.</p></div>
 </div></div>
 </li>
 <li>
@@ -1047,7 +1046,12 @@ it can take quite a long time to run genomes all the way through the IGGPIPE
 software. Depending on your computer speed and memory, it can take hours or even
 days. If an error occurs, <em>make</em> will stop, and an error message should be visible
 on the terminal. After fixing the error, all you have to do resume the pipeline
-commands from the last successful step is re-enter the same <em>make</em> command.</p></div>
+commands from the last successful step is re-enter the same <em>make</em> command.
+<em>make</em> knows which step to start at because it knows all the files to be produced
+by the pipeline, as they are specified in allParameters.XY, and it checks to see
+if the files exist, and starts at the pipeline step whose output file does not
+exist. Manually deleting a file will also cause <em>make</em> to run the pipeline
+starting at the step needed to make that file.</p></div>
 <div class="paragraph"><p>You must finish editing the allParameters.XY file before trying to run the pipeline
 using <em>make</em>. If that file is ready to go, you can start running IGGPIPE using the
 command <em>make</em> from the command line, with additional command arguments. The first
@@ -1055,7 +1059,8 @@ argument that is required is of the form "PARAMS=&lt;allParameters filename&gt;"
 example, if your allParameters file is named "allParameters.XY", then the <em>make</em>
 command starts out as <em>make PARAMS=allParameters.XY</em>.</p></div>
 <div class="paragraph"><p>The remaining command arguments for the <em>make</em> command tell which part of the
-pipeline to run. If the argument is <em>ALL</em>, the entire pipeline is run (or as
+pipeline to run. If no additional argument is given or if the argument is <em>ALL</em>,
+the entire pipeline is run (or as
 much of it as is needed to resume where a previous error had halted). However,
 since the choice of some of the parameters, especially the value of K, can have
 a strong influence on the number of markers found, it is best to run IGGPIPE a
@@ -1094,7 +1099,12 @@ commands <em>| tee logFiles/make_kmerIsect_HP14.txt</em>, as in this example:</p
 <pre><code>make PARAMS=allParameters.XY kmerIsect | tee logFiles/make_kmerIsect_HP14.txt</code></pre>
 </div></div>
 <div class="paragraph"><p>Then, after <em>make</em> finishes, you can examine that log file at any time to see
-what the pipeline output was. You should use the <em>tee</em> command each time you
+what the pipeline output was, for example:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>more logFiles/make_kmerIsect_HP14.txt</code></pre>
+</div></div>
+<div class="paragraph"><p>You should use the <em>tee</em> command each time you
 run the pipeline unless you are sure you won&#8217;t want to reexamine the output
 later. We will not show the <em>tee</em> command in the instructions below, however.
 It is up to you to decide whether to use it.</p></div>
@@ -1461,7 +1471,7 @@ Rscript code/R/dotplot.R dotplot.XY    (or whatever name you gave the parameter 
 the name specified in the parameter file. Use multiple parameter files with different
 settings to explore different regions of the genomes in greater resolution.</p></div>
 <div class="paragraph"><p>The "dotplot.template" file is configured for generating a dot plot file
-using the LCRs generated via the allParameters.test.template configuration file.</p></div>
+using the LCRs generated via the allParameters.test configuration file.</p></div>
 <div class="paragraph"><p>Besides the sample parameter file "dotplot.template" (which has settings for
 testing the IGGPIPE installation), there are several more sample "dotplot" parameter
 files in the subfolder <em>dotplot</em>, that were used for plotting data from various
@@ -1959,7 +1969,7 @@ in each genome is end-start-1.</p></td>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-09-28 06:00:25 PDT
+Last updated 2015-10-01 09:25:29 PDT
 </div>
 </div>
 </body>

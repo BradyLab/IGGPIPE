@@ -772,9 +772,9 @@ Rename the unzipped folder from "IGGPIPE-master" to just "IGGPIPE".
 <p>
 If you are a GitHub user and wish to use the IGGPIPE GitHub repository directly,
 instead of the above steps, you can fork the IGGPIPE repository and work on your own
-copy. The <em>work</em> branch is where I do work. The <em>master</em> branch is where the
-releases reside, each tagged with a version number. You can create a branch whose
-contents are the same as a tagged version with the command:
+copy. The <em>master</em> branch is where the releases reside, each tagged with a version
+number. You can create a branch whose contents are the same as a tagged version
+with the command:
 </p>
 <div class="openblock">
 <div class="content">
@@ -795,14 +795,13 @@ contents are the same as a tagged version with the command:
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-<strong>Mac OSX System</strong>
+<strong>64-bit Mac OSX or Linux System</strong>
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>This assumes installation is on a Mac OSX system.  For Linux or Windows systems,
-you should be able to do the installation without too much trouble, using these
-instructions as a guide.  Please take detailed notes and email them to me,
-especially if you are successful! I will incorporate them into these instructions.</p></div>
+<div class="paragraph"><p>This describes installation on a 64-bit Mac OSX system.  For 64-bit Linux, we have
+tested it and tried to include installation differences here.  It will not work on
+32-bit Windows systems.  It should work on 64-bit Windows systems but is untested.</p></div>
 </div></div>
 </li>
 <li>
@@ -814,8 +813,10 @@ especially if you are successful! I will incorporate them into these instruction
 <div class="paragraph"><p>Before starting the installation, consider whether the computer on which the
 software is to be installed has enough memory for the problem at hand. I have
 been running IGGPIPE using 16GB of RAM, and I&#8217;d recommend no less than that amount.
-For larger genomes, you may need more. My computer has a 2.4 GHz processor, which
-has been adequate.</p></div>
+For larger genomes or more genomes, you will need more. My computer has a 2.4 GHz
+processor, which has been adequate. You should monitor memory usage while the
+pipeline is running, and if it becomes excessive for your computer, you know you
+will need more memory to run those genomes.</p></div>
 </div></div>
 </li>
 <li>
@@ -856,8 +857,10 @@ directory with this command:</p></div>
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>You must have a plain text editor you know how to use.  If nothing else, the Mac
-<em>TextEdit</em> program will work (use Plain Text format).  The free open-source
+<div class="paragraph"><p>You must have a plain text editor you know how to use.  If nothing else, the
+simple editor <em>nano</em>, which comes with Mac and Linux systems, will work. On
+a Mac you can also use the <em>TextEdit</em> program will work (use Plain Text
+format).  For Mac, the free open-source
 TextWrangler program is strongly recommended, and its $50 more capable version
 called BBEdit is totally worth the money for anyone who regularly edits text files.
 TextWrangler is available from the Apple App Store (Applications, App Store) or
@@ -912,7 +915,7 @@ MUSCLE (V3.8.31 works) (<a href="http://www.drive5.com/muscle/downloads.htm">htt
 </li>
 <li>
 <p>
-<strong>Some of the above will require compilation and build on your computer using <em>make</em>:</strong>
+<strong>Two of the above will require compilation and build on your computer using <em>make</em>:</strong>
 </p>
 <div class="openblock">
 <div class="content">
@@ -924,7 +927,7 @@ Jellyfish
 </li>
 <li>
 <p>
-e-PCR
+e-PCR (only requires compile on Mac OSX)
 </p>
 </li>
 </ol></div>
@@ -947,61 +950,50 @@ commands.</strong></p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-<strong>Copy allParameters.template file to new file allParameters.mytemplate</strong>
+<strong>Copy allPathParameters.template file to new file allPathParameters.ours</strong>
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>A variety of applications must be installed. Before installing them, it is
-helpful to prepare a text file for editing. There is a text file in the
-IGGPIPE main directory that contains parameter settings for running IGGPIPE:
-  * allParameters.template is a template file containing sample settings for
-    running IGGPIPE on your genome data.</p></div>
-<div class="paragraph"><p>The file includes settings of paths where applications have been installed.
-Although you may make many copies of the file for running IGGPIPE using different
-genomes or parameters, all will have the same application paths in them. To
-make your own template file containing your own application paths, copy the
-file to a new filename, replacing ".template" with ".mytemplate". You will edit
-the new file and add application paths to it as you install applications. You
-can do the copying in Mac&#8217;s Finder or from the command line:</p></div>
+<div class="paragraph"><p>A variety of applications must be installed. Before installing them, you should
+prepare a text file for editing. There is a text file in the IGGPIPE main
+directory that contains tool path settings for running IGGPIPE:
+allPathParameters.template.</p></div>
+<div class="paragraph"><p>The file provides settings of paths where applications have been installed, and
+related settings. To make your own version of this file containing your own
+application paths, copy the file to a new filename, replacing ".template" with
+".ours":</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>cp allParameters.template allParameters.mytemplate</code></pre>
+<pre><code>cp allPathParameters.template allPathParameters.ours</code></pre>
 </div></div>
 </div></div>
 </li>
 <li>
 <p>
-<strong>Open the allParameters.mytemplate file in a plain text editor</strong>
+<strong>Open the allPathParameters.ours file in a plain text editor</strong>
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>Open the new allParameters.mytemplate file created above in your plain text editor
+<div class="paragraph"><p>Open the new allPathParameters.ours file created above in your plain text editor
 for editing. If you are in a hurry, you don&#8217;t need to read anything in the file, but
-can simply search for "##\# " (that&#8217;s supposed to be three hash symbols with no
-backslashes, so ignore backslashes if there are any), which are comment lines
-marking items that may need
-to be changed. Each "##\#" comment says whether it must be changed, might need to
-be changed, or probably will never need to be changed, etc. Many of these items
-typically will never need to be changed, so the actual number of changes
-that need to be made is smaller than it might first appear. It is recommended that
-at some point you take time to read through the file, as the comments
-explain the purpose of each parameter, and you will need to know this
-information, at least for key parameters, in order to run IGGPIPE properly.
-For example, if your text editor is bbedit, you might use the command line to
-open your editor to edit the template file:</p></div>
+can simply search for "@@", which are comment lines
+marking items that may need to be changed. Each "@@" comment says whether
+it must be changed, might need to be changed, or probably will never need to be
+changed, etc. For example, if your text editor is nano, you might use this
+command line to open your editor to edit the template file:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>bbedit allParameters.mytemplate</code></pre>
+<pre><code>nano allPathParameters.ours</code></pre>
 </div></div>
 </div></div>
 </li>
 <li>
 <p>
-<strong>Set WD to your IGGPIPE directory in the allParameters.mytemplate file</strong>
+<strong>Set WD to your IGGPIPE directory in the allPathParameters.ours file</strong>
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>Search for "##\# " in the allParameters.mytemplate file and locate the one that is
+<div class="paragraph"><p>Search for "#@@" in the allPathParameters.ours file and locate the one that is
 followed by a line setting the value of the "WD" parameter.  It looks like:</p></div>
 <div class="literalblock">
 <div class="content">
@@ -1024,6 +1016,7 @@ the IGGPIPE files). For example, maybe it would look like this:</p></div>
 <div class="paragraph"><p>IGGPIPE makes use of a utility called <em>make</em>, and also, some of the applications used
 by IGGPIPE are distributed as source code that must be compiled and built into a runnable
 application on the user&#8217;s computer, which requires a C<code> compiler (g</code> utility). On
+Linux, these utilities are already installed so you can skip this step. On
 Mac OSX, the Apple Developer Toolkit named Xcode provides these utilities, and it is
 available free from the Apple App Store (Applications, App Store).
 Xcode is a good thing to have installed anyway, for anyone doing bioinformatics work.
@@ -1052,36 +1045,6 @@ as <em>make</em> and <em>g++</em> are installed, and if not, installs them:</p><
 </li>
 <li>
 <p>
-<strong>Enable Access to FileMerge (optional, but this or any other file merge utility will be helpful later)</strong>
-</p>
-<div class="openblock">
-<div class="content">
-<div class="paragraph"><p>There is a marvelous file comparison and merging tool called <em>FileMerge</em> that
-comes with Xcode. It will be handy for two subsequent steps. It is initially
-hidden within Xcode, but you can put it in your dock to make it more easily
-accessible. To run it, start Xcode, then on the menu choose Xcode,
-Open Developer Tool, FileMerge.  When it opens up, find its icon on the dock
-and set it to stay put in the dock, then you can close Xcode and in the future
-get to it directly from the dock.</p></div>
-<div class="paragraph"><p>When you run FileMerge, it prompts for two or three or four file names.
-To see an example of use, enter the first two file names, "left" and "right",
-setting "left" to allParameters.template and "right" to allParameters.test.template,
-then click "Compare". You will see a comparison of the two files, with the
-differences clearly shown. If you wanted to incorporate changes from one of
-these files into the other, you can do this easily by using the up/down arrow
-keys to go through the differences one
-by one, and use the left/right arrow keys to select whether you want the left or
-right side file text in the output, and you can also click in the box on the
-bottom that shows the merged text and edit it; when finished you can save the
-merged text to a new file or overwrite one of the two compared files, using
-File, Save Merge. Since we don&#8217;t want to merge these files, exit FileMerge
-without saving anything.</p></div>
-<div class="paragraph"><p>There is also additional useful functionality by using the "Ancestor" file box,
-which will will make use of below.</p></div>
-</div></div>
-</li>
-<li>
-<p>
 <strong>Install Jellyfish and set its path</strong>
 </p>
 <div class="openblock">
@@ -1106,7 +1069,8 @@ mkdir src
 cp Downloads/jellyfish-2.2.3 src</code></pre>
 </div></div>
 <div class="paragraph"><p>This version of IGGPIPE was tested with Jellyfish version 2.2.3.  Newer versions should
-work as well.</p></div>
+work as well. <em>Older versions will not work, because Jellyfish changed its output file
+names. They used to end with _0 but no longer do!</em></p></div>
 <div class="paragraph"><p>Now the jellyfish program must be compiled and built into an application, and installed
 on your computer.  I used these commands, which worked without error:</p></div>
 <div class="literalblock">
@@ -1124,8 +1088,8 @@ and that I could run it with these commands:</p></div>
 <pre><code>which jellyfish
 jellyfish --version</code></pre>
 </div></div>
-<div class="paragraph"><p>Finally, the allParameters.mytemplate file must have the path to Jellyfish included in
-it. Search the files for "##\# " and assign the path to Jellyfish, which was shown when
+<div class="paragraph"><p>Finally, the allPathParameters.ours file must have the path to Jellyfish included in
+it. Search the files for "#@@" and assign the path to Jellyfish, which was shown when
 you gave the "which jellyfish" command above, to the parameter "PATH_JELLYFISH".
 The path will probably already be correct because Jellyfish usually gets installed
 in a standard location.</p></div>
@@ -1176,7 +1140,7 @@ perl --version</code></pre>
 Explicit installation instructions are not given here.  Follow the instructions
 provided in the downloaded installation package, then re-run the "which perl" command
 to find the path to it.</p></div>
-<div class="paragraph"><p>The allParameters.mytemplate file must have the path to Perl included in it.
+<div class="paragraph"><p>The allPathParameters.ours file must have the path to Perl included in it.
 Assign the path, which was shown with the "which perl" command, to the parameter
 "PATH_PERL". For example, maybe your path will be:</p></div>
 <div class="literalblock">
@@ -1216,7 +1180,7 @@ Rscript --version</code></pre>
 Explicit installation instructions are not given here.  Follow the instructions
 provided in the downloaded installation package, then re-run the "which Rscript"
 command to find the path to it.</p></div>
-<div class="paragraph"><p>The allParameters.mytemplate file must have the path to RScript included in it.
+<div class="paragraph"><p>The allPathParameters.ours file must have the path to RScript included in it.
 Assign the path, which was shown with the "which RScript" command, to the parameter
 "PATH_RSCRIPT". For example, maybe your path will be:</p></div>
 <div class="literalblock">
@@ -1251,7 +1215,7 @@ it. Look for it here:</p></div>
 <div class="paragraph"><p>It comes pre-built for OSX, so make sure you download the OSX version. Put the
 downloaded directory wherever you want on your computer. The file named
 primer3_core in the root directory of the downloaded package is the executable
-program file. The allParameters.mytemplate file must have the path to primer3_core
+program file. The allPathParameters.ours file must have the path to primer3_core
 included in it. Assign the path to the parameter "PATH_PRIMER3CORE". For example,
 maybe you put the downloaded folder into your Documents folder and you set the
 parameter as follows:</p></div>
@@ -1283,23 +1247,28 @@ fine. To install e-PCR, look for it here:</p></div>
 <pre><code>http://www.ncbi.nlm.nih.gov/tools/epcr</code></pre>
 </div></div>
 <div class="paragraph"><p>The download link uses FTP protocol. Log in as user GUEST with no password.
-Look for the latest .zip version and copy the zip file to your computer and unzip
-it.  Put the unzipped directory wherever you want on your computer.</p></div>
-<div class="paragraph"><p>It is now necessary to run <em>make</em> to compile and build the program. Version 2.3.12
-had two problems with it that required editing of the source code in order for the
-<em>make</em> operation to complete successfully. Perhaps these problems will have been
-fixed in the version you download. Test it by trying to build e-PCR. Change into
-the directory that you unzipped and enter the following command:</p></div>
+Look for the latest .zip version (Mac), tar.gz (Linux), or binary folder (win32)
+and copy the file or folder to your computer and unzip it as needed. Put the
+unzipped directory wherever you want on your computer.</p></div>
+<div class="paragraph"><p>For Linux and Windows, binary distributions of e-PCR are available at that download
+link, so once downloaded, you should be able to run e-PCR without further ado.  With
+OSX, however, it is now necessary to run <em>make</em> to compile and build the program.
+Version 2.3.12 had two problems with it that required editing of the source code
+in order for the <em>make</em> operation to complete successfully. Perhaps these problems
+will have been fixed in the version you download (or perhaps a binary version will
+be available for Mac also at the time you download). Test by trying to build e-PCR.
+Change into the directory that you unzipped and enter the following command:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>cd e-PCR-2.3.12
+<pre><code>(Mac only)
+cd e-PCR-2.3.12
 make LF64LDFLAGS= LF64CCFLAGS=-DNATIVE_LARGEFILES COMMON_CC_FLAGS=-w</code></pre>
 </div></div>
 <div class="paragraph"><p>If the <em>make</em> completes without error, there will be a file named "e-PCR" in the
 directory, and if you run it, it will display a page full of usage info:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>e-PCR    (Run e-PCR)</code></pre>
+<pre><code>e-PCR    (Run e-PCR to see if it works)</code></pre>
 </div></div>
 <div class="paragraph"><p>If you get errors from the <em>make</em> like I did, here are the changes I made that
 allowed the <em>make</em> to succeed:</p></div>
@@ -1329,13 +1298,14 @@ Edit file minilcs.hpp and insert the following two lines after the line
 e-PCR    (Run e-PCR)</code></pre>
 </div></div>
 <div class="paragraph"><p>The <em>make</em> should succeed and e-PCR should display its usage information, meaning
-you are good to go.  Now the allParameters.mytemplate file must have the path to
-e-PCR included in it. Assign the path to the parameter "PATH_EPCR". For example,
-maybe you unzipped the zip file in your Documents folder and you set the parameter
-as follows:</p></div>
+you are good to go.</p></div>
+<div class="paragraph"><p>Now the allPathParameters.ours file must have the path to e-PCR included in it.
+Assign the path to the parameter "PATH_EPCR". For example, maybe you unzipped
+the zip file in your Documents folder and you set the parameter as follows:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>PATH_EPCR := ~/Documents/e-PCR-2.3.12/e-PCR</code></pre>
+<pre><code>(Mac, Linux, and Windows)
+PATH_EPCR := ~/Documents/e-PCR-2.3.12/e-PCR</code></pre>
 </div></div>
 <div class="paragraph"><p>or, if e-PCR is on your path, you can optionally use simply:</p></div>
 <div class="literalblock">
@@ -1363,7 +1333,7 @@ here:</p></div>
 <div class="paragraph"><p>The executable images are already built, so choose the correct download for your
 system and download the file, putting it wherever you want on your computer, such
 as a bin folder.</p></div>
-<div class="paragraph"><p>Now the allParameters.mytemplate file must have the path to MUSCLE included in it.
+<div class="paragraph"><p>Now the allPathParameters.ours file must have the path to MUSCLE included in it.
 Assign the path to the parameter "PATH_ALIGNER". For example, maybe you put the
 downloaded file in a <em>bin</em> folder in your user directory and you set the parameter
 as follows:</p></div>
@@ -1406,7 +1376,7 @@ folders.  It should complete without error, and there will be a file named
 "findMers" in the directory, and when that file is run with the <em>findMers</em>
 command shown above following <em>make</em>, it will display a page of usage
 information. The path to "findMers" is already set correctly in the
-allParameters.mytemplate file.</p></div>
+allPathParameters.ours file.</p></div>
 </div></div>
 </li>
 <li>
@@ -1440,7 +1410,7 @@ you should set the $(CMD_DELETE) method as the delete method:</p></div>
 </li>
 <li>
 <p>
-<strong>Copy primer3settings.default.txt and later you might edit Primer3 settings</strong>
+<strong>Copy primer3settings.default.txt</strong>
 </p>
 <div class="openblock">
 <div class="content">
@@ -1448,111 +1418,60 @@ you should set the $(CMD_DELETE) method as the delete method:</p></div>
 primers. Several sample settings files come with Primer3, in its root directory.
 One of these, <strong>primer3web_v4_0_0_default_settings.txt</strong>, was copied and modified
 for use with IGGPIPE. The file is named <strong>primer3settings.default.txt</strong>, in the main
-IGGPIPE directory. One important change was to set parameter PRIMER_NUM_RETURN
-to 1 instead of its default 5.</p></div>
-<div class="paragraph"><p>You will want to be able to set the Primer3 settings appropriately for your needs.
-To do this, copy primer3settings.default.txt to primer3settings.txt:</p></div>
+IGGPIPE directory. The following required changes were made to it:
+. P3_FILE_ID was set to a descriptive settings title.
+. PRIMER_EXPLAIN_FLAG was changed from 1 to 0.
+. PRIMER_PRODUCT_SIZE_RANGE was set to a simplified 36-300 (primers are designed
+with most intervening DNA sequence removed)
+. PRIMER_NUM_RETURN was changed from 5 to 1.
+. PRIMER_GC_CLAMP was changed from 0 to 1 (optional but recommended).</p></div>
+<div class="paragraph"><p>Copy primer3settings.default.txt to primer3settings.txt:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>cp primer3settings.default.txt primer3settings.txt</code></pre>
 </div></div>
-<div class="paragraph"><p><em>This is all you need to do, IGGPIPE will work with this version, which is the
-required version for running the test of IGGPIPE.</em></p></div>
-<div class="paragraph"><p>After finishing installation, and prior to any run of IGGPIPE, you can edit
-primer3settings.txt file with your text editor and make any changes that are
-important for your needs. For example, you might change the parameters that
-determine the acceptable <em>range of primer Tm values</em>. If you have several
-different setting values you use, you will probably want to keep a directory
-of different primer3settings.txt files and copy the needed one prior to each
-run of IGGPIPE.</p></div>
-<div class="paragraph"><p>The Primer3 user manual (<a href="http://primer3.sourceforge.net/primer3_manual.htm">http://primer3.sourceforge.net/primer3_manual.htm</a>)
-describes all the parameters.</p></div>
-<div class="paragraph"><p>To see what was changed in the primer settings file, you can use FileMerge,
-introduced above. I recommend you run it now to compare primer3settings.txt
-to primer3web_v4_0_0_default_settings.txt in the Primer3 folder to see these
-changes.</p></div>
-<div class="paragraph"><p>An explanation of the sequence data IGGPIPE gives Primer3 in order to generate
-primers will be helpful, particularly in understanding the setting of the
-parameter PRIMER_PRODUCT_SIZE_RANGE. Since IGGPIPE is making primers to be used
-in different genomes with different sequences and sequence lengths between
-the two primer sites, it cannot use the typical method of giving Primer3 the
-entire sequence between the two primer sites. Instead, IGGPIPE gives Primer3
-the concatenation of two short sequences, one around each of the two k-mers
-that define and anchor the candidate IGG marker. Each sequence is equal to
-K plus twice EXTENSION_LEN in length. Both K (the k-mer length) and EXTENSION_LEN
-(the number of bases to add on each side of the k-mer) are defined in
-allParameters.mytemplate. Thus, the sequence that Primer3 uses for designing
-the primers is equal to 2K + 4*EXTENSION_LEN in length. IGGPIPE also gives
-Primer3 a value for its parameter SEQUENCE_PRIMER_PAIR_OK_REGION_LIST.
-This tells Primer3 to design one primer in the left half of the sequence and
-one primer in the right half. Thus, the primer product size will appear to
-Primer3 to be much smaller than the actual amplicon size will be, which is
-why PRIMER_PRODUCT_SIZE_RANGE can be set to a smaller value than the amplicon
-sizes.</p></div>
-<div class="paragraph"><p>Although Primer3 is a stable program and unlikely to change a
-lot, if new versions of Primer3 add parameters, you might want to incorporate
-them into primer3settings.txt. You will see new parameters if you
-run FileMerge to compare primer3settings.txt to Primer3&#8217;s file
-primer3web_v4_0_0_default_settings.txt.</p></div>
+<div class="paragraph"><p>This makes primer3settings.txt available for editing by you, should you want to
+change Primer3 settings for your needs, while keeping a pristine copy in the
+original primer3settings.default.txt file.</p></div>
+<div class="paragraph"><p><em>This file copy is all you need to do, IGGPIPE will work with this version,
+and this is the required version for running the test of IGGPIPE.</em></p></div>
+<div class="paragraph"><p>The RUN instructions for IGGPIPE indicate that primer3settings.txt should be
+edited if you want to change primer settings for your needs. However, whenever
+you want to run the test of IGGPIPE as shown below, you should re-do the above
+copy to use the pristine file for testing.</p></div>
 </div></div>
 </li>
 <li>
 <p>
-<strong>Copy allParameters.test.template file to new file allParameters.test and add
-the changes made to allParameters.mytemplate</strong>
+<strong>Enable Access to FileMerge (optional, Mac only)</strong>
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>File allParameters.test.mytemplate is more-or-less a copy of the allParameters.template
-file, modified for testing IGGPIPE, as you saw above if you did testing of FileMerge.
-Copy it to a new filename, leaving off the <em>.mytemplate</em> suffix:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>cp allParameters.test.mytemplate allParameters.test</code></pre>
-</div></div>
-<div class="paragraph"><p>You now must incorporate the same changes you just made to allParameters.mytemplate
-into allParameters.test. The most straightforward way to do this it to simply edit
-it, for example:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>bbedit allParameters.test</code></pre>
-</div></div>
-<div class="paragraph"><p>and add the same changes to it that you added to allParameters.mytemplate.</p></div>
-<div class="paragraph"><p>A more reliable way to do this is to use FileMerge. To use it,
-start FileMerge and set the four file text boxes to the following files:</p></div>
-<div class="olist loweralpha"><ol class="loweralpha">
-<li>
-<p>
-Left: allParameters.test.template file path
-</p>
-</li>
-<li>
-<p>
-Right: allParameters.mytemplate file path
-</p>
-</li>
-<li>
-<p>
-Ancestor: allParameters.template file path
-</p>
-</li>
-<li>
-<p>
-Merge: allParameters.test file path
-</p>
-</li>
-</ol></div>
-<div class="paragraph"><p>Now when you click "Compare", the majority of the arrows in the center of the FileMerge
-screen will point left, indicating that the essential changes in allParameters.test.template
-will be retained. However, every line you changed in allParameters.mytemplate should have
-an arrow pointing to the right, to your changed line (because the Right file differs from
-the Ancestor file), indicating that your changes will be incorporated into the merged file
-shown at the bottom. Go through to make sure all your changes have right arrows, and all
-the other differences have arrows pointing to the left. If necessary, you can click in the
-merge window at the bottom and edit the merged text. Then choose File, Save Merge, and the
-allParameters.test file will be overwritten with a new version containing your new
-parameter settings (application paths, mainly). Load allParameters.test into your text
-editor and quickly browse it to make sure it looks correct.</p></div>
+<div class="paragraph"><p>Parameter settings files (allParameters.* and allPathParameters.*) and
+Primer3 settings files (primer3settings.txt) can be edited by the user. You
+might at some time wish to see what changes were made to a file by comparing it
+to another similar file. The <em>diff</em> command can be used on the command line to
+do this. Another program, available on Mac OSX, is <em>FileMerge</em>, a great file
+comparison and merging tool that comes with Xcode. It is initially
+hidden within Xcode, but you can put it in your dock to make it more easily
+accessible.</p></div>
+<div class="paragraph"><p>To run FileMerge, start Xcode, then on the menu choose Xcode,
+Open Developer Tool, FileMerge.  When it opens up, find its icon on the dock
+and set it to stay put in the dock, then you can close Xcode and in the future
+get to it directly from the dock.</p></div>
+<div class="paragraph"><p>When you run FileMerge, it prompts for two or three or four file names.
+To see an example of use, enter the first two file names, "left" and "right",
+setting "left" to allParameters.template and "right" to allParameters.test,
+then click "Compare". You will see a comparison of the two files, with the
+differences clearly shown. If you wanted to incorporate changes from one of
+these files into the other, you can do this easily by using the up/down arrow
+keys to go through the differences one
+by one, and use the left/right arrow keys to select whether you want the left or
+right side file text in the output, and you can also click in the box on the
+bottom that shows the merged text and edit it; when finished you can save the
+merged text to a new file or overwrite one of the two compared files, using
+File, Save Merge. Since we don&#8217;t want to merge these files, exit FileMerge
+without saving anything.</p></div>
 </div></div>
 </li>
 <li>
@@ -1564,11 +1483,9 @@ editor and quickly browse it to make sure it looks correct.</p></div>
 <div class="paragraph"><p>Everything is now ready to run the IGGPIPE pipeline. Data for testing it is provided
 in the testFASTA folder. This consists of two FASTA files that are truncated versions
 of the S. lycopersicum (tomato) and S. pennellii genomes, with only two chromosomes
-(1 and 2) and only about 14 Mbp for each one. The parameter file allParameters.test.template
-has parameters set for using these FASTA files and doing the test. You edited that
-parameter file in the previous step to create file allParameters.test, containing the
-appropriate parameter values that point to the applications and programs you installed
-above.</p></div>
+(1 and 2) and only about 14 Mbp for each one. The parameter file allParameters.test
+has parameters set for using these FASTA files and doing the test. It is more-or-less
+a copy of the allParameters.template file, modified for testing IGGPIPE.</p></div>
 <div class="paragraph"><p>To test IGGPIPE, from the command line in the IGGPIPE main directory, enter this command:</p></div>
 <div class="literalblock">
 <div class="content">
@@ -1707,6 +1624,46 @@ You can examine this file with a text editor or Excel to see the new column.</p>
 other types of files or do other types of file data manipulation.</p></div>
 </div></div>
 </li>
+<li>
+<p>
+<strong>Edit primer3settings.txt (optional)</strong>
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>After finishing installation, and prior to any run of IGGPIPE, you may want to
+edit primer3settings.txt file and make any changes that are
+important for your needs. For example, you might change the parameters that
+determine the acceptable <em>range of primer Tm values</em>. If you have several
+different setting values you use, you will probably want to keep a directory
+of different primer3settings.txt files and copy the needed one prior to each
+run of IGGPIPE.</p></div>
+<div class="paragraph"><p>The Primer3 user manual (<a href="http://primer3.sourceforge.net/primer3_manual.htm">http://primer3.sourceforge.net/primer3_manual.htm</a>)
+describes all the parameters.</p></div>
+<div class="paragraph"><p>An explanation of the sequence data IGGPIPE gives Primer3 in order to generate
+primers will be helpful, particularly in understanding the setting of the
+parameter PRIMER_PRODUCT_SIZE_RANGE. Since IGGPIPE is making primers to be used
+in different genomes with different sequences and sequence lengths between
+the two primer sites, it cannot use the typical method of giving Primer3 the
+entire sequence between the two primer sites. Instead, IGGPIPE gives Primer3
+the concatenation of two short sequences, one around each of the two k-mers
+that define and anchor the candidate IGG marker. Each sequence is equal to
+K plus twice EXTENSION_LEN in length. Both K (the k-mer length) and EXTENSION_LEN
+(the number of bases to add on each side of the k-mer) are defined in
+allParameters.template. Thus, the sequence that Primer3 uses for designing
+the primers is equal to 2K + 4*EXTENSION_LEN in length. IGGPIPE also gives
+Primer3 a value for its parameter SEQUENCE_PRIMER_PAIR_OK_REGION_LIST.
+This tells Primer3 to design one primer in the left half of the sequence and
+one primer in the right half. Thus, the primer product size will appear to
+Primer3 to be much smaller than the actual amplicon size will be, which is
+why PRIMER_PRODUCT_SIZE_RANGE can be set to a smaller value than the amplicon
+sizes.</p></div>
+<div class="paragraph"><p>Although Primer3 is a stable program and unlikely to change a
+lot, if new versions of Primer3 add parameters, you might want to incorporate
+them into primer3settings.txt. You will see new parameters if you compare
+primer3settings.txt to Primer3&#8217;s file primer3web_v4_0_0_default_settings.txt
+(for example by using <em>diff</em> or <em>FileMerge</em>).</p></div>
+</div></div>
+</li>
 </ol></div>
 <div class="paragraph"><p><strong>That completes the installation of IGGPIPE.</strong></p></div>
 </div>
@@ -1743,7 +1700,7 @@ Contact me, Ted Toal, <a href="mailto:twtoal@ucdavis.edu">twtoal@ucdavis.edu</a>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-09-28 05:57:19 PDT
+Last updated 2015-10-01 11:15:14 PDT
 </div>
 </div>
 </body>

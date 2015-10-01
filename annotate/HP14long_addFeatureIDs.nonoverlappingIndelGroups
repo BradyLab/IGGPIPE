@@ -1,7 +1,7 @@
 ################################################################################
 # Parameter file for annotateFile.R to add an "isInNear" column to the IGG marker
-# file in subfolder outHP14 named:
-#       MarkersNonoverlapping_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.indels.tsv
+# Indel Groups file in subfolder outHP14 named:
+#       outHP14/IndelGroupsNonoverlapping_K14k2L100D1_3000A100_3000d100_100N2F0.indels.tsv 
 # The "isInNear" column gives the CDSs, introns, five-prime-utr's, and three-
 # prime-utrs overlapping or within 1000 bp up/downstream of each Indel Group,
 # and the position of the feature in base-pairs from the Indel Group.
@@ -14,7 +14,7 @@
 #       "isInNear" to the inputFileT data, containing feature name, strand, and
 #       relative base pair position of the feature relative to the marker.
 #   5. Writes the new inputFileT data to subfolder outHP14 to this file:
-#       MarkersNonoverlappingWithInNearFeatures_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.indels.tsv
+#       IndelGroupsNonoverlappingWithInNearFeatures_K14k2L100D1_3000A100_3000d100_100N2F0.indels.tsv
 ################################################################################
 
 ################################################################################
@@ -22,7 +22,7 @@
 ################################################################################
 
 inputFileT:
-    path := "outHP14/MarkersNonoverlapping_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.indels.tsv"
+    path := "outHP14/IndelGroupsNonoverlapping_K14k2L100D1_3000A100_3000d100_100N2F0.indels.tsv"
     type := tsv
 
 ################################################################################
@@ -88,7 +88,7 @@ mergeCols:
 ################################################################################
 
 outputFile:
-    path := "outHP14/MarkersNonoverlappingWithInNearFeatures_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.indels.tsv"
+    path := "outHP14/IndelGroupsNonoverlappingWithInNearFeatures_K14k2L100D1_3000A100_3000d100_100N2F0.indels.tsv"
     type := tsv
     header := YES
     quote := NO

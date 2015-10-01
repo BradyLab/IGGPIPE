@@ -4,7 +4,6 @@ P3_FILE_TYPE=settings
 PRIMER_FIRST_BASE_INDEX=1
 PRIMER_TASK=generic
 P3_FILE_ID=Settings for picking best primers inside extended k-mers
-PRIMER_THERMODYNAMIC_PARAMETERS_PATH=/Users/tedtoal/bin/primer3_config/
 PRIMER_MIN_THREE_PRIME_DISTANCE=3
 PRIMER_EXPLAIN_FLAG=0
 

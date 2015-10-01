@@ -24,6 +24,7 @@ source(paste(thisDir, "Include_Common.R", sep=""))
 # Get arguments.
 testing = 0
 #testing = 1 # For testing only.
+#testing = 2 # For testing only.
 {
 if (testing == 0)
     args = commandArgs(TRUE)
@@ -34,12 +35,23 @@ else if (testing == 1)
         "outTestHP11/GenomeData/Genome_",
         "outTestHP11/NonvalidatedMarkers_K11k2L100D10_2000A100_2000d10_100N2F0X20.tsv",
         "~/bin/primer3_core", "primer3settings.txt",
+        "/Users/tedtoal/src/primer3-2.3.6/primer3_config",
         "outTestHP11/Primers/Primer3In.txt", "outTestHP11/Primers/Primer3Out.txt", TRUE)
+    }
+else if (testing == 2)
+    {
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
+        "outHPT14/IndelGroupsOverlapping_K14k2L300D5_1500A300_1500d50_300N2F0.tsv",
+        "outHPT14/GenomeData/Genome_",
+        "outHPT14/NonvalidatedMarkers_K14k2L300D5_1500A300_1500d50_300N2F0X15.tsv",
+        "~/bin/primer3_core", "primer3settings.txt",
+        "/Users/tedtoal/src/primer3-2.3.6/primer3_config",
+        "outHPT14/Primers/Primer3In.txt", "outHPT14/Primers/Primer3Out.txt", TRUE)
     }
 else stop("Unknown value for 'testing'")
 }
 
-Nexpected = 9
+Nexpected = 10
 if (length(args) != Nexpected)
     {
     usage = c(
@@ -48,7 +60,7 @@ if (length(args) != Nexpected)
         "sequences.  Write the new candidate IGG marker data including primers to a new file.",
         "",
         "Usage: Rscript findPrimers.R <wd> <indelFile> <seqInPfx> <tsvMarkerFile> \\",
-        "       <primer3core> <primer3settings> <primer3DataFile> <primer3OutFile> <investigate>",
+        "       <primer3core> <primer3settings> <primer3config> <primer3DataFile> <primer3OutFile> <investigate>",
         "",
         "Arguments:",
         "   <wd>              : Path of R working directory, specify other file paths relative to this.",
@@ -58,6 +70,7 @@ if (length(args) != Nexpected)
         "   <tsvMarkerFile>   : Output file to be written containing the candidate marker k-mer pairs with DNA sequences.",
         "   <primer3core>     : Full path of the primer3_core program file",
         "   <primer3settings> : File containing primer3 settings edited for desired IGG marker primer characteristics.",
+        "   <primer3config>   : Path of primer3 config directory containing .ds and .dh thermodynamic parameter files.",
         "   <primer3DataFile> : File in which to place sequence data for primer3 to use to design primers.",
         "   <primer3OutFile>  : File into which primer3 should place its primer design results.",
         "   <investigate>     : FALSE for normal operation, TRUE for more verbose debugging output."
@@ -91,13 +104,16 @@ catnow("  primer3core: ", primer3core, "\n")
 primer3settings = args[6]
 catnow("  primer3settings: ", primer3settings, "\n")
 
-primer3DataFile = args[7]
+primer3config = args[7]
+catnow("  primer3config: ", primer3config, "\n")
+
+primer3DataFile = args[8]
 catnow("  primer3DataFile: ", primer3DataFile, "\n")
 
-primer3OutFile = args[8]
+primer3OutFile = args[9]
 catnow("  primer3OutFile: ", primer3OutFile, "\n")
 
-investigate = as.logical(args[9])
+investigate = as.logical(args[10])
 catnow("  investigate: ", investigate, "\n")
 if (is.na(investigate))
     stop("investigate must be TRUE or FALSE")
@@ -107,7 +123,9 @@ if (is.na(investigate))
 ########################################
 
 # Read indel k-mer pairs data, which become the initial marker candidates.
+catnow("Reading InDel Group file...")
 dfMarkers = read.table(indelFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
+catnow("\n")
 if (nrow(dfMarkers) == 0)
     stop("There are no Indel Groups.")
 inv(dim(dfMarkers), "input markers dim")
@@ -137,6 +155,7 @@ inv(genomeLtrs, "genomeLtrs")
 df = NULL
 for (i in 1:Ngenomes)
     {
+    catnow("Reading DNA sequence data for genome #", i, "...")
     seqInFile = paste(seqInPfx, i, ".dnaseqs", sep="")
     dft = read.table(seqInFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
     dft = dft[order(dft$kmer),]
@@ -164,6 +183,8 @@ for (i in 1:Ngenomes)
         dft = dft[, !colnames(dft) %in% sameCols]
         df = cbind(df, dft)
         }
+    rm(dft)
+    catnow("\n")
     }
 if (nrow(df) == 0)
     stop("There is no indel DNA sequence data.")
@@ -212,6 +233,7 @@ refDnaSeq2Col = dnaSeq2Col[refGenomeLtr]
 # base matches the corresponding reference genome base.
 ########################################
 
+catnow("Replacing bases with '.'...")
 refBases = strsplit(df[, refDnaSeqCol], "", fixed=TRUE)
 for (genome in otherGenomeLtrs)
     {
@@ -222,20 +244,28 @@ for (genome in otherGenomeLtrs)
         v[v == refBases[[i]]] = "."
         return(list(v))
         })
+    rm(genomeBases)
     df[, dnaSeqCol[genome]] = sapply(newBases, paste, collapse="")
+    rm(newBases)
     }
+rm(refBases)
+catnow("\n")
 
 # Put the data frame rows in order by reference genome position.
+catnow("Sorting by reference genome position...")
 df = df[order(df[, refIdCol], df[, refPosCol]),]
 rownames(df) = NULL
+catnow("\n")
 
 # Put the data frame columns in order by genome.
+catnow("Reordering columns...")
 df = df[, c(setdiff(colnames(df), "kmer"), "kmer")]
 for (genome in genomeLtrs)
     {
     genomeCols = colnames(df)[grepl(paste("^", genome, sep=""), colnames(df))]
     df = df[, c(setdiff(colnames(df), genomeCols), genomeCols)]
     }
+catnow("\n")
 
 # The extensionLen value used to extract the DNA sequences.
 extensionLen = (nchar(df[1, refDnaSeqCol]) - kmerLen)/2
@@ -246,15 +276,22 @@ extensionLen = (nchar(df[1, refDnaSeqCol]) - kmerLen)/2
 # dfMarkers as keys to match up with the df$kmer column.
 ########################################
 
+catnow("Matching k-mers 1...")
 kmer1idxs = match(dfMarkers$kmer1, df$kmer)
+catnow("\n")
+catnow("Matching k-mers 1...")
 kmer2idxs = match(dfMarkers$kmer2, df$kmer)
+catnow("\n")
 
 if (any(is.na(kmer1idxs))) stop("Missing kmer1 in primer output")
 if (any(is.na(kmer2idxs))) stop("Missing kmer2 in primer output")
 
+catnow("Merging sequence data...")
 dfMarkers[, dnaSeq1Col] = df[kmer1idxs, dnaSeqCol]
 dfMarkers[, dnaSeq2Col] = df[kmer2idxs, dnaSeqCol]
+rm(df, kmer1idxs, kmer2idxs)
 inv(dim(dfMarkers), "Marker data frame with DNA sequence data dim")
+catnow("\n")
 
 ########################################
 # You may be wondering how primers are made if the extracted sequences in the
@@ -271,27 +308,67 @@ inv(dim(dfMarkers), "Marker data frame with DNA sequence data dim")
 # in reverse complement order, so concatenating the k-mer #1 and k-mer #2
 # sequences is the correct thing to do; k-mer #1 position in that case is >
 # k-mer #2 position.
-seqs = paste(dfMarkers[, refDnaSeq1Col], dfMarkers[, refDnaSeq2Col], sep="")
 
-# Split the sequences apart into vectors of characters.
-seqs = strsplit(seqs, "", fixed=TRUE)
-
-# Convert reference genome sequence bases to N if corresponding base in other
-# genome does not match (is not ".").
-for (genome in otherGenomeLtrs)
+# The following can be extremely intensive in memory usage.  We can easily
+# break this up and do it in pieces to avoid that.  Let's do a million rows of
+# dfMarkers at a time.
+NatOnce = 1000000
+Npasses = as.integer((nrow(dfMarkers)-1)/NatOnce) + 1
+curPass = 0
+curStart = 1
+seqs = c() # Result sequences.
+catnow("Converting '.' to 'N' in DNA sequences...\n")
+while (curStart <= nrow(dfMarkers))
     {
-    seqsO = paste(dfMarkers[, dnaSeq1Col[genome]], dfMarkers[, dnaSeq2Col[genome]], sep="")
-    seqsO = strsplit(seqsO, "", fixed=TRUE)
-    seqs = sapply(1:length(seqs), function(i)
-        {
-        v = seqs[[i]]
-        v[seqsO[[i]] != "."] = "N"
-        return(list(v))
-        })
-    }
+    curEnd = curStart + NatOnce - 1
+    if (curEnd > nrow(dfMarkers))
+        curEnd = nrow(dfMarkers)
+    rng = curStart:curEnd
 
-# Rejoin the split-up sequence characters.
-seqs = sapply(seqs, paste, collapse="")
+    #catnow("Concatenating DNA sequences...")
+    tmpSeqs = paste(dfMarkers[rng, refDnaSeq1Col], dfMarkers[rng, refDnaSeq2Col], sep="")
+    #catnow("\n")
+
+    # Split the sequences apart into vectors of characters.
+    #catnow("Splitting sequences...")
+    tmpSeqs = strsplit(tmpSeqs, "", fixed=TRUE)
+    #catnow("\n")
+
+    # Convert reference genome sequence bases to N if corresponding base in other
+    # genome does not match (is not ".").
+    #catnow("Changing bases to N...\n")
+    for (genome in otherGenomeLtrs)
+        {
+        #catnow("  Concatenating DNA sequences for genome", genome, "...")
+        tmpSeqsO = paste(dfMarkers[rng, dnaSeq1Col[genome]], dfMarkers[rng, dnaSeq2Col[genome]], sep="")
+        #catnow("\n")
+        #catnow("  Splitting sequences for genome", genome, "...")
+        tmpSeqsO = strsplit(tmpSeqsO, "", fixed=TRUE)
+        #catnow("\n")
+        #catnow("  Changing '.' to 'N'...")
+        tmpSeqs = sapply(1:length(tmpSeqs), function(i)
+            {
+            v = tmpSeqs[[i]]
+            v[tmpSeqsO[[i]] != "."] = "N"
+            return(list(v))
+            })
+        rm(tmpSeqsO)
+        #catnow("\n")
+        }
+    #catnow("Done\n")
+
+    # Rejoin the split-up sequence characters.
+    catnow("Rejoining sequence characters...")
+    tmpSeqs = sapply(tmpSeqs, paste, collapse="")
+    seqs = c(seqs, tmpSeqs)
+    rm(tmpSeqs)
+    catnow("\n")
+
+    # Next NatOnce rows of dfMarkers.
+    curStart = curEnd + 1
+    curPass = curPass+1
+    catnow(" ", curPass, " of ", Npasses, "\n", sep="")
+    }
 
 ########################################
 # Create an input file for primer3 to make a pair of primers for each marker.
@@ -302,16 +379,26 @@ seqs = sapply(seqs, paste, collapse="")
 #   SEQUENCE_TEMPLATE=TGGTACAANGGGGTTCATCCGGACCCCNTNNNNNNAAAANTAAAAGAAAAAGACATGACTCGTGACGACAATTTAAATAATT
 #   SEQUENCE_PRIMER_PAIR_OK_REGION_LIST=1,41,42,41
 #   =
+#
+# We write a first line to the input file that gives a path to the primer
+# thermodynamic settings files with PRIMER_THERMODYNAMIC_PARAMETERS_PATH.
 ########################################
 
+catnow("Creating primer3 input file...")
+thermo = paste("PRIMER_THERMODYNAMIC_PARAMETERS_PATH=", primer3config, "/", sep="")
 seqIDs = paste("SEQUENCE_ID=", dfMarkers$kmer1, "_", dfMarkers$kmer2, sep="")
 primerTemplates = paste("SEQUENCE_TEMPLATE=", seqs, sep="")
+rm(seqs)
 seqLen = 2*extensionLen+kmerLen
 primerRegions = paste("SEQUENCE_PRIMER_PAIR_OK_REGION_LIST=1,", seqLen, ",", seqLen+1,",", seqLen, sep="")
 primerRegions = rep(primerRegions, nrow(dfMarkers))
 recordSeps = rep("=", nrow(dfMarkers))
-records = c(rbind(seqIDs, primerTemplates, primerRegions, recordSeps))
+records = c(rbind(thermo, seqIDs, primerTemplates, primerRegions, recordSeps))
+numSeqIDs = length(seqIDs)
+rm(seqIDs, primerTemplates, primerRegions, recordSeps)
 writeLines(records, primer3DataFile)
+rm(records)
+catnow("\n")
 
 ########################################
 # Run primer3 on the sequence data file we just created.
@@ -324,7 +411,7 @@ estimateTime = FALSE
 if (estimateTime)
     {
     maxSecondsPerPrimer = 0.025
-    totalSeconds = round(maxSecondsPerPrimer * length(seqIDs))
+    totalSeconds = round(maxSecondsPerPrimer * numSeqIDs)
     maxMinutes = ceiling(totalSeconds/60)
     catnow("Expect this to take up to", maxMinutes, "minutes on a slower computer.\n")
     }
@@ -336,6 +423,7 @@ system(primer3_cmd)
 ########################################
 
 # Sample output.
+#   PRIMER_THERMODYNAMIC_PARAMETERS_PATH=/Users/tedtoal/src/primer3-2.3.6/primer3_config/
 #   SEQUENCE_ID=GGGGCACAATTGGA_GTCGATCAAAGCAC
 #   SEQUENCE_TEMPLATE=CAATTTAAAATCCAATTGTGCCCCAAATTCTCTTGTCTGAAATTGTGCTTTGATCGACAAAAGTNTCG
 #   SEQUENCE_PRIMER_PAIR_OK_REGION_LIST=1,34,35,34
@@ -379,69 +467,100 @@ system(primer3_cmd)
 #   PRIMER_RIGHT_0_TM
 #   =
 
+# It is possible that the primer3 output file is huge.  We reduce the size of the
+# data vastly by removing unwanted parameters.  So, let's read the file in chunks
+# of NlinesAtOnce until end of file.
+NlinesAtOnce = 1000000
+
+primers = c()   # Collect filtered and simplified data lines here.
 catnow("Processing primer data\n")
-primers = readLines(primer3OutFile)
+isEOF = FALSE
+inFile = file(primer3OutFile, open="r")
+while (!isEOF)
+    {
+    lines = readLines(inFile, n=NlinesAtOnce)
+    if (length(lines) < NlinesAtOnce)
+        isEOF = TRUE
+    if (length(lines) == 0)
+        break
 
-primers = primers[!grepl("SEQUENCE_PRIMER_PAIR_OK_REGION_LIST", primers, fixed=TRUE)]
-primers = primers[!grepl("PRIMER_INTERNAL_NUM_RETURNED", primers, fixed=TRUE)]
-primers = primers[!grepl("_0_GC_PERCENT", primers, fixed=TRUE)]
-primers = primers[!grepl("_0_SELF_END_TH", primers, fixed=TRUE)]
-primers = primers[!grepl("_0_END_STABILITY", primers, fixed=TRUE)]
-primers = primers[!grepl("SEQUENCE_TEMPLATE", primers, fixed=TRUE)]
-primers = primers[!grepl("_NUM_RETURNED", primers, fixed=TRUE)]
-primers = primers[!grepl("_0_SELF_ANY_TH", primers, fixed=TRUE)]
-primers = primers[!grepl("_0_HAIRPIN_TH", primers, fixed=TRUE)]
-primers = primers[!grepl("_0_TEMPLATE_MISPRIMING", primers, fixed=TRUE)]
-primers = primers[!grepl("_0_PENALTY", primers, fixed=TRUE)]
-primers = primers[!grepl("PRIMER_PAIR_0_", primers, fixed=TRUE)]
+    # Remove lines we don't care about.
+    lines = lines[!grepl("PRIMER_THERMODYNAMIC_PARAMETERS_PATH", lines, fixed=TRUE)]
+    lines = lines[!grepl("SEQUENCE_PRIMER_PAIR_OK_REGION_LIST", lines, fixed=TRUE)]
+    lines = lines[!grepl("PRIMER_INTERNAL_NUM_RETURNED", lines, fixed=TRUE)]
+    lines = lines[!grepl("_0_GC_PERCENT", lines, fixed=TRUE)]
+    lines = lines[!grepl("_0_SELF_END_TH", lines, fixed=TRUE)]
+    lines = lines[!grepl("_0_END_STABILITY", lines, fixed=TRUE)]
+    lines = lines[!grepl("SEQUENCE_TEMPLATE", lines, fixed=TRUE)]
+    lines = lines[!grepl("_NUM_RETURNED", lines, fixed=TRUE)]
+    lines = lines[!grepl("_0_SELF_ANY_TH", lines, fixed=TRUE)]
+    lines = lines[!grepl("_0_HAIRPIN_TH", lines, fixed=TRUE)]
+    lines = lines[!grepl("_0_TEMPLATE_MISPRIMING", lines, fixed=TRUE)]
+    lines = lines[!grepl("_0_PENALTY", lines, fixed=TRUE)]
+    lines = lines[!grepl("PRIMER_PAIR_0_", lines, fixed=TRUE)]
+    lines = lines[!grepl("SEQUENCE_ID", lines, fixed=TRUE)] # We previously were retaining this but not using it, then discarding it.
 
-# Split them up into separate groups, one per primer.
+    # Reduce the size of remaining lines by trimming away some "fat".
+    lines = sub("SEQUENCE", "SEQ", lines)
+    lines = sub("PRIMER_", "", lines)
+    lines = sub("LEFT_0", "L", lines)
+    lines = sub("RIGHT_0", "R", lines)
+    lines = sub("^L=", "L_POS=", lines)
+    lines = sub("^R=", "R_POS=", lines)
+
+    primers = c(primers, lines)
+    rm(lines)
+    }
+close(inFile)
+
+# Find starting and ending lines of each primer group.
 endGroup = which(primers == "=")
 startGroup = c(1, endGroup[-length(endGroup)]+1)
-groups = sapply(1:length(startGroup), function(i)
+
+# Make sure each group's size is either 0 (no primer found) or 6 (left and right
+# sequence, position, and Tm) lines.
+Nlines = endGroup-startGroup
+if (!all(Nlines == 0 | Nlines == 6))
+    stop("Expected all primers to have 6 data lines but something else was found")
+rm(Nlines)
+
+# Split them up into separate groups, one per primer.
+primers = sapply(1:length(startGroup), function(i)
     {
-    v = primers[startGroup[i]:(endGroup[i]-1)]
-    v = unlist(strsplit(v, "=", fixed=TRUE))
-    vnames = v[seq(1, length(v), 2)]
-    vnames = sub("PRIMER_(LEFT|RIGHT)_0", "\\1", vnames)
-    vnames[vnames == "LEFT"] = "LEFT_POSLEN"
-    vnames[vnames == "RIGHT"] = "RIGHT_POSLEN"
-    v = v[seq(2, length(v), 2)]
-    names(v) = vnames
-    if (length(v) != 7)
+    if (startGroup[i] == endGroup[i])
+        v = c("", "", "", "", "", "")
+    else
         {
-        if (length(v) != 1) stop("Unexpected primer3 output data, expected these edited names:\n",
-            "SEQUENCE_ID, and on good primers: LEFT_SEQUENCE, RIGHT_SEQUENCE, LEFT_POS, RIGHT_POS,\n",
-            "LEFT_TM, and RIGHT_TM.  Instead we see these:\n",
-            paste(vnames, collapse=" "))
-        # Following must be in same order as cases where a primer WAS found.
-        v["LEFT_SEQUENCE"] = ""
-        v["RIGHT_SEQUENCE"] = ""
-        v["LEFT_POSLEN"] = ""
-        v["RIGHT_POSLEN"] = ""
-        v["LEFT_TM"] = ""
-        v["RIGHT_TM"] = ""
+        v = primers[startGroup[i]:(endGroup[i]-1)]
+        v = unlist(strsplit(v, "=", fixed=TRUE))
+        v = v[seq(2, length(v), 2)]
         }
     return(list(v))
     })
-dfPrimers = do.call(rbind, groups)
-rm(groups)
-colnames(dfPrimers) = c("name", "seqL", "seqR", "poslenL", "poslenR", "tmL", "tmR")
-dfPrimers = as.data.frame(dfPrimers, stringsAsFactors=FALSE)
-dfPrimers$tmL = round(as.numeric(dfPrimers$tmL), 2)
-dfPrimers$tmR = round(as.numeric(dfPrimers$tmR), 2)
-dfPrimers$posL = as.integer(sub(",[0-9]+$", "", dfPrimers$poslenL))
-dfPrimers$posR = as.integer(sub(",[0-9]+$", "", dfPrimers$poslenR))
-dfPrimers$lenL = as.integer(sub("^[0-9]+,", "", dfPrimers$poslenL))
-dfPrimers$lenR = as.integer(sub("^[0-9]+,", "", dfPrimers$poslenR))
-dfPrimers = dfPrimers[, !colnames(dfPrimers) %in% c("name", "poslenL", "poslenR")]
-dfPrimers = dfPrimers[, c("seqL", "tmL", "posL", "lenL", "seqR", "tmR", "posR", "lenR")]
-colnames(dfPrimers) = c("prmSeqL",  "prmTmL",  "prmPosL",  "prmLenL",
-    "prmSeqR",  "prmTmR",  "prmPosR",  "prmLenR")
-if (nrow(dfPrimers) != nrow(dfMarkers))
+rm(startGroup, endGroup)
+
+catnow("Binding primer data...")
+primers = matrix(unlist(primers, use.names=FALSE), ncol=length(primers[[1]]), byrow=TRUE)
+colnames(primers) = c("seqL", "seqR", "poslenL", "poslenR", "tmL", "tmR")
+primers = as.data.frame(primers, stringsAsFactors=FALSE)
+catnow("\n")
+
+catnow("Editing primer data...")
+primers$tmL = round(as.numeric(primers$tmL), 2)
+primers$tmR = round(as.numeric(primers$tmR), 2)
+primers$posL = as.integer(sub(",[0-9]+$", "", primers$poslenL))
+primers$lenL = as.integer(sub("^[0-9]+,", "", primers$poslenL))
+primers = primers[, colnames(primers) != "poslenL"]
+primers$posR = as.integer(sub(",[0-9]+$", "", primers$poslenR))
+primers$lenR = as.integer(sub("^[0-9]+,", "", primers$poslenR))
+primers = primers[, colnames(primers) != "poslenR"]
+primers = primers[, c("seqL", "tmL", "posL", "lenL", "seqR", "tmR", "posR", "lenR")]
+colnames(primers) = c("prmSeqL",  "prmTmL",  "prmPosL",  "prmLenL", "prmSeqR",  "prmTmR",  "prmPosR",  "prmLenR")
+if (nrow(primers) != nrow(dfMarkers))
     stop("Wrong number of primers returned by primer3")
-dfMarkers = cbind(dfMarkers, dfPrimers, stringsAsFactors=FALSE)
-rm(dfPrimers)
+dfMarkers = cbind(dfMarkers, primers, stringsAsFactors=FALSE)
+rm(primers)
+catnow("\n")
 
 ########################################
 # There will be many markers for which primers could not be found.  Get rid of these.
@@ -470,9 +589,11 @@ if (nrow(dfMarkers) == 0)
 # ones we discard (losing certain k-mers is not an issue).
 ########################################
 
+catnow("Removing duplicates...")
 dupes = duplicated(paste(dfMarkers$prmSeqL, dfMarkers$prmSeqR, sep="_"))
-catnow(sum(dupes), "duplicate primer-pairs removed\n")
 dfMarkers = dfMarkers[!dupes,]
+catnow(sum(dupes), "duplicate primer-pairs removed\n")
+rm(dupes)
 
 ########################################
 # Add "phase" columns giving the genome strand which matches the reference genome
@@ -481,9 +602,11 @@ dfMarkers = dfMarkers[!dupes,]
 # so we will remove it from the data frame we write to a file.
 ########################################
 
+catnow("Adding phase columns...")
 phaseCol = makeColVec(paste(refGenomeLtr, "phase", sep=""))
 for (genome in genomeLtrs)
     dfMarkers[, phaseCol[genome]] = ifelse(dfMarkers[, refStrand1Col] == dfMarkers[, strand1Col[genome]], "+", "-")
+catnow("\n")
 
 ########################################
 # Change the "prmPosL" and "prmPosR" columns, which give the offset+1 of the 5'
@@ -498,10 +621,12 @@ for (genome in genomeLtrs)
 # concatenated to the kmer1 DNA sequence.
 ########################################
 
+catnow("Adding kmer offset columns...")
 dfMarkers$kmer1offset = extensionLen - (dfMarkers$prmPosL-1)
 seqLen = 2*(2*extensionLen+kmerLen)
 kmer2End = seqLen - extensionLen
 dfMarkers$kmer2offset = dfMarkers$prmPosR - kmer2End
+catnow("\n")
 
 ########################################
 # Change the "*pos1" and "*pos2" columns, which give the position of the 5' end
@@ -522,6 +647,7 @@ dfMarkers$kmer2offset = dfMarkers$prmPosR - kmer2End
 #   - ampPos2 = pos2 - kmer2offset
 ########################################
 
+catnow("Adding amplicon position columns...")
 ampPos1Col = makeColVec("ampPos1")
 ampPos2Col = makeColVec("ampPos2")
 refAmpPos1Col = ampPos1Col[refGenomeLtr]
@@ -537,7 +663,9 @@ for (genome in genomeLtrs)
         dfMarkers[negPhase, pos1Col[genome]] + dfMarkers[negPhase, "kmer1offset"] + (kmerLen-1)
     dfMarkers[posPhase, ampPos2Col[genome]] =
         dfMarkers[posPhase, pos2Col[genome]] + dfMarkers[posPhase, "kmer2offset"] + (kmerLen-1)
+    rm(posPhase, negPhase)
     }
+catnow("\n")
 
 ########################################
 # Remove the *kkLen columns, which contain k-mer-to-k-mer lengths, and replace
@@ -545,6 +673,7 @@ for (genome in genomeLtrs)
 # abs(ampPos1-ampPos2+1).
 ########################################
 
+catnow("Adding amplicon length columns...")
 ampLenCol = makeColVec("ampLen")
 refAmpLenCol = ampLenCol[refGenomeLtr]
 for (genome in genomeLtrs)
@@ -552,6 +681,7 @@ for (genome in genomeLtrs)
     dfMarkers[, ampLenCol[genome]] = abs(dfMarkers[, ampPos1Col[genome]] - dfMarkers[, ampPos2Col[genome]]) + 1
     dfMarkers = dfMarkers[, colnames(dfMarkers) != kkLenCol[genome]]
     }
+catnow("\n")
 
 ########################################
 # Add "dif" columns giving difference of amplicon length of each other genome
@@ -559,20 +689,26 @@ for (genome in genomeLtrs)
 # since it would always be 0, but columns exist for each other genome.
 ########################################
 
+catnow("Adding dif columns...")
 difToRefCol = makeColVec(paste(refGenomeLtr, "dif", sep=""))
 for (genome in otherGenomeLtrs)
     dfMarkers[, difToRefCol[genome]] = dfMarkers[, ampLenCol[genome]] - dfMarkers[, refAmpLenCol]
+catnow("\n")
 
 ########################################
 # Concatenate the k-mer strand signs of all genomes into a single column.
 ########################################
 
+catnow("Concatenating strand signs...")
 dfMarkers$kmer1strands = apply(dfMarkers[, strand1Col], 1, paste, collapse="")
 dfMarkers$kmer2strands = apply(dfMarkers[, strand2Col], 1, paste, collapse="")
+catnow("\n")
 
 ########################################
 # Put the data in a nice order and write it to the output file.
 ########################################
+
+catnow("Setting column order...")
 
 # Put columns in a nice order.  Put NDA column first.
 colOrder = c("NDA")
@@ -603,13 +739,16 @@ for (genome in genomeLtrs)
 dfMarkers = dfMarkers[, colOrder[]]
 rownames(dfMarkers) = NULL
 
+catnow("\n")
+
 ########################################
 # Write the dfMarkers data frame to the output file.
 ########################################
 
+catnow("Writing output file...")
 write.table(dfMarkers, tsvMarkerFile, col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
 # dfMarkers = read.table(tsvMarkerFile, header=TRUE, sep="\t", stringsAsFactors=FALSE)
-
+catnow("\n\n")
 catnow("Finished adding primer sequences to Indel Groups, candidate marker output file:\n", tsvMarkerFile, "\n")
 }
 

@@ -1,6 +1,6 @@
-make PARAMS=allParameters.test.template CLEAN=1 ALL
-make PARAMS=allParameters.test.template ALL | tee logFiles/makeLog_Test.txt
-make PARAMS=allParameters.test.template plotInDels | tee logFiles/makeLog_Test_Indels.txt
+make PARAMS=allParameters.test CLEAN=1 ALL
+make PARAMS=allParameters.test ALL | tee logFiles/makeLog_Test.txt
+make PARAMS=allParameters.test plotInDels | tee logFiles/makeLog_Test_Indels.txt
 
 make PARAMS=allParameters.template CLEAN=1 ALL
 make PARAMS=allParameters.template ALL | tee logFiles/makeLog_HP.txt

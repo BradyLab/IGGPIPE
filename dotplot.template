@@ -2,7 +2,7 @@
 # This is a template for a parameter file for running the R program dotplot.R,
 # which makes dot plots of LCR data from an IGGPIPE LCRs_*.tsv output file.
 # This file is configured to use the LCRs_*.tsv file produced as a result of
-# running IGGPIPE using the test parameter file named allParameters.test.template.
+# running IGGPIPE using the test parameter file named allParameters.test.
 # Therefore, you can test dotplot.R with this command:
 #
 #   Rscript code/R/dotplot.R dotplot.template

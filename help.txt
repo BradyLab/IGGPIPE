@@ -1,20 +1,6 @@
 
 Usage:
 
-Before running your data, make sure you test your installation by copying file
-allParameters.test.template to allParameters.test and editing it, searching for
-'# CHANGE' and making changes for your system, then run this command:
-
-     make PARAMS=allParameters.test ALL | tee logFiles/makeLog_test.txt
-
-It should run through to completion fairly quickly with no errors.  When it is
-finished, compare files X and Y with the command 'diff X Y', where X and Y are:
-X = outTestHP10/MarkersOverlapping_K10Km4Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF1XL15DT10.tsv
-Y = MarkersOverlapping.test.tsv
-(relative to IGGPIPE directory).  There should be no differences between them.
-BTW, the resulting IGG markers are useless since they are based on only part of
-the genome.
-
 To run the entire pipeline on your own data, invoke 'make' as follows:
 
      make PARAMS=myFilename ALL | tee logFiles/makeLog.txt

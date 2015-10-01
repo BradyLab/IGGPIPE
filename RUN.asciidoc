@@ -85,29 +85,31 @@ a single capital letter you will use to represent each of your genomes. For
 example, I used H=Heinz and P=pennellii for some of my testing.
 --
 
-. *Copy allParameters.mytemplate file to new file allParameters.XY*
+. *Copy allParameters.template file to new file allParameters.XY*
 +
 --
 IGGPIPE has a number of parameters that must be set to the values you desire. These
-are contained in plain text files whose name starts with "allParameters". During
-IGGPIPE installation, a file should have been created named *allParameters.mytemplate*.
-This is a template containing some parameters already set correctly for your system.
-You need to copy and edit this file to change other parameters to the settings you
-want. You should make a new parameter file for each different set of settings you
+are contained in plain text files whose name starts with "allParameters". IGGPIPE
+provides a template file named *allParameters.template* that you copy and edit to
+create your own "allParameters" files containing the parameter settings you want.
+
+You should make a new parameter file for each different set of settings you
 want to run with IGGPIPE. For example, each new set of genomes would have a different
 parameter file. Also, if you decided to make two different sets of markers from the
 same genomes, using two different parameter settings, you might make two different
 parameter files. Here, we assume to begin with that you are only running your genomes
-with a single set of parameters, and we will name the parameter file allParameters.XY
-where X and Y are the genome capital letters you chose. It is convenient to include
-those letters in the file name, to help you keep multiple parameter file straight.
-*Copy allParameters.mytemplate to allParameters.XY* (substituting your genome letters
+with two genomes and a single set of parameters, and we will name the parameter file
+allParameters.XY, where X and Y are capital letters you chose to represent the two
+genomes. It is convenient to include those letters in the file name, to help you
+keep multiple parameter file straight.
+
+*Copy allParameters.template to allParameters.XY* (substituting your genome letters
 for X and Y), using either the Mac's Finder or via the command line. For example:
 
   cd ~/Documents/IGGPIPE    (or whatever is appropriate for your system)
-  cp allParameters.mytemplate allParameters.HP    (here, X=H, Y=P)
+  cp allParameters.template allParameters.HP    (here, X=H, Y=P)
 
-Besides the sample parameter file "allParameters.mytemplate", there are several more
+Besides the sample parameter file "allParameters.template", there are several more
 sample "allParameters" parameter files in the subfolder 'allParameters'.  These
 were used for testing IGGPIPE with various genomes.  The subfolder 'allParameters'
 was made to keep the files better organized and keep the root folder less messy.
@@ -119,16 +121,16 @@ You may want to adopt the same strategy and put your "allParameters" files in th
 +
 --
 Open the new *allParameters.XY* file created above in your plain text editor
-for editing. For example, you might open your text editor from the command line:
+for editing. For example, you might open the 'nano' text editor from the command
+line:
 
-  bbedit allParameters.XY
+  nano allParameters.XY
 
 If you are in a hurry, you don't need to read anything in the file, but
-can simply *search for "\#\#\# "* (that's supposed to be three hash symbols with no
-backslashes, so ignore backslashes if there are any), which are comment lines
+can simply *search for "#@@"*, which are comment lines
 marking items that may need to be changed.
 
-Each "\#\#\#" comment says whether it must be changed, might need to
+Each "#@@" comment says whether it must be changed, might need to
 be changed, or probably will never need to be changed, etc. Many of these items
 typically will never need to be changed, so the actual number of changes that need
 to be made is smaller than it might first appear. Some of the parameters have
@@ -139,11 +141,10 @@ want to know this information, at least for key parameters, to select the right
 parameter values for your needs.
 --
 
-. *Search for "\#\#\# " (ignore that backslash til I figure out how to get rid of it)
-and set parameters to desired values*
+. *Search for "#@@" and set parameters to desired values*
 +
 --
-Search for "\#\#\# " in the allParameters.XY file and check each one to see if it
+Search for "#@@" in the allParameters.XY file and check each one to see if it
 needs to be changed. If so, set it to the value you desire. Parameters you will
 definitely want to review and consider are:
 
@@ -173,12 +174,12 @@ edit the file and make the desired changes. For example, you might change the
 parameters that determine the acceptable 'range of primer Tm values'. If you
 have several different setting values you use, you will probably want to keep
 a directory of different primer3settings.txt files and copy the needed one
-prior to each run of IGGPIPE. When testing IGGPIPE using the allParameters.test
-file that was created during installation, always copy primer3settings.default.txt
-to primer3settings.txt.
+to "primer3settings.txt" prior to each run of IGGPIPE. When testing IGGPIPE
+using the allParameters.test file that was created during installation, always
+copy primer3settings.default.txt to primer3settings.txt first.
 
 The Primer3 user manual (http://primer3.sourceforge.net/primer3_manual.htm)
-describes all the parameters.
+describes all the Primer3 settings file parameters.
 --
 
 . *Understand use of 'make' and "Makefile" for running IGGPIPE*
@@ -200,6 +201,11 @@ software. Depending on your computer speed and memory, it can take hours or even
 days. If an error occurs, 'make' will stop, and an error message should be visible
 on the terminal. After fixing the error, all you have to do resume the pipeline
 commands from the last successful step is re-enter the same 'make' command.
+'make' knows which step to start at because it knows all the files to be produced
+by the pipeline, as they are specified in allParameters.XY, and it checks to see
+if the files exist, and starts at the pipeline step whose output file does not
+exist. Manually deleting a file will also cause 'make' to run the pipeline
+starting at the step needed to make that file.
 
 You must finish editing the allParameters.XY file before trying to run the pipeline
 using 'make'. If that file is ready to go, you can start running IGGPIPE using the
@@ -209,7 +215,8 @@ example, if your allParameters file is named "allParameters.XY", then the 'make'
 command starts out as 'make PARAMS=allParameters.XY'.
 
 The remaining command arguments for the 'make' command tell which part of the
-pipeline to run. If the argument is 'ALL', the entire pipeline is run (or as
+pipeline to run. If no additional argument is given or if the argument is 'ALL',
+the entire pipeline is run (or as
 much of it as is needed to resume where a previous error had halted). However,
 since the choice of some of the parameters, especially the value of K, can have
 a strong influence on the number of markers found, it is best to run IGGPIPE a
@@ -246,7 +253,11 @@ commands '| tee logFiles/make_kmerIsect_HP14.txt', as in this example:
   make PARAMS=allParameters.XY kmerIsect | tee logFiles/make_kmerIsect_HP14.txt
 
 Then, after 'make' finishes, you can examine that log file at any time to see
-what the pipeline output was. You should use the 'tee' command each time you
+what the pipeline output was, for example:
+
+  more logFiles/make_kmerIsect_HP14.txt
+
+You should use the 'tee' command each time you
 run the pipeline unless you are sure you won't want to reexamine the output
 later. We will not show the 'tee' command in the instructions below, however.
 It is up to you to decide whether to use it.
@@ -545,7 +556,7 @@ the name specified in the parameter file. Use multiple parameter files with diff
 settings to explore different regions of the genomes in greater resolution.
 
 The "dotplot.template" file is configured for generating a dot plot file
-using the LCRs generated via the allParameters.test.template configuration file.
+using the LCRs generated via the allParameters.test configuration file.
 
 Besides the sample parameter file "dotplot.template" (which has settings for
 testing the IGGPIPE installation), there are several more sample "dotplot" parameter

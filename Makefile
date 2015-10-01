@@ -32,7 +32,12 @@ INDENT := $(EMPTY)    $(EMPTY)
 % : %.o
 
 ################################################################################
-# Include parameter definition file (there might not be one).
+# Include path parameters definition file.
+################################################################################
+include allPathParameters.ours
+
+################################################################################
+# Include main parameter definition file (there might not be one).
 ################################################################################
 include $(PARAMS)
 
@@ -714,20 +719,20 @@ $(DNA_SEQ_FILES) : $(PFX_GENOME_DATA_FILE)%.dnaseqs : $$(PATH_GENOME_FASTA_$$*) 
 
 # A list of all .dnaseqs files is already defined above: DNA_SEQ_FILES
 
-# Phony target to make or clean PATH_MARKER_DATA_FILE file.
+# Phony target to make or clean PATH_NONVALIDATED_MARKER_FILE file.
 ifeq ($(CLEAN),)
-findPrimers: $(PATH_MARKER_DATA_FILE)
+findPrimers: $(PATH_NONVALIDATED_MARKER_FILE)
 	@echo
 	@echo "findPrimers files are up to date."
 else
 findPrimers:
-	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_MARKER_DATA_FILE) $(PATH_PRIMER3_IN) $(PATH_PRIMER3_OUT)
+	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_NONVALIDATED_MARKER_FILE) $(PATH_PRIMER3_IN) $(PATH_PRIMER3_OUT)
 	@echo "findPrimers output file(s) removed."
 endif
 
-# PATH_MARKER_DATA_FILE target.
+# PATH_NONVALIDATED_MARKER_FILE target.
 
-$(PATH_MARKER_DATA_FILE) : $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) $(DNA_SEQ_FILES) | $(PATH_RSCRIPT) \
+$(PATH_NONVALIDATED_MARKER_FILE) : $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) $(DNA_SEQ_FILES) | $(PATH_RSCRIPT) \
         $(DIR_PRIMER_DATA) $(PATH_FIND_PRIMERS) $(PATH_PRIMER3CORE) $(PATH_PRIMER3_SETTINGS)
 	@echo
 	@echo "*** findPrimers PARAMS=$(PARAMS) $(CLEAN) ***"
@@ -735,8 +740,8 @@ $(PATH_MARKER_DATA_FILE) : $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) $(DNA_SEQ_FILES
 	$(TIME) $(PATH_RSCRIPT) $(PATH_FIND_PRIMERS) $(WD) \
 		$(PATH_OVERLAPPING_INDEL_GROUPS_FILE) \
 		$(PFX_GENOME_DATA_FILE) \
-		$(PATH_MARKER_DATA_FILE) \
-		$(PATH_PRIMER3CORE) $(PATH_PRIMER3_SETTINGS) \
+		$(PATH_NONVALIDATED_MARKER_FILE) \
+		$(PATH_PRIMER3CORE) $(PATH_PRIMER3_SETTINGS) $(PATH_PRIMER3CONFIG) \
 		$(PATH_PRIMER3_IN) $(PATH_PRIMER3_OUT) \
 		$(INVESTIGATE_FINDPRIMERS) $(REDIR)
 	@echo "Finished."
@@ -772,13 +777,13 @@ endif
 # Here, % is a genome number.
 
 $(BAD_MARKER_FILES) : $(PFX_BAD_MARKER_ERROR_PATH)_%.bad.tsv : $$(PATH_GENOME_FASTA_$$*) \
-        $(PATH_MARKER_DATA_FILE) | $(DIR_IGGPIPE_OUT) $(DIR_GENOME_OUT_DATA) $(DIR_PRIMER_DATA) \
+        $(PATH_NONVALIDATED_MARKER_FILE) | $(DIR_IGGPIPE_OUT) $(DIR_GENOME_OUT_DATA) $(DIR_PRIMER_DATA) \
         $(PATH_RSCRIPT) $(PATH_EPCR_TESTING) $(PATH_EPCR)
 	@echo
 	@echo "*** ePCRtesting PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
 	@echo "Use e-PCR to test marker primer pairs and write errors to $@"
 	$(TIME) $(PATH_RSCRIPT) $(PATH_EPCR_TESTING) $(WD) \
-	    $(PATH_MARKER_DATA_FILE) $* $@ \
+	    $(PATH_NONVALIDATED_MARKER_FILE) $* $@ \
 	    $(DIR_GENOME_OUT_DATA) $(PATH_EPCR) \
 	    $(EPCR_MAX_DEV) $(EPCR_WORD_SIZE) $(EPCR_MAX_MISMATCH) $(EPCR_MAX_GAPS) \
 		$(PATH_GENOME_FASTA_$*) $(INVESTIGATE_EPCRTESTING) $(REDIR)
@@ -812,13 +817,13 @@ PTN_OVERLAPPING_MARKERS_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_OVERLAPPING_MARKERS_FIL
 PTN_NONOVERLAPPING_MARKERS_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_NONOVERLAPPING_MARKERS_FILE)%
 
 # Use the patterns in a pattern target.
-$(PTN_OVERLAPPING_MARKERS_FILE) $(PTN_NONOVERLAPPING_MARKERS_FILE) : $(PATH_MARKER_DATA_FILE) $(BAD_MARKER_FILES) | \
+$(PTN_OVERLAPPING_MARKERS_FILE) $(PTN_NONOVERLAPPING_MARKERS_FILE) : $(PATH_NONVALIDATED_MARKER_FILE) $(BAD_MARKER_FILES) | \
         $(PATH_RSCRIPT) $(PATH_RMV_BAD_MARKERS)
 	@echo
 	@echo "*** removeBadMarkers PARAMS=$(PARAMS) $(CLEAN) ***"
 	@echo "Remove markers identified by e-PCR as bad from $< and write good ones to two output files"
 	$(TIME) $(PATH_RSCRIPT) $(PATH_RMV_BAD_MARKERS) $(WD) $(OVERLAP_REMOVAL) \
-	    $(PATH_MARKER_DATA_FILE) \
+	    $(PATH_NONVALIDATED_MARKER_FILE) \
 	    $(PFX_BAD_MARKER_ERROR_PATH) \
 		$(PATH_OVERLAPPING_MARKERS_FILE) \
 		$(PATH_NONOVERLAPPING_MARKERS_FILE) \
