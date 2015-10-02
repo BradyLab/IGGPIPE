@@ -16,12 +16,14 @@
 {
 
 # Pathname separator.
-PATHSEP = ifelse(grepl("/", Sys.getenv("HOME")), "/", "\\")
+#PATHSEP = ifelse(grepl("/", Sys.getenv("HOME")), "/", "\\")
+PATHSEP = "/"
 
 # Get directory where this file resides.
 XSEP = ifelse(PATHSEP == "\\", "\\\\", PATHSEP)
 RE = paste("^.*--file=(([^", XSEP, "]*", XSEP, ")*)[^", XSEP, "]+$", sep="")
 args = commandArgs(FALSE)
+#cat("args: ", paste(args, collapse=" "), "\n", sep="")
 thisDir = sub(RE, "\\1", args[grepl("--file=", args)])
 #cat("Directory containing this .R file is: '", thisDir, "'\n", sep="")
 #thisDir = "~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE/code/R/" # For testing only.

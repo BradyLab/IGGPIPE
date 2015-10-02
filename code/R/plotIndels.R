@@ -12,7 +12,8 @@
 maxPlotPoints = 20000
 
 # Pathname separator.
-PATHSEP = ifelse(grepl("/", Sys.getenv("HOME")), "/", "\\")
+#PATHSEP = ifelse(grepl("/", Sys.getenv("HOME")), "/", "\\")
+PATHSEP = "/"
 
 # Get directory where this file resides.
 XSEP = ifelse(PATHSEP == "\\", "\\\\", PATHSEP)
