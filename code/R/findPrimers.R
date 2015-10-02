@@ -385,7 +385,7 @@ while (curStart <= nrow(dfMarkers))
 ########################################
 
 catnow("Creating primer3 input file...")
-thermo = paste("PRIMER_THERMODYNAMIC_PARAMETERS_PATH=", primer3config, "/", sep="")
+thermo = paste("PRIMER_THERMODYNAMIC_PARAMETERS_PATH=", primer3config, PATHSEP, sep="")
 seqIDs = paste("SEQUENCE_ID=", dfMarkers$kmer1, "_", dfMarkers$kmer2, sep="")
 primerTemplates = paste("SEQUENCE_TEMPLATE=", seqs, sep="")
 rm(seqs)
