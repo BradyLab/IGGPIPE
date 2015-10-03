@@ -59,7 +59,7 @@ while (!$endOfAfile) {
             if (!defined($kmer)) {
                 $endOfAfile = 1;
             } else {
-                chomp $kmer;
+                $kmer = eolChomp($kmer);
                 $kmers[$i] = $kmer;
                 $Nkmers[$i]++;
             }
@@ -86,7 +86,7 @@ while (!$endOfAfile) {
                     $endOfAfile = 1;
                     last;
                 } else {
-                    chomp $kmer;
+                    $kmer = eolChomp($kmer);
                     $kmers[$i] = $kmer;
                     $Nkmers[$i]++;
                 }

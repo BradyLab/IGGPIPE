@@ -185,7 +185,7 @@ if (exists($options{i}) && $options{i}) {
     open(my $seqFile, "<", $seqFileName) or die("Can't open -i file '$seqFileName': $!");
     my $line;
     while (defined($line = <$seqFile>)) {
-        chomp $line;
+        $line = eolChomp($line);
         push(@seqs, $line);
     }
     close($seqFile);
