@@ -75,7 +75,7 @@ mergeCols:
         maxMatch := 0
         join := YES
         joinSep := ","
-        format := "{+gene}({#T}:{+strand})" # E.g. "Solyc07g008570(@384:+)" means plus strand, overlaps with marker starting 384 bp after gene start.
+        format := "{+gene}({#T}:{+strand})" # E.g. "Solyc07g008570(@384:+)" means plus strand, gene overlaps with marker starting 384 bp after marker start.
 
 ################################################################################
 # Output file parameters.

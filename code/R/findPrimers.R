@@ -26,6 +26,7 @@ source(paste(thisDir, "Include_Common.R", sep=""))
 testing = 0
 #testing = 1 # For testing only.
 #testing = 2 # For testing only.
+#testing = 3 # For testing only.
 {
 if (testing == 0)
     args = commandArgs(TRUE)
@@ -33,7 +34,7 @@ else if (testing == 1)
     {
     args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
         "outTestHP11/IndelGroupsOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0.tsv",
-        "outTestHP11/GenomeData/Genome_",
+        "outTestHP11/GenomeData/DNAseqs_K11k2L100D10_2000A100_2000d10_100N2F0X20",
         "outTestHP11/NonvalidatedMarkers_K11k2L100D10_2000A100_2000d10_100N2F0X20.tsv",
         "~/bin/primer3_core", "primer3settings.txt",
         "/Users/tedtoal/src/primer3-2.3.6/primer3_config",
@@ -42,8 +43,18 @@ else if (testing == 1)
 else if (testing == 2)
     {
     args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
+        "outHP14/IndelGroupsOverlapping_K14k2L400D10_1500A400_1500d50_300N2F0.tsv",
+        "outHP14/GenomeData/DNAseqs_K14k2L400D10_1500A400_1500d50_300N2F0X20",
+        "outHP14/NonvalidatedMarkers_K14k2L400D10_1500A400_1500d50_300N2F0X20.tsv",
+        "~/bin/primer3_core", "primer3settings.txt",
+        "/Users/tedtoal/src/primer3-2.3.6/primer3_config",
+        "outHP14/Primers/Primer3In.txt", "outHP14/Primers/Primer3Out.txt", TRUE)
+    }
+else if (testing == 3)
+    {
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
         "outHPT14/IndelGroupsOverlapping_K14k2L300D5_1500A300_1500d50_300N2F0.tsv",
-        "outHPT14/GenomeData/Genome_",
+        "outHPT14/GenomeData/DNAseqs_K14k2L300D5_1500A300_1500d50_300N2F0X15",
         "outHPT14/NonvalidatedMarkers_K14k2L300D5_1500A300_1500d50_300N2F0X15.tsv",
         "~/bin/primer3_core", "primer3settings.txt",
         "/Users/tedtoal/src/primer3-2.3.6/primer3_config",
@@ -67,7 +78,7 @@ if (length(args) != Nexpected)
         "   <wd>              : Path of R working directory, specify other file paths relative to this.",
         "   <indelFile>       : Input file containing the indel k-mer pairs.",
         "   <seqInPfx>        : Prefix, including directory, of input files containing the DNA sequences.  The filename",
-        "                       suffix is the genome number followed by '.dnaseqs'",
+        "                       suffix is '_<genome number>.dnaseqs'",
         "   <tsvMarkerFile>   : Output file to be written containing the candidate marker k-mer pairs with DNA sequences.",
         "   <primer3core>     : Full path of the primer3_core program file",
         "   <primer3settings> : File containing primer3 settings edited for desired IGG marker primer characteristics.",
@@ -123,7 +134,7 @@ if (is.na(investigate))
 # Initialize.
 ########################################
 
-# Read indel k-mer pairs data, which become the initial marker candidates.
+# Read indel group k-mer pairs data, which become the initial marker candidates.
 catnow("Reading InDel Group file...")
 dfMarkers = read.table(indelFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
 catnow("\n")
@@ -157,7 +168,7 @@ df = NULL
 for (i in 1:Ngenomes)
     {
     catnow("Reading DNA sequence data for genome #", i, "...")
-    seqInFile = paste(seqInPfx, i, ".dnaseqs", sep="")
+    seqInFile = paste(seqInPfx, "_", i, ".dnaseqs", sep="")
     dft = read.table(seqInFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
     dft = dft[order(dft$kmer),]
     # Add genome letter prefix.
@@ -235,6 +246,13 @@ refDnaSeq2Col = dnaSeq2Col[refGenomeLtr]
 ########################################
 
 catnow("Replacing bases with '.'...")
+
+# Length of each DNA sequence.
+DNAseqLen = nchar(df[1, refDnaSeqCol])
+
+# The extensionLen value used to extract the DNA sequences.
+extensionLen = (DNAseqLen - kmerLen)/2
+
 refBases = strsplit(df[, refDnaSeqCol], "", fixed=TRUE)
 for (genome in otherGenomeLtrs)
     {
@@ -632,13 +650,13 @@ catnow("\n")
 ########################################
 # Change the "*pos1" and "*pos2" columns, which give the position of the 5' end
 # of each k-mer on the + strand, to columns "*ampPos1" and "*ampPos2", giving
-# the position of the end of the amplicon.
+# the positions of the ends of the amplicon.
 #
 # The position change is different for each genome depending on whether the k-mer
 # "phase" is + or -.  The reference genome is always "+" phase for all k-mers,
-# while the other genomes have k-mers of both phases.  For a "+" phase genome,
-# the pos1 values are adjusted in one manner, and the pos2 values are adjusted
-# in a different manner, to give the ampPos1 and ampPos2 values.  For a "-" phase
+# while the other genomes have both phases.  For a "+" phase genome, the pos1
+# values are adjusted in one manner, and the pos2 values are adjusted in a
+# different manner, to give the ampPos1 and ampPos2 values.  For a "-" phase
 # genome, the adjustment manners are switched.
 # Adjustment for a "+" phase genome:
 #   - ampPos1 = pos1 - kmer1offset

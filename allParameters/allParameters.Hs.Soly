@@ -180,8 +180,6 @@ DIR_GENOME_OUT_DATA := $(DIR_IGGPIPE_OUT)/GenomeData
 # 2. A list of sequence contig information: for each contig, the sequence ID,
 #   start position, contig sequence number, and contig length:
 #       <this prefix><genome_number>.contigs
-# 3. A file of genome DNA sequences around each k-mer:
-#       <this prefix><genome_number>.dnaseqs
 #@@ THIS DOES NOT NEED TO BE CHANGED.
 
 PFX_GENOME_DATA_FILE := $(DIR_GENOME_OUT_DATA)/Genome_
@@ -569,7 +567,13 @@ PFX_OVERLAPPING_INDEL_GROUPS_FILE := IndelGroupsOverlapping
 PFX_NONOVERLAPPING_INDEL_GROUPS_FILE := IndelGroupsNonoverlapping
 
 
-# Filename prefix of IGG marker file, prior to e-PCR verification.
+# Filename prefix of DNA sequences around k-mers file, prior to finding primers.
+#@@ THIS DOES NOT NEED TO BE CHANGED.
+
+PFX_DNA_SEQS_FILE := DNAseqs
+
+
+# Filename prefix of IGG marker file, for markers prior to e-PCR verification.
 #@@ THIS DOES NOT NEED TO BE CHANGED.
 
 PFX_NONVALIDATED_MARKER_FILE := NonvalidatedMarkers
@@ -635,21 +639,31 @@ SFX_LCR_FILE := _K$(K)k$(KMIN)L$(LMIN)D$(DMIN)_$(DMAX)
 SFX_INDEL_GROUPS_FILE := $(SFX_LCR_FILE)A$(AMIN)_$(AMAX)d$(ADMIN)_$(ADMAX)N$(NDAMIN)F$(MINFLANK)
 
 
-# Suffix to use for the files containing IGG markers with primers and marker
-# density plots.
+# Suffix to use for the file that holds DNA sequence around k-mers.
 #@@ THIS DOES NOT NEED TO BE CHANGED.
 
-# (This includes all of SFX_SEQ_FILE and the parameters used when extracting DNA
-# and making primers)
-SFX_MARKER_FILE := $(SFX_INDEL_GROUPS_FILE)X$(EXTENSION_LEN)
+# (This includes all of SFX_INDEL_GROUPS_FILE and the parameter value used to extract DNA sequences)
+SFX_DNA_SEQS_FILE := $(SFX_INDEL_GROUPS_FILE)X$(EXTENSION_LEN)
+
+
+# Suffix of IGG marker file, for markers prior to e-PCR verification.
+#@@ THIS DOES NOT NEED TO BE CHANGED.
+
+# (This includes all of SFX_DNA_SEQS_FILE and it should include the parameters
+# used when making primers, but those are in the primer parameters file.  We
+# should use a separate primer parameters filename for each run, and include
+# that filename within this filename, but we don't, we assume the same primer
+# parameter file always.  If it changes, user had better clean the directories
+# before doing a make.)
+SFX_NONVALIDATED_MARKER_FILE := $(SFX_DNA_SEQS_FILE)
 
 
 # Suffix to use for the files that hold candidate IGG marker primers, both
 # before and after e-PCR testing.
 #@@ THIS DOES NOT NEED TO BE CHANGED.
 
-# (This includes all of SFX_MARKER_FILE and the parameter values used for e-PCR)
-SFX_GOOD_MARKER_FILE := $(SFX_MARKER_FILE)V$(EPCR_MAX_DEV)W$(EPCR_WORD_SIZE)M$(EPCR_MAX_MISMATCH)G$(EPCR_MAX_GAPS)
+# (This includes all of SFX_NONVALIDATED_MARKER_FILE and the parameter values used for e-PCR)
+SFX_GOOD_MARKER_FILE := $(SFX_NONVALIDATED_MARKER_FILE)V$(EPCR_MAX_DEV)W$(EPCR_WORD_SIZE)M$(EPCR_MAX_MISMATCH)G$(EPCR_MAX_GAPS)
 
 
 ################################################################################
@@ -673,10 +687,17 @@ PATH_OVERLAPPING_INDEL_GROUPS_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_OVERLAPPING_INDEL
 PATH_NONOVERLAPPING_INDEL_GROUPS_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_NONOVERLAPPING_INDEL_GROUPS_FILE)$(SFX_INDEL_GROUPS_FILE).tsv
 
 
-# Path of IGG marker file, prior to e-PCR verification.
+# Path prefix of file that holds DNA sequence around k-mers, excluding only the
+# suffix, which consists of "_<genome number>.dnaseqs".
 #@@ DO NOT CHANGE THIS.
 
-PATH_NONVALIDATED_MARKER_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_NONVALIDATED_MARKER_FILE)$(SFX_MARKER_FILE).tsv
+PFX_DNA_SEQS_PATH := $(DIR_GENOME_OUT_DATA)/$(PFX_DNA_SEQS_FILE)$(SFX_DNA_SEQS_FILE)
+
+
+# Path of IGG marker file, for markers prior to e-PCR verification.
+#@@ DO NOT CHANGE THIS.
+
+PATH_NONVALIDATED_MARKER_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_NONVALIDATED_MARKER_FILE)$(SFX_NONVALIDATED_MARKER_FILE).tsv
 
 
 # Path prefix of IGG marker e-PCR bad marker file as determined by e-PCR,

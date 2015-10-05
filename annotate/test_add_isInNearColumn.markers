@@ -14,7 +14,8 @@
 #   4. Performs a match-and-merge operation between the two files and adds column
 #       "isInNear" to the inputFileT data, containing feature ID, strand, and
 #       relative base pair position of the feature relative to the marker.
-#   5. Writes the new inputFileT data to file code/R/testOutput/InDelsWithFeatures.test.tsv
+#   5. Writes the new inputFileT data to directory outTestHP11 to this file:
+# MarkersNonoverlappingWithInNearFeatures_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv
 ################################################################################
 
 ################################################################################
@@ -84,14 +85,14 @@ mergeCols:
         maxMatch := 0
         join := YES
         joinSep := ","
-        format := "{+ID}({#T}:{+strand})" # E.g. "intron:Solyc07g008570(@384:+)" means plus strand, overlaps with marker starting 384 bp after intron start.
+        format := "{+ID}({#T}:{+strand})" # E.g. "intron:Solyc07g008570(@384:+)" means plus strand, intron overlaps with marker starting 384 bp after marker start.
 
 ################################################################################
 # Output file parameters.
 ################################################################################
 
 outputFile:
-    path := "code/R/testOutput/InDelsWithFeatures.test.tsv"
+    path := "outTestHP11/MarkersNonoverlappingWithInNearFeatures_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv"
     type := tsv
     header := YES
     quote := NO

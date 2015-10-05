@@ -199,19 +199,25 @@ inv(dim(df), "input data dim")
 inv(colnames(df), "input data columns")
 inv(head(df), "input data head")
 
+# Convert df into a data frame with columns 'ID', 'phases', 'idx', 'Xdel', 'Xid',
+#'Xstart', and 'Xend', where X=genome letter.  This conversion involves doing
+# different things depending on whether the input file was LCRs, InDel Groups,
+# or markers.  Set the Xstart and Xend values to be the exact start and end
+# positions of the outside k-mers, so a DNA extraction will start and end with
+# the k-mers.
+
 # If this is an LCR file (has an "LCR" column), convert it by:
 #   (1) dropping "contig" columns
 #   (2) removing row names, which should actually be in column "row.names"
 #       because we read the file w/o row names
 #   (3) converting "X." column name prefix to "X"
 #   (4) changing "XseqID" column names to "Xid"
-#   (5) adding an "ID" column by concatenating reference ID with LCR number and
-#       deleting the LCR column
-#   (6) merging rows with the same ID, unsuring that pos1 and pos2 are set
+#   (5) changing "LCR" column name to "ID"
+#   (6) merging rows with the same LCR ID, ensuring that pos1 and pos2 are set
 #       correctly and offset correctly so they are PRECISELY the positions of
-#       the first bases INSIDE of the two flanking k-mers, and adding column
-#       "phases" that has "-" when the direction is reversed relative to the
-#       reference strand.
+#       the first bases INSIDE of the two outermost k-mers of the LCR, and
+#       adding column "phases" that has "-" when the direction is reversed
+#       relative to the reference strand.
 {
 if (any(colnames(df) == "LCR"))
     {
@@ -242,8 +248,8 @@ if (any(colnames(df) == "LCR"))
     # Rename LCR column to ID column.
     colnames(df) = sub("^LCR$", "ID", colnames(df))
 
-    # Merge: collapse all the identical ID rows together, compute correct Xpos1,
-    # Xpos2, and phase.  Add phases column.
+    # Merge: collapse all the identical LCR ID rows together into a single row,
+    # then compute correct Xpos1, Xpos2, and phase.  Add phases column.
     df = df[order(df$ID, df[, idCols[1]], df[, posCols[1]]),] # Make sure df is sorted by reference genome within each LCR.
     dfx = data.frame(ID=unique(df$ID), phases="", row.names=unique(df$ID), stringsAsFactors=FALSE)
     pos1Cols = paste(genomeLtrs, "pos1", sep="")
@@ -258,21 +264,35 @@ if (any(colnames(df) == "LCR"))
         refStrandCol = strandCols[1]
         pos1Col = pos1Cols[genome]
         pos2Col = pos2Cols[genome]
+
         i1 = tapply(1:nrow(df), df$ID, function(ii) return(ii[1]))
         i2 = tapply(1:nrow(df), df$ID, function(ii) return(ii[length(ii)]))
-        IDs = df$ID[i1]
-        revPhase = (df[i1, strandCol] != df[i1, refStrandCol])
-        dfx[IDs, idCol] = df[i1, idCol]
-        dfx[IDs, pos1Col] = df[i1, posCol]
-        dfx[IDs, pos2Col] = df[i2, posCol]
-        dfx[IDs[revPhase], pos1Col] = df[i2[revPhase], posCol]
-        dfx[IDs[revPhase], pos2Col] = df[i1[revPhase], posCol]
-        dfx[IDs, "phases"] = paste(dfx[IDs, "phases"], c("+", "-")[1+revPhase], sep="")
+        IDsAsNames = names(i1)
+        minusPhase = (df[i1, strandCol] != df[i1, refStrandCol])
+        dfx[IDsAsNames, idCol] = df[i1, idCol]
+        dfx[IDsAsNames, pos1Col] = df[i1, posCol]
+        dfx[IDsAsNames, pos2Col] = df[i2, posCol]
+        dfx[IDsAsNames, "phases"] = paste(dfx[IDsAsNames, "phases"], c("+", "-")[1+minusPhase], sep="")
 
         # Adjust positions so that instead of being the 5' end of the k-mer, they
         # are the positions of the first bases TO THE INSIDE of the k-mer.
-        dfx[, pos1Col] = dfx[, pos1Col] + kmerLen
-        dfx[, pos2Col] = dfx[, pos2Col] - 1
+
+        # Adjustment for a "+" phase genome to go from 5' end of k-mer to outside base of k-mer:
+        #   - pos1 = pos1
+        #   - pos2 = pos2 + (k-1)
+        # Adjustment for a "-" phase genome to go from 5' end of k-mer to outside base of k-mer:
+        #   - pos1 = pos1 + (k-1)
+        #   - pos2 = pos2
+
+        dfx[IDsAsNames[!minusPhase], pos2Col] = dfx[IDsAsNames[!minusPhase], pos2Col] + rep(kmerLen-1, sum(!minusPhase))
+        dfx[IDsAsNames[minusPhase], pos1Col] = dfx[IDsAsNames[minusPhase], pos1Col] + rep(kmerLen-1, sum(minusPhase))
+
+        # Also, swap the positions of "-" phase positions so that pos1 < pos2 always.
+        t = dfx[IDsAsNames[minusPhase], pos1Col]
+        dfx[IDsAsNames[minusPhase], pos1Col] = dfx[IDsAsNames[minusPhase], pos2Col]
+        dfx[IDsAsNames[minusPhase], pos2Col] = t
+
+        rm(i1, i2, IDsAsNames, minusPhase)
         }
     df = dfx
     rm(dfx)
@@ -286,7 +306,7 @@ if (any(colnames(df) == "LCR"))
 #   (4) creating a "phase" column which has "-" if Xpos1 > Xpos2, swapping Xpos1/Xpos2
 #       columns when that is the case so Xpos1 < Xpos2 always, and adjusting Xpos1/Xpos2
 #       to change the positions from the 5' end of the "+" strand k-mer to being
-#       PRECISELY the positions of the first bases to the inside of the k-mer.
+#       PRECISELY the positions of the first bases on the outside side of each k-mer.
 else if (any(grepl("ctg1$", colnames(df))))
     {
     # The k-mer length we are working with.
@@ -312,20 +332,32 @@ else if (any(grepl("ctg1$", colnames(df))))
     df$ID = paste(df[,idCols[1]], df[,pos1Cols[1]], df[,pos2Cols[1]], sep="_")
     # Create phases column, swap Xpos1/Xpos2 when backwards (means k-mer "-" strand), add k-1 to Xpos2.
     df$phases = ""
+
+    # Adjustment for a "+" phase genome to go from 5' end of k-mer to outside base of k-mer:
+    #   - pos1 = pos1
+    #   - pos2 = pos2 + (k-1)
+    # Adjustment for a "-" phase genome to go from 5' end of k-mer to outside base of k-mer:
+    #   - pos1 = pos1 + (k-1)
+    #   - pos2 = pos2
+
+    # In addition to these adjustments, we want to swap pos1 and pos2 if pos1 > pos2 ("-" phase).
     for (genome in genomeLtrs)
         {
-        isReversed = (df[, pos1Cols[genome]] > df[, pos2Cols[genome]])
-        t = df[isReversed, pos1Cols[genome]]
-        df[isReversed, pos1Cols[genome]] = df[isReversed, pos2Cols[genome]]
-        df[isReversed, pos2Cols[genome]] = t
+        pos1Col = pos1Cols[genome]
+        pos2Col = pos2Cols[genome]
+
+        minusPhase = (df[, pos1Col] > df[, pos2Col])
+        df[!minusPhase, pos2Col] = df[!minusPhase, pos2Col] + rep(kmerLen-1, sum(!minusPhase))
+        df[minusPhase, pos1Col] = df[minusPhase, pos1Col] + rep(kmerLen-1, sum(minusPhase))
+
+        t = df[minusPhase, pos1Col]
+        df[minusPhase, pos1Col] = df[minusPhase, pos2Col]
+        df[minusPhase, pos2Col] = t
         phases = rep("+", nrow(df))
-        phases[isReversed] = "-"
+        phases[minusPhase] = "-"
         df$phases = paste(df$phases, phases, sep="")
 
-        # Adjust positions so that instead of being the 5' end of the k-mer, they
-        # are the positions of the first bases TO THE INSIDE of the k-mer.
-        df[, pos1Cols[genome]] = df[, pos1Cols[genome]] + kmerLen
-        df[, pos2Cols[genome]] = df[, pos2Cols[genome]] - 1
+        rm(minusPhase, t, phases)
         }
     }
 
@@ -339,8 +371,8 @@ else if (any(grepl("ctg1$", colnames(df))))
 #       if swap, adding kmer2offset to Xpos1 and subtracting kmer1offset from Xpos2,
 #       placing Xpos1/Xpos2 at the outside ends of the k-mers.
 #   (6) adjusting Xpos1/Xpos2 to change the positions from the 5' end of the "+"
-#       strand k-mer to being PRECISELY the positions of the first bases to the
-#       inside of the k-mer.
+#       strand k-mer to being PRECISELY the positions of the first bases on the
+#       outside side of each k-mer.
 #   (7) retaining only the needed columns: 'Xid', 'XYphase', 'Xpos1', 'Xpos2'
 #   (8) concatenating columns "XYphase" to form column "phases" and deleting the
 #       XYphase columns.
@@ -370,27 +402,47 @@ else
     # Create ID column.
     df$ID = paste(df[,idCols[1]], df[,pos1Cols[1]], df[,pos2Cols[1]], sep="_")
 
-    # Swap pos1 and pos2 if they are backwards ("-" strand, but we don't care).
-    # If no swap, add kmer1offset to Xpos1 and subtracting kmer2offset from Xpos2,
-    # If swap, add kmer2offset to Xpos1 and subtracting kmer1offset from Xpos2,
-    # placing Xpos1/Xpos2 at the outside ends of the k-mers.  Then adjust Xpos1/Xpos2
-    # to change the positions from the 5' end of the "+" strand k-mer to the positions
-    # of the first base to the inside of the k-mer.
+    # Here we need to reverse the changes made by findPrimers.R to convert positions
+    # from 5' end of each k-mer on + strand, to ampPos columns.  More than that, we
+    # want the positions to be the OUTSIDE BASE of each k-mer, not the 5' end.
+
+    # Adjustment for a "+" phase genome to return position to 5' end of k-mer:
+    #   - pos1 = ampPos1 + kmer1offset
+    #   - pos2 = ampPos2 - kmer2offset - (k-1)
+    # Adjustment for a "-" phase genome to return position to 5' end of k-mer:
+    #   - pos1 = ampPos1 - kmer1offset - (k-1)
+    #   - pos2 = ampPos2 + kmer2offset
+
+    # Adjustment for a "+" phase genome to go from 5' end of k-mer to outside base of k-mer:
+    #   - pos1 = pos1
+    #   - pos2 = pos2 + (k-1)
+    # Adjustment for a "-" phase genome to go from 5' end of k-mer to outside base of k-mer:
+    #   - pos1 = pos1 + (k-1)
+    #   - pos2 = pos2
+
+    # Overall adjustment for a "+" phase genome:
+    #   - pos1 = ampPos1 + kmer1offset
+    #   - pos2 = ampPos2 - kmer2offset
+    # Overall adjustment for a "-" phase genome:
+    #   - pos1 = ampPos1 - kmer1offset
+    #   - pos2 = ampPos2 + kmer2offset
+
+    # In addition to these adjustments, we want to swap pos1 and pos2 if pos1 > pos2 ("-" phase).
     for (genome in genomeLtrs)
         {
-        isReversed = (df[, pos1Cols[genome]] > df[, pos2Cols[genome]])
-        t = df[isReversed, pos1Cols[genome]]
-        df[isReversed, pos1Cols[genome]] = df[isReversed, pos2Cols[genome]]
-        df[isReversed, pos2Cols[genome]] = t
-        df[!isReversed,pos1Cols[genome]] = df[!isReversed,pos1Cols[genome]] + df$kmer1offset[!isReversed]
-        df[!isReversed,pos2Cols[genome]] = df[!isReversed,pos2Cols[genome]] - df$kmer2offset[!isReversed]
-        df[isReversed,pos1Cols[genome]] = df[isReversed,pos1Cols[genome]] + df$kmer2offset[isReversed]
-        df[isReversed,pos2Cols[genome]] = df[isReversed,pos2Cols[genome]] - df$kmer1offset[isReversed]
+        pos1Col = pos1Cols[genome]
+        pos2Col = pos2Cols[genome]
 
-        # Adjust positions so that instead of being the outside end of the k-mer,
-        # they are the positions of the first bases TO THE INSIDE of the k-mer.
-        df[, pos1Cols[genome]] = df[, pos1Cols[genome]] + kmerLen
-        df[, pos2Cols[genome]] = df[, pos2Cols[genome]] - kmerLen
+        minusPhase = (df[, pos1Col] > df[, pos2Col])
+        df[!minusPhase, pos1Col] = df[!minusPhase, pos1Col] + df$kmer1offset[!minusPhase]
+        df[!minusPhase, pos2Col] = df[!minusPhase, pos2Col] - df$kmer2offset[!minusPhase]
+        df[minusPhase, pos1Col] = df[minusPhase, pos1Col] - df$kmer1offset[minusPhase]
+        df[minusPhase, pos2Col] = df[minusPhase, pos2Col] + df$kmer2offset[minusPhase]
+        t = df[minusPhase, pos1Col]
+        df[minusPhase, pos1Col] = df[minusPhase, pos2Col]
+        df[minusPhase, pos2Col] = t
+
+        rm(minusPhase, t)
         }
 
     # Retain only needed columns.
@@ -448,6 +500,7 @@ for (genome in genomeLtrs)
         as.integer(df[, pos1Cols[genome]]), "..", as.integer(df[, pos2Cols[genome]]), sep="")
     inv(length(seqExtStrs[[genome]]), "length(seqExtStrs[[genome]])")
     writeLines(seqExtStrs[[genome]], extractPosFiles[genome])
+    rm(revComp)
     }
 
 ################################################################################
@@ -507,8 +560,51 @@ for (genome in genomeLtrs)
     df = data.frame(df, seq=seqs, stringsAsFactors=FALSE)
     colnames(df)[ncol(df)] = paste(genome, "seq", sep="")
     rownames(df) = NULL
+
+    rm(seqs, dft)
     }
+rm(seqExtStrs)
 seqCols = paste(genomeLtrs, "seq", sep="")
+names(seqCols) = genomeLtrs
+refSeqCol = seqCols[1]
+
+################################################################################
+# Confirm that all sequences start and end with the same kmerLen characters,
+# which are the common unique k-mer.
+#
+# This is where we find out if the Xpos1 and Xpos2 adjustments we made after
+# reading the input file were correct.
+################################################################################
+
+ref.startKmers = substr(df[, refSeqCol], 1, kmerLen)
+lens = nchar(df[, refSeqCol])
+ref.endKmers = substr(df[, refSeqCol], lens-kmerLen+1, lens)
+startKmerMatches = rep(TRUE, nrow(df))
+endKmerMatches = startKmerMatches
+for (genome in otherGenomeLtrs)
+    {
+    seqCol = seqCols[genome]
+    g.startKmers = substr(df[, seqCol], 1, kmerLen)
+    lens = nchar(df[, seqCol])
+    g.endKmers = substr(df[, seqCol], lens-kmerLen+1, lens)
+    startKmerMatches = startKmerMatches & (ref.startKmers == g.startKmers)
+    endKmerMatches = endKmerMatches & (ref.endKmers == g.endKmers)
+    }
+if (any(!startKmerMatches) || any(!endKmerMatches))
+    stop("Error, expected all sequences to start and end with the same k-mer but ",
+        sum(!startKmerMatches), " start seqs and ", sum(!endKmerMatches),
+        " end seqs do not match out of ", nrow(df))
+
+################################################################################
+# Remove all df rows for which the DNA sequences are identical for all genomes,
+# since there will be no InDels in such sequences.  There will be many of these
+# if the input file was an LCR file, none if it was an Indel Group or marker file.
+################################################################################
+
+allIdentical = rep(TRUE, nrow(df))
+for (genome in otherGenomeLtrs)
+    allIdentical = allIdentical & (df[, refSeqCol] == df[, seqCols[genome]])
+df = df[!allIdentical,]
 
 ################################################################################
 # Now perform and analyze alignments.  For each row of df, write a FASTA file
@@ -633,10 +729,10 @@ for (i in 1:nrow(df))
         # Create a data frame of InDels and append it to dfIndels.
         phases = df$phases[i]
         dfi = data.frame(ID=df$ID[i], phases=phases, idx=1:Nindels, stringsAsFactors=FALSE)
-        for (i in 1:Ngenomes)
+        for (j in 1:Ngenomes)
             {
-            genome = genomeLtrs[i]
-            phase = substring(phases, i, i)
+            genome = genomeLtrs[j]
+            phase = substring(phases, j, j)
             dfi[, delCols[genome]] = gapCount[[genome]]
             dfi[, idCols[genome]] = df[i, idCols[genome]]
             # For start and end positions, we must SUBTRACT THE NUMBER OF GAPS IN EACH GENOME.

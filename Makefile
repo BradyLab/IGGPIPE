@@ -674,13 +674,13 @@ $(PTN_OVERLAPPING_INDELS_FILE) $(PTN_NONOVERLAPPING_INDELS_FILE) : $(PATH_LCR_FI
 # Likewise, a list of all .contigs files is already defined above: CONTIG_FILES
 
 # A list of all .dnaseqs files to be produced.
-DNA_SEQ_FILES := $(foreach G,$(GENOME_NUMBERS),$(PFX_GENOME_DATA_FILE)$(G).dnaseqs)
+DNA_SEQ_FILES := $(foreach G,$(GENOME_NUMBERS),$(PFX_DNA_SEQS_PATH)_$(G).dnaseqs)
 
 # Target .dnaseqs file(s) for genome GENOME.
 ifeq ($(GENOME),ALL)
 TARGET_DNASEQ := $(DNA_SEQ_FILES)
 else
-TARGET_DNASEQ := $(PFX_GENOME_DATA_FILE)$(GENOME).dnaseqs
+TARGET_DNASEQ := $(PFX_DNA_SEQS_PATH)_$(GENOME).dnaseqs
 endif
 
 # Phony target to make or clean TARGET_DNASEQ file(s).
@@ -697,7 +697,7 @@ endif
 # DNA_SEQ_FILES is multiple targets, one per genome.
 # Here, % is a genome number.
 
-$(DNA_SEQ_FILES) : $(PFX_GENOME_DATA_FILE)%.dnaseqs : $$(PATH_GENOME_FASTA_$$*) \
+$(DNA_SEQ_FILES) : $(PFX_DNA_SEQS_PATH)_%.dnaseqs : $$(PATH_GENOME_FASTA_$$*) \
         $(PFX_GENOME_DATA_FILE)$$*.contigs $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) | \
         $(DIR_IGGPIPE_OUT) $(DIR_GENOME_OUT_DATA) \
         $(PATH_RSCRIPT) $(PATH_GET_DNA_SEQS) $(PATH_PERL) $(PATH_GET_SEQS_FASTA)
@@ -739,7 +739,7 @@ $(PATH_NONVALIDATED_MARKER_FILE) : $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) $(DNA_S
 	@echo "Find primers around Indel Groups in $< and write to $@"
 	$(TIME) $(PATH_RSCRIPT) $(PATH_FIND_PRIMERS) $(WD) \
 		$(PATH_OVERLAPPING_INDEL_GROUPS_FILE) \
-		$(PFX_GENOME_DATA_FILE) \
+		$(PFX_DNA_SEQS_PATH) \
 		$(PATH_NONVALIDATED_MARKER_FILE) \
 		$(PATH_PRIMER3CORE) $(PATH_PRIMER3_SETTINGS) $(PATH_PRIMER3CONFIG) \
 		$(PATH_PRIMER3_IN) $(PATH_PRIMER3_OUT) \
@@ -881,6 +881,12 @@ $(PTN_COUNTS_FILE) $(PTN_DENSITY_FILES) : $(PATH_OVERLAPPING_MARKERS_FILE) $(PAT
 
 # A list of all FASTA files already defined above: FASTA_FILES
 
+# Do this to avoid case annoyance.
+Indels: InDels
+
+# Do this to avoid case annoyance.
+indels: InDels
+
 # Phony target to make or clean PATH_INDELS_OUTPUT_FILE file.
 # If variable PARAMS is not defined, show basic usage info, else make InDels
 # output file target.
@@ -919,6 +925,9 @@ $(PATH_INDELS_OUTPUT_FILE) : $(PATH_INDELS_INPUT_FILE) $(FASTA_FILES) | $(DIR_GE
 ################################################################################
 # plotInDels: Make plots of information about InDels found within InDel groups.
 ################################################################################
+
+# Do this to avoid case annoyance.
+plotIndels: plotInDels
 
 # Phony target to make or clean PATH_INDELS_PLOT_FILE file.
 # If variable PARAMS is not defined, show basic usage info, else make plotInDels

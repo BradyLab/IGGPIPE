@@ -36,6 +36,7 @@ testing = 0
 #testing = 4 # For testing only.
 #testing = 5 # For testing only.
 #testing = 6 # For testing only.
+#testing = 7 # For testing only.
 {
 if (testing == 0)
     args = commandArgs(TRUE)
@@ -54,6 +55,8 @@ else
         args = "annotate/test_addILs_column.markers"
     else if (testing == 6)
         args = "annotate/test_add_genesColumn.markers"
+    else if (testing == 7)
+        args = "annotate/test_add_isInNearColumn.markers"
     else
         stop("Unknown value for 'testing'")
     }
@@ -809,7 +812,12 @@ if (doMatchMerge && !is.null(L$attrExtractS))
 
 if (doMatchMerge)
     {
-    T.df = mergeOnMatches(T.df, S.df, L$positionT, L$positionS, L$match, L$mergeCols)
+    # mergeOnMatches = function(T.df, S.df, T.pos, S.pos, match, mergeCols)
+    T.pos = L$positionT
+    S.pos = L$positionS
+    match = L$match
+    mergeCols = L$mergeCols
+    T.df = mergeOnMatches(T.df, S.df, T.pos, S.pos, match, mergeCols)
     }
 
 ################################################################################

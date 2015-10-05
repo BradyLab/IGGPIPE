@@ -524,7 +524,7 @@ match:
     # another parameter, "closest", lets you select ALL of them to appear in the new
     # inputFileT column(s), or only the NEAREST, or only the nearest UPSTREAM and
     # nearest DOWNSTREAM.  In the case of overlaps, ALL overlaps appear in the new
-    # column(s).  Only used when method is S.NEAR.
+    # column(s).  Only used when method is S.NEAR or T.NEAR.
     #   closest := 0: all inputFileS rows that are near are added to the new column(s).
     #   closest := 1: the NEAREST inputFileS row is added to the new column(s).
     #   closest := 2: the nearest UPSTREAM and DOWNSTREAM rows are added to the new column(s).
@@ -655,6 +655,9 @@ mergeCols:
         # So, if {#T} is used and -140 is displayed, this means the end of S lies 140 bp
         # upstream of the start of T.  If {%S} is used and @-12 is displayed, this means
         # the start of T lies 12% of the length of S UPSTREAM from the start of S.
+        # NOTE: "upstream" and "downstream" are always assuming a "+" strand, so if the
+        # inputFileS position is of a feature on the "-" strand, you must reverse "upstream"
+        # and "downstream" to get the true relative positions.
 
         format := "{+gene}({#T})"
 

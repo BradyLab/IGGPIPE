@@ -81,7 +81,7 @@ mergeCols:
     1:
         col := isInNear
         maxMatch := 0
-        format := "{+ID}({#T}:{+strand})" # E.g. "intron:Solyc07g008570(@384:+)" means plus strand, overlaps with marker starting 384 bp after gene start.
+        format := "{+ID}({#T}:{+strand})" # E.g. "intron:Solyc07g008570(@384:+)" means plus strand, intron overlaps with marker starting 384 bp after marker start.
 
 ################################################################################
 # Output file parameters.

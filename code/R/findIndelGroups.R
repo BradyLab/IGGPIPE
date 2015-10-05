@@ -270,6 +270,7 @@ df = df[order(df$LCR),]
 # Add column NkmerFromLCRstart containing the number of this k-mer from the START
 # of the LCR, the first one being 1.
 numKmersInLCR = tapply(1:nrow(df), df$LCR, length)
+
 # Following needs unlist() and c() depending on whether all elements of numKmersInLCR are equal
 df$NkmerFromLCRstart = unlist(c(sapply(numKmersInLCR, function(N) 1:N)), use.names=FALSE)
 
@@ -301,8 +302,7 @@ for (genome in otherGenomes)
 
 # Remove candidate LCRs that don't have at least 2*minFlank+2 k-mers in them.
 inv(length(unique(df$LCR)), "Number of LCRs before removing those with too few k-mers")
-numKmersInLCR = tapply(1:nrow(df), df$LCR, length)
-keepLCRs = names(numKmersInLCR)[numKmersInLCR >= 2*minFlank+2]
+keepLCRs = as.integer(names(numKmersInLCR)[numKmersInLCR >= 2*minFlank+2])
 df = df[df$LCR %in% keepLCRs,]
 inv(length(unique(df$LCR)), "Number of LCRs after removing those with too few k-mers")
 rm(numKmersInLCR, keepLCRs)
@@ -590,13 +590,13 @@ while (length(rightSideKmers) > 0)
         {
         catnow("Loop", format(loopCount, width=4), " # right-side k-mers remaining to test:",
             format(length(rightSideKmers), width=9), "out of", format(initialNright, width=9),
-            "  # candidates found:", attr(goodPairs, "nrow"), "\n")
+            "  # Indel Groups found:", attr(goodPairs, "nrow"), "\n")
         lastProgressTime = curTime
         }
     }
 goodPairs = rbind.fast.finish(goodPairs)
 inv(sum(!is.na(goodPairs)))
-catnow("Finished testing, # candidates found:", nrow(goodPairs), "\n")
+catnow("Finished testing, # Indel Groups found:", nrow(goodPairs), "\n")
 
 # Retrieve the df rows for the good left- and right-side k-mers into dfEL and dfER.
 catnow("Merging k-mer pairs into single InDel Group rows...")

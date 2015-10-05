@@ -102,6 +102,10 @@ inv = function(a, title="") { if (investigate) objPrint(a, title) }
 ################################################################################
 rbind.fast = function(df1, df2)
     {
+    if (!(is.null(df1) || is.data.frame(df1) || (is.list(df1) && is.list(df1[[1]]))) ||
+        !(is.null(df2) || is.data.frame(df2) || (is.list(df2) && is.list(df2[[1]]))))
+        stop("rbind.fast only works with NULL or data frame or list of lists arguments")
+
     # Convert df1 from data frame to list if not already done.  Each list element
     # is itself a list.
     if (is.data.frame(df1))

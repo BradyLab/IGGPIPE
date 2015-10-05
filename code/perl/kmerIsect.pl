@@ -4,6 +4,9 @@
 ###########################################################################
 use strict;
 use warnings;
+use File::Basename;
+use lib dirname($0); # Look for TedsLibrary.pm in same directory as this .pl file.
+use TedsLibrary ':all';
 
 # Get arguments.
 my $n = @ARGV;

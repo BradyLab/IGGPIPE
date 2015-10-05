@@ -92,9 +92,9 @@ coerceObj = function(obj, type, errfunc, ..., allowNA=FALSE, name=NULL)
 # Arguments:
 #   df1: data frame with columns start, end, and idx.  start and end define the starting
 #       and ending positions of a contig, and idx is returned from each df1 row of all
-#       (df1, df2) matching pairs of rows.
-#   df2: data frame with columns like df1.  idx is returned from each df2 row of all
-#       (df1, df2) matching pairs of rows.
+#       df1 rows whose contigs contain the df2 position.
+#   df2: data frame with columns pos and idx.  idx is returned from each df2 row of all
+#       df2 rows whose position is contained by the df1 contig.
 #
 # Returns: a vector with an even length, composed of consecutive pairs (x, y), where,
 # for each row of df1 and row of df2 such that df1[["start"]] <= df2[["pos"]] <= df1[["end"]],
@@ -194,9 +194,9 @@ findContainsIdxs.recursive = function(df1, df2, start, end)
 # df2's position is within df1's contig.
 #
 # Arguments:
-#   df1: data frame with columns start and end that define the starting and ending
-#       positions of a contig.
-#   df2: data frame with columns like df1.
+#   df1: data frame with columns "start" and "end" that define the starting and
+#       ending positions of a contig.
+#   df2: data frame with column "pos".
 #
 # Returns: a matrix with 2 columns.  The first column is row numbers of df1 and the
 # second column is row numbers of df2.  Each row of the matrix identifies a pair of
@@ -410,13 +410,16 @@ getMatchIdxs = function(T.position, S.position, match)
                     # the dist.S.upstreamOf.T or dist.S.downstreamOf.T value, whichever one is
                     # not negative.
                     dist.T = pmax(dist.S.upstreamOf.T, dist.S.downstreamOf.T)
-                    L = tapply(1:nrow(idxs.no.overlap), idxs.no.overlap[,1], function(ii)
+                    # Get indexes into idxs.no.overlap of the rows with the smallest distance away, for each [,1] index.
+                    V = tapply(1:nrow(idxs.no.overlap), idxs.no.overlap[,1], function(ii)
                         {
                         # Get value of ii (idxs.no.overlap row number) of the row that has the
                         # smallest value in dist.T.
                         i = ii[which.min(dist.T[ii])]
-                        return(idxs.no.overlap[i,])
+                        return(i)
                         })
+                    # Get data frame of subset of idxs.no.overlap that are the closest distances, back into idxs.no.overlap.
+                    idxs.no.overlap = idxs.no.overlap[V,,drop=FALSE]
                     }
                 else # (match[["closest"]] == 2)
                     {
@@ -427,24 +430,22 @@ getMatchIdxs = function(T.position, S.position, match)
                     dist.S.upstreamOf.T = dist.S.upstreamOf.T[upstream]
                     dist.S.downstreamOf.T = dist.S.downstreamOf.T[!upstream]
 
-                    # Get separate lists of nearest upstream and nearest downstream index pairs.
-                    L.upstream = tapply(1:nrow(idxs.upstream), idxs.upstream[,1], function(ii)
+                    # Get separate vectors of indexes of nearest upstream and nearest downstream index pairs.
+                    V.upstream = tapply(1:nrow(idxs.upstream), idxs.upstream[,1], function(ii)
                         {
                         i = ii[which.min(dist.S.upstreamOf.T[ii])]
-                        return(idxs.upstream[i,])
+                        return(i)
                         })
 
-                    L.downstream = tapply(1:nrow(idxs.downstream), idxs.downstream[,1], function(ii)
+                    V.downstream = tapply(1:nrow(idxs.downstream), idxs.downstream[,1], function(ii)
                         {
                         i = ii[which.min(dist.S.downstreamOf.T[ii])]
-                        return(idxs.downstream[i,])
+                        return(i)
                         })
 
-                    L = c(L.upstream, L.downstream)
+                    # Get data frame of subset of idxs.no.overlap that are the closest distances, back into idxs.no.overlap.
+                    idxs.no.overlap = rbind(idxs.upstream[V.upstream,,drop=FALSE], idxs.downstream[V.downstream,,drop=FALSE])
                     }
-                # Convert list L of one-row data frames to a single data frame
-                # which is the new idxs.no.overlap.
-                idxs.no.overlap = do.call.rbind.fast(L)
                 }
 
             # Bind idxs.overlap and idxs.no.overlap to form new idxs matrix.
@@ -718,7 +719,7 @@ formatData = function(format, T.colnames, S.colnames, T.df=NULL, S.df=NULL, idxs
 #   S.pos: like T.pos, for S.df.
 #   match: list defining how to find position matches between T.df and S.df.  Members:
 #           "method" (required) : one of "OVERLAP", "S.TINY", "T.TINY", "S.NEAR", "T.NEAR"
-#           "closest" (optional) : for s/T.NEAR, 0 (all), 1 (nearest 1), or 2 (nearest 2)
+#           "closest" (optional) : for S/T.NEAR, 0 (all), 1 (nearest 1), or 2 (nearest 2)
 #           "start.up", "start.down", "end.up", "end.down" (optional) : for x.NEAR, x = S/T:
 #               start.up: x.start must be no less than y.start-start.up
 #               start.down: x.start must be no more than y.end+start.down
@@ -785,16 +786,16 @@ formatData = function(format, T.colnames, S.colnames, T.df=NULL, S.df=NULL, idxs
 #               are near to one another to the degree specified by the members "closest"
 #               and "start.up", "start.down", "end.up", "end.down".
 #           "T.NEAR": The opposite of T.NEAR, swap S.df and T.df roles.
-#       closest: this is only applicable when method is s/T.NEAR, and it is optional and
+#       closest: this is only applicable when method is S/T.NEAR, and it is optional and
 #               if not specified is taken as 0.  It can have one of these values:
 #           0: ALL contigs satisfying the four position limits below are taken as matches.
 #           1: Like "OVERLAP" but when there is no overlap, only the NEAREST to each T.df
 #               (S.NEAR) or S.df (T.NEAR) row of all non-overlapping matches that satisfy
 #               the four position limits below is taken as a match.
-#           2: like 1, but allows one match upstream of s/T.df and a second downstream,
+#           2: like 1, but allows one match upstream of S/T.df and a second downstream,
 #               in both cases the NEAREST one.
 #       start.up, start.down, end.up, end.down: these are only applicable when 'method'
-#           is s/T.NEAR.  Each is a signed integer that may be positive OR NEGATIVE OR NA.
+#           is S/T.NEAR.  Each is a signed integer that may be positive OR NEGATIVE OR NA.
 #           Each is optional and taken as NA if unspecified.  All four function similarly,
 #           being used as limits to how far the start and end of the S.df (S.NEAR) or T.df
 #           (T.NEAR) position can be from the start and end of the T.df (S.NEAR) or S.df
@@ -851,6 +852,9 @@ formatData = function(format, T.colnames, S.colnames, T.df=NULL, S.df=NULL, idxs
 #           So, if {#T} is used and -140 is displayed, this means the end of S lies 140 bp
 #           upstream of the start of T.  If {%S} is used and @-12 is displayed, this means
 #           the start of T lies 12% of the length of S UPSTREAM from the start of S.
+#           NOTE: "upstream" and "downstream" are always assuming a "+" strand, so if the S.df position
+#           is of a feature on the "-" strand, you must reverse "upstream" and "downstream" to get the
+#           true relative positions.
 #       maxMatch: optional integer specifying the maximum number of matches of multiple S.df rows to a single
 #           T.df row, whose data is to be copied to "col".  If 0 or if not specified, there is no limit, all
 #           matches are copied.  Otherwise, if there are more matches than this integer, the remaining matches
@@ -1118,6 +1122,7 @@ mergeOnMatches = function(T.df, S.df, T.pos, S.pos, match, mergeCols)
 
         # Search for matches based on match[["method"]].  Matrix idxs holds indexes
         # of T.df (idxs column 1) rows and S.df (idxs column 2) rows that match.
+        #       getMatchIdxs = function(T.position, S.position, match)
         idxs = getMatchIdxs(T.position, S.position, match)
 
         # With the matching indexes at hand, we can now add columns to T.df under
