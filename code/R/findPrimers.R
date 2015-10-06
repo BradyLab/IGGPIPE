@@ -415,9 +415,7 @@ recordSeps = rep("=", nrow(dfMarkers))
 records = c(rbind(thermo, seqIDs, primerTemplates, primerRegions, recordSeps))
 numSeqIDs = length(seqIDs)
 rm(seqIDs, primerTemplates, primerRegions, recordSeps)
-f = file(primer3DataFile, "wb")
-writeLines(records, f)
-close(f)
+writeLines(records, primer3DataFile)
 rm(records)
 catnow("\n")
 
@@ -426,8 +424,8 @@ catnow("\n")
 ########################################
 
 if (!file.exists(primer3settings)) stop("Primer3 settings file ", primer3settings, " not found")
-primer3_cmd = paste(primer3core, "-p3_settings_file", primer3settings, "<", primer3DataFile, ">", primer3OutFile)
-catnow("Running primer3 to design primers:\n   ", primer3_cmd, "\n")
+primer3_args = c("-p3_settings_file", primer3settings)
+catnow("Running primer3 to design primers\n")
 estimateTime = FALSE
 if (estimateTime)
     {
@@ -436,7 +434,7 @@ if (estimateTime)
     maxMinutes = ceiling(totalSeconds/60)
     catnow("Expect this to take up to", maxMinutes, "minutes on a slower computer.\n")
     }
-system(primer3_cmd)
+system2(primer3core, primer3_args, stdout=primer3OutFile, stdin=primer3DataFile)
 
 ########################################
 # Read and parse the primer3 output file to extract the primers, and include
