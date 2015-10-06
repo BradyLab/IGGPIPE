@@ -201,5 +201,92 @@ do.call.rbind.fast = function(L, stringsAsFactors=FALSE)
     }
 
 ################################################################################
+# Like pretty() without all the extra arguments, except that this finds a
+# sequence of "round" values appropriate when the axis is logarithmic.  The
+# returned sequence includes powers of 10, and optionally, 2 * powers of 10,
+# and 5 * powers of 10.
+#
+# Arguments:
+#   x: an object coercible to numeric().
+#   include: one of the values "X1", "X12", "X15", or "X125" indicating inclusion
+#       of powers of 10 only (X1), 1* and 2* powers of 10 (X12), 1* and 5* (X15),
+#       or 1*, 2*, and 5* (X125).
+#   P10.StartEnd: TRUE if sequence must start and end with a power of 10, FALSE
+#       if it may start or end with 2* or 5* a power of 10 (depending of course
+#       on 'include').
+#
+# Returns: the computed sequence.
+################################################################################
+pretty.log = function(x, include="X125", P10.StartEnd=FALSE)
+    {
+    x = as.numeric(x)
+    r = range(x)
+
+    # Compute first element of the sequence.
+    x1 = log10(r[1])
+    x1 = ifelse(x1 < 0, as.integer(x1)-1, as.integer(x1))
+    x1 = 10^x1
+    # Raise first sequence element by *5 if possible, else *2 if possible.
+    cur = "atX1"
+    if (!P10.StartEnd && (include %in% c("X15", "X125")) && (x1*5 <= r[1]))
+        {
+        x1 = x1*5
+        cur = "atX5"
+        }
+    else if (!P10.StartEnd && (include %in% c("X12", "X125")) && (x1*2 <= r[1]))
+        {
+        x1 = x1*2
+        cur = "atX2"
+        }
+
+    # Compute last element of the sequence.
+    x2 = log10(r[2])
+    x2 = ifelse(x2 < 0, as.integer(x2), as.integer(x2)+1)
+    x2 = 10^x2
+    # Lower last sequence element by *2/10 if possible, else *5/10 if possible.
+    if (!P10.StartEnd && (include %in% c("X12", "X125")) && (x2*2/10 >= r[2]))
+        x2 = x2*2/10
+    else if (!P10.StartEnd && (include %in% c("X15", "X125")) && (x2*5/10 >= r[2]))
+        x2 = x2*5/10
+
+    # Value to assign to 'cur' when moving from one sequence element to the next,
+    # depending on value of 'include' argument as well as value of 'cur'.
+    nextCur = list(X1=c(atX1="atX1"),
+                   X12=c(atX1="atX2", atX2="atX1"),
+                   X15=c(atX1="atX5", atX5="atX1"),
+                   X125=c(atX1="atX2", atX2="atX5", atX5="atX1"))
+
+    # Value to multiply current sequence member by, to get next sequence member,
+    # depending on value of 'include' argument as well as value of 'cur'.
+    multFactor = list(X1=c(atX1=10),
+                      X12=c(atX1=2, atX2=5),
+                      X15=c(atX1=5, atX5=2),
+                      X125=c(atX1=2, atX2=5/2, atX5=2))
+
+    # Compute the full sequence.
+    seq = x1
+    xt = x1
+    while (xt <= x2)
+        {
+        xt = xt * multFactor[[include]][cur]
+        cur = nextCur[[include]][cur]
+        seq = c(seq, xt)
+        }
+    names(seq) = NULL
+    return(seq)
+    }
+
+################################################################################
+# Conservative 8-color palette adapted for color blindness, with first color = "black".
+#
+# Wong, Bang. "Points of view: Color blindness." nature methods 8.6 (2011): 441-441.
+################################################################################
+colorBlind.8 = c(black="#000000", orange="#E69F00", skyblue="#56B4E9",
+    bluegreen="#009E73", yellow="#F0E442", blue="#0072B2", vermillion="#D55E00",
+    reddishpurple="#CC79A7")
+# plot(NA, xlim=0:1, ylim=0:1, axes=FALSE, xlab="", ylab="")
+# rect((0:7)/8, 0, (1:8)/8, 1, border=NA, col=colorBlind.8)
+
+################################################################################
 # End of file.
 ################################################################################

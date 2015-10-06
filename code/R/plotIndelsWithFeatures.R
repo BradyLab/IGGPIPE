@@ -25,7 +25,7 @@ source(paste(thisDir, "Include_Common.R", sep=""))
 # Get arguments.
 testing = 0
 #testing = 1 # For testing only.  .test
-#testing = 2 # For testing only.  .HP
+#testing = 2 # For testing only.  .HPlong
 {
 if (testing == 0)
     args = commandArgs(TRUE)
@@ -34,19 +34,19 @@ else if (testing == 1)
     args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
         "outTestHP11/MarkersNonoverlappingWithInNearFeatures_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv",
         "outTestHP11/MarkersNonoverlappingWithInNearFeatures_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.pdf",
-        1000, "S.lycopersicum,S.pennellii")
+        1000, 2000, "S.lycopersicum,S.pennellii")
     }
 else if (testing == 2)
     {
     args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
-        "outHP14/IndelGroupsNonoverlappingWithInNearFeatures_K14k2L100D1_3000A100_3000d100_100N2F0.indels",
+        "outHP14/IndelGroupsNonoverlappingWithInNearFeatures_K14k2L100D1_3000A100_3000d100_100N2F0.indels.tsv",
         "outHP14/MarkersNonoverlappingWithInNearFeatures_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.indels.pdf",
-        1000, "S.lycopersicum,S.pennellii")
+        1000, 3000, "S.lycopersicum,S.pennellii")
     }
 else stop("Unknown value for 'testing'")
 }
 
-Nexpected = 5
+Nexpected = 6
 if (length(args) != Nexpected)
     {
     usage = c(
@@ -55,7 +55,7 @@ if (length(args) != Nexpected)
         "See annotate/HPlong_addFeatureIDs.nonoverlappingIndelGroups for parameters used to create the",
         "input file for this.",
         "",
-        "Usage: Rscript plotIndelsWithFeatures.R <wd> <InDelsFile> <pdfPlotFile> <nearInBp> <genomeNames>",
+        "Usage: Rscript plotIndelsWithFeatures.R <wd> <InDelsFile> <pdfPlotFile> <nearInBp> <maxIndelLen> <genomeNames>",
         "",
         "Arguments:",
         "   <wd>                 : Path of R working directory, specify other file paths relative to this.",
@@ -63,6 +63,7 @@ if (length(args) != Nexpected)
         "                          See annotate/test_add_isInNearColumn.markers",
         "   <pdfPlotFile>        : Name of pdf file to be created.",
         "   <nearInBp>           : Number of base pairs used to define 'near' when running annotateFile.R",
+        "   <maxIndelLen>        : Maximum possible size of any indel that is detected with the method used to detect them.",
         "   <genomeNames>        : Comma-separated names of genomes in the input file, same order as input file."
         )
     for (S in usage)
@@ -88,7 +89,10 @@ catnow("  pdfPlotFile: ", pdfPlotFile, "\n")
 nearInBp = as.integer(args[4])
 catnow("  nearInBp: ", nearInBp, "\n")
 
-genomeNames = unlist(strsplit(args[5], ",", fixed=TRUE))
+maxIndelLen = as.integer(args[5])
+catnow("  maxIndelLen: ", maxIndelLen, "\n")
+
+genomeNames = unlist(strsplit(args[6], ",", fixed=TRUE))
 catnow("  genomeNames: ", paste(genomeNames, collapse=","), "\n")
 
 ########################################
@@ -201,19 +205,17 @@ if (any(!unique(dfIndels$isInNear) %in% features))
     stop("Missing features (this is set up for S. lycopersicum only)")
 
 ########################################
-# Plot colors for each genome.
+# Plot colors for each genome and each feature.
 ########################################
 
-genomeCols = c("blue", "red", "gold")[1:Ngenomes]
-if (Ngenomes > 3)
+genomeCols = colorBlind.8[1:Ngenomes]
+if (Ngenomes > 8)
     genomeCols = rainbow(Ngenomes)
 names(genomeCols) = genomeLtrs
 
-########################################
-# Plot colors for each feature.
-########################################
-
-featureCols = rainbow(Nfeatures)
+featureCols = colorBlind.8[1:Nfeatures]
+if (Nfeatures > 8)
+    featureCols = rainbow(Nfeatures)
 names(featureCols) = features
 
 ########################################
@@ -223,11 +225,21 @@ names(featureCols) = features
 gridCol = "gray"
 
 ########################################
+# Line types for each genome and each feature.
+########################################
+
+ltys = c("solid", "dashed", "dotted", "dotdash", "longdash", "twodash")
+genomeLtys = rep(ltys, length.out=Ngenomes)
+names(genomeLtys) = genomeLtrs
+featureLtys = rep(ltys, length.out=Nfeatures)
+names(featureLtys) = features
+
+########################################
 # Create pdf file.
 ########################################
 
 pdf(pdfPlotFile, height=8, width=11)
-par(mar=c(7,4,4,2))
+par(mar=c(7,6,4,2))
 
 ########################################
 # Make a bar plot (one bar per genome) showing the number of indels occurring
@@ -247,11 +259,25 @@ for (genome in genomeLtrs)
     countMtx[genome,] = x
     }
 
+# Compute axis labels.
+ypretty = pretty.log(countMtx)
+ylim = range(ypretty)
+yat = ypretty
+ylab="Number of InDels"
+if (ypretty[1] >= 1000)
+    {
+    ypretty = ypretty / 1000
+    ylab="Number of InDels  (x1000)"
+    }
+ypretty = format(ypretty, scientific=FALSE)
+
 # Make the bar plot.
-barplot(countMtx, beside=TRUE, col=genomeCols, log="y", las=2,
+barplot(countMtx, beside=TRUE, col=genomeCols, axes=FALSE, log="y", las=2,
     main="Distribution of indel locations",
-    ylab="Number of InDels (log scale)")
-title(paste("upstream and downstream mean within ", nearInBp, " bp of 5'UTR/CDS/3'UTR", sep=""), line=0.5, cex.main=0.7)
+    ylab="")
+title(paste("upstream and downstream defined as within ", nearInBp, " bp of 5'UTR/CDS/3'UTR", sep=""), line=0.5, cex.main=0.9)
+axis(2, at=yat, labels=ypretty, las=2)
+mtext(ylab, 2, line=4)
 
 # Legend.
 legend("topleft", genomeNames, fill=genomeCols)
@@ -267,6 +293,7 @@ minIndelLen = c(0, 1, 5, 25, 100, 250, 1000)
 Nbins = length(minIndelLen)
 binRanges = paste(minIndelLen, "..", c((minIndelLen-1)[-1], "+"), sep="")
 binRanges = sub("0..0", "0", binRanges)
+binRanges = sub("1000..+", "1000+", binRanges)
 
 # Count number of indels in each indel size range.
 countMtx = matrix(0, ncol=Nbins, nrow=Ngenomes, dimnames=list(genomeLtrs, minIndelLen))
@@ -281,37 +308,41 @@ for (genome in genomeLtrs)
     countMtx[genome,] = x[as.character(minIndelLen)]
     }
 
+# Compute axis labels.
 xlim = c(1, Nbins)
-ylim = range(pretty(c(0, 1.1*countMtx)))
-ylim[1] = 1
+ypretty = pretty.log(countMtx)
+ylim = range(ypretty)
+yat = ypretty
+ylab="Number of InDels"
+if (ypretty[1] >= 1000)
+    {
+    ypretty = ypretty / 1000
+    ylab="Number of InDels  (x1000)"
+    }
+ypretty = format(ypretty, scientific=FALSE)
 
 # Start the plot.
-plot(NA, type="n", xlim=xlim, ylim=ylim, xaxt="n", log="y", las=2,
+plot(NA, type="n", xlim=xlim, ylim=ylim, axes=FALSE, log="y",
     main="Distribution of indel deletion sizes",
-    xlab="Deletion size range (bp), 0=insertion", ylab="Number of InDels (log scale)")
-
-axis(1, at=1:Nbins, labels=binRanges, cex.axis=0.8)
+    xlab=paste("Deletion size range (bp), 0=insertion, max detectable ~ ", maxIndelLen, " bp", sep=""),
+    ylab="")
+axis(1, at=1:Nbins, labels=binRanges)
+axis(2, at=yat, labels=ypretty, las=2)
+mtext(ylab, 2, line=4)
 
 # Loop and plot line/points for each genome.
 for (genome in genomeLtrs)
     {
-    lines(2:Nbins, countMtx[genome, -1], col=genomeCols[genome])
-    points(1:Nbins, countMtx[genome,], col=genomeCols[genome], pch=20)
+    lines(2:Nbins, countMtx[genome, -1], col=genomeCols[genome], lwd=2, lty=genomeLtys[genome])
+    points(1:Nbins, countMtx[genome,], col=genomeCols[genome], pch=20, cex=2)
     }
 
 # Make some grid lines.
 segments(1:Nbins, ylim[1], 1:Nbins, ylim[2], col=gridCol)
-y = 1
-n = 5
-while (y <= ylim[2])
-    {
-    segments(0, y, xlim[2], y, col=gridCol)
-    y = y * n
-    n = ifelse(n == 5, 2, 5)
-    }
+segments(0, yat, xlim[2], yat, col=gridCol)
 
 # Legend.
-legend("topright", genomeNames, pch=20, col=genomeCols)
+legend("topright", genomeNames, pch=20, col=genomeCols, pt.cex=2, lwd=2, lty=genomeLtys, seg.len=5, bty="n")
 
 ########################################
 # Similar to the previous, except show a line for each feature type, and make a
@@ -334,43 +365,60 @@ for (genome in genomeLtrs)
         }
     }
 
+# Compute axis labels.
 xlim = c(1, Nbins)
-ylim = range(pretty(c(0, 1.1*counts)))
-ylim[1] = 1
+ypretty = pretty.log(counts)
+ylim = range(ypretty)
+yat = ypretty
+ylab="Number of InDels"
+if (ypretty[1] >= 1000)
+    {
+    ypretty = ypretty / 1000
+    ylab="Number of InDels  (x1000)"
+    }
+ypretty = format(ypretty, scientific=FALSE)
 
 # Loop and plot feature lines/points for each genome.
 for (genome in genomeLtrs)
     {
     # Start the plot.
-    plot(NA, type="n", xlim=xlim, ylim=ylim, xaxt="n", log="y", las=2,
-        main=paste("Distribution of indel deletion sizes among features in genome", genomeNames[genome]),
-        xlab="Deletion size range (bp), 0=insertion", ylab="Number of InDels")
-
-    axis(1, at=1:Nbins, labels=binRanges, cex.axis=0.8)
+    plot(NA, type="n", xlim=xlim, ylim=ylim, axes=FALSE, log="y",
+        main=paste("Distribution of indel deletion sizes among features in genome ",
+            genomeNames[genome], sep=""),
+        xlab=paste("Deletion size range (bp), 0=insertion, max detectable ~ ", maxIndelLen, " bp", sep=""),
+        ylab="")
+    title(paste("upstream and downstream defined as within ", nearInBp, " bp of 5'UTR/CDS/3'UTR", sep=""), line=0.5, cex.main=0.9)
+    axis(1, at=1:Nbins, labels=binRanges)
+    axis(2, at=yat, labels=ypretty, las=2)
+    mtext(ylab, 2, line=4)
 
     # Loop for each feature type.
     for (feat in features)
         {
-        lines(2:Nbins, counts[genome, feat, -1], col=featureCols[feat])
-        points(1:Nbins, counts[genome, feat,], col=featureCols[feat], pch=20)
+        lines(2:Nbins, counts[genome, feat, -1], col=featureCols[feat], lwd=2, lty=featureLtys[feat])
+        points(1:Nbins, counts[genome, feat,], col=featureCols[feat], pch=20, cex=2)
         }
 
-    # Label points left of x=2.
-    text(2, counts[genome, features, 2], features, pos=2, cex=0.7)
+    # Label points left of x=2.  When distance is close in y-direction, spread them.
+    y = counts[genome, features, 2]
+    txt = features
+    ord = order(y)
+    y = y[ord]
+    txt = txt[ord]
+    near = (diff(y)/y[-1] < 0.2)
+    while (any(near))
+        {
+        y[c(FALSE,near)] = y[c(FALSE,near)]*1.05
+        near = (diff(y)/y[-1] < 0.2)
+        }
+    text(2, y, txt, pos=2, cex=0.8)
 
     # Make some grid lines.
     segments(1:Nbins, ylim[1], 1:Nbins, ylim[2], col=gridCol)
-    y = 1
-    n = 5
-    while (y <= ylim[2])
-        {
-        segments(0, y, xlim[2], y, col=gridCol)
-        y = y * n
-        n = ifelse(n == 5, 2, 5)
-        }
+    segments(0, yat, xlim[2], yat, col=gridCol)
 
     # Legend.
-    legend("topright", features, pch=20, col=featureCols)
+    legend("topright", features, pch=20, col=featureCols, pt.cex=2, lwd=2, lty=featureLtys, seg.len=5, bty="n")
     }
 
 ########################################

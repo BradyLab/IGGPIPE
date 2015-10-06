@@ -160,8 +160,8 @@ for (i in 1:Npairs)
     meanAmpliconLen = mean(ampliconLens)
     meanNumIndels = mean(numIndels)
     catnow("meanAmpliconLen =", meanAmpliconLen, " meanNumIndels =", meanNumIndels, "\n")
-    points(meanAmpliconLen, meanNumIndels, pch=20, cex=2, col="blue")
-    text(meanAmpliconLen, meanNumIndels, "Mean", cex=2, col="blue", pos=4)
+    points(meanAmpliconLen, meanNumIndels, pch=20, cex=2, col="tan")
+    text(meanAmpliconLen, meanNumIndels, "Mean", cex=2, col="tan", pos=4)
     }
 
 ########################################
@@ -206,8 +206,8 @@ for (i in 1:Npairs)
     meanAmpliconLen = mean(ampliconLens)
     meanIndelsLens = mean(indelLens)
     catnow("meanAmpliconLen =", meanAmpliconLen, " meanIndelsLens =", meanIndelsLens, "\n")
-    points(meanAmpliconLen, meanIndelsLens, pch=20, cex=2, col="blue")
-    text(meanAmpliconLen, meanIndelsLens, "Mean", cex=2, col="blue", pos=4)
+    points(meanAmpliconLen, meanIndelsLens, pch=20, cex=2, col="tan")
+    text(meanAmpliconLen, meanIndelsLens, "Mean", cex=2, col="tan", pos=4)
     }
 
 ########################################

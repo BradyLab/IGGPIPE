@@ -292,8 +292,7 @@ catnow("Finished making plots of counts of number of good candidate markers, out
 maxSeqLenMbp = max(unlist(idlens))
 xlim = c(0, 1.2*maxSeqLenMbp)
 
-# Set the color of the line segments drawn at each marker position.  Use an
-# alpha value that is fairly small.
+# Set the color of the line segments drawn at each marker position.
 markerColor = "black"
 markerColor = col2rgb(markerColor)
 markerColor = rgb(markerColor["red",], markerColor["green",], markerColor["blue",], alpha*255, maxColorValue=255)
