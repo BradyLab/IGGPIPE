@@ -434,7 +434,9 @@ if (estimateTime)
     maxMinutes = ceiling(totalSeconds/60)
     catnow("Expect this to take up to", maxMinutes, "minutes on a slower computer.\n")
     }
-system2(primer3core, primer3_args, stdout=primer3OutFile, stdin=primer3DataFile)
+stat = system2(primer3core, primer3_args, stdout=primer3OutFile, stdin=primer3DataFile)
+if (stat != 0)
+    stop("Program ", primer3core, " exited with error status ", stat)
 
 ########################################
 # Read and parse the primer3 output file to extract the primers, and include
