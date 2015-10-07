@@ -384,10 +384,10 @@ for (genome in genomeLtrs)
     # Start the plot.
     plot(NA, type="n", xlim=xlim, ylim=ylim, axes=FALSE, log="y",
         main=paste("Distribution of indel deletion sizes among features in genome ",
-            genomeNames[genome], sep=""),
+            genomeNames[genome], "\n(features are from S. lycopersicum gene model file)", sep=""),
         xlab=paste("Deletion size range (bp), 0=insertion, max detectable ~ ", maxIndelLen, " bp", sep=""),
         ylab="")
-    title(paste("upstream and downstream defined as within ", nearInBp, " bp of 5'UTR/CDS/3'UTR", sep=""), line=0.5, cex.main=0.9)
+    title(paste("upstream and downstream defined as within ", nearInBp, " bp of 5'UTR/CDS/3'UTR", sep=""), line=-0.5, cex.main=0.9)
     axis(1, at=1:Nbins, labels=binRanges)
     axis(2, at=yat, labels=ypretty, las=2)
     mtext(ylab, 2, line=4)
