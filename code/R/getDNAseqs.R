@@ -325,13 +325,15 @@ seqExtStrs = paste(c("", "!")[1+dfXP$pos.revcomp], df$id,
     "..", as.integer(dfXP$pos.right), sep="")
 
 extractPosFile = paste(extractDir, paste("extract_KmerRgns_", genomeNum, ".txt", sep=""), sep=PATHSEP)
-writeLines(seqExtStrs, extractPosFile)
+outFile = file(extractPosFile, "wb")
+writeLines(seqExtStrs, outFile)
+close(outFile)
 
 seqFile = paste(extractDir, paste("seqs_KmerRgns_", genomeNum, ".txt", sep=""), sep=PATHSEP)
-cmdLine = paste(perlPath, getSeqsFromFasta, fastaFile, "-i", extractPosFile, "-o", seqFile)
+getSeqs_args = c(getSeqsFromFasta, fastaFile, "-i", extractPosFile, "-o", seqFile)
 
 inv(length(seqExtStrs), "length(seqExtStrs)")
-inv(cmdLine, "Perl command line")
+inv(paste(getSeqs_args, collapse=" "), "Perl getSeqsFromFasta arguments")
 inv(seqFile, "DNA sequence file")
 
 ########################################
@@ -340,9 +342,11 @@ inv(seqFile, "DNA sequence file")
 # getSeqsFromFasta.pl reads an entire sequence into memory before processing it.
 ########################################
 
-catnow("Running command to retrieve k-mer-vicinity sequences from FASTA file\n")
-catnow("   ", cmdLine, "\n")
-system(cmdLine)
+catnow("Running command to retrieve k-mer-vicinity sequences from FASTA file:\n")
+catnow("   ", perlPath, " ", paste(getSeqs_args, collapse=" "), "\n")
+stat = system2(perlPath, getSeqs_args)
+if (stat != 0)
+    stop("Perl program ", getSeqsFromFasta, " exited with error status ", stat)
 
 ########################################
 # Read the output file, extract the sequence extraction strings from the

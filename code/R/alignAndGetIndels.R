@@ -499,7 +499,9 @@ for (genome in genomeLtrs)
     seqExtStrs[[genome]] = paste(revComp, df[, idCols[genome]], ":",
         as.integer(df[, pos1Cols[genome]]), "..", as.integer(df[, pos2Cols[genome]]), sep="")
     inv(length(seqExtStrs[[genome]]), "length(seqExtStrs[[genome]])")
-    writeLines(seqExtStrs[[genome]], extractPosFiles[genome])
+    outFile = file(extractPosFiles[genome], "wb")
+    writeLines(seqExtStrs[[genome]], outFile)
+    close(outFile)
     rm(revComp)
     }
 
@@ -516,8 +518,8 @@ for (genome in genomeLtrs)
 
 seqFiles = paste(extractDir, paste("seqs_IndelGroupRgns_", 1:Ngenomes, ".txt", sep=""), sep=PATHSEP)
 names(seqFiles) = genomeLtrs
-cmdLines = paste(perlPath, getSeqsFromFasta, fastaFiles, "-l 0", "-i", extractPosFiles, "-o", seqFiles)
-names(cmdLines) = genomeLtrs
+getSeqs_args = sapply(genomeLtrs, function(genome)
+    c(getSeqsFromFasta, fastaFiles[genome], "-l", "0", "-i", extractPosFiles[genome], "-o", seqFiles[genome]), simplify=FALSE)
 
 catnow("Retrieving sequences at each LCR or marker for each genome.\n")
 for (genome in genomeLtrs)
@@ -526,8 +528,10 @@ for (genome in genomeLtrs)
     inv(extractPosFiles[genome], "extraction positions file")
     inv(seqFiles[genome], "DNA sequences file")
     catnow("  Genome ", genome, "command line:\n")
-    catnow("   ", cmdLines[genome], "\n")
-    system(cmdLines[genome])
+    catnow("   ", perlPath, " ", paste(getSeqs_args[[genome]], collapse=" "), "\n")
+    stat = system2(perlPath, getSeqs_args[[genome]])
+    if (stat != 0)
+        stop("Perl program ", getSeqsFromFasta, " exited with error status ", stat)
     }
 
 ################################################################################
@@ -618,7 +622,7 @@ df = df[!allIdentical,]
 outputType = "FASTA" # ClustalW2.  Muscle default is FASTA.
 tempFastaFileName = paste(extractDir, "align.fa", sep=PATHSEP)
 tempAlignFileName = paste(extractDir, "align.fasta", sep=PATHSEP)
-tempStdoutFileName = paste(extractDir, "align.stdout", sep=PATHSEP) # ClustalW2.  Muscle is quiet.
+tempStdoutFileName = ifelse(useClustal, paste(extractDir, "align.stdout", sep=PATHSEP), "") # ClustalW2.  Muscle is quiet.
 
 # Make missing genome column name vectors for dfIndels.
 #    ID, phases, idx, Xdel, Xid, Xstart, Xend
@@ -646,7 +650,9 @@ for (i in 1:nrow(df))
 
     # Write sequences to FASTA file.
     idLines = paste(">", genomeLtrs, sep="")
-    writeLines(unlist(c(rbind(idLines, df[i, seqCols]))), tempFastaFileName)
+    outFile = file(tempFastaFileName, "wb")
+    writeLines(unlist(c(rbind(idLines, df[i, seqCols]))), outFile)
+    close(outFile)
 
     # Create and execute a command to align the sequences.
     {
@@ -670,17 +676,19 @@ for (i in 1:nrow(df))
         # alignment, and adjusted the code below to allow for gaps at the start or end
         # of the alignment.  I continued using Muscle, however.
 
-        cmdLine = paste(alignerPath, " -quiet", " -quicktree", " -gapext=0", " -gapopen=-1",
-            " -outorder=INPUT", " -type=DNA", " -output=", outputType, " -infile=",
-            tempFastaFileName, " >", tempStdoutFileName, sep="")
+        alignerArgs = c("-quiet", "-quicktree", "-gapext=0", "-gapopen=-1",
+            "-outorder=INPUT", "-type=DNA", paste("-output=", outputType, sep=""),
+            paste("-infile=", tempFastaFileName, sep=""))
         }
     else
         {
-        cmdLine = paste(alignerPath, " -quiet", " -in ", tempFastaFileName, " -out ", tempAlignFileName, sep="")
+        alignerArgs = c("-quiet", "-in", tempFastaFileName, "-out", tempAlignFileName)
         }
     }
-    #inv(cmdLine)
-    system(cmdLine)
+    #inv(paste(alignerArgs, collapse=" "), "alignerArgs")
+    stat = system2(alignerPath, alignerArgs, stdout=tempStdoutFileName)
+    if (stat != 0)
+        stop("Aligner program ", alignerPath, " exited with error status ", stat)
 
     # Read the alignment output file and split the lines by genome, paste
     # together the sequence lines into one long character vector.

@@ -263,7 +263,7 @@ for (genome in genomeLtrs)
 # Find Indel Groups.
 ########################################
 
-# Sort df by the name column so that all k-mers of a candidate LCR will be
+# Sort df by the LCR ID column so that all k-mers of a candidate LCR will be
 # adjacent to one another.
 df = df[order(df$LCR),]
 
@@ -359,8 +359,10 @@ rm(cumSum, difDifAtStartKmer, cumSumThruStartKmer, cumSumThruEndKmer, cumSumLCRs
 # rightSideKmers and leftSideKmers is the same, and corresponding elements form
 # a pair.  The two vectors initially hold every possible ADJACENT k-mer pair
 # within each LCR that may be adjacent-k-mer marker candidates.  However, there
-# will be many more pairs of candidates besides these.  The next steps describe
-# how the analysis proceeds using these two vectors.
+# will be many more pairs of candidates besides these.  They are all tested by
+# decrementing the left-side vector by 1 after each test, allowing the right-side
+# k-mers to be tested against every possible left-side k-mer.  The next steps
+# describe how the analysis proceeds using these two vectors.
 #
 # 3. For each candidate k-mer pair in the two vectors, test to see if the pair
 # satisfies ADmin/ADmax/NDAmin considering all genomes, and satisfies Amin and
@@ -370,49 +372,65 @@ rm(cumSum, difDifAtStartKmer, cumSumThruStartKmer, cumSumThruEndKmer, cumSumLCRs
 # for the left and right sides of the Indel Groups.
 #
 # 4. After testing the pairs in the two vectors, additional pairs need to be
-# tested.  For each right-side k-mer, k-mers that PRECEDE the adjacent k-mer
-# in the left-side vector and are in the same LCR are also candidate left-side
+# tested.  For each right-side k-mer, k-mers that PRECEDE the adjacent k-mer in
+# the left-side vector, and are in the same LCR, are also candidate left-side
 # k-mers for that right-side k-mer.  In order to test all these possibilities,
 # we will back up the left-side k-mers one k-mer at a time (i.e. one df row at
 # a time, i.e. one df row index at a time, i.e. subtract 1 from each left-side
-# index) and re-test.  Eventually, the left-side k-mer indexes reach the index
-# of the minFlank+1 k-mer in the LCR, and after that is tested, there is no
-# longer any need for that PAIR of k-mers to remain in the left-side and
-# right-side vectors, because the right-side k-mer has now been tested with
-# every possible left-side k-mer.  Since only the left-side indexes are changed,
-# the right-side indexes always represent the same right-side k-mer being tested
-# against every candidate left-side k-mer.  Once it has been tested against all
-# of them, removing that pair of indexes from both left-side and right-side
-# vectors removes that right-side k-mer from further testing, but removing the
-# left-side index does NOT mean the left-side k-mer is finished being tested,
-# the other left-side vector entries for that LCR will eventually be decremented
-# to be equal to the same left-side k-mer as is being removed.  And thus, every
-# possible k-mer pair within each LCR is tested.  Each test involves the entire
-# left-side and right-side vectors, so many tests are done "simultaneously"
-# using R's vector capability.  Given this explanation, pay attention to the
-# following steps.
+# index) and re-test.  The first left-side k-mer index is always the minFlank+1
+# k-mer in the LCR (it is initialized that way, and after subtracting 1, we
+# remove the first one).  Therefore, after each test, there is no longer any
+# need for the first index for each LCR in the left-side k-mer indexes to remain,
+# because it has been tested with all possible k-mers to the right of it in that
+# LCR (by virtue of the same index value appearing in higher-up left-side vector
+# elements), so that index can be removed.  Also, the first index for each LCR in
+# the right-side k-mer indexes is no longer needed, because it has now been tested
+# with all possible k-mers to the left of it in that LCR (by virtue of the left-
+# side element with which it is paired having been decremented from the top-most
+# candidate all the way to the bottom-most candidate), so it too can be removed.
+# Therefore, the bottom PAIR of k-mers in the left-side and right-side k-mer index
+# vectors are removed.  Since only the left-side indexes are changed by subtracting
+# 1 after each test, the right-side indexes always represent the same right-side
+# k-mer being tested against every candidate left-side k-mer.  Removing the bottom
+# pair of k-mers from the two vectors thus removes that right-side k-mer from
+# further testing, but that does NOT mean the left-side k-mer that was also removed
+# is finished being tested as a left-side k-mer, because the other left-side vector
+# entries for that LCR will eventually be decremented to be equal to the same
+# left-side k-mer index as is being removed.
+# (So, think of the right-side vector as the more important one; as long as a
+# k-mer index remains in it, that k-mer continues to be tested against left-side
+# k-mers, and only when the right-side k-mer has been tested against all left-side
+# candidates, is it removed.  Any time the right-side k-mer index is determined
+# to no longer be a possible right-side candidate, BOTH its left and right side
+# vector elements are removed).
+# And thus, every possible k-mer pair within each LCR is tested.  Each test
+# involves the entire left-side and right-side vectors, so many tests are done
+# "simultaneously" using R's vector capability.
+# Given this explanation, pay attention to the following steps.
 #
 # 5. If at any time Amax is exceeded for a k-mer pair, that pair is removed from
 # the left-side and right-side vectors, and that right-k-mer is no longer
 # considered (because every other left-side k-mer before that pair will exceed
-# Amax by even more), nor is that left-side k-mer considered any longer (because
-# every other right-side k-mer after that pair will exceed Amax by even more).
+# Amax by even more).  Remember that removing the pair does not mean that the
+# left-side k-mer index will not be tested against other right-side k-mers,
+# since other indexes above it will eventually be decremented to be equal to it.
 # As a consequence, the number of tested pairs in an LCR containing N k-mers can
 # be far less than N^2/2, if it contains a lot of k-mers separated by more than
 # Amax.  Every right-side k-mer beyond those in that LCR, in the right-side
 # vector, will eventually also have its left-side k-mer pass over this same k-mer
-# boundary (but passing to the next left-side k-mer BEFORE this one, since this
-# one has been removed), at which time it too will be eliminated.  The right-side
-# vector therefore holds onto right-side k-mers until they have been tested with
-# every possible left-side k-mer that could form a valid candidate, and likewise
-# the left-side vector holds onto left-side k-mers until they have been decremented
-# through all possible left-side k-mers that could form a valid candidate.
+# boundary, at which time it too will be eliminated.  The right-side vector
+# therefore holds onto right-side k-mers until they have been tested with every
+# possible left-side k-mer that could form a valid candidate.  The left-side
+# vector, which is steadily decremented, holds onto left-side k-mers until they
+# have been decremented through all possible left-side k-mers that could form a
+# valid candidate with their right-side k-mer.
 #
 # 6. After testing the pairs in the left-side and right-side vectors, pairs are
 # removed from the vectors if the left-side k-mer was the minFlank+1 k-mer of the
-# LCR, because in that case the corresponding right-side k-mer has now been tested
-# with every possible valid left-side k-mer, and the left-side k-mer has been
-# decremented through all those possible valid left-side k-mers.
+# LCR (i.e. the "bottom-most k-mer), because in that case the corresponding
+# right-side k-mer has now been tested with every possible valid left-side k-mer,
+# and the left-side k-mer has been decremented through all those possible valid
+# left-side k-mers.  I'm repeating myself.
 #
 # 7. ALL left-side k-mer indexes in the left-side vector are decremented by ONE
 # so they now index a k-mer one row earlier or one k-mer more towards the start

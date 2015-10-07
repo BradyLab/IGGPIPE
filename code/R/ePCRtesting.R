@@ -201,17 +201,15 @@ write.table(dfEPCR, ePCRinputFile, row.names=FALSE, col.names=FALSE, quote=FALSE
 
 ePCRoutputFile = paste("Genome_", genomeNum, ".epcr.out", sep="")
 ePCRoutputFile = paste(pcrInfoDir, ePCRoutputFile, sep=PATHSEP)
-cmdLine = paste(ePCRpath, "-v-", "-p+", "-t3",
-    paste("-m", maxDeviation, sep=""),
-    paste("-w", wordSize, sep=""),
-    paste("-n", maxMismatches, sep=""),
-    paste("-g", maxGaps, sep=""),
-    "-o", ePCRoutputFile, ePCRinputFile, fastaFile)
+ePCR_args = c("-v-", "-p+", "-t3", "-m", maxDeviation, "-w", wordSize,
+    "-n", maxMismatches, "-g", maxGaps, "-o", ePCRoutputFile, ePCRinputFile, fastaFile)
 inv(nrow(dfEPCR), "nrow(dfEPCR)")
-inv(cmdLine, "e-PCR command line")
-catnow("Running e-PCR command to search for marker primer sequences from FASTA file\n")
-catnow("   ", cmdLine, "\n")
-system(cmdLine)
+inv(ePCR_args, "e-PCR arguments")
+catnow("Running e-PCR command to search for marker primer sequences from FASTA file:\n")
+catnow("  ", ePCRpath, " ", paste(ePCR_args, collapse=" "), "\n")
+stat = system2(ePCRpath, ePCR_args)
+if (stat != 0)
+    stop("Program ", ePCRpath, " exited with error status ", stat)
 
 ########################################
 # Read the output file and check to see that each pair had one and only one

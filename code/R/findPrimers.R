@@ -427,7 +427,8 @@ catnow("\n")
 
 if (!file.exists(primer3settings)) stop("Primer3 settings file ", primer3settings, " not found")
 primer3_args = c("-p3_settings_file", primer3settings)
-catnow("Running primer3 to design primers\n")
+catnow("Running command to design primers:\n")
+catnow("  ", primer3core, " ", paste(primer3_args, collapse=" "), "\n")
 estimateTime = FALSE
 if (estimateTime)
     {
