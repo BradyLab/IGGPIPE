@@ -130,9 +130,10 @@ ALL:
 	-$(CMD_DELETE_WHEN_CLEANING) $(DIR_PRIMER_DATA)/*
 	-$(CMD_DELETE_WHEN_CLEANING) $(DIR_IGGPIPE_OUT)/*
 	-$(CMD_DELETE_WHEN_CLEANING) $(DIR_IGGPIPE_OUT)
+	@echo
 	@echo "Removed all files from the output directory."
 	@echo
-else ifeq ($(CLEAN),1)
+else ifeq ($(CLEAN),)
 ALL: all_getSeqInfo all_getKmers all_kmerStats all_sortKmers all_getContigFile \
     kmerIsect all_getGenomicPos all_mergeKmers getCommonUniqueKmers findLCRs \
     findIndelGroups all_getDNAseqs findPrimers all_ePCRtesting removeBadMarkers \
@@ -248,11 +249,11 @@ endif
 # Here, % is a genome number.
 
 $(IDLEN_FILES) : $(PFX_GENOME_DATA_FILE)%.idlens : $$(PATH_GENOME_FASTA_$$*) | \
-        $(DIR_GENOME_OUT_DATA) $(PATH_PERL) $(PATH_EXTRACT_SEQ_IDS)
+        $(DIR_GENOME_OUT_DATA) $(PATH_EXTRACT_SEQ_IDS)
 	@echo
 	@echo "*** getSeqInfo PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
 	@echo "Extracting sequence IDs and lengths from $< into $@"
-	$(TIME) $(PATH_PERL) $(PATH_EXTRACT_SEQ_IDS) $< $@ $(REDIR)
+	$(TIME) $(CMD_PERL) $(PATH_EXTRACT_SEQ_IDS) $< $@ $(REDIR)
 	@echo "Finished."
 
 ################################################################################
@@ -450,11 +451,11 @@ endif
 
 # PATH_ISECT_KMERS target.
 
-$(PATH_ISECT_KMERS) : $(SORTED_KMERS_FILES) | $(DIR_KMERS) $(PATH_PERL) $(PATH_KMER_ISECT)
+$(PATH_ISECT_KMERS) : $(SORTED_KMERS_FILES) | $(DIR_KMERS) $(PATH_KMER_ISECT)
 	@echo
 	@echo "*** kmerIsect PARAMS=$(PARAMS) $(CLEAN) ***"
 	@echo "Intersecting unique $(K)-mers from .sorted files into $@"
-	$(TIME) $(PATH_PERL) $(PATH_KMER_ISECT) $@ $^ $(REDIR)
+	$(TIME) $(CMD_PERL) $(PATH_KMER_ISECT) $@ $^ $(REDIR)
 	@echo "Finished."
 
 ################################################################################
@@ -568,7 +569,7 @@ G_PREV := 0 $(GENOME_NUMBERS)
 # Here, % is a genome number.
 
 $(TARGET_MERGE_OTHERS) : $(PFX_KMERS_DATA_FILE)%.merge : $(PFX_KMERS_DATA_FILE)%.isect \
-        $(PFX_KMERS_DATA_FILE)$$(word %,$$(G_PREV)).merge | $(PATH_RSCRIPT)
+        $(PFX_KMERS_DATA_FILE)$$(word %,$$(G_PREV)).merge
 	@echo
 	@echo "*** mergeKmers PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
 	@echo "Merge common unique $(K)-mers for genomes $(word $*,$(G_PREV)) and $* to $@"
@@ -599,7 +600,7 @@ endif
 
 # Target for the sorted common unique k-mers file.
 $(PATH_COMMON_UNIQUE_KMERS) : $(UNSORTED_COMMON_UNIQUE_KMERS)
-	@echo "*** findLCRs PARAMS=$(PARAMS) $(CLEAN) ***"
+	@echo "*** getCommonUniqueKmers PARAMS=$(PARAMS) $(CLEAN) ***"
 	@echo
 	@echo "Sort merged common unique $(K)-mers by reference genome position from $< into $(PATH_COMMON_UNIQUE_KMERS)"
 	$(TIME) sort -k 2,2 -k 5,5n -k 3,3n $< >$(PATH_COMMON_UNIQUE_KMERS) $(REDIR)
@@ -635,11 +636,11 @@ PTN_BAD_KMERS_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_BAD_KMERS_FILE)%
 # Use the patterns in a pattern target.  Dependent file is the SORTED version of
 # the common unique k-mers file.
 $(PTN_LCR_FILE) $(PTN_BAD_KMERS_FILE) : $(PATH_COMMON_UNIQUE_KMERS) | \
-        $(DIR_IGGPIPE_OUT) $(PATH_RSCRIPT) $(PATH_FIND_LCRS)
+        $(DIR_IGGPIPE_OUT) $(PATH_FIND_LCRS)
 	@echo "*** findLCRs PARAMS=$(PARAMS) $(CLEAN) ***"
 	@echo
 	@echo "Find locally conserved regions using common unique $(K)-mers from $< into $@"
-	$(TIME) $(PATH_RSCRIPT) $(PATH_FIND_LCRS) $(WD) $(PATH_COMMON_UNIQUE_KMERS) \
+	$(TIME) $(CMD_RSCRIPT) $(PATH_FIND_LCRS) $(WD) $(PATH_COMMON_UNIQUE_KMERS) \
 	    $(GENOME_LETTERS_SQUISHED) $(KMIN) $(LMIN) $(DMIN) $(DMAX) \
 	    $(PATH_LCR_FILE) \
 	    $(PATH_BAD_KMERS_FILE) \
@@ -675,11 +676,11 @@ PTN_NONOVERLAPPING_INDELS_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_NONOVERLAPPING_INDEL_
 
 # Use the patterns in a pattern target.
 $(PTN_OVERLAPPING_INDELS_FILE) $(PTN_NONOVERLAPPING_INDELS_FILE) : $(PATH_LCR_FILE) $(IDLEN_FILES) | \
-        $(DIR_IGGPIPE_OUT) $(PATH_RSCRIPT) $(PATH_FIND_INDEL_GROUPS)
+        $(DIR_IGGPIPE_OUT) $(PATH_FIND_INDEL_GROUPS)
 	@echo
 	@echo "*** findIndelGroups PARAMS=$(PARAMS) $(CLEAN) ***"
 	@echo "Find Indel Groups using locally conserved regions in $< and write them to two output files"
-	$(TIME) $(PATH_RSCRIPT) $(PATH_FIND_INDEL_GROUPS) $(WD) \
+	$(TIME) $(CMD_RSCRIPT) $(PATH_FIND_INDEL_GROUPS) $(WD) \
 	    $(PATH_LCR_FILE) \
 	    $(AMIN) $(AMAX) $(ADMIN) $(ADMAX) $(NDAMIN) $(MINFLANK) $(OVERLAP_REMOVAL) \
 	    $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) $(PATH_NONOVERLAPPING_INDEL_GROUPS_FILE) \
@@ -724,15 +725,15 @@ endif
 $(DNA_SEQ_FILES) : $(PFX_DNA_SEQS_PATH)_%.dnaseqs : $$(PATH_GENOME_FASTA_$$*) \
         $(PFX_GENOME_DATA_FILE)$$*.contigs $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) | \
         $(DIR_IGGPIPE_OUT) $(DIR_GENOME_OUT_DATA) \
-        $(PATH_RSCRIPT) $(PATH_GET_DNA_SEQS) $(PATH_PERL) $(PATH_GET_SEQS_FASTA)
+        $(PATH_GET_DNA_SEQS) $(PATH_GET_SEQS_FASTA)
 	@echo
 	@echo "*** getDNAseqs PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
 	@echo "Extract DNA sequence around Indel Groups and write to $@"
-	$(TIME) $(PATH_RSCRIPT) $(PATH_GET_DNA_SEQS) $(WD) \
+	$(TIME) $(CMD_RSCRIPT) $(PATH_GET_DNA_SEQS) $(WD) \
 	    $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) $* \
 	    $@ \
 		$(DIR_GENOME_OUT_DATA) $(EXTENSION_LEN) \
-		$(PATH_PERL) $(PATH_GET_SEQS_FASTA) \
+		$(CMD_PERL) $(PATH_GET_SEQS_FASTA) \
 		$(PATH_GENOME_FASTA_$*) \
 		$(PFX_GENOME_DATA_FILE)$*.contigs $(INVESTIGATE_GETDNASEQS) $(REDIR)
 	@echo "Finished."
@@ -758,16 +759,16 @@ endif
 
 # PATH_NONVALIDATED_MARKER_FILE target.
 
-$(PATH_NONVALIDATED_MARKER_FILE) : $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) $(DNA_SEQ_FILES) | $(PATH_RSCRIPT) \
-        $(DIR_PRIMER_DATA) $(PATH_FIND_PRIMERS) $(PATH_PRIMER3CORE) $(PATH_PRIMER3_SETTINGS)
+$(PATH_NONVALIDATED_MARKER_FILE) : $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) $(DNA_SEQ_FILES) \
+        $(DIR_PRIMER_DATA) $(PATH_FIND_PRIMERS) $(PATH_PRIMER3_SETTINGS)
 	@echo
 	@echo "*** findPrimers PARAMS=$(PARAMS) $(CLEAN) ***"
 	@echo "Find primers around Indel Groups in $< and write to $@"
-	$(TIME) $(PATH_RSCRIPT) $(PATH_FIND_PRIMERS) $(WD) \
+	$(TIME) $(CMD_RSCRIPT) $(PATH_FIND_PRIMERS) $(WD) \
 		$(PATH_OVERLAPPING_INDEL_GROUPS_FILE) \
 		$(PFX_DNA_SEQS_PATH) \
 		$(PATH_NONVALIDATED_MARKER_FILE) \
-		$(PATH_PRIMER3CORE) $(PATH_PRIMER3_SETTINGS) $(PATH_PRIMER3CONFIG) \
+		$(CMD_PRIMER3CORE) $(PATH_PRIMER3_SETTINGS) $(DIR_PRIMER3CONFIG) \
 		$(PATH_PRIMER3_IN) $(PATH_PRIMER3_OUT) \
 		$(INVESTIGATE_FINDPRIMERS) $(REDIR)
 	@echo "Finished."
@@ -806,13 +807,13 @@ endif
 
 $(BAD_MARKER_FILES) : $(PFX_BAD_MARKER_ERROR_PATH)_%.bad.tsv : $$(PATH_GENOME_FASTA_$$*) \
         $(PATH_NONVALIDATED_MARKER_FILE) | $(DIR_IGGPIPE_OUT) $(DIR_GENOME_OUT_DATA) $(DIR_PRIMER_DATA) \
-        $(PATH_RSCRIPT) $(PATH_EPCR_TESTING) $(PATH_EPCR)
+        $(PATH_EPCR_TESTING)
 	@echo
 	@echo "*** ePCRtesting PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
 	@echo "Use e-PCR to test marker primer pairs and write errors to $@"
-	$(TIME) $(PATH_RSCRIPT) $(PATH_EPCR_TESTING) $(WD) \
+	$(TIME) $(CMD_RSCRIPT) $(PATH_EPCR_TESTING) $(WD) \
 	    $(PATH_NONVALIDATED_MARKER_FILE) $* $@ \
-	    $(DIR_GENOME_OUT_DATA) $(PATH_EPCR) \
+	    $(DIR_GENOME_OUT_DATA) $(CMD_EPCR) \
 	    $(EPCR_MAX_DEV) $(EPCR_WORD_SIZE) $(EPCR_MAX_MISMATCH) $(EPCR_MAX_GAPS) \
 		$(PATH_GENOME_FASTA_$*) $(INVESTIGATE_EPCRTESTING) $(REDIR)
 	@echo "Finished."
@@ -848,11 +849,11 @@ PTN_NONOVERLAPPING_MARKERS_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_NONOVERLAPPING_MARKE
 
 # Use the patterns in a pattern target.
 $(PTN_OVERLAPPING_MARKERS_FILE) $(PTN_NONOVERLAPPING_MARKERS_FILE) : $(PATH_NONVALIDATED_MARKER_FILE) $(BAD_MARKER_FILES) | \
-        $(PATH_RSCRIPT) $(PATH_RMV_BAD_MARKERS)
+        $(PATH_RMV_BAD_MARKERS)
 	@echo
 	@echo "*** removeBadMarkers PARAMS=$(PARAMS) $(CLEAN) ***"
 	@echo "Remove markers identified by e-PCR as bad from $< and write good ones to two output files"
-	$(TIME) $(PATH_RSCRIPT) $(PATH_RMV_BAD_MARKERS) $(WD) $(OVERLAP_REMOVAL) \
+	$(TIME) $(CMD_RSCRIPT) $(PATH_RMV_BAD_MARKERS) $(WD) $(OVERLAP_REMOVAL) \
 	    $(PATH_NONVALIDATED_MARKER_FILE) \
 	    $(PFX_BAD_MARKER_ERROR_PATH) \
 		$(PATH_OVERLAPPING_MARKERS_FILE) \
@@ -895,11 +896,11 @@ PTN_DENSITY_FILES := $(foreach G,$(GENOME_LETTERS),$(PFX_MARKER_DENSITY_PATH)_$(
 
 # Use the patterns in a pattern target.
 $(PTN_COUNTS_FILE) $(PTN_DENSITY_FILES) : $(PATH_OVERLAPPING_MARKERS_FILE) $(PATH_NONOVERLAPPING_MARKERS_FILE) \
-        $(IDLEN_FILES) | $(PATH_RSCRIPT) $(PATH_PLOT_MARKERS)
+        $(IDLEN_FILES) | $(PATH_PLOT_MARKERS)
 	@echo
 	@echo "*** plotMarkers PARAMS=$(PARAMS) $(CLEAN) ***"
 	@echo "Make density plots of 'good' candidate IGG markers to file $@"
-	$(TIME) $(PATH_RSCRIPT) $(PATH_PLOT_MARKERS) $(WD) $(PLOT_NDAMIN) $(PLOT_ALPHA) \
+	$(TIME) $(CMD_RSCRIPT) $(PATH_PLOT_MARKERS) $(WD) $(PLOT_NDAMIN) $(PLOT_ALPHA) \
 	    $(PATH_OVERLAPPING_MARKERS_FILE) \
 	    $(PATH_NONOVERLAPPING_MARKERS_FILE) \
 		$(PFX_MARKER_COUNTS_PATH) \
@@ -941,15 +942,15 @@ endif
 # PATH_INDELS_OUTPUT_FILE target.
 
 $(PATH_INDELS_OUTPUT_FILE) : $(PATH_INDELS_INPUT_FILE) $(FASTA_FILES) | $(DIR_GENOME_OUT_DATA) \
-        $(PATH_RSCRIPT) $(PATH_ALIGN_AND_GET_INDELS) $(PATH_PERL) $(PATH_GET_SEQS_FASTA) $(PATH_ALIGNER)
+        $(PATH_ALIGN_AND_GET_INDELS) $(PATH_GET_SEQS_FASTA)
 	@echo
 	@echo "*** Indels PARAMS=$(PARAMS) $(CLEAN) ***"
 	@echo "Align sequences of $< and find Indels and write them to $@"
-	$(TIME) $(PATH_RSCRIPT) $(PATH_ALIGN_AND_GET_INDELS) $(WD) \
+	$(TIME) $(CMD_RSCRIPT) $(PATH_ALIGN_AND_GET_INDELS) $(WD) \
 	    $(PATH_INDELS_INPUT_FILE) $(PATH_INDELS_OUTPUT_FILE) \
 	    $(DIR_GENOME_OUT_DATA) \
-		$(PATH_PERL) $(PATH_GET_SEQS_FASTA) \
-		$(PATH_ALIGNER) $(INVESTIGATE_ALIGN_AND_GET_INDELS) \
+		$(CMD_PERL) $(PATH_GET_SEQS_FASTA) \
+		$(CMD_ALIGNER) $(INVESTIGATE_ALIGN_AND_GET_INDELS) \
 		$(FASTA_FILES) $(REDIR)
 	@echo "Finished."
 
@@ -984,11 +985,11 @@ endif
 
 # PATH_INDELS_PLOT_FILE target.
 
-$(PATH_INDELS_PLOT_FILE) : $(PATH_INDELS_OUTPUT_FILE) | $(PATH_RSCRIPT) $(PATH_PLOT_INDELS)
+$(PATH_INDELS_PLOT_FILE) : $(PATH_INDELS_OUTPUT_FILE) | $(PATH_PLOT_INDELS)
 	@echo
 	@echo "*** plotIndels PARAMS=$(PARAMS) $(CLEAN) ***"
 	@echo "Make plots of Indel information to file $@"
-	$(TIME) $(PATH_RSCRIPT) $(PATH_PLOT_INDELS) $(WD) $(PATH_INDELS_OUTPUT_FILE) \
+	$(TIME) $(CMD_RSCRIPT) $(PATH_PLOT_INDELS) $(WD) $(PATH_INDELS_OUTPUT_FILE) \
 	    $(PATH_INDELS_PLOT_FILE) $(REDIR)
 	@echo "Finished."
 

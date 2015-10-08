@@ -962,6 +962,27 @@ commands.</strong></p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
+<strong>Change to IGGPIPE directory</strong>
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>All work from the command line while installing IGGPIPE is generally done with
+the current directory set to the IGGPIPE directory where you download the IGGPIPE
+files:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>cd whatever/IGGPIPE</code></pre>
+</div></div>
+<div class="paragraph"><p>In Windows under Cygwin, you must use the following command after changing to
+the IGGPIPE directory:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>cygpath -am</code></pre>
+</div></div>
+</div></div>
+</li>
+<li>
+<p>
 <strong>Copy allPathParameters.template file to new file allPathParameters.ours</strong>
 </p>
 <div class="openblock">
@@ -1059,14 +1080,22 @@ as <em>make</em> and <em>g++</em> are installed, and if not, installs them:</p><
 </li>
 <li>
 <p>
-<strong>Install Jellyfish and set its path</strong>
+<strong>Install Jellyfish</strong>
 </p>
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>Jellyfish is a free open-source bioinformatics application that searches FASTA
 sequence files for k-mers of a specified size and writes them to a file. IGGPIPE
 uses Jellyfish to extract unique (occurring once) k-mers from the genome sequences
-being used. You can find the Jellyfish at:</p></div>
+being used.  You may already have Jellyfish installed, and if so you want to check
+its version number.  Here is the command to see if it is installed and check the
+version:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>jellyfish --version</code></pre>
+</div></div>
+<div class="paragraph"><p>Assuming you do not have it installed, or you have a version older than 2.2.3,
+you must do an installation.  You can find the Jellyfish at:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>http://www.genome.umd.edu/jellyfish.html</code></pre>
@@ -1124,30 +1153,15 @@ and adding the following lines <em>after #include &lt;jellyfish/rectangular_bina
 <pre><code>sudo make install</code></pre>
 </div></div>
 <div class="paragraph"><p>The <em>sudo</em> command prompts for a password, and I entered my computer&#8217;s administrator
-password.  When the above commands are finished, I verified that Jellyfish was installed
-and that I could run it with these commands:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>which jellyfish
-jellyfish --version</code></pre>
-</div></div>
-<div class="paragraph"><p>Finally, find parameter PATH_JELLYFISH in the allPathParameters.oursfile and assign
-it the path to Jellyfish, which was shown when you gave the "which jellyfish"
-command above.  The path will probably already be correct because Jellyfish usually
-gets installed in a standard location:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>PATH_JELLYFISH := /usr/local/bin/jellyfish</code></pre>
-</div></div>
-<div class="paragraph"><p>If you have Jellyfish on your path, you might be able to simply use:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>PATH_JELLYFISH := jellyfish</code></pre>
-</div></div>
-<div class="paragraph"><p>However, we had trouble doing this under Windows, and so we simply stick with putting
-the complete tool paths in the parameters, which is what we will show below.</p></div>
-<div class="paragraph"><p>Also, you may need to change the parameter JELLYFISH_HASH_SIZE, located further down
-in the file. The value already in the file will usually work fine.  However, if you
+password.  The above command places the Jellyfish program in the PATH variable so
+that the program can be run with the command <em>jellyfish</em>. (Sometimes it is necessary
+to log out and back in for a PATH change to take effect). Rerun the "jellyfish --version"
+command to verify that Jellyfish is installed.</p></div>
+<div class="paragraph"><p>The parameter CMD_JELLYFISH in the allPathParameters.ours file is already set to
+<em>jellyfish</em>, which is the command needed to run the Jellyfish program. You
+shouldn&#8217;t need to change it.</p></div>
+<div class="paragraph"><p>Also, you shouldn&#8217;t need to change the parameter JELLYFISH_HASH_SIZE. The value
+that is set for it already will usually work fine.  However, if you
 are using a computer with lots of memory, you may want to change the value to take
 advantage of that.  It can be especially helpful if you are working with k-mer sizes
 or genome sizes that produce lots more than 25 million k-mers.</p></div>
@@ -1155,7 +1169,7 @@ or genome sizes that produce lots more than 25 million k-mers.</p></div>
 </li>
 <li>
 <p>
-<strong>Install Perl and set its path</strong>
+<strong>Install Perl</strong>
 </p>
 <div class="openblock">
 <div class="content">
@@ -1163,69 +1177,61 @@ or genome sizes that produce lots more than 25 million k-mers.</p></div>
 application on your computer. The Mac OSX system comes with a Perl interpreter
 already installed, and this should be sufficient. This version of IGGPIPE was
 tested with Perl version 5.16.0, although later versions, and earlier V5 versions,
-will probably be fine. You can find out if you already have Perl installed, where
-it is located, and what its version is with this command:</p></div>
+will probably be fine. You can find out if you already have Perl installed and what
+its version is with this command:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>which perl
-perl --version</code></pre>
+<pre><code>perl --version</code></pre>
 </div></div>
-<div class="paragraph"><p>If you do not have Perl installed, look for it here:</p></div>
+<div class="paragraph"><p>If you do not have Perl installed or if the version is older than V5, you must
+install it, so look for it here:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>https://www.perl.org/get.html</code></pre>
 </div></div>
 <div class="paragraph"><p>Explicit installation instructions are not given here.  Follow the instructions
-provided in the downloaded installation package, then re-run the "which perl" command
-to find the path to it.</p></div>
-<div class="paragraph"><p>Now assign the path, which was shown with the "which perl" command, to the parameter
-"PATH_PERL" in the allPathParameters.ours file, for example:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>PATH_PERL := /usr/local/bin/perl</code></pre>
-</div></div>
+provided in the downloaded installation package, then re-run the "perl --version"
+command to verify that it is installed. Sometimes it may be necessary to log out
+and log back in so that the Perl location can be added to the PATH, before the
+command will work.</p></div>
+<div class="paragraph"><p>The parameter CMD_PERL in the allPathParameters.ours file is already set to
+<em>perl</em>, which is the command needed to run the Perl program. You shouldn&#8217;t need
+to change it.</p></div>
 </div></div>
 </li>
 <li>
 <p>
-<strong>Install R and set its path</strong>
+<strong>Install R</strong>
 </p>
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>R is a programming language used by IGGPIPE. Using it requires that the R programming
 environment be installed on your computer. This version of IGGPIPE was tested with R
 version 3.2.1, although later versions, and earlier V3 versions, will probably be
-fine. You can find out if you already have R installed, where it is located, and
-what its version is with this command, which invokes the command line version of
-the R interpreter:</p></div>
+fine. You can find out if you already have R installed and what its version is
+with this command, which invokes the command line version of the R interpreter:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>which Rscript
-Rscript --version</code></pre>
+<pre><code>Rscript --version</code></pre>
 </div></div>
-<div class="paragraph"><p>If you do not have R installed, look for it here:</p></div>
+<div class="paragraph"><p>If you do not have R installed, or have it installed but want to update to a newer
+version number, look for it here:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>https://www.r-project.org</code></pre>
 </div></div>
 <div class="paragraph"><p>Explicit installation instructions are not given here.  Follow the instructions
-provided in the downloaded installation package, then re-run the "which Rscript"
-command to find the path to it.</p></div>
-<div class="paragraph"><p>If you already have R but want to update it, run R and choose "R, About R" to check your
-R version number, then choose "R, Check for R Updates" and look to see if a newer
-version is available.  If so, download and install the package.</p></div>
+provided in the downloaded installation package, then re-run the "Rscript --version"
+command to verify that it is installed.</p></div>
 <div class="paragraph"><p>IGGPIPE does not use any extra R packages.</p></div>
-<div class="paragraph"><p>Now assign the path, which was shown with the "which RScript" command, to the
-parameter "PATH_RSCRIPT" in the allPathParameters.ours file, for example:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>PATH_RSCRIPT := /usr/bin/Rscript</code></pre>
-</div></div>
+<div class="paragraph"><p>The parameter CMD_RSCRIPT in the allPathParameters.ours file is already set to
+<em>Rscript</em>, which is the command needed to run the Rscript program. You shouldn&#8217;t
+need to change it.</p></div>
 </div></div>
 </li>
 <li>
 <p>
-<strong>Install Primer3 and set its path</strong>
+<strong>Install Primer3</strong>
 </p>
 <div class="openblock">
 <div class="content">
@@ -1245,17 +1251,25 @@ Make sure you download the correct version (primer3, not primer3plus). Put the
 downloaded directory wherever you want on your computer. The file named
 primer3_core (primer3_core.exe on Windows) in the root directory of the
 downloaded package is the executable program file.</p></div>
-<div class="paragraph"><p>Now assign the path to the parameter "PATH_PRIMER3CORE" in the allPathParameters.ours
+<div class="paragraph"><p>Now assign the parameter "CMD_PRIMER3CORE" in the allPathParameters.ours
 file, for example:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>PATH_PRIMER3CORE := ~/Documents/primer3-2.3.6/primer3_core</code></pre>
+<pre><code>CMD_PRIMER3CORE := ~/Documents/primer3-2.3.6/primer3_core</code></pre>
+</div></div>
+<div class="paragraph"><p>A set of files containing thermodynamic settings is provided with the Primer3
+installation, in a subdirectory of the main Primer3 directory named <em>primer3_config</em>.
+The parameter "DIR_PRIMER3CONFIG" in the allPathParameters.ours file, must be
+set to the full path to this directory.  For example:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>DIR_PRIMER3CONFIG := /Users/tedtoal/src/primer3-2.3.6/primer3_config</code></pre>
 </div></div>
 </div></div>
 </li>
 <li>
 <p>
-<strong>Install e-PCR and set its path</strong>
+<strong>Install e-PCR</strong>
 </p>
 <div class="openblock">
 <div class="content">
@@ -1326,17 +1340,17 @@ e-PCR    (Run e-PCR)</code></pre>
 </div></div>
 <div class="paragraph"><p>The <em>make</em> should succeed and e-PCR should display its usage information, meaning
 you are good to go.</p></div>
-<div class="paragraph"><p>Now assign the path to the parameter "PATH_EPCR" in the allPathParameters.ours
-file, for example:</p></div>
+<div class="paragraph"><p>Now assign the parameter "CMD_EPCR" in the allPathParameters.ours file, for
+example:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>PATH_EPCR := ~/Documents/e-PCR-2.3.12-1/e-PCR</code></pre>
+<pre><code>CMD_EPCR := ~/Documents/e-PCR-2.3.12-1/e-PCR</code></pre>
 </div></div>
 </div></div>
 </li>
 <li>
 <p>
-<strong>Install MUSCLE and set its path</strong>
+<strong>Install MUSCLE</strong>
 </p>
 <div class="openblock">
 <div class="content">
@@ -1353,11 +1367,10 @@ here:</p></div>
 <div class="paragraph"><p>The executable images are already built, so choose the correct download for your
 system and download the file, putting it wherever you want on your computer, such
 as a bin folder.</p></div>
-<div class="paragraph"><p>Now assign the path to the parameter "PATH_ALIGNER" in the allPathParameters.ours
-file, for example:</p></div>
+<div class="paragraph"><p>Now assign the parameter "CMD_ALIGNER" in the allPathParameters.ours file, for example:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>PATH_ALIGNER := ~/bin/muscle3.8.31_i86darwin64</code></pre>
+<pre><code>CMD_ALIGNER := ~/bin/muscle3.8.31_i86darwin64</code></pre>
 </div></div>
 </div></div>
 </li>
@@ -1947,7 +1960,7 @@ Contact me, Ted Toal, <a href="mailto:twtoal@ucdavis.edu">twtoal@ucdavis.edu</a>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-10-08 13:42:10 PDT
+Last updated 2015-10-08 16:51:55 PDT
 </div>
 </div>
 </body>

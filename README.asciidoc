@@ -19,9 +19,19 @@ Download, Installation, and Running
 
 *Requirements*
 ~~~~~~~~~~~~~~
-* The installation instructions are for 64-bit Mac OSX. It has also been tested on
-64-bit Linux.  It will not work on 32-bit Windows.  It has not been tested on
-64-bit Windows.
+* Installation has been tested on 64-bit Mac OSX, 64-bit Linux, and 64-bit Windows.
+It will not work on 32-bit Windows.
+* Installation instructions include installing these programs:
++
+--
+.. Xcode (V6.4 works) (Apple App Store; 'make' and 'g++')
+.. Jellyfish V2 or later (V2.2.3 works) (http://www.genome.umd.edu/jellyfish.html)
+.. Perl V5 or later (V5.16.0 works) (https://www.perl.org/get.html)
+.. R V3 or later (V3.2.1 works) (https://www.r-project.org)
+.. Primer3 (V2.3.6 works) (http://sourceforge.net/projects/primer3)
+.. NCBI e-PCR (V2.3.12-1 works) (http://www.ncbi.nlm.nih.gov/tools/epcr)
+.. MUSCLE (V3.8.31 works) (http://www.drive5.com/muscle/downloads.htm)
+--
 
 *Download IGGPIPE files*
 ~~~~~~~~~~~~~~~~~~~~~~~~
