@@ -31,9 +31,11 @@ I will try to monitor for pull requests if you make useful changes.
 . *64-bit Mac OSX or Linux System*
 +
 --
-This describes installation on a 64-bit Mac OSX system.  For 64-bit Linux, we have
-tested it and tried to include installation differences here.  It will not work on
-32-bit Windows systems.  It should work on 64-bit Windows systems but is untested.
+This description focuses on installation on a 64-bit Mac OSX system.  Installation
+has also been tested on 64-bit Linux and 64-bit Windows, and we describe installation
+differences, but command line examples here are for Mac OSX, and Linux and Windows
+users are expected to be savvy enough to translate these to their system.
+IGGPIPE will not work on 32-bit Windows systems.
 --
 
 . *The computer must have enough memory and speed*
@@ -42,9 +44,9 @@ tested it and tried to include installation differences here.  It will not work 
 Before starting the installation, consider whether the computer on which the
 software is to be installed has enough memory for the problem at hand. I have
 been running IGGPIPE using 16GB of RAM, and I'd recommend no less than that amount.
-For larger genomes or more genomes, you will need more. My computer has a 2.4 GHz
-processor, which has been adequate. You should monitor memory usage while the
-pipeline is running, and if it becomes excessive for your computer, you know you
+For larger genomes or more genomes, you will possibly need more. My computer has
+a 2.4 GHz processor, which has been adequate. You should monitor memory usage while
+the pipeline is running, and if it becomes excessive for your computer, you know you
 will need more memory to run those genomes.
 --
 
@@ -67,7 +69,7 @@ http://korflab.ucdavis.edu/Unix_and_Perl/current.html
 --
 While working from the command line to install IGGPIPE, most of the time you will
 be in the IGGPIPE main directory, unless instructed otherwise. If you unzipped
-the IGGPIPE zip file in your Documents folder, you would change into the IGGPIPE
+the IGGPIPE zip file in your Documents folder, you might change into the IGGPIPE
 directory with this command:
 
   cd ~/Documents/IGGPIPE
@@ -78,10 +80,10 @@ directory with this command:
 --
 You must have a plain text editor you know how to use.  If nothing else, the
 simple editor 'nano', which comes with Mac and Linux systems, will work. On
-a Mac you can also use the 'TextEdit' program will work (use Plain Text
-format).  For Mac, the free open-source
-TextWrangler program is strongly recommended, and its $50 more capable version
-called BBEdit is totally worth the money for anyone who regularly edits text files.
+a Mac you can also use the 'TextEdit' program (use Plain Text format).  For Mac,
+the free open-source
+TextWrangler program is strongly recommended, and its more capable version
+called BBEdit is totally worth the $50 price for anyone who regularly edits text files.
 TextWrangler is available from the Apple App Store (Applications, App Store) or
 from:
 
@@ -137,11 +139,11 @@ application paths, copy the file to a new filename, replacing ".template" with
 +
 --
 Open the new allPathParameters.ours file created above in your plain text editor
-for editing. If you are in a hurry, you don't need to read anything in the file, but
-can simply search for "#@@", which are comment lines
-marking items that may need to be changed. Each "#@@" comment says whether
-it must be changed, might need to be changed, or probably will never need to be
-changed, etc. For example, if your text editor is nano, you might use this
+for editing. If you are in a hurry, you don't need to go through the whole file,
+but simply need to set the parameters shown at the start of the file, up to the
+comment that indicates you are at the end of the quick start section.
+
+For example, if your text editor is nano, you might use this
 command line to open your editor to edit the template file:
 
   nano allPathParameters.ours
@@ -150,8 +152,7 @@ command line to open your editor to edit the template file:
 . *Set WD to your IGGPIPE directory in the allPathParameters.ours file*
 +
 --
-Search for "#@@" in the allPathParameters.ours file and locate the one that is
-followed by a line setting the value of the "WD" parameter.  It looks like:
+Find the WD parameter in the allPathParameters.ours file, which looks like:
 
   WD := $(BRADYLAB)/Genomes/kmers/IGGPIPE
 
@@ -161,17 +162,20 @@ the IGGPIPE files). For example, maybe it would look like this:
   WD := /Users/johndoe/Documents/IGGPIPE
 --
 
-. *Install make and g++ (Xcode in Mac OSX)*
+. *Install make and g++ (Xcode in Mac OSX, Cygwin in Windows)*
 +
 --
 IGGPIPE makes use of a utility called 'make', and also, some of the applications used
 by IGGPIPE are distributed as source code that must be compiled and built into a runnable
-application on the user's computer, which requires a C++ compiler (g++ utility). On
+application on the user's computer, which requires a C\++ compiler (g\++ utility). On
 Linux, these utilities are already installed so you can skip this step. On
 Mac OSX, the Apple Developer Toolkit named Xcode provides these utilities, and it is
-available free from the Apple App Store (Applications, App Store).
-Xcode is a good thing to have installed anyway, for anyone doing bioinformatics work.
-If you don't have it installed already, run the App Store
+available free from the Apple App Store (Applications, App Store). On Windows, these
+utilities are provided by the Cygwin tools, available from:
+
+  https://www.cygwin.com
+
+For Mac OSX, if you don't have Xcode installed already, run the App Store
 application, search for "Xcode", and double-click the 'Install' button to install it,
 and even if you do have it installed, make sure you are updated with the latest version.
 I used version 6.4, although later versions should work fine.
@@ -214,7 +218,7 @@ to produce a jellyfish folder. I moved this folder to a directory I made named
 
 This version of IGGPIPE was tested with Jellyfish version 2.2.3.  Newer versions should
 work as well. 'Older versions will not work, because Jellyfish changed its output file
-names. They used to end with _0 but no longer do!'
+names. They used to end with "_0" but no longer do!'
 
 Now the jellyfish program must be compiled and built into an application, and installed
 on your computer.  I used these commands, which worked without error:
@@ -231,26 +235,25 @@ and that I could run it with these commands:
   which jellyfish
   jellyfish --version
 
-Finally, the allPathParameters.ours file must have the path to Jellyfish included in
-it. Search the files for "#@@" and assign the path to Jellyfish, which was shown when
-you gave the "which jellyfish" command above, to the parameter "PATH_JELLYFISH".
-The path will probably already be correct because Jellyfish usually gets installed
-in a standard location.
+Finally, find parameter PATH_JELLYFISH in the allPathParameters.oursfile and assign
+it the path to Jellyfish, which was shown when you gave the "which jellyfish"
+command above.  The path will probably already be correct because Jellyfish usually
+gets installed in a standard location:
 
   PATH_JELLYFISH := /usr/local/bin/jellyfish
 
-or, if you have Jellyfish on your path, you can optionally use simply:
+If you have Jellyfish on your path, you might be able to simply use:
 
   PATH_JELLYFISH := jellyfish
 
-Also, set the value JELLYFISH_HASH_SIZE, which follows, to something that seems appropriate
-for your computer and its memory. Read the comments for each parameter to learn more
-about it. If you don't know how much memory your Mac computer has, choose Apple Icon,
-About This Mac, and look for "Memory". The value shown may work fine, but if you are
-working with k-mer sizes or genome sizes that produce lots more than 24 million k-mers,
-you may need to increase the size (and have sufficient computer memory).
+However, we had trouble doing this under Windows, and so we simply stick with putting
+the complete tool paths in the parameters, which is what we will show below.
 
-  JELLYFISH_HASH_SIZE := 80M
+Also, you may need to change the parameter JELLYFISH_HASH_SIZE, located further down
+in the file. The value already in the file will usually work fine.  However, if you
+are using a computer with lots of memory, you may want to change the value to take
+advantage of that.  It can be especially helpful if you are working with k-mer sizes
+or genome sizes that produce lots more than 25 million k-mers.
 --
 
 . *Install Perl and set its path*
@@ -270,20 +273,14 @@ If you do not have Perl installed, look for it here:
 
   https://www.perl.org/get.html
 
-Perl is a good thing to have installed anyway, for anyone doing bioinformatics work.
 Explicit installation instructions are not given here.  Follow the instructions
 provided in the downloaded installation package, then re-run the "which perl" command
 to find the path to it.
 
-The allPathParameters.ours file must have the path to Perl included in it.
-Assign the path, which was shown with the "which perl" command, to the parameter
-"PATH_PERL". For example, maybe your path will be:
+Now assign the path, which was shown with the "which perl" command, to the parameter
+"PATH_PERL" in the allPathParameters.ours file, for example:
 
   PATH_PERL := /usr/local/bin/perl
-
-or if Perl is on your path, you can optionally use simply:
-
-  PATH_PERL := perl
 --
 
 . *Install R and set its path*
@@ -303,21 +300,20 @@ If you do not have R installed, look for it here:
 
   https://www.r-project.org
 
-R is a good thing to have installed anyway, for anyone doing bioinformatics work.
 Explicit installation instructions are not given here.  Follow the instructions
 provided in the downloaded installation package, then re-run the "which Rscript"
 command to find the path to it.
 
-The allPathParameters.ours file must have the path to RScript included in it.
-Assign the path, which was shown with the "which RScript" command, to the parameter
-"PATH_RSCRIPT". For example, maybe your path will be:
+If you already have R but want to update it, run R and choose "R, About R" to check your
+R version number, then choose "R, Check for R Updates" and look to see if a newer
+version is available.  If so, download and install the package.
+
+IGGPIPE does not use any extra R packages.
+
+Now assign the path, which was shown with the "which RScript" command, to the
+parameter "PATH_RSCRIPT" in the allPathParameters.ours file, for example:
 
   PATH_RSCRIPT := /usr/bin/Rscript
-
-or, if Rscript is on your path (it may be set that way during installation), you
-can optionally use simply:
-
-  PATH_RSCRIPT := Rscript
 --
 
 . *Install Primer3 and set its path*
@@ -326,37 +322,38 @@ can optionally use simply:
 Primer3 is a classic bioinformatics application that generates primers from
 sequence data.  It is used by IGGPIPE to generate primers for candidate IGG
 markers, so it must be installed on your computer. This version of IGGPIPE was
-tested with Primer3 version 2.3.6, although later versions, and earlier V2
-versions, will probably be fine. You probably know if you already have
+tested with Primer3 version 2.3.6, although later versions and earlier V2
+versions will probably be fine. You probably know if you already have
 Primer3 installed. If you don't know that you do, then you should install
 it. Look for it here:
 
   http://sourceforge.net/projects/primer3
 
-It comes pre-built for OSX, so make sure you download the OSX version. Put the
+It comes pre-built for OSX and Windows but may need to be compiled for Linux.
+Make sure you download the correct version (primer3, not primer3plus). Put the
 downloaded directory wherever you want on your computer. The file named
-primer3_core in the root directory of the downloaded package is the executable
-program file. The allPathParameters.ours file must have the path to primer3_core
-included in it. Assign the path to the parameter "PATH_PRIMER3CORE". For example,
-maybe you put the downloaded folder into your Documents folder and you set the
-parameter as follows:
+primer3_core (primer3_core.exe on Windows) in the root directory of the
+downloaded package is the executable program file.
+
+Now assign the path to the parameter "PATH_PRIMER3CORE" in the allPathParameters.ours
+file, for example:
 
   PATH_PRIMER3CORE := ~/Documents/primer3-2.3.6/primer3_core
-
-or, if primer3_core is on your path, you can optionally use simply:
-
-  PATH_PRIMER3CORE := primer3_core
 --
 
 . *Install e-PCR and set its path*
 +
 --
 e-PCR is an "electronic PCR" application from NCBI that uses primers and sequence
-data to do an in-silico PCR amplification.  It is used by IGGPIPE to test primers
+data to do an 'in silico' PCR amplification.  It is used by IGGPIPE to test primers
 of candidate IGG markers to see if they generate unique amplicons of the
 expected length, so it must be installed on your computer. This version of IGGPIPE
 was tested with e-PCR version 2.3.12, although later versions will probably be
-fine. To install e-PCR, look for it here:
+fine. For Windows, we had to use version 2.3.9, which worked but produced different
+results than version 2.3.12, making it impossible to do a file difference test to
+see if expected results of the test data were obtained.
+
+To install e-PCR, look for it here:
 
   http://www.ncbi.nlm.nih.gov/tools/epcr
 
@@ -402,16 +399,10 @@ Now try the 'make' command again, followed by running "e-PCR":
 The 'make' should succeed and e-PCR should display its usage information, meaning
 you are good to go.
 
-Now the allPathParameters.ours file must have the path to e-PCR included in it.
-Assign the path to the parameter "PATH_EPCR". For example, maybe you unzipped
-the zip file in your Documents folder and you set the parameter as follows:
+Now assign the path to the parameter "PATH_EPCR" in the allPathParameters.ours
+file, for example:
 
-  (Mac, Linux, and Windows)
   PATH_EPCR := ~/Documents/e-PCR-2.3.12/e-PCR
-
-or, if e-PCR is on your path, you can optionally use simply:
-
-  PATH_EPCR := e-PCR
 --
 
 . *Install MUSCLE and set its path*
@@ -430,17 +421,10 @@ The executable images are already built, so choose the correct download for your
 system and download the file, putting it wherever you want on your computer, such
 as a bin folder.
 
-Now the allPathParameters.ours file must have the path to MUSCLE included in it.
-Assign the path to the parameter "PATH_ALIGNER". For example, maybe you put the
-downloaded file in a 'bin' folder in your user directory and you set the parameter
-as follows:
+Now assign the path to the parameter "PATH_ALIGNER" in the allPathParameters.ours
+file, for example:
 
   PATH_ALIGNER := ~/bin/muscle3.8.31_i86darwin64
-
-or, if Muscle is on your path and the binary file is named 'muscle', you can
-optionally use simply:
-
-  PATH_ALIGNER := muscle
 --
 
 . *Build findMers*
@@ -453,16 +437,16 @@ also locate all contigs in the genome FASTA file and output a file that lists
 the starting position and length of each contig. IGGPIPE uses both of these
 functions of findMers to generate a list of common unique k-mers to be analyzed
 for LCRs (locally conserved regions). The findMers program must be compiled and
-built using 'make'. Its source files are located in subfolders within the code/cpp
-folder. Change into the code/cpp/findMers directory and enter the command 'make':
+built using 'make'. Its source files are located in the code/cpp/findMers directory.
+Change into that directory and enter the command 'make':
 
   cd code/cpp/findMers
   make
   findMers
   cd ../../..
 
-The 'make' should compile C++ files in the findMers folder and other in sister
-folders.  It should complete without error, and there will be a file named
+The 'make' should compile the C++ files in the findMers folder.  It should
+complete without error, and there will be a file named
 "findMers" in the directory, and when that file is run with the 'findMers'
 command shown above following 'make', it will display a page of usage
 information. The path to "findMers" is already set correctly in the
@@ -473,13 +457,22 @@ allPathParameters.ours file.
 +
 --
 IGGPIPE uses 'make' to run data through its pipeline. A command can be given to
-cause 'make' to delete files that it has generate by running the pipeline.
+cause 'make' to delete files that it has generated by running the pipeline.
 There are two different ways it can delete files: it can actually delete them,
-or it can move them to the Mac trash can where they can be found and undeleted
-if necessary. You must choose which of these methods you want. Since the trash
-can method seems more useful and flexible, it is the default method. You select
-the method by setting the parameter CMD_DELETE_WHEN_CLEANING to either $(CMD_DELETE)
-or $(CMD_TRASH). You should make sure it is set the way you want. Also, you should
+or it can move them to a trash folder where they can be found and undeleted
+if necessary. A script file (code/shell/trash.sh) is provided to move files to
+the Mac OSX trash
+folder, but for linux or Windows, you must either modify that script file so
+that it will work with your operating system, or choose the other method that
+simply deletes files.
+
+You must choose which of these methods you want. Since the trash folder method is
+more useful and flexible, it is the default method, but again, on Linux or Windows
+you will need to change it or modify trash.sh to work properly.
+
+You select the method by setting the allPathParameters.ours parameter
+CMD_DELETE_WHEN_CLEANING to either $(CMD_DELETE) or $(CMD_TRASH). You should
+make sure it is set the way you want.  Also, you should
 test the shell script that moves files to the trash, to make sure it works. To
 do this, use these commands:
 
@@ -500,23 +493,22 @@ primers. Several sample settings files come with Primer3, in its root directory.
 One of these, *primer3web_v4_0_0_default_settings.txt*, was copied and modified
 for use with IGGPIPE. The file is named *primer3settings.default.txt*, in the main
 IGGPIPE directory. The following required changes were made to it:
-. P3_FILE_ID was set to a descriptive settings title.
-. PRIMER_EXPLAIN_FLAG was changed from 1 to 0.
-. PRIMER_PRODUCT_SIZE_RANGE was set to a simplified 36-300 (primers are designed
-with most intervening DNA sequence removed)
-. PRIMER_NUM_RETURN was changed from 5 to 1.
-. PRIMER_GC_CLAMP was changed from 0 to 1 (optional but recommended).
 
-Copy primer3settings.default.txt to primer3settings.txt:
+a. P3_FILE_ID was set to a descriptive settings title.
+b. PRIMER_EXPLAIN_FLAG was changed from 1 to 0.
+c. PRIMER_PRODUCT_SIZE_RANGE was set to a simplified 36-300 (primers are designed
+with most intervening DNA sequence removed)
+d. PRIMER_NUM_RETURN was changed from 5 to 1.
+e. PRIMER_GC_CLAMP was changed from 0 to 1 (optional but recommended).
+
+You need to copy the default settings file to a new file that can be edited by you,
+should you want to change Primer3 settings for your needs while keeping a pristine
+copy in the original primer3settings.default.txt file.  Copy it to this file name:
 
   cp primer3settings.default.txt primer3settings.txt
 
-This makes primer3settings.txt available for editing by you, should you want to
-change Primer3 settings for your needs, while keeping a pristine copy in the
-original primer3settings.default.txt file.
-
-'This file copy is all you need to do, IGGPIPE will work with this version,
-and this is the required version for running the test of IGGPIPE.'
+This file copy is all you need to do, IGGPIPE will work with this version,
+and this is the required version for running the test of IGGPIPE.
 
 The RUN instructions for IGGPIPE indicate that primer3settings.txt should be
 edited if you want to change primer settings for your needs. However, whenever
@@ -524,7 +516,7 @@ you want to run the test of IGGPIPE as shown below, you should re-do the above
 copy to use the pristine file for testing.
 --
 
-. *Enable Access to FileMerge (optional, Mac only)*
+. *Enable Access to FileMerge (optional and Mac only)*
 +
 --
 Parameter settings files (allParameters.* and allPathParameters.*) and
@@ -575,27 +567,80 @@ should finish with the message *ALL files are up to date*.
 
 The 'tee' command routes the piped log output from 'make' to the console and to the
 file logFiles/makeLog.test.txt. You can examine this file after the run to see what
-specifically happened at each step. Note that the output includes timestamps telling
-how long each step took to run.
+specifically happened at each step, for example with this command:
 
-There should be several
-files in the output folder "outTestHP11", including files starting with the prefixes
-BadKmers_, NonvalidatedMarkers_, IndelGroupsNonoverlapping_, IndelGroupsOverlapping_,
-LCRs_, MarkerCounts_, MarkerDensity_, MarkerErrors_, MarkersNonoverlapping_, and
-MarkersOverlapping_. The last two are the final output files containing the markers.
+  more logFiles/makeLog.test.txt
+
+Note that the output includes timestamps telling how long each step took to run.
+
+If the pipeline fails, an error message of some kind is displayed, and 'make' stops.
+(There is a problem with Windows, where sometimes 'make' does not stop on an error,
+but keeps going.  We have not found a way around this.  If this happens to you, you
+will need to go back through the output to look for errors.)  If an error occurs,
+proceed to the next step, troubleshooting.
+
+If no error occurs, there should be several
+files in the output folder "outTestHP11", including files starting with these
+prefixes and suffixes (shown in the order that they are produced by the pipeline):
+
+a. LCRs_*.tsv
+b. BadKmers_*.tsv
+c. IndelGroupsOverlapping_*.tsv
+d. IndelGroupsNonoverlapping_*.tsv
+e. NonvalidatedMarkers_*.tsv
+f. MarkerErrors_*.tsv
+g. MarkersOverlapping_*.tsv
+h. MarkersNonoverlapping_*.tsv
+i. MarkerCounts_*.pdf
+j. MarkerDensity_*.png
+
+The MarkersOverlapping_ and MarkersNonoverlapping_ files are the final output files
+containing the markers.
+
 The .pdf and .png files should be examined to see how they depict marker counts
 and densities.
 
-To make sure the pipeline ran correctly, compare the file of output markers to the
+The tables at the end of this document describe the columns in these tab-separated
+data files.
+
+To make sure the pipeline ran correctly, compare the MarkersOverlapping_ file to the
 expected result, which is in file MarkersOverlapping.test.tsv in the IGGPIPE main
 directory:
 
   diff MarkersOverlapping.test.tsv outTestHP11/MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv
 
 This command should not produce any output, indicating the two files are identical.
+If it produces output indicating non-identity of the files, you have a problem.
+Proceed to the next step, troubleshooting.
+--
 
-Note that there are other sample "allParameters" files in subdirectory 'allParameters'
-which have been used for testing IGGPIPE on various genomes.
+. *Troubleshooting*
++
+--
+A common problem is with file paths. Pay close attention to error messages at the
+end before 'make' stops.  Recheck file paths if messages indicate a file could not
+be found.  Note that with Windows, which uses "\" rather than "/" to separate
+directories in file paths, we found that we could use "/" in all the paths in
+the allParameters.ours file and allParameters.test file and it worked fine; we
+did not have to use "\" anywhere.
+
+Another common problem with Windows was in text file line endings, which are
+handled differently in Windows than in OSX and Linux.  We believe we have worked
+out these problems, but if you find mysterious cases where a file looks ok but
+doesn't work, you may need to change it to have Linux style line endings.
+
+Another problem was program versions.  The e-PCR version for Windows was different
+than the one used for OSX and Linux, and this caused the final marker output files
+to be different than what was expected, resulting in output when the 'diff' command
+was run to check for file identity above.  If this happens, you should do difference
+testing on other test files as described next.
+
+
+You may need to doubl
+the problem is most
+likely due to running a software package of a different version than what we used
+for testing. For example, on Windows an older version of e-PCR was all that was
+available, and this led to differences in the output.  If 
 --
 
 . *Run 'make InDels' to align markers and find InDels*
