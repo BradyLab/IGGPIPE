@@ -1575,8 +1575,8 @@ expected result, which is in subdirectory outTestHP11/goodTest:</p></div>
 <pre><code>diff outTestHP11/MarkersOverlapping_*.tsv outTestHP11/goodTest/</code></pre>
 </div></div>
 <div class="paragraph"><p>This command should not produce any output, indicating the two files are identical.
-If it produces output indicating non-identity of the files, you have a problem.
-Proceed to the next step, troubleshooting.</p></div>
+If it produces output indicating non-identity of the files, you have a problem, so
+proceed to the next step, troubleshooting.</p></div>
 </div></div>
 </li>
 <li>
@@ -1611,7 +1611,16 @@ prefixes and suffixes are listed in the previous step have a "good" version of
 the file containing the expected results, in folder outTestHP11/goodTest.  Each
 of those files can be compared to the output IGGPIPE produced when you ran it
 using a <em>diff</em> command to see which ones are good. No output means the files match.
-For example:</p></div>
+A shell script named <em>diffKeyFiles.sh</em> is provided that runs <em>diff</em> on each of these
+files. To use it with the allParameters.test output files:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>source code/shell/diffKeyFiles.sh</code></pre>
+</div></div>
+<div class="paragraph"><p>It will show only a single line of output for each file, saying it diffed the file,
+if the files match.  If they don&#8217;t match, you will get a lot of output from the
+mismatches.  A single file can be diffed with this command, for example to diff the
+LCRs_ file:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>diff outTestHP11/LCRs_*.tsv outTestHP11/goodTest/</code></pre>
@@ -1899,7 +1908,7 @@ Contact me, Ted Toal, <a href="mailto:twtoal@ucdavis.edu">twtoal@ucdavis.edu</a>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-10-08 11:41:00 PDT
+Last updated 2015-10-08 13:00:59 PDT
 </div>
 </div>
 </body>
