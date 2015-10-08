@@ -10,10 +10,6 @@
 WD := $(BRADYLAB)/Genomes/kmers/IGGPIPE
 
 
-# Path to the 'jellyfish' program file.  Use 'which jellyfish' to see this path.
-PATH_JELLYFISH := /usr/local/bin/jellyfish
-
-
 # Path to the file that is the 'perl' program file.  Use 'which perl' to see it.
 PATH_PERL := ~/perl5/perlbrew/perls/perl-5.16.0/bin/perl
 
@@ -105,8 +101,12 @@ CMD_DELETE_WHEN_CLEANING := $(CMD_TRASH)
 
 
 ################################################################################
-# Parameters for installed programs.
+# Installed program commands and parameters.
 ################################################################################
+
+# Command to invoke the 'jellyfish' program file.  Usually on PATH so this is ok.
+CMD_JELLYFISH := jellyfish
+
 
 # Number of entries in Jellyfish hash.  This should be large enough to make
 # Jellyfish run fast, without being so large that it uses up more memory than

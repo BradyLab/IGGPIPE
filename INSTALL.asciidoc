@@ -109,7 +109,11 @@ http://www.barebones.com/products/textwrangler
 .. e-PCR
 --
 
-. *One C++ program provided with IGGPIPE will be compiled and built: findMers*
+. *One C++ program provided with IGGPIPE will be compiled and built:*
++
+--
+.. findMers
+--
 
 *Install IGGPIPE*
 -----------------
@@ -118,6 +122,21 @@ http://www.barebones.com/products/textwrangler
 below and execute them, with occasional skimming of the text just above/below the
 commands.*
 
+
+. *Change to IGGPIPE directory*
++
+--
+All work from the command line while installing IGGPIPE is generally done with
+the current directory set to the IGGPIPE directory where you download the IGGPIPE
+files:
+
+  cd whatever/IGGPIPE
+
+In Windows under Cygwin, you must use the following command after changing to
+the IGGPIPE directory:
+
+  cygpath -am
+--
 
 . *Copy allPathParameters.template file to new file allPathParameters.ours*
 +
@@ -221,36 +240,58 @@ work as well. 'Older versions will not work, because Jellyfish changed its outpu
 names. They used to end with "_0" but no longer do!'
 
 Now the jellyfish program must be compiled and built into an application, and installed
-on your computer.  I used these commands, which worked without error:
+on your computer.  I used these commands:
 
   cd ~/src/jellyfish-2.2.3
   ./configure
   make
+
+The commands worked without error on OSX and Linux, but compile errors ("impossible
+constraint" errors) occurred on Windows. We fixed these by editing file 'file_header.hpp'
+and adding the following lines 'after #include <jellyfish/rectangular_binary_matrix.hpp>':
+
+..........................
+namespace std {
+    #include <sstream>
+
+    template <typename T>
+    std::string to_string(T value)
+      {
+      //create an output string stream
+      std::ostringstream os ;
+
+      //throw the value into the string stream
+      os << value ;
+
+      //convert the string stream into a string and return
+      return os.str() ;
+      }
+
+    template std::string to_string<long long int>(long long int); // instantiate with long long int
+}
+..........................
+
+That allowed the 'make' to succeed under Windows too.
+
+Then, to install the code, use this command:
+
   sudo make install
 
 The 'sudo' command prompts for a password, and I entered my computer's administrator
-password.  When the above commands are finished, I verified that Jellyfish was installed
-and that I could run it with these commands:
+password.  The above command places the Jellyfish program in the PATH variable so
+that the program can be run with the command 'jellyfish'. (Sometimes it is necessary
+to log out and back in for a PATH change to take effect). I verified that Jellyfish
+was installed and able to be run with this command:
 
-  which jellyfish
   jellyfish --version
 
-Finally, find parameter PATH_JELLYFISH in the allPathParameters.oursfile and assign
-it the path to Jellyfish, which was shown when you gave the "which jellyfish"
-command above.  The path will probably already be correct because Jellyfish usually
-gets installed in a standard location:
+The parameter CMD_JELLYFISH in the allPathParameters.oursfile is already set to
+'jellyfish', which is the command needed to run the Jellyfish program. You
+shouldn't need to change it.
 
-  PATH_JELLYFISH := /usr/local/bin/jellyfish
-
-If you have Jellyfish on your path, you might be able to simply use:
-
-  PATH_JELLYFISH := jellyfish
-
-However, we had trouble doing this under Windows, and so we simply stick with putting
-the complete tool paths in the parameters, which is what we will show below.
-
-Also, you may need to change the parameter JELLYFISH_HASH_SIZE, located further down
-in the file. The value already in the file will usually work fine.  However, if you
+Also, you may need to change the parameter JELLYFISH_HASH_SIZE, also located in the
+allPathParameters.ours file. The value already in the file will usually work fine.
+However, if you
 are using a computer with lots of memory, you may want to change the value to take
 advantage of that.  It can be especially helpful if you are working with k-mer sizes
 or genome sizes that produce lots more than 25 million k-mers.

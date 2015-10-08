@@ -322,11 +322,11 @@ endif
 # Here, % is a genome number.
 
 $(KMERS_FILES) : $(PFX_KMERS_DATA_FILE)%.kmers : $$(PATH_GENOME_FASTA_$$*) | \
-        $(DIR_KMERS) $(PATH_JELLYFISH)
+        $(DIR_KMERS)
 	@echo
 	@echo "*** getKmers PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
 	@echo "Extracting unique $(K)-mers from $< into $(PFX_KMERS_DATA_FILE)$*.kmers_*"
-	$(TIME) $(PATH_JELLYFISH) count -C -m $(K) -s $(JELLYFISH_HASH_SIZE) -U 1 \
+	$(TIME) $(CMD_JELLYFISH) count -C -m $(K) -s $(JELLYFISH_HASH_SIZE) -U 1 \
 	    -o $(PFX_KMERS_DATA_FILE)$*.kmers $< $(REDIR)
 	@echo "Finished."
 
@@ -365,7 +365,7 @@ $(KMERS_STATS_FILES) : $(PFX_KMERS_DATA_FILE)%.stats : $(PFX_KMERS_DATA_FILE)%.k
 	@echo
 	@echo "*** kmerStats PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
 	@echo "Getting statistics for $(K)-mers from $< into $@"
-	$(TIME) $(PATH_JELLYFISH) stats -v $< >$@ $(REDIR)
+	$(TIME) $(CMD_JELLYFISH) stats -v $< >$@ $(REDIR)
 	@echo "Finished."
 	@echo
 	@echo "Statistics are:"
@@ -409,7 +409,7 @@ $(SORTED_KMERS_FILES) : $(PFX_KMERS_DATA_FILE)%.sorted : $(PFX_KMERS_DATA_FILE)%
 	@echo "Sorting text-based $(K)-mers from $< into $@"
 	@echo
 	@echo "Extracting text-based $(K)-mers from binary file $< into $@.tmp"
-	$(TIME) $(PATH_JELLYFISH) dump -c -o $@.tmp $< $(REDIR)
+	$(TIME) $(CMD_JELLYFISH) dump -c -o $@.tmp $< $(REDIR)
 	@echo "Sorting text-based $(K)-mers from $@.tmp into $@.tsv."
 	$(TIME) sort $@.tmp >$@.tsv $(REDIR)
 	@echo "Removing $@.tmp"

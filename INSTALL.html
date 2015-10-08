@@ -937,8 +937,18 @@ e-PCR
 </li>
 <li>
 <p>
-<strong>One C++ program provided with IGGPIPE will be compiled and built: findMers</strong>
+<strong>One C++ program provided with IGGPIPE will be compiled and built:</strong>
 </p>
+<div class="openblock">
+<div class="content">
+<div class="olist loweralpha"><ol class="loweralpha">
+<li>
+<p>
+findMers
+</p>
+</li>
+</ol></div>
+</div></div>
 </li>
 </ol></div>
 </div>
@@ -1076,13 +1086,42 @@ cp Downloads/jellyfish-2.2.3 src</code></pre>
 work as well. <em>Older versions will not work, because Jellyfish changed its output file
 names. They used to end with "_0" but no longer do!</em></p></div>
 <div class="paragraph"><p>Now the jellyfish program must be compiled and built into an application, and installed
-on your computer.  I used these commands, which worked without error:</p></div>
+on your computer.  I used these commands:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>cd ~/src/jellyfish-2.2.3
 ./configure
-make
-sudo make install</code></pre>
+make</code></pre>
+</div></div>
+<div class="paragraph"><p>The commands worked without error on OSX and Linux, but compile errors ("impossible
+constraint" errors) occurred on Windows. We fixed these by editing file <em>file_header.hpp</em>
+and adding the following lines <em>after #include &lt;jellyfish/rectangular_binary_matrix.hpp&gt;</em>:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>namespace std {
+    #include &lt;sstream&gt;
+
+    template &lt;typename T&gt;
+    std::string to_string(T value)
+      {
+      //create an output string stream
+      std::ostringstream os ;
+
+      //throw the value into the string stream
+      os &lt;&lt; value ;
+
+      //convert the string stream into a string and return
+      return os.str() ;
+      }
+
+    template std::string to_string&lt;long long int&gt;(long long int); // instantiate with long long int
+}</code></pre>
+</div></div>
+<div class="paragraph"><p>That allowed the <em>make</em> to succeed under Windows too.</p></div>
+<div class="paragraph"><p>Then, to install the code, use this command:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>sudo make install</code></pre>
 </div></div>
 <div class="paragraph"><p>The <em>sudo</em> command prompts for a password, and I entered my computer&#8217;s administrator
 password.  When the above commands are finished, I verified that Jellyfish was installed
@@ -1908,7 +1947,7 @@ Contact me, Ted Toal, <a href="mailto:twtoal@ucdavis.edu">twtoal@ucdavis.edu</a>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-10-08 13:04:33 PDT
+Last updated 2015-10-08 13:42:10 PDT
 </div>
 </div>
 </body>
