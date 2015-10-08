@@ -1,8 +1,9 @@
-# Copy key files in test directory $1 to $1/$2
+# Copy key files in output directory $1 to $1/$2
 
 if [[ -z $1 || -z $2 ]] ; then
-    echo Missing argument 1 and/or 2
-    echo Usage: source copyKeyFiles.sh "<srcDestDir>" "<destSubdir>"
+    echo "Missing argument 1 and/or 2"
+    echo "Usage: source copyKeyFiles.sh <srcDestDir> <destSubdir>"
+    echo "Example: source code/shell/copyKeyFiles.sh outTestHP11 goodTest"
     return
 fi
 
