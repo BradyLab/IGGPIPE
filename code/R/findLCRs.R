@@ -1018,9 +1018,9 @@ cumLcrDf = cumLcrDf[order(cumLcrDf$LCR, cumLcrDf[, refPosCol]),]
 # Write results to files.
 ################################################################################
 
-write.table(cumLcrDf, outLcbFile, quote=FALSE, sep="\t")
+write.table.winSafe(cumLcrDf, outLcbFile, quote=FALSE, sep="\t")
 # cumLcrDf = read.table(outLcbFile, header=TRUE, row.names=1, sep="\t", stringsAsFactors=FALSE)
-write.table(cumDiscardDf, outBadKmers, quote=FALSE, sep="\t")
+write.table.winSafe(cumDiscardDf, outBadKmers, quote=FALSE, sep="\t")
 # cumDiscardDf = read.table(outBadKmers, header=TRUE, row.names=1, sep="\t", stringsAsFactors=FALSE)
 
 catnow("\nFound a total of", length(unique(cumLcrDf$LCR)), "LCRs containing",

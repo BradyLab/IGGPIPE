@@ -292,6 +292,39 @@ colorBlind.8 = c(black="#000000", orange="#E69F00", skyblue="#56B4E9",
 #######################################################################################
 sem = function(V) sd(V)/sqrt(length(V))
 
+#######################################################################################
+# The R writeLines() function, done in a manner that will write unix-style line ends
+# always, even on Windows systems.
+#######################################################################################
+writeLines.winSafe = function(text, fileName, ...)
+    {
+    con = file(fileName, "wb")
+    writeLines(text, con, ...)
+    close(con)
+    }
+
+#######################################################################################
+# The R write.table() function, done in a manner that will write unix-style line ends
+# always, even on Windows systems.
+#######################################################################################
+write.table.winSafe = function(x, fileName, ...)
+    {
+    con = file(fileName, "wb")
+    write.table(x, con, ...)
+    close(con)
+    }
+
+#######################################################################################
+# The R write.csv() function, done in a manner that will write unix-style line ends
+# always, even on Windows systems.
+#######################################################################################
+write.csv.winSafe = function(x, fileName, ...)
+    {
+    con = file(fileName, "wb")
+    write.csv(x, con, ...)
+    close(con)
+    }
+
 ################################################################################
 # End of file.
 ################################################################################

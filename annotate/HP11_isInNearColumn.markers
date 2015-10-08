@@ -1,9 +1,9 @@
 ################################################################################
 # Parameter file for annotateFile.R to add an "isInNear" column to the IGG
-# marker InDels test file and write the result to a new file.  The "isInNear"
+# marker Indels test file and write the result to a new file.  The "isInNear"
 # column gives the gene features (from a gene model file) overlapping or within
-# 1000 bp up/downstream of each InDel, and the position of the feature in
-# base-pairs from the InDel.  Specifically:
+# 1000 bp up/downstream of each Indel, and the position of the feature in
+# base-pairs from the Indel.  Specifically:
 #   1. Reads as inputFileT the file in directory outTestHP11 named:
 # MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv
 #   2. Reads code/R/test_GFFfuncsAndMergeData/ITAG2.4_test.gff3 as inputFileS,
@@ -15,7 +15,7 @@
 #       "isInNear" to the inputFileT data, containing feature ID, strand, and
 #       relative base pair position of the feature relative to the marker.
 #   5. Writes the new inputFileT data to directory outTestHP11 to this file:
-# MarkersNonoverlappingWithInNearFeatures_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv
+# MarkersAnnotated_WithInNearFeatures_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv
 ################################################################################
 
 ################################################################################
@@ -92,7 +92,7 @@ mergeCols:
 ################################################################################
 
 outputFile:
-    path := "outTestHP11/MarkersNonoverlappingWithInNearFeatures_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv"
+    path := "outTestHP11/MarkersAnnotated_WithInNearFeatures_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv"
     type := tsv
     header := YES
     quote := NO

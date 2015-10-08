@@ -617,7 +617,7 @@ inv(sum(!is.na(goodPairs)))
 catnow("Finished testing, # Indel Groups found:", nrow(goodPairs), "\n")
 
 # Retrieve the df rows for the good left- and right-side k-mers into dfEL and dfER.
-catnow("Merging k-mer pairs into single InDel Group rows...")
+catnow("Merging k-mer pairs into single Indel Group rows...")
 dfEL = df[goodPairs$left,]
 dfER = df[goodPairs$right,]
 rownames(dfEL) = NULL
@@ -681,7 +681,7 @@ catnow("\n")
 ########################################
 
 catnow("Writing output file", outOverlappingIndelGroups, "...")
-write.table(dfIGs, outOverlappingIndelGroups, row.names=FALSE, quote=FALSE, sep="\t")
+write.table.winSafe(dfIGs, outOverlappingIndelGroups, row.names=FALSE, quote=FALSE, sep="\t")
 # dfIGs = read.table(outOverlappingIndelGroups, header=TRUE, sep="\t", quote="", row.names=NULL,
 #    na.strings=NULL, check.names=FALSE, fill=FALSE, strip.white=FALSE, blank.lines.skip=FALSE,
 #    comment.char="", allowEscapes=FALSE, flush=FALSE, stringsAsFactors=FALSE)
@@ -711,9 +711,9 @@ catnow("Getting non-overlapping Indel Groups...")
 inv(nrow(dfIGs), "\nNumber of Indel Groups including overlapping ones")
 
 # We will use the same data frame that holds the overlapping Indel Groups, dfIGs,
-# to hold the non-overlapping InDel Groups, since there might be a LOT of them
+# to hold the non-overlapping Indel Groups, since there might be a LOT of them
 # (so copying the data frame would be costly) and we need to start out this algorithm
-# with the data frame containing the overlapping InDel Groups, which dfIGs already
+# with the data frame containing the overlapping Indel Groups, which dfIGs already
 # does.  The data frame will be transformed into one containing only non-overlapping
 # Indel Groups.  We no longer need the overlapping groups (except for this).
 
@@ -724,7 +724,7 @@ dfIGs = removeOverlappingRows(dfIGs, "Indel Group", "genome", genomes, idCol.I, 
 ########################################
 
 catnow("Writing Indel Groups to output file...")
-write.table(dfIGs, outNonoverlappingIndelGroups, row.names=FALSE, quote=FALSE, sep="\t")
+write.table.winSafe(dfIGs, outNonoverlappingIndelGroups, row.names=FALSE, quote=FALSE, sep="\t")
 # dfIGs = read.table(outNonoverlappingIndelGroups, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
 catnow("\n")
 

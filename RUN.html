@@ -1233,11 +1233,11 @@ you before proceeding with additional pipeline steps.</p></div>
 </li>
 <li>
 <p>
-<strong>Run IGGPIPE with the command "make PARAMS=allParameters.XY InDels"</strong>
+<strong>Run IGGPIPE with the command "make PARAMS=allParameters.XY Indels"</strong>
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>The next step of the pipeline analyzes the LCRs to find InDel Groups that satisfy
+<div class="paragraph"><p>The next step of the pipeline analyzes the LCRs to find Indel Groups that satisfy
 the parameters AMIN, AMAX, ADMIN, ADMAX, NDAMIN, and MINFLANK. To run these steps,
 use this command:</p></div>
 <div class="literalblock">
@@ -1247,14 +1247,14 @@ use this command:</p></div>
 <div class="paragraph"><p>If it completes successfully, the end of the command output will show the message:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>InDels files are up to date.</code></pre>
+<pre><code>Indels files are up to date.</code></pre>
 </div></div>
 <div class="paragraph"><p>If it says something else, indicating an error occurred, then as usual, examine
 the output carefully and try to diagnose and fix the error, then enter the
 above <em>make</em> command again to retry the failed step.</p></div>
 <div class="paragraph"><p>Assuming the step completed successfully, count the number of Indel Groups in the
-two output files. One output file includes all InDel Groups found, even when they
-overlap one another. The other output file includes only non-overlapping InDel
+two output files. One output file includes all Indel Groups found, even when they
+overlap one another. The other output file includes only non-overlapping Indel
 Groups, which were determined based on the setting of the parameter OVERLAP_REMOVAL.
 The output files are located in the main output directory and their names start
 with <em>IndelGroups</em> followed by <em>Overlapping_</em> and <em>Nonoverlapping_</em>.
@@ -1408,42 +1408,42 @@ BadKmers_*.tsv contains common unique k-mers rejected from assignment to any LCR
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-<strong>Finding InDels</strong>
+<strong>Finding Indels</strong>
 </p>
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>An R program that is NOT run as part of the pipeline when the <em>make &#8230; ALL</em> target
-is built, but which can be run using <em>make &#8230; InDels</em>, is able to read a file of LCRs,
-non-overlapping InDelGroups, or non-overlapping Markers, extract the DNA sequences
+is built, but which can be run using <em>make &#8230; Indels</em>, is able to read a file of LCRs,
+non-overlapping Indel Groups, or non-overlapping Markers, extract the DNA sequences
 from the genomes in each LCR or Marker region and align them, then locate all
-InDels in the aligned sequences and write their positions to a file. The program
+Indels in the aligned sequences and write their positions to a file. The program
 is called alignAndGetIndels.R. You should already have set its input file name in
 your "allParameters" parameter file. Run it as follows:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY InDels    (replacing with your allParameters name)</code></pre>
+<pre><code>make PARAMS=allParameters.XY Indels    (replacing with your allParameters name)</code></pre>
 </div></div>
 <div class="paragraph"><p>This produces a file in your output folder whose name ends with "indels.tsv",
-containing a table of all InDels found in the LCR or marker regions.  Examine it
+containing a table of all Indels found in the LCR or marker regions.  Examine it
 to see the data it contains (see Table 5 of column descriptions).</p></div>
 </div></div>
 </li>
 <li>
 <p>
-<strong>Plotting InDel information</strong>
+<strong>Plotting Indel information</strong>
 </p>
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>Another R program that is NOT run as part of the pipeline when the <em>make &#8230; ALL</em> target
-is built, but which can be run using <em>make &#8230; plotInDels</em>, reads the InDels file produced
-by <em>make &#8230; InDels</em> and plots information from it in a pdf file. The program is called
+is built, but which can be run using <em>make &#8230; plotIndels</em>, reads the Indels file produced
+by <em>make &#8230; Indels</em> and plots information from it in a pdf file. The program is called
 plotIndels.R. Run it as follows:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY plotInDels    (replacing with your allParameters name)</code></pre>
+<pre><code>make PARAMS=allParameters.XY plotIndels    (replacing with your allParameters name)</code></pre>
 </div></div>
 <div class="paragraph"><p>This produces a file in your output folder whose name ends with "indels.pdf",
-containing plots of various InDel information.  Examine it to see the plots it
+containing plots of various Indel information.  Examine it to see the plots it
 contains.</p></div>
 </div></div>
 </li>
@@ -1926,7 +1926,7 @@ cellspacing="0" cellpadding="4">
 <tr>
 <td align="center" valign="top"><p class="table">ID</p></td>
 <td align="left" valign="top"><p class="table">Unique ID tying row back to originating input file row. LCR input files: LCRnumber.
-InDelGroup and Markers files: refID_refPos1_refPos2.</p></td>
+IndelGroup and Markers files: refID_refPos1_refPos2.</p></td>
 </tr>
 <tr>
 <td align="center" valign="top"><p class="table">phases</p></td>
@@ -1935,29 +1935,29 @@ InDelGroup and Markers files: refID_refPos1_refPos2.</p></td>
 </tr>
 <tr>
 <td align="center" valign="top"><p class="table">idx</p></td>
-<td align="left" valign="top"><p class="table">Starts at 1 and counts each InDel within an ID. For given ID (input row), number of InDels
+<td align="left" valign="top"><p class="table">Starts at 1 and counts each Indel within an ID. For given ID (input row), number of Indels
 in that region is max idx value. If more than two genomes, entire region where alignment has a
-gap in one or more genomes is counted as one InDel even if multiple gap regions occur in different
+gap in one or more genomes is counted as one Indel even if multiple gap regions occur in different
 genomes.</p></td>
 </tr>
 <tr>
 <td align="center" valign="top"><p class="table">Xdel,Ydel</p></td>
-<td align="left" valign="top"><p class="table">Total number of deleted bps within the InDel in genomes X,Y. With 2 genomes, del = 0
+<td align="left" valign="top"><p class="table">Total number of deleted bps within the Indel in genomes X,Y. With 2 genomes, del = 0
 in genome with insertion (no gaps), del &gt; 0 in genome with deletion (gaps). With &gt;2 genomes, del
-can be non-zero for all genomes. A genome has only insertions in the InDel if del is 0, and it has
+can be non-zero for all genomes. A genome has only insertions in the Indel if del is 0, and it has
 only deletions if end-start-1 = 0, and otherwise it has a mixture of at least one insertion and
-one deletion within the InDel interval.</p></td>
+one deletion within the Indel interval.</p></td>
 </tr>
 <tr>
 <td align="center" valign="top"><p class="table">Xid,Yid</p></td>
-<td align="left" valign="top"><p class="table">Sequence ID of the InDel in genomes X,Y.</p></td>
+<td align="left" valign="top"><p class="table">Sequence ID of the Indel in genomes X,Y.</p></td>
 </tr>
 <tr>
 <td align="center" valign="top"><p class="table">Xstart,Xend,Ystart,Yend</p></td>
-<td align="left" valign="top"><p class="table">Overall InDel starting and ending position in genomes X,Y.
-start/end are positions of bps just BEFORE first and AFTER last InDel gap in any genome,
+<td align="left" valign="top"><p class="table">Overall Indel starting and ending position in genomes X,Y.
+start/end are positions of bps just BEFORE first and AFTER last Indel gap in any genome,
 so they refer to the same two bps in all genomes. Always start &lt; end. If <em>-</em> phase,
-start is bp just AFTER, end is bp just BEFORE, opposite of <em>+</em>. Length of the InDel region
+start is bp just AFTER, end is bp just BEFORE, opposite of <em>+</em>. Length of the Indel region
 in each genome is end-start-1.</p></td>
 </tr>
 </tbody>
@@ -1969,7 +1969,7 @@ in each genome is end-start-1.</p></td>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-10-01 09:25:29 PDT
+Last updated 2015-10-08 11:16:44 PDT
 </div>
 </div>
 </body>

@@ -325,9 +325,7 @@ seqExtStrs = paste(c("", "!")[1+dfXP$pos.revcomp], df$id,
     "..", as.integer(dfXP$pos.right), sep="")
 
 extractPosFile = paste(extractDir, paste("extract_KmerRgns_", genomeNum, ".txt", sep=""), sep=PATHSEP)
-outFile = file(extractPosFile, "wb")
-writeLines(seqExtStrs, outFile)
-close(outFile)
+writeLines.winSafe(seqExtStrs, extractPosFile)
 
 seqFile = paste(extractDir, paste("seqs_KmerRgns_", genomeNum, ".txt", sep=""), sep=PATHSEP)
 getSeqs_args = c(getSeqsFromFasta, fastaFile, "-i", extractPosFile, "-o", seqFile)
@@ -407,7 +405,7 @@ df = df[, colnames(df) != "refS"]
 df = df[, colnames(df) != "ctg"]
 
 # Write the data frame to the output file.
-write.table(df, seqOutFile, row.names=FALSE, quote=FALSE, sep="\t")
+write.table.winSafe(df, seqOutFile, row.names=FALSE, quote=FALSE, sep="\t")
 # df = read.table(seqOutFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
 
 catnow("Finished retrieving DNA sequences for Indel Groups, output file:\n", seqOutFile, "\n")

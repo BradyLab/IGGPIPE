@@ -876,35 +876,32 @@ $(PTN_COUNTS_FILE) $(PTN_DENSITY_FILES) : $(PATH_OVERLAPPING_MARKERS_FILE) $(PAT
 	@echo "Finished."
 
 ################################################################################
-# InDels: Read input file and perform alignments, then search them for InDels.
+# Indels: Read input file and perform alignments, then search them for Indels.
 ################################################################################
 
 # A list of all FASTA files already defined above: FASTA_FILES
 
 # Do this to avoid case annoyance.
-Indels: InDels
-
-# Do this to avoid case annoyance.
-indels: InDels
+indels: Indels
 
 # Phony target to make or clean PATH_INDELS_OUTPUT_FILE file.
-# If variable PARAMS is not defined, show basic usage info, else make InDels
+# If variable PARAMS is not defined, show basic usage info, else make Indels
 # output file target.
 ifeq ($(PARAMS),)
-InDels:
+Indels:
 	@echo
 	@echo "You must specify a PARAMS file:"
 	@echo
-	@echo "$(INDENT)make PARAMS=<allParametersFile> InDels"
+	@echo "$(INDENT)make PARAMS=<allParametersFile> Indels"
 	@echo 
 else ifeq ($(CLEAN),)
-InDels: $(PATH_INDELS_OUTPUT_FILE)
+Indels: $(PATH_INDELS_OUTPUT_FILE)
 	@echo
-	@echo "InDels files are up to date."
+	@echo "Indels files are up to date."
 else
-InDels:
+Indels:
 	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_INDELS_OUTPUT_FILE)
-	@echo "InDels output file(s) removed."
+	@echo "Indels output file(s) removed."
 endif
 
 # PATH_INDELS_OUTPUT_FILE target.
@@ -912,8 +909,8 @@ endif
 $(PATH_INDELS_OUTPUT_FILE) : $(PATH_INDELS_INPUT_FILE) $(FASTA_FILES) | $(DIR_GENOME_OUT_DATA) \
         $(PATH_RSCRIPT) $(PATH_ALIGN_AND_GET_INDELS) $(PATH_PERL) $(PATH_GET_SEQS_FASTA) $(PATH_ALIGNER)
 	@echo
-	@echo "*** InDels PARAMS=$(PARAMS) $(CLEAN) ***"
-	@echo "Align sequences of $< and find InDels and write them to $@"
+	@echo "*** Indels PARAMS=$(PARAMS) $(CLEAN) ***"
+	@echo "Align sequences of $< and find Indels and write them to $@"
 	$(TIME) $(PATH_RSCRIPT) $(PATH_ALIGN_AND_GET_INDELS) $(WD) \
 	    $(PATH_INDELS_INPUT_FILE) $(PATH_INDELS_OUTPUT_FILE) \
 	    $(DIR_GENOME_OUT_DATA) \
@@ -923,38 +920,38 @@ $(PATH_INDELS_OUTPUT_FILE) : $(PATH_INDELS_INPUT_FILE) $(FASTA_FILES) | $(DIR_GE
 	@echo "Finished."
 
 ################################################################################
-# plotInDels: Make plots of information about InDels found within InDel groups.
+# plotIndels: Make plots of information about Indels found within Indel groups.
 ################################################################################
 
 # Do this to avoid case annoyance.
-plotIndels: plotInDels
+plotindels: plotIndels
 
 # Phony target to make or clean PATH_INDELS_PLOT_FILE file.
-# If variable PARAMS is not defined, show basic usage info, else make plotInDels
+# If variable PARAMS is not defined, show basic usage info, else make plotIndels
 # output file target.
 ifeq ($(PARAMS),)
-plotInDels:
+plotIndels:
 	@echo
 	@echo "You must specify a PARAMS file:"
 	@echo
-	@echo "$(INDENT)make PARAMS=<allParametersFile> plotInDels"
+	@echo "$(INDENT)make PARAMS=<allParametersFile> plotIndels"
 	@echo 
 else ifeq ($(CLEAN),)
-plotInDels: $(PATH_INDELS_PLOT_FILE)
+plotIndels: $(PATH_INDELS_PLOT_FILE)
 	@echo
-	@echo "plotInDels file is up to date."
+	@echo "plotIndels file is up to date."
 else
-plotInDels:
+plotIndels:
 	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_INDELS_PLOT_FILE)
-	@echo "plotInDels output file(s) removed."
+	@echo "plotIndels output file(s) removed."
 endif
 
 # PATH_INDELS_PLOT_FILE target.
 
 $(PATH_INDELS_PLOT_FILE) : $(PATH_INDELS_OUTPUT_FILE) | $(PATH_RSCRIPT) $(PATH_PLOT_INDELS)
 	@echo
-	@echo "*** plotInDels PARAMS=$(PARAMS) $(CLEAN) ***"
-	@echo "Make plots of InDel information to file $@"
+	@echo "*** plotIndels PARAMS=$(PARAMS) $(CLEAN) ***"
+	@echo "Make plots of Indel information to file $@"
 	$(TIME) $(PATH_RSCRIPT) $(PATH_PLOT_INDELS) $(WD) $(PATH_INDELS_OUTPUT_FILE) \
 	    $(PATH_INDELS_PLOT_FILE) $(REDIR)
 	@echo "Finished."

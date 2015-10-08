@@ -31,7 +31,7 @@ PATH_PRIMER3CONFIG := /Users/tedtoal/src/primer3-2.3.6/primer3_config
 
 
 # Path to the 'e-PCR' program file, where you built or copied it after download.
-PATH_EPCR := ~/src/e-PCR-2.3.12/e-PCR
+PATH_EPCR := ~/src/e-PCR-2.3.12-1/e-PCR
 
 
 # Path to the 'MUSCLE' alignment program file, where you put it after download.

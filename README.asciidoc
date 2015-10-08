@@ -52,7 +52,7 @@ References
 .*IGG markers and the IGGPIPE software are described in:*
 
 [bibliography]
-- Toal, T.W., Burkart-Waco, D., Kuppu, S., Chetelat, R., and Brady, S.M. 'InDel
+- Toal, T.W., Burkart-Waco, D., Kuppu, S., Chetelat, R., and Brady, S.M. 'Indel
 Group in Genomes (IGG): Molecular Genetic Markers Between Multiple Species Identified
 within Next Generation Sequencing Data by an in silico K-mer-based Pipeline'
 (Publication in process)

@@ -109,9 +109,9 @@ file as DIR_IGGPIPE_OUT):
 
      make PARAMS=myFilename CLEAN_OUT_DIR=1 ALL
 
-If you want to analyze an output file for InDels (parameters should have already
+If you want to analyze an output file for Indels (parameters should have already
 been set in the allParameters file), then use these commands to analyze for
-InDels and to plot InDel information:
+Indels and to plot Indel information:
 
-     make PARAMS=myFilename InDels
-     make PARAMS=myFilename plotInDels
+     make PARAMS=myFilename Indels
+     make PARAMS=myFilename plotIndels

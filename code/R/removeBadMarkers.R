@@ -182,7 +182,7 @@ catnow("\n")
 ########################################
 
 rownames(dfMarkers) = NULL
-write.table(dfMarkers, overlappingFile, col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
+write.table.winSafe(dfMarkers, overlappingFile, col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
 # dfMarkers = read.table(overlappingFile, header=TRUE, sep="\t", stringsAsFactors=FALSE)
 catnow(nrow(dfMarkers), "overlapping markers output to file:\n", overlappingFile, "\n")
 
@@ -207,7 +207,7 @@ dfMarkers = removeOverlappingRows(dfMarkers, "Marker", "genome", genomeLtrs, idC
 ########################################
 
 rownames(dfMarkers) = NULL
-write.table(dfMarkers, nonoverlappingFile, col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
+write.table.winSafe(dfMarkers, nonoverlappingFile, col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
 # dfMarkers = read.table(nonoverlappingFile, header=TRUE, sep="\t", stringsAsFactors=FALSE)
 catnow(nrow(dfMarkers), "non-overlapping markers output to file:\n", nonoverlappingFile, "\n")
 

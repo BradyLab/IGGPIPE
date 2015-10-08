@@ -888,13 +888,13 @@ if (!is.null(L$attrCreation))
         # tsv
         if (L$outputFile$type == "tsv")
             {
-            write.table(T.df, L$outputFile$path, quote=L$outputFile$quote,
+            write.table.winSafe(T.df, L$outputFile$path, quote=L$outputFile$quote,
                 col.names=col.names, row.names=row.names, sep="\t")
             }
         # csv
         else
             {
-            write.csv(T.df, L$outputFile$path, quote=L$outputFile$quote,
+            write.csv.winSafe(T.df, L$outputFile$path, quote=L$outputFile$quote,
                 col.names=col.names, row.names=row.names)
             }
         }

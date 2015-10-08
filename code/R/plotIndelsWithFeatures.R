@@ -50,16 +50,16 @@ Nexpected = 6
 if (length(args) != Nexpected)
     {
     usage = c(
-        "Read a data frame of InDel information that has had gene feature information added to it, and",
+        "Read a data frame of Indel information that has had gene feature information added to it, and",
         "make plots of various aspects of the data.  NOTE: This is currently specific to S. lycopersicum.",
         "See annotate/HPlong_addFeatureIDs.nonoverlappingIndelGroups for parameters used to create the",
         "input file for this.",
         "",
-        "Usage: Rscript plotIndelsWithFeatures.R <wd> <InDelsFile> <pdfPlotFile> <nearInBp> <maxIndelLen> <genomeNames>",
+        "Usage: Rscript plotIndelsWithFeatures.R <wd> <IndelsFile> <pdfPlotFile> <nearInBp> <maxIndelLen> <genomeNames>",
         "",
         "Arguments:",
         "   <wd>                 : Path of R working directory, specify other file paths relative to this.",
-        "   <InDelsFile>         : Name of file containing InDel position information with a column named 'isInNear'.",
+        "   <IndelsFile>         : Name of file containing Indel position information with a column named 'isInNear'.",
         "                          See annotate/test_add_isInNearColumn.markers",
         "   <pdfPlotFile>        : Name of pdf file to be created.",
         "   <nearInBp>           : Number of base pairs used to define 'near' when running annotateFile.R",
@@ -78,10 +78,10 @@ if (!dir.exists(workingDirectory))
     stop("Directory doesn't exist: ", workingDirectory)
 setwd(workingDirectory)
 
-InDelsFile = args[2]
-catnow("  InDelsFile: ", InDelsFile, "\n")
-if (!file.exists(InDelsFile))
-    stop("File doesn't exist: ", InDelsFile)
+IndelsFile = args[2]
+catnow("  IndelsFile: ", IndelsFile, "\n")
+if (!file.exists(IndelsFile))
+    stop("File doesn't exist: ", IndelsFile)
 
 pdfPlotFile = args[3]
 catnow("  pdfPlotFile: ", pdfPlotFile, "\n")
@@ -99,10 +99,10 @@ catnow("  genomeNames: ", paste(genomeNames, collapse=","), "\n")
 # Initialize.
 ########################################
 
-# Read InDels data.
-dfIndels = read.table(InDelsFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
+# Read Indels data.
+dfIndels = read.table(IndelsFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
 if (nrow(dfIndels) == 0)
-    stop("There are no InDels.")
+    stop("There are no Indels.")
 
 # Get the genome identifying letters from the dfIndels id columns names.
 genomeLtrs = sub("id", "", colnames(dfIndels)[grepl("id$", colnames(dfIndels))])
@@ -136,7 +136,7 @@ refStartCol = startCol[refGenomeLtr]
 endCol = makeColVec("end")
 refEndCol = endCol[refGenomeLtr]
 
-catnow("Number of InDels:", nrow(dfIndels), "\n")
+catnow("Number of Indels:", nrow(dfIndels), "\n")
 
 ########################################
 # What fraction overlap more than one?
@@ -263,11 +263,11 @@ for (genome in genomeLtrs)
 ypretty = pretty.log(countMtx)
 ylim = range(ypretty)
 yat = ypretty
-ylab="Number of InDels"
+ylab="Number of Indels"
 if (ypretty[1] >= 1000)
     {
     ypretty = ypretty / 1000
-    ylab="Number of InDels  (x1000)"
+    ylab="Number of Indels  (x1000)"
     }
 ypretty = format(ypretty, scientific=FALSE)
 
@@ -313,11 +313,11 @@ xlim = c(1, Nbins)
 ypretty = pretty.log(countMtx)
 ylim = range(ypretty)
 yat = ypretty
-ylab="Number of InDels"
+ylab="Number of Indels"
 if (ypretty[1] >= 1000)
     {
     ypretty = ypretty / 1000
-    ylab="Number of InDels  (x1000)"
+    ylab="Number of Indels  (x1000)"
     }
 ypretty = format(ypretty, scientific=FALSE)
 
@@ -370,11 +370,11 @@ xlim = c(1, Nbins)
 ypretty = pretty.log(counts)
 ylim = range(ypretty)
 yat = ypretty
-ylab="Number of InDels"
+ylab="Number of Indels"
 if (ypretty[1] >= 1000)
     {
     ypretty = ypretty / 1000
-    ylab="Number of InDels  (x1000)"
+    ylab="Number of Indels  (x1000)"
     }
 ypretty = format(ypretty, scientific=FALSE)
 
@@ -426,7 +426,7 @@ for (genome in genomeLtrs)
 ########################################
 
 dev.off()
-catnow("Finished making plots of InDel information, output file:\n", pdfPlotFile, "\n")
+catnow("Finished making plots of Indel information, output file:\n", pdfPlotFile, "\n")
 }
 
 ################################################################################

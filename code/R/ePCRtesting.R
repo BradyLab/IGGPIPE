@@ -192,7 +192,7 @@ dfEPCR = data.frame(rowNum=1:nrow(df), prmSeqL=df$prmSeqL, prmSeqR=df$prmSeqR,
 ePCRinputFile = paste("Genome_", genomeNum, ".epcr.in", sep="")
 ePCRinputFile = paste(pcrInfoDir, ePCRinputFile, sep=PATHSEP)
 cat("ePCRinputFile='", ePCRinputFile, "'\n", sep="")
-write.table(dfEPCR, ePCRinputFile, row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+write.table.winSafe(dfEPCR, ePCRinputFile, row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 
 ########################################
 # Now run the e-PCR command.  This can take a long time, because the entire FASTA
@@ -289,7 +289,7 @@ else
 ########################################
 
 # Write the data frame to the output file.
-write.table(dfRemove, badMarkerFile, row.names=FALSE, quote=FALSE, sep="\t")
+write.table.winSafe(dfRemove, badMarkerFile, row.names=FALSE, quote=FALSE, sep="\t")
 # dfRemove = read.table(badMarkerFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
 
 catnow("Finished testing primers of candidate markers for genome", genomeNum, "\n")

@@ -51,13 +51,13 @@ Nexpected = 3
 if (length(args) != Nexpected)
     {
     usage = c(
-        "Read a data frame of InDel information and make plots of various aspects of the data.",
+        "Read a data frame of Indel information and make plots of various aspects of the data.",
         "",
-        "Usage: Rscript plotIndels.R <wd> <InDelsFile> <pdfPlotFile>",
+        "Usage: Rscript plotIndels.R <wd> <IndelsFile> <pdfPlotFile>",
         "",
         "Arguments:",
         "   <wd>                 : Path of R working directory, specify other file paths relative to this.",
-        "   <InDelsFile>         : Name of file containing InDel position information.",
+        "   <IndelsFile>         : Name of file containing Indel position information.",
         "   <pdfPlotFile>        : Name of pdf file to be created."
         )
     for (S in usage)
@@ -72,10 +72,10 @@ if (!dir.exists(workingDirectory))
     stop("Directory doesn't exist: ", workingDirectory)
 setwd(workingDirectory)
 
-InDelsFile = args[2]
-catnow("  InDelsFile: ", InDelsFile, "\n")
-if (!file.exists(InDelsFile))
-    stop("File doesn't exist: ", InDelsFile)
+IndelsFile = args[2]
+catnow("  IndelsFile: ", IndelsFile, "\n")
+if (!file.exists(IndelsFile))
+    stop("File doesn't exist: ", IndelsFile)
 
 pdfPlotFile = args[3]
 catnow("  pdfPlotFile: ", pdfPlotFile, "\n")
@@ -84,10 +84,10 @@ catnow("  pdfPlotFile: ", pdfPlotFile, "\n")
 # Initialize.
 ########################################
 
-# Read InDels data.
-dfIndels = read.table(InDelsFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
+# Read Indels data.
+dfIndels = read.table(IndelsFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
 if (nrow(dfIndels) == 0)
-    stop("There are no InDels.")
+    stop("There are no Indels.")
 
 # Get the genome identifying letters from the dfIndels id columns names.
 genomeLtrs = sub("id", "", colnames(dfIndels)[grepl("id$", colnames(dfIndels))])
@@ -117,7 +117,7 @@ refStartCol = startCol[refGenomeLtr]
 endCol = makeColVec("end")
 refEndCol = endCol[refGenomeLtr]
 
-catnow("Number of InDels:", nrow(dfIndels), "\n")
+catnow("Number of Indels:", nrow(dfIndels), "\n")
 
 ########################################
 # Create pdf file.
@@ -127,7 +127,7 @@ pdf(pdfPlotFile, height=8, width=8)
 
 ########################################
 # Make scatter plots (one per genome pair) where x-axis is amplicon or LCR length
-# difference and y-axis is total number of InDels.
+# difference and y-axis is total number of Indels.
 ########################################
 
 cat("Npairs = ", Npairs, "\n")
@@ -155,7 +155,7 @@ for (i in 1:Npairs)
     plot(ampliconLens, numIndels, type="p", xlim=xlim, ylim=ylim, cex=0.5, pch=20,
         main=paste("Scatter plot of amplicon/LCR size diff. vs. number of indels, genomes ",
             g1, " and ", g2, sep=""),
-        xlab="Amplicon size difference (bp)", ylab="Number of InDels")
+        xlab="Amplicon size difference (bp)", ylab="Number of Indels")
     catnow("Plotted", N, "points in plot 1\n") 
     meanAmpliconLen = mean(ampliconLens)
     meanNumIndels = mean(numIndels)
@@ -166,7 +166,7 @@ for (i in 1:Npairs)
 
 ########################################
 # Make scatter plots (one per genome pair) where x-axis is amplicon or LCR length
-# difference and y-axis is InDel size.
+# difference and y-axis is Indel size.
 ########################################
 
 cat("Npairs = ", Npairs, "\n")
@@ -201,7 +201,7 @@ for (i in 1:Npairs)
     plot(ampliconLens, indelLens, type="p", xlim=xlim, ylim=ylim, cex=0.5, pch=20,
         main=paste("Scatter plot of amplicon/LCR size diff. vs. indels size, genomes ",
             g1, " and ", g2, sep=""),
-        xlab="Amplicon size difference (bp)", ylab="InDels size (bp)")
+        xlab="Amplicon size difference (bp)", ylab="Indels size (bp)")
     catnow("Plotted", N, "points in plot 2\n") 
     meanAmpliconLen = mean(ampliconLens)
     meanIndelsLens = mean(indelLens)
@@ -215,7 +215,7 @@ for (i in 1:Npairs)
 ########################################
 
 dev.off()
-catnow("Finished making plots of InDel information, output file:\n", pdfPlotFile, "\n")
+catnow("Finished making plots of Indel information, output file:\n", pdfPlotFile, "\n")
 }
 
 ################################################################################

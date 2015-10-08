@@ -377,10 +377,10 @@ Set the parameter file to the values for DMIN, LMIN, and KMIN that seem best to
 you before proceeding with additional pipeline steps.
 --
 
-. *Run IGGPIPE with the command "make PARAMS=allParameters.XY InDels"*
+. *Run IGGPIPE with the command "make PARAMS=allParameters.XY Indels"*
 +
 --
-The next step of the pipeline analyzes the LCRs to find InDel Groups that satisfy
+The next step of the pipeline analyzes the LCRs to find Indel Groups that satisfy
 the parameters AMIN, AMAX, ADMIN, ADMAX, NDAMIN, and MINFLANK. To run these steps,
 use this command:
 
@@ -388,15 +388,15 @@ use this command:
 
 If it completes successfully, the end of the command output will show the message:
 
-  InDels files are up to date.
+  Indels files are up to date.
 
 If it says something else, indicating an error occurred, then as usual, examine
 the output carefully and try to diagnose and fix the error, then enter the
 above 'make' command again to retry the failed step.
 
 Assuming the step completed successfully, count the number of Indel Groups in the
-two output files. One output file includes all InDel Groups found, even when they
-overlap one another. The other output file includes only non-overlapping InDel
+two output files. One output file includes all Indel Groups found, even when they
+overlap one another. The other output file includes only non-overlapping Indel
 Groups, which were determined based on the setting of the parameter OVERLAP_REMOVAL.
 The output files are located in the main output directory and their names start
 with 'IndelGroups' followed by 'Overlapping_' and 'Nonoverlapping_'.
@@ -501,36 +501,36 @@ Tables describing each column in each file type are at the end of this document.
 *Post-processing tools*
 -----------------------
 
-. *Finding InDels*
+. *Finding Indels*
 +
 --
 An R program that is NOT run as part of the pipeline when the 'make ... ALL' target
-is built, but which can be run using 'make ... InDels', is able to read a file of LCRs,
-non-overlapping InDelGroups, or non-overlapping Markers, extract the DNA sequences
+is built, but which can be run using 'make ... Indels', is able to read a file of LCRs,
+non-overlapping Indel Groups, or non-overlapping Markers, extract the DNA sequences
 from the genomes in each LCR or Marker region and align them, then locate all
-InDels in the aligned sequences and write their positions to a file. The program
+Indels in the aligned sequences and write their positions to a file. The program
 is called alignAndGetIndels.R. You should already have set its input file name in
 your "allParameters" parameter file. Run it as follows:
 
-  make PARAMS=allParameters.XY InDels    (replacing with your allParameters name)
+  make PARAMS=allParameters.XY Indels    (replacing with your allParameters name)
 
 This produces a file in your output folder whose name ends with "indels.tsv",
-containing a table of all InDels found in the LCR or marker regions.  Examine it
+containing a table of all Indels found in the LCR or marker regions.  Examine it
 to see the data it contains (see Table 5 of column descriptions).
 --
 
-. *Plotting InDel information*
+. *Plotting Indel information*
 +
 --
 Another R program that is NOT run as part of the pipeline when the 'make ... ALL' target
-is built, but which can be run using 'make ... plotInDels', reads the InDels file produced
-by 'make ... InDels' and plots information from it in a pdf file. The program is called
+is built, but which can be run using 'make ... plotIndels', reads the Indels file produced
+by 'make ... Indels' and plots information from it in a pdf file. The program is called
 plotIndels.R. Run it as follows:
 
-  make PARAMS=allParameters.XY plotInDels    (replacing with your allParameters name)
+  make PARAMS=allParameters.XY plotIndels    (replacing with your allParameters name)
 
 This produces a file in your output folder whose name ends with "indels.pdf",
-containing plots of various InDel information.  Examine it to see the plots it
+containing plots of various Indel information.  Examine it to see the plots it
 contains.
 --
 
@@ -735,22 +735,22 @@ if amplicon in X and Y genomes run in the same direction, > if opposite directio
 |===================================================
 |Column|Description
 |ID|Unique ID tying row back to originating input file row. LCR input files: LCRnumber.
-InDelGroup and Markers files: refID_refPos1_refPos2.
+IndelGroup and Markers files: refID_refPos1_refPos2.
 |phases|Phase of each genome incl. ref. genome, relative to ref. genome, string of +/- chars,
 + : same direction, - : opposite direction.",
-|idx|Starts at 1 and counts each InDel within an ID. For given ID (input row), number of InDels
+|idx|Starts at 1 and counts each Indel within an ID. For given ID (input row), number of Indels
 in that region is max idx value. If more than two genomes, entire region where alignment has a
-gap in one or more genomes is counted as one InDel even if multiple gap regions occur in different
+gap in one or more genomes is counted as one Indel even if multiple gap regions occur in different
 genomes.  
-|Xdel,Ydel|Total number of deleted bps within the InDel in genomes X,Y. With 2 genomes, del = 0
+|Xdel,Ydel|Total number of deleted bps within the Indel in genomes X,Y. With 2 genomes, del = 0
 in genome with insertion (no gaps), del > 0 in genome with deletion (gaps). With >2 genomes, del
-can be non-zero for all genomes. A genome has only insertions in the InDel if del is 0, and it has
+can be non-zero for all genomes. A genome has only insertions in the Indel if del is 0, and it has
 only deletions if end-start-1 = 0, and otherwise it has a mixture of at least one insertion and
-one deletion within the InDel interval.
-|Xid,Yid|Sequence ID of the InDel in genomes X,Y.
-|Xstart,Xend,Ystart,Yend|Overall InDel starting and ending position in genomes X,Y.
-start/end are positions of bps just BEFORE first and AFTER last InDel gap in any genome,
+one deletion within the Indel interval.
+|Xid,Yid|Sequence ID of the Indel in genomes X,Y.
+|Xstart,Xend,Ystart,Yend|Overall Indel starting and ending position in genomes X,Y.
+start/end are positions of bps just BEFORE first and AFTER last Indel gap in any genome,
 so they refer to the same two bps in all genomes. Always start < end. If '-' phase,
-start is bp just AFTER, end is bp just BEFORE, opposite of '+'. Length of the InDel region
+start is bp just AFTER, end is bp just BEFORE, opposite of '+'. Length of the Indel region
 in each genome is end-start-1.
 |===================================================

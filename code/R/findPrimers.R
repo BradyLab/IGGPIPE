@@ -135,7 +135,7 @@ if (is.na(investigate))
 ########################################
 
 # Read indel group k-mer pairs data, which become the initial marker candidates.
-catnow("Reading InDel Group file...")
+catnow("Reading Indel Group file...")
 dfMarkers = read.table(indelFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
 catnow("\n")
 if (nrow(dfMarkers) == 0)
@@ -415,9 +415,7 @@ recordSeps = rep("=", nrow(dfMarkers))
 records = c(rbind(thermo, seqIDs, primerTemplates, primerRegions, recordSeps))
 numSeqIDs = length(seqIDs)
 rm(seqIDs, primerTemplates, primerRegions, recordSeps)
-outFile = file(primer3DataFile, "wb")
-writeLines(records, outFile)
-close(outFile)
+writeLines.winSafe(records, primer3DataFile)
 rm(records)
 catnow("\n")
 
@@ -770,7 +768,7 @@ catnow("\n")
 ########################################
 
 catnow("Writing output file...")
-write.table(dfMarkers, tsvMarkerFile, col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
+write.table.winSafe(dfMarkers, tsvMarkerFile, col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
 # dfMarkers = read.table(tsvMarkerFile, header=TRUE, sep="\t", stringsAsFactors=FALSE)
 catnow("\n\n")
 catnow("Finished adding primer sequences to Indel Groups, candidate marker output file:\n", tsvMarkerFile, "\n")

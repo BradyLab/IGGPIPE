@@ -224,7 +224,7 @@ DMIN := 10
 # Maximum distance in bp between two adjacent k-mers in an LCR.  If two adjacent
 # k-mers are farther apart than this in any genome, the k-mers serve to split the
 # LCR into two LCRs at that point.  This value limits the maximum length of one
-# indel within an InDel Group or LCR.  This is normally set equal to the maximum
+# indel within an Indel Group or LCR.  This is normally set equal to the maximum
 # acceptable amplicon size AMAX (defined below), although it could be larger.
 #@@ YOU PROBABLY WANT TO SET THIS EQUAL TO YOUR MAXIMUM ACCEPTABLE AMPLICON
 #@@ LENGTH.
@@ -676,13 +676,13 @@ PFX_MARKER_DENSITY_PATH := $(DIR_MAIN_OUTPUT)/$(PFX_MARKER_DENSITY_FILE)$(SFX_GO
 
 
 # Path of input file for aligning LCRs or IndelGroups or Markers and locating the
-# InDels in the alignment.  Used only if 'make InDels' command is run.  This path
+# Indels in the alignment.  Used only if 'make Indels' command is run.  This path
 # can be any of three different files, shown here commented out: the LCRs file,
 # the non-overlapping IndelGroups file, or the non-overlapping markers file.
-# The output file containing the InDel positions is the same name as the input
+# The output file containing the Indel positions is the same name as the input
 # file with the .suffix replaced with the suffix ".indels.tsv".
-# Copy and uncomment the ONE you want to use to find InDels if you intend to run
-# 'make InDels'.
+# Copy and uncomment the ONE you want to use to find Indels if you intend to run
+# 'make Indels'.
 #@@ THESE DO NOT NEED TO BE CHANGED.
 
 #PATH_INDELS_INPUT_FILE := $(PATH_LCR_FILE)
@@ -692,8 +692,8 @@ PFX_MARKER_DENSITY_PATH := $(DIR_MAIN_OUTPUT)/$(PFX_MARKER_DENSITY_FILE)$(SFX_GO
 PATH_INDELS_INPUT_FILE := $(PATH_NONOVERLAPPING_MARKERS_FILE)
 
 
-# Path of InDels output file, used only if 'make InDels' command is run to find
-# actual InDel positions.
+# Path of Indels output file, used only if 'make Indels' command is run to find
+# actual Indel positions.
 #@@ THIS DOES NOT NEED TO BE CHANGED.
 
 # Replace the ".<suffix>" on PATH_INDELS_INPUT_FILE with ".indels.<suffix>" to
@@ -701,8 +701,8 @@ PATH_INDELS_INPUT_FILE := $(PATH_NONOVERLAPPING_MARKERS_FILE)
 PATH_INDELS_OUTPUT_FILE := $(basename $(PATH_INDELS_INPUT_FILE)).indels$(suffix $(PATH_INDELS_INPUT_FILE))
 
 
-# Path of InDels plot file, used only if 'make plotInDels' command is run to plot
-# InDel data.
+# Path of Indels plot file, used only if 'make plotIndels' command is run to plot
+# Indel data.
 #@@ THIS DOES NOT NEED TO BE CHANGED.
 
 # Replace the ".<suffix>" on PATH_INDELS_OUTPUT_FILE with ".<pdf>" to form the
@@ -770,7 +770,7 @@ INVESTIGATE_EPCRTESTING := FALSE
 INVESTIGATE_RMVBADMARKERS := FALSE
 
 
-# Produce debug output when extracting and aligning sequences and locating InDels.
+# Produce debug output when extracting and aligning sequences and locating Indels.
 #@@ THIS DOES NOT NEED TO BE CHANGED.
 
 INVESTIGATE_ALIGN_AND_GET_INDELS := FALSE

@@ -49,7 +49,7 @@ readFile_GTF = function(filename)
 ################################################################################
 writeFile_GFF3_GTF = function(df, filename)
     {
-    write.table(df, file=filename, sep="\t", quote=FALSE, row.names=FALSE, col.names=FALSE)
+    write.table.winSafe(df, file=filename, sep="\t", quote=FALSE, row.names=FALSE, col.names=FALSE)
     }
 
 ################################################################################

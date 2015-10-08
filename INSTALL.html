@@ -904,7 +904,7 @@ Primer3 (V2.3.6 works) (<a href="http://sourceforge.net/projects/primer3">http:/
 </li>
 <li>
 <p>
-NCBI e-PCR (V2.3.12 works) (<a href="http://www.ncbi.nlm.nih.gov/tools/epcr">http://www.ncbi.nlm.nih.gov/tools/epcr</a>)
+NCBI e-PCR (V2.3.12-1 works) (<a href="http://www.ncbi.nlm.nih.gov/tools/epcr">http://www.ncbi.nlm.nih.gov/tools/epcr</a>)
 </p>
 </li>
 <li>
@@ -929,7 +929,7 @@ Jellyfish
 </li>
 <li>
 <p>
-e-PCR (only requires compile on Mac OSX)
+e-PCR
 </p>
 </li>
 </ol></div>
@@ -1224,31 +1224,32 @@ file, for example:</p></div>
 data to do an <em>in silico</em> PCR amplification.  It is used by IGGPIPE to test primers
 of candidate IGG markers to see if they generate unique amplicons of the
 expected length, so it must be installed on your computer. This version of IGGPIPE
-was tested with e-PCR version 2.3.12, although later versions will probably be
-fine. For Windows, we had to use version 2.3.9, which worked but produced different
-results than version 2.3.12, making it impossible to do a file difference test to
-see if expected results of the test data were obtained.</p></div>
+was tested with e-PCR version 2.3.12-1 (-V option displays version 2.3.12, but
+downloaded file was 2.3.12-1), although later versions will probably be
+fine.</p></div>
 <div class="paragraph"><p>To install e-PCR, look for it here:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>http://www.ncbi.nlm.nih.gov/tools/epcr</code></pre>
 </div></div>
 <div class="paragraph"><p>The download link uses FTP protocol. Log in as user GUEST with no password.
-Look for the latest .zip version (Mac), tar.gz (Linux), or binary folder (win32)
-and copy the file or folder to your computer and unzip it as needed. Put the
-unzipped directory wherever you want on your computer.</p></div>
-<div class="paragraph"><p>For Linux and Windows, binary distributions of e-PCR are available at that download
-link, so once downloaded, you should be able to run e-PCR without further ado.  With
-OSX, however, it is now necessary to run <em>make</em> to compile and build the program.
-Version 2.3.12 had two problems with it that required editing of the source code
-in order for the <em>make</em> operation to complete successfully. Perhaps these problems
-will have been fixed in the version you download (or perhaps a binary version will
-be available for Mac also at the time you download). Test by trying to build e-PCR.
-Change into the directory that you unzipped and enter the following command:</p></div>
+Look for the latest .zip version or tar.gz, copy the file or folder to your,
+computer, and unzip it. Put the unzipped directory wherever you want on your
+computer.</p></div>
+<div class="paragraph"><p>In some cases, a binary distribution might be available, so once downloaded, you
+should be able to run e-PCR without further ado.  At the time we downloaded version
+2.3.12-1, it was only available as source code and it was necessary to run <em>make</em>
+to compile and build the program.</p></div>
+<div class="paragraph"><p>Version 2.3.12-1 had two problems with it that required editing of the source code
+in order for the <em>make</em> operation to complete successfully under OSX. Perhaps these
+problems will have been fixed in the version you download (or perhaps a binary
+version will be available at the time you download). Test by trying to build e-PCR.
+Refer to the file <em>BUILD.html</em> in the e-PCR source directory for instructions on
+compiling the source.  For Mac OSX, the source was compiled by changing into the
+directory where the files were unzipped and entering the following command:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>(Mac only)
-cd e-PCR-2.3.12
+<pre><code>cd e-PCR-2.3.12-1
 make LF64LDFLAGS= LF64CCFLAGS=-DNATIVE_LARGEFILES COMMON_CC_FLAGS=-w</code></pre>
 </div></div>
 <div class="paragraph"><p>If the <em>make</em> completes without error, there will be a file named "e-PCR" in the
@@ -1290,7 +1291,7 @@ you are good to go.</p></div>
 file, for example:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>PATH_EPCR := ~/Documents/e-PCR-2.3.12/e-PCR</code></pre>
+<pre><code>PATH_EPCR := ~/Documents/e-PCR-2.3.12-1/e-PCR</code></pre>
 </div></div>
 </div></div>
 </li>
@@ -1301,7 +1302,7 @@ file, for example:</p></div>
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>MUSCLE is an open-domain multiple sequence aligner.  It is used by IGGPIPE only
-if you choose to search markers or LCRs for InDels by using the <em>make InDels</em>
+if you choose to search markers or LCRs for Indels by using the <em>make Indels</em>
 command, so if you don&#8217;t do that you can skip this step, although you may as
 well install it. This version of IGGPIPE was tested with MUSCLE version v.8.31,
 although later versions will probably be fine. To install MUSCLE, look for it
@@ -1565,14 +1566,13 @@ MarkerDensity_*.png
 containing the markers.</p></div>
 <div class="paragraph"><p>The .pdf and .png files should be examined to see how they depict marker counts
 and densities.</p></div>
-<div class="paragraph"><p>The tables at the end of this document describe the columns in these tab-separated
+<div class="paragraph"><p>The tables at the end of the RUN document describe the columns in these tab-separated
 data files.</p></div>
 <div class="paragraph"><p>To make sure the pipeline ran correctly, compare the MarkersOverlapping_ file to the
-expected result, which is in file MarkersOverlapping.test.tsv in the IGGPIPE main
-directory:</p></div>
+expected result, which is in subdirectory outTestHP11/goodTest:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>diff MarkersOverlapping.test.tsv outTestHP11/MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv</code></pre>
+<pre><code>diff outTestHP11/MarkersOverlapping_*.tsv outTestHP11/goodTest/</code></pre>
 </div></div>
 <div class="paragraph"><p>This command should not produce any output, indicating the two files are identical.
 If it produces output indicating non-identity of the files, you have a problem.
@@ -1591,60 +1591,170 @@ be found.  Note that with Windows, which uses "\" rather than "/" to separate
 directories in file paths, we found that we could use "/" in all the paths in
 the allParameters.ours file and allParameters.test file and it worked fine; we
 did not have to use "\" anywhere.</p></div>
-<div class="paragraph"><p>You may need to doubl
-the problem is most
-likely due to running a software package of a different version than what we used
-for testing. For example, on Windows an older version of e-PCR was all that was
-available, and this led to differences in the output.  If</p></div>
+<div class="paragraph"><p>Windows gave the most problems, and the most common problem with Windows was in
+text file line endings, which under Windows can be either "DOS" or "Unix" line
+endings.  IGGPIPE produces files with Unix line endings exclusively, but it
+generally tolerates input files with either type of line ending.  Most tools
+and programs you might use to examine the files will also tolerate either type
+of line ending, but occasionally, a program requires DOS line endings.  Be aware
+of this situation during troubleshooting, and consider whether the observed
+problem might be one with line endings.</p></div>
+<div class="paragraph"><p>Another problem can be program versions.  If you use an older or newer version
+of a program than what we used, the pipeline might fail, depending on what the
+changes are, or it might produce different output.  Look carefully at version
+numbers and check to see if the output differs for any program that has a different
+version number than what we used.</p></div>
+<div class="paragraph"><p>If IGGPIPE produces a different marker output file than expected, as indicated by
+output being produced by the <em>diff</em> command shown in the preceding step, you
+should do difference testing on other output files.  Each of the files whose
+prefixes and suffixes are listed in the previous step have a "good" version of
+the file containing the expected results, in folder outTestHP11/goodTest.  Each
+of those files can be compared to the output IGGPIPE produced when you ran it
+using a <em>diff</em> command to see which ones are good. No output means the files match.
+For example:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>diff outTestHP11/LCRs_*.tsv outTestHP11/goodTest/</code></pre>
+</div></div>
+<div class="paragraph"><p>If the final output file does not match, but one or more output files do match (starting
+with the first file listed in the previous step), then you can tell which step
+produced an incorrect result based on which file in the list is the first one that
+is incorrect.  The following <em>make</em> steps produce the following output files (italicized
+output files are those available in the goodTest subdirectory for comparison to your files):</p></div>
+<div class="tableblock">
+<table rules="all"
+width="100%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<col width="50%" />
+<col width="50%" />
+<thead>
+<tr>
+<th align="left" valign="top"><em>make</em> Command</th>
+<th align="left" valign="top">Produces output file(s)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table">a. make PARAMS=myFilename getSeqInfo    GENOME=ALL</p></td>
+<td align="left" valign="top"><p class="table">GenomeData/*.idlens</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">b. make PARAMS=myFilename getContigFile GENOME=ALL</p></td>
+<td align="left" valign="top"><p class="table">GenomeData/*.contigs</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">c. make PARAMS=myFilename getKmers      GENOME=ALL</p></td>
+<td align="left" valign="top"><p class="table">Kmers/Kmers_*.kmers</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">d. make PARAMS=myFilename kmerStats     GENOME=ALL</p></td>
+<td align="left" valign="top"><p class="table">Kmers/Kmers_*.stats</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">e. make PARAMS=myFilename sortKmers     GENOME=ALL</p></td>
+<td align="left" valign="top"><p class="table">Kmers/Kmers_*.sorted</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">f. make PARAMS=myFilename kmerIsect</p></td>
+<td align="left" valign="top"><p class="table">Kmers/isect.kmers</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">g. make PARAMS=myFilename getGenomicPos GENOME=ALL</p></td>
+<td align="left" valign="top"><p class="table">Kmers/Kmers_*.isect</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">h. make PARAMS=myFilename mergeKmers    GENOME=ALL</p></td>
+<td align="left" valign="top"><p class="table">Kmers/Kmers_*.merge</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">i. make PARAMS=myFilename getCommonUniqueKmers</p></td>
+<td align="left" valign="top"><p class="table">Kmers/common.unique.kmers</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">j. make PARAMS=myFilename findLCRs</p></td>
+<td align="left" valign="top"><p class="table"><em>LCRs_*.tsv, BadKmers_*.tsv</em></p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">k. make PARAMS=myFilename findIndelGroups</p></td>
+<td align="left" valign="top"><p class="table"><em>IndelGroupsOverlapping_*.tsv, IndelGroupsNonoverlapping_*.tsv</em></p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">l. make PARAMS=myFilename getDNAseqs    GENOME=ALL</p></td>
+<td align="left" valign="top"><p class="table"><em>DNAseqs_*.dnaseqs</em></p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">m. make PARAMS=myFilename findPrimers</p></td>
+<td align="left" valign="top"><p class="table"><em>NonvalidatedMarkers_*.tsv</em></p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">n. make PARAMS=myFilename ePCRtesting   GENOME=ALL</p></td>
+<td align="left" valign="top"><p class="table"><em>MarkerErrors_*.tsv</em></p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">o. make PARAMS=myFilename removeBadMarkers</p></td>
+<td align="left" valign="top"><p class="table"><em>MarkersOverlapping_*.tsv, MarkersNonoverlapping_*.tsv</em></p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">p. make PARAMS=myFilename plotMarkers</p></td>
+<td align="left" valign="top"><p class="table"><em>MarkerCounts_*.pdf, MarkerDensity_*.png</em></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="paragraph"><p>The different results might be due to running a software package of a different
+version than what we used for testing. For example, a different version of e-PCR
+might cause a mismatch starting at file <em>MarkerErrors_*.tsv</em>. Another possibility
+to be aware of is that the files may in fact be identical except one might have
+Unix line ends and the other might have DOS line ends.</p></div>
 </div></div>
 </li>
 <li>
 <p>
-<strong>Run <em>make InDels</em> to align markers and find InDels</strong>
+<strong>Run <em>make Indels</em> to align markers and find Indels</strong>
 </p>
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>An R program that is NOT run as part of the pipeline when the <em>make &#8230; ALL</em> target
-is built, but which can be run using <em>make &#8230; InDels</em>, is able to read a file of LCRs,
-non-overlapping InDelGroups, or non-overlapping Markers, extract the DNA sequences
+is built, but which can be run using <em>make &#8230; Indels</em>, is able to read a file of LCRs,
+non-overlapping IndelGroups, or non-overlapping Markers, extract the DNA sequences
 from the genomes in each LCR or Marker region and align them, then locate all
-InDels in the aligned sequences and write their positions to a file.  The program
-is called alignAndGetIndels.R. Run it as follows:</p></div>
+Indels in the aligned sequences and write their positions to a file.  The input file
+to be used is selected with parameter PATH_INDELS_INPUT_FILE in the allParameters.* file.
+The program to find Indels is called alignAndGetIndels.R. Run it as follows:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.test InDels</code></pre>
+<pre><code>make PARAMS=allParameters.test Indels</code></pre>
 </div></div>
 <div class="paragraph"><p>Check that the output file exists with:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>ls outTestHP11/Markers*.indels.tsv</code></pre>
 </div></div>
-<div class="paragraph"><p>This should list the file outTestHP11/
-MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv</p></div>
-<div class="paragraph"><p>You can examine it with Excel or a text editor to see the InDel data it contains.</p></div>
+<div class="paragraph"><p>This should list the file <em>outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv</em></p></div>
+<div class="paragraph"><p>You can examine it with Excel or a text editor to see the Indel data it contains.</p></div>
 </div></div>
 </li>
 <li>
 <p>
-<strong>Run <em>make plotInDels</em> to plot InDel information</strong>
+<strong>Run <em>make plotIndels</em> to plot Indel information</strong>
 </p>
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>Another R program that is NOT run as part of the pipeline when the <em>make &#8230; ALL</em> target
-is built, but which can be run using <em>make &#8230; plotInDels</em>, reads the InDels file produced
-by <em>make &#8230; InDels</em> and plots information from it in a pdf file. The program is called
+is built, but which can be run using <em>make &#8230; plotIndels</em>, reads the Indels file produced
+by <em>make &#8230; Indels</em> and plots information from it in a pdf file. The program is called
 plotIndels.R. Run it as follows:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.test plotInDels</code></pre>
+<pre><code>make PARAMS=allParameters.test plotIndels</code></pre>
 </div></div>
 <div class="paragraph"><p>Check that the output file exists with:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>ls outTestHP11/Markers*.indels.pdf</code></pre>
 </div></div>
-<div class="paragraph"><p>This should list the file outTestHP11/
-MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.pdf</p></div>
+<div class="paragraph"><p>This should list the file <em>outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.pdf</em></p></div>
 <div class="paragraph"><p>You might want to open it and look at the plots.</p></div>
 </div></div>
 </li>
@@ -1658,7 +1768,8 @@ MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels
 regions (LCRs), and it can be used to make a dotplot depicting alignment of the two
 genomes. The R program dotplot.R is provided to do this. It is driven by a parameter
 file, a sample of which has been provided, dotplot.template, that is set for using
-the test data just produced. Run dotplot.R as follows:</p></div>
+the test data produced by running IGGPIPE with allParameters.test. Run dotplot.R
+as follows:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>Rscript code/R/dotplot.R dotplot.template</code></pre>
@@ -1668,10 +1779,11 @@ the test data just produced. Run dotplot.R as follows:</p></div>
 <div class="content">
 <pre><code>ls outTestHP11/LCRs_*.dotplot.png</code></pre>
 </div></div>
-<div class="paragraph"><p>This should list the file outTestHP11/LCRs_K11k2L100D10_2000.dotplot.png, an image file.
+<div class="paragraph"><p>This should list the file <em>outTestHP11/LCRs_K11k2L100D10_2000.dotplot.png</em>, an image file.
 You may want to examine it (e.g. in the OSX Preview app) to see the dot plot.</p></div>
 <div class="paragraph"><p>There are other sample parameter files in subdirectory <em>dotplot</em>, although the
-parameter file is fairly straightforward and you probably don&#8217;t need other examples.</p></div>
+parameter file is fairly straightforward and you probably don&#8217;t need other examples
+to work from.</p></div>
 </div></div>
 </li>
 <li>
@@ -1681,7 +1793,7 @@ parameter file is fairly straightforward and you probably don&#8217;t need other
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>A common need is to add additional annotation information the table of markers. For
-example, you might be working with an introgression line population (as I was) and
+example, you might be working with an introgression line population and
 wish to annotate each marker with the names of the lines whose introgressions that
 marker lies within, along with the marker position relative to the introgression.
 Or, you might want to annotate each marker with the ID of the nearest gene and its
@@ -1689,8 +1801,9 @@ distance away. You may also want to change file format, from .tsv (tab-separated
 to .gff3 or .gtf for adding the markers to a browser track. All this can be done with
 the R program annotateFile.R that is provided with IGGPIPE. It is driven by a parameter
 file, a sample of which has been provided, annotate.template, that is set for using
-the test data just produced along with additional annotation test data in folder
-code/R/test_GFFfuncsAndMergeData. Run annotateFile.R as follows:</p></div>
+the test data produced by running IGGPIPE with allParameters.test, along with
+additional annotation test data in folder code/R/test_GFFfuncsAndMergeData. Run
+annotateFile.R as follows:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>Rscript code/R/annotateFile.R annotate.template</code></pre>
@@ -1698,12 +1811,16 @@ code/R/test_GFFfuncsAndMergeData. Run annotateFile.R as follows:</p></div>
 <div class="paragraph"><p>Check that the output file exists with:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>ls MarkersAnnotated.*</code></pre>
+<pre><code>ls outTestHP11/MarkersAnnotated.*</code></pre>
 </div></div>
-<div class="paragraph"><p>This should list file MarkersAnnotated.test.tsv in the root IGGPIPE folder.
-You can examine this file with a text editor or Excel to see the new column.</p></div>
+<div class="paragraph"><p>This should list file <em>MarkersAnnotated.test.tsv</em> in the outTestHP11 folder.
+You can examine this file with a text editor or Excel to see the new column that
+was added compared to the input file <em>MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv</em>.</p></div>
 <div class="paragraph"><p>There are other sample parameter files in subdirectory <em>annotate</em> which produce
-other types of files or do other types of file data manipulation.</p></div>
+other types of files or do other types of file data manipulation.  The parameters
+can be challenging to set properly, especially when merging data from a separate
+file, so these sample files can be helpful. Also, when .gff3 files are used, they
+must conform well to the expected GFF3 format else an error is likely to occur.</p></div>
 </div></div>
 </li>
 <li>
@@ -1782,7 +1899,7 @@ Contact me, Ted Toal, <a href="mailto:twtoal@ucdavis.edu">twtoal@ucdavis.edu</a>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-10-07 17:44:48 PDT
+Last updated 2015-10-08 11:41:00 PDT
 </div>
 </div>
 </body>

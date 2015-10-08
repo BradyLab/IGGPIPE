@@ -8,22 +8,32 @@ fi
 
 mkdir -p $1/$2
 
-function checkIfFileExistsAndCopy {
-    if [ ! -f $1 ];
-       then
-        echo "File $1 does not exist, not copied"
-        return
-    fi
-    cp $1 $2
+function checkIfFilesExistAndCopy {
+    MAINDIR=$1
+    SUBDIR=$2
+    PATTERN=$3
+    DEST=$MAINDIR/$SUBDIR/
+    FILES=$MAINDIR/$PATTERN
+    for f in $FILES
+    do
+        if [ ! -f $f ]; then
+            echo "File $f does not exist, not copied"
+        else
+            echo "Copying $f"
+            cp $f $DEST
+        fi
+    done
     }
 
-checkIfFileExistsAndCopy $1/LCRs_*.tsv $1/$2/
-checkIfFileExistsAndCopy $1/BadKmers_*.tsv $1/$2/
-checkIfFileExistsAndCopy $1/IndelGroupsOverlapping_*.tsv $1/$2/
-checkIfFileExistsAndCopy $1/IndelGroupsNonoverlapping_*.tsv $1/$2/
-checkIfFileExistsAndCopy $1/NonvalidatedMarkers_*.tsv $1/$2/
-checkIfFileExistsAndCopy $1/MarkerErrors_*.tsv $1/$2/
-checkIfFileExistsAndCopy $1/MarkersOverlapping_*.tsv $1/$2/
-checkIfFileExistsAndCopy $1/MarkersNonoverlapping_*.tsv $1/$2/
-checkIfFileExistsAndCopy $1/MarkerCounts_*.pdf $1/$2/
-checkIfFileExistsAndCopy $1/MarkerDensity_*.png $1/$2/
+checkIfFilesExistAndCopy $1 $2 'LCRs_*.tsv'
+checkIfFilesExistAndCopy $1 $2 'BadKmers_*.tsv'
+checkIfFilesExistAndCopy $1 $2 'IndelGroupsOverlapping_*.tsv'
+checkIfFilesExistAndCopy $1 $2 'IndelGroupsNonoverlapping_*.tsv'
+checkIfFilesExistAndCopy $1 $2 'NonvalidatedMarkers_*.tsv'
+checkIfFilesExistAndCopy $1 $2 'MarkerErrors_*.tsv'
+checkIfFilesExistAndCopy $1 $2 'MarkersOverlapping_*.tsv'
+checkIfFilesExistAndCopy $1 $2 'MarkersNonoverlapping_*.tsv'
+checkIfFilesExistAndCopy $1 $2 'MarkersNonoverlapping_*.pdf'
+checkIfFilesExistAndCopy $1 $2 'MarkerCounts_*.pdf'
+checkIfFilesExistAndCopy $1 $2 'MarkerDensity_*.png'
+checkIfFilesExistAndCopy $1 $2 'MarkersAnnotated_*'

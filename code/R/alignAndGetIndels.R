@@ -78,41 +78,41 @@ if (length(args) < NexpectedMin)
     usage = c(
         "Read a data frame of LCRs, Indel Groups, or markers, extract DNA sequences from all",
         "genomes between the start and end position of each one, align the sequences, and",
-        "extract from the alignments the size of each InDel that larger than the specified",
-        "minimum size.  Write a new file containing the InDel positions, with columns 'ID',",
-        "'phases', 'idx', 'Xdel', 'Xid', 'Xstart', and 'Xend', and with one row per InDel.",
+        "extract from the alignments the size of each Indel that larger than the specified",
+        "minimum size.  Write a new file containing the Indel positions, with columns 'ID',",
+        "'phases', 'idx', 'Xdel', 'Xid', 'Xstart', and 'Xend', and with one row per Indel.",
         "The 'ID' column contains a unique ID that ties the row back to the input file row(s)",
-        "from which it originated.  For LCR input files, the ID is the LCR number.  For InDel",
+        "from which it originated.  For LCR input files, the ID is the LCR number.  For Indel",
         "group and marker input files, the ID is the reference genome ID followed by '_', the",
         "reference genome 'pos1' number, an '_', and the reference genome 'pos2' number.",
         "The 'phases' column gives the 'phase' of each genome including the reference genome,",
         "relative to the reference genome, as a string of '+' and '-' characters, where '+'",
         "means the sequences in the two genomes run in the same direction, and '-' means they",
         "run in the opposite direction.",
-        "The 'idx' column contains integers that indicate which InDel this is among all InDels",
-        "with the same 'ID' value. The 'idx' value will start at 1 and count each InDel within",
-        "an 'ID'. In cases with more than two genomes where the alignment shows a complex InDel",
+        "The 'idx' column contains integers that indicate which Indel this is among all Indels",
+        "with the same 'ID' value. The 'idx' value will start at 1 and count each Indel within",
+        "an 'ID'. In cases with more than two genomes where the alignment shows a complex Indel",
         "with insertions and deletions in various genomes overlapping one another, the entire",
         "region where one or more genomes shows an indel at some base position is counted as",
-        "one InDel.  The number of InDels found in the region for a given input row is equal to",
+        "one Indel.  The number of Indels found in the region for a given input row is equal to",
         "the maximum value found in the 'idx' column of all rows with that 'ID'.",
         "The 'Xdel', 'Xid', 'Xstart', and 'Xend' columns give the total number of deleted bps",
-        "within the InDel in each genome (Xdel), the sequence ID of the InDel in each genome (Xid)",
-        "and the overall InDel starting and ending position in each genome (Xstart and Xend).",
-        "Xstart and Xend are the positions of the bps just before the InDel (before the first gap",
-        "in the alignment) and just after the InDel (after the last gap in the alignment), so that",
+        "within the Indel in each genome (Xdel), the sequence ID of the Indel in each genome (Xid)",
+        "and the overall Indel starting and ending position in each genome (Xstart and Xend).",
+        "Xstart and Xend are the positions of the bps just before the Indel (before the first gap",
+        "in the alignment) and just after the Indel (after the last gap in the alignment), so that",
         "Xstart/Xend refer to the same two bps in all genomes.  However, it is always true that",
         "Xstart < Xend, but if the 'phases' value for that genome is '-', then Xstart is the bp",
-        "just AFTER the InDel, not just before it, and likewise for Xend, i.e. the InDel region was",
+        "just AFTER the Indel, not just before it, and likewise for Xend, i.e. the Indel region was",
         "reverse-complemented in order to align it to the reference genome sequence (which always",
-        "has phase '+' and is never reverse-complemented).  The length of the InDel region in each",
+        "has phase '+' and is never reverse-complemented).  The length of the Indel region in each",
         "genome is therefore Xend-Xstart-1.  Xdel is always the total number of deleted bp within the",
-        "InDel in the genome.  With 2 genomes, when Xdel is 0 that is the genome with the insertion",
+        "Indel in the genome.  With 2 genomes, when Xdel is 0 that is the genome with the insertion",
         "(no gaps), and the length of it is Xend-Xstart-1, which will be equal to Xdel of the genome",
         "with the deletion (whose Xend-Xstart-1 will be 0).  With >2 genomes, Xdel can be non-zero",
-        "for all genomes.  A genome has only insertions in the InDel if Xdel is 0, and it has only",
+        "for all genomes.  A genome has only insertions in the Indel if Xdel is 0, and it has only",
         "deletions if Xend-Xstart-1 = 0, and otherwise it has a mixture of at least one insertion and",
-        "one deletion within the InDel interval.",
+        "one deletion within the Indel interval.",
         "",
         "Usage: Rscript alignAndGetIndels.R <wd> <inputFile> <outputFile> <extractDir> \\",
         "       <perlPath> <getSeqsFromFasta> <alignerPath> <investigate> \\",
@@ -120,8 +120,8 @@ if (length(args) < NexpectedMin)
         "",
         "Arguments:",
         "   <wd> : Path of R working directory, specify other file paths relative to this.",
-        "   <inputFile>    : Input file containing LCRs, InDel groups, or markers.",
-        "   <outputFile>   : Output file to which to write data frame of InDel information.",
+        "   <inputFile>    : Input file containing LCRs, Indel groups, or markers.",
+        "   <outputFile>   : Output file to which to write data frame of Indel information.",
         "   <extractDir>   : Directory to hold DNA sequence extraction files.",
         "   <perlPath>     : Full path of the Perl language interpreter program",
         "   <getSeqsFromFasta> : Full path of the Perl script getSeqsFromFasta.pl",
@@ -201,7 +201,7 @@ inv(head(df), "input data head")
 
 # Convert df into a data frame with columns 'ID', 'phases', 'idx', 'Xdel', 'Xid',
 #'Xstart', and 'Xend', where X=genome letter.  This conversion involves doing
-# different things depending on whether the input file was LCRs, InDel Groups,
+# different things depending on whether the input file was LCRs, Indel Groups,
 # or markers.  Set the Xstart and Xend values to be the exact start and end
 # positions of the outside k-mers, so a DNA extraction will start and end with
 # the k-mers.
@@ -499,9 +499,7 @@ for (genome in genomeLtrs)
     seqExtStrs[[genome]] = paste(revComp, df[, idCols[genome]], ":",
         as.integer(df[, pos1Cols[genome]]), "..", as.integer(df[, pos2Cols[genome]]), sep="")
     inv(length(seqExtStrs[[genome]]), "length(seqExtStrs[[genome]])")
-    outFile = file(extractPosFiles[genome], "wb")
-    writeLines(seqExtStrs[[genome]], outFile)
-    close(outFile)
+    writeLines.winSafe(seqExtStrs[[genome]], extractPosFiles[genome])
     rm(revComp)
     }
 
@@ -601,7 +599,7 @@ if (any(!startKmerMatches) || any(!endKmerMatches))
 
 ################################################################################
 # Remove all df rows for which the DNA sequences are identical for all genomes,
-# since there will be no InDels in such sequences.  There will be many of these
+# since there will be no Indels in such sequences.  There will be many of these
 # if the input file was an LCR file, none if it was an Indel Group or marker file.
 ################################################################################
 
@@ -614,7 +612,7 @@ df = df[!allIdentical,]
 # Now perform and analyze alignments.  For each row of df, write a FASTA file
 # containing the sequences for each genome, then invoke the sequence alignment
 # program in "alignerPath" to perform a multiple alignment.  Read the alignment
-# back, parse it to extract the positions of all InDels, and create new data
+# back, parse it to extract the positions of all Indels, and create new data
 # frame dfIndels containing them.
 ################################################################################
 
@@ -637,7 +635,7 @@ names(endCols) = genomeLtrs
 dfIndels = NULL
 logEveryN = 100
 logCount = 0
-catnow("Performing", nrow(df), "alignments and extracting InDel positions\n")
+catnow("Performing", nrow(df), "alignments and extracting Indel positions\n")
 
 # Timing note: with Muscle, and with 459 alignments, total time without anything
 # below EXCEPT the Muscle alignment was 1:05 minutes, and with everything below
@@ -650,9 +648,7 @@ for (i in 1:nrow(df))
 
     # Write sequences to FASTA file.
     idLines = paste(">", genomeLtrs, sep="")
-    outFile = file(tempFastaFileName, "wb")
-    writeLines(unlist(c(rbind(idLines, df[i, seqCols]))), outFile)
-    close(outFile)
+    writeLines.winSafe(unlist(c(rbind(idLines, df[i, seqCols]))), tempFastaFileName)
 
     # Create and execute a command to align the sequences.
     {
@@ -710,9 +706,9 @@ for (i in 1:nrow(df))
         stop("Expected all sequences to be the same size")
     alignMtx = matrix(unlist(strsplit(alignSeqs, "", fixed=TRUE)), ncol=Ngenomes, dimnames=list(NULL, genomeLtrs))
 
-    # Here is how we will find InDels.  If a base position has no "-" gap characters
-    # in any genome, that base position is not part of an InDel, else it is.  The
-    # InDel spans all consecutive bases where one or more genomes has a "-".
+    # Here is how we will find Indels.  If a base position has no "-" gap characters
+    # in any genome, that base position is not part of an Indel, else it is.  The
+    # Indel spans all consecutive bases where one or more genomes has a "-".
     gaps = apply(alignMtx, 1, function(V) any(V == "-"))
     indelStarts = which(c(TRUE, !gaps[-N]) & gaps) # Previous bp not a gap and this bp is a gap
     indelEnds = which(c(!gaps[-1], TRUE) & gaps) # Next bp not a gap and this bp is a gap
@@ -721,20 +717,20 @@ for (i in 1:nrow(df))
         stop("Programming error, expected equal number of starts/ends")
     if (Nindels > 0)
         {
-        # Each InDel in each genome has a number of gaps ("-" characters) between the
-        # InDel start and end position, and we need to count these.
+        # Each Indel in each genome has a number of gaps ("-" characters) between the
+        # Indel start and end position, and we need to count these.
         gapCount = list()
         for (genome in genomeLtrs)
             gapCount[[genome]] = sapply(1:Nindels, function(i) sum(alignMtx[indelStarts[i]:indelEnds[i], genome] == "-"))
 
-        # We use the base BEFORE the InDel as its starting position and the base AFTER the
-        # InDel as its ending position.  If the alignment includes gaps at the start or end,
+        # We use the base BEFORE the Indel as its starting position and the base AFTER the
+        # Indel as its ending position.  If the alignment includes gaps at the start or end,
         # the base before or after may be at an offset of 0 or (seq length + 1) from the
         # extraction position start/end (Xpos1/Xpos2).
         indelBaseBeforeStart = indelStarts - 1
         indelBaseAfterEnd = indelEnds + 1
 
-        # Create a data frame of InDels and append it to dfIndels.
+        # Create a data frame of Indels and append it to dfIndels.
         phases = df$phases[i]
         dfi = data.frame(ID=df$ID[i], phases=phases, idx=1:Nindels, stringsAsFactors=FALSE)
         for (j in 1:Ngenomes)
@@ -782,10 +778,10 @@ inv(dim(dfIndels), "dim(dfIndels)")
 ########################################
 
 # Write the data frame to the output file.
-write.table(dfIndels, outputFile, row.names=FALSE, quote=FALSE, sep="\t")
+write.table.winSafe(dfIndels, outputFile, row.names=FALSE, quote=FALSE, sep="\t")
 # dfIndels = read.table(outputFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
 
-catnow("Finished aligning sequences for Indel Groups and locating InDels, output file:\n", outputFile, "\n")
+catnow("Finished aligning sequences for Indel Groups and locating Indels, output file:\n", outputFile, "\n")
 }
 
 ################################################################################

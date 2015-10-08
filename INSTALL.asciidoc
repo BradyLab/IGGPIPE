@@ -98,7 +98,7 @@ http://www.barebones.com/products/textwrangler
 .. Perl V5 or later (V5.16.0 works) (https://www.perl.org/get.html)
 .. R V3 or later (V3.2.1 works) (https://www.r-project.org)
 .. Primer3 (V2.3.6 works) (http://sourceforge.net/projects/primer3)
-.. NCBI e-PCR (V2.3.12 works) (http://www.ncbi.nlm.nih.gov/tools/epcr)
+.. NCBI e-PCR (V2.3.12-1 works) (http://www.ncbi.nlm.nih.gov/tools/epcr)
 .. MUSCLE (V3.8.31 works) (http://www.drive5.com/muscle/downloads.htm)
 --
 
@@ -106,7 +106,7 @@ http://www.barebones.com/products/textwrangler
 +
 --
 .. Jellyfish
-.. e-PCR (only requires compile on Mac OSX)
+.. e-PCR
 --
 
 . *One C++ program provided with IGGPIPE will be compiled and built: findMers*
@@ -348,31 +348,33 @@ e-PCR is an "electronic PCR" application from NCBI that uses primers and sequenc
 data to do an 'in silico' PCR amplification.  It is used by IGGPIPE to test primers
 of candidate IGG markers to see if they generate unique amplicons of the
 expected length, so it must be installed on your computer. This version of IGGPIPE
-was tested with e-PCR version 2.3.12, although later versions will probably be
-fine. For Windows, we had to use version 2.3.9, which worked but produced different
-results than version 2.3.12, making it impossible to do a file difference test to
-see if expected results of the test data were obtained.
+was tested with e-PCR version 2.3.12-1 (-V option displays version 2.3.12, but
+downloaded file was 2.3.12-1), although later versions will probably be
+fine.
 
 To install e-PCR, look for it here:
 
   http://www.ncbi.nlm.nih.gov/tools/epcr
 
 The download link uses FTP protocol. Log in as user GUEST with no password.
-Look for the latest .zip version (Mac), tar.gz (Linux), or binary folder (win32)
-and copy the file or folder to your computer and unzip it as needed. Put the
-unzipped directory wherever you want on your computer.
+Look for the latest .zip version or tar.gz, copy the file or folder to your,
+computer, and unzip it. Put the unzipped directory wherever you want on your
+computer.
 
-For Linux and Windows, binary distributions of e-PCR are available at that download
-link, so once downloaded, you should be able to run e-PCR without further ado.  With
-OSX, however, it is now necessary to run 'make' to compile and build the program.
-Version 2.3.12 had two problems with it that required editing of the source code
-in order for the 'make' operation to complete successfully. Perhaps these problems
-will have been fixed in the version you download (or perhaps a binary version will
-be available for Mac also at the time you download). Test by trying to build e-PCR.
-Change into the directory that you unzipped and enter the following command:
+In some cases, a binary distribution might be available, so once downloaded, you
+should be able to run e-PCR without further ado.  At the time we downloaded version
+2.3.12-1, it was only available as source code and it was necessary to run 'make'
+to compile and build the program.
 
-  (Mac only)
-  cd e-PCR-2.3.12
+Version 2.3.12-1 had two problems with it that required editing of the source code
+in order for the 'make' operation to complete successfully under OSX. Perhaps these
+problems will have been fixed in the version you download (or perhaps a binary
+version will be available at the time you download). Test by trying to build e-PCR.
+Refer to the file 'BUILD.html' in the e-PCR source directory for instructions on
+compiling the source.  For Mac OSX, the source was compiled by changing into the
+directory where the files were unzipped and entering the following command:
+
+  cd e-PCR-2.3.12-1
   make LF64LDFLAGS= LF64CCFLAGS=-DNATIVE_LARGEFILES COMMON_CC_FLAGS=-w
 
 If the 'make' completes without error, there will be a file named "e-PCR" in the
@@ -402,14 +404,14 @@ you are good to go.
 Now assign the path to the parameter "PATH_EPCR" in the allPathParameters.ours
 file, for example:
 
-  PATH_EPCR := ~/Documents/e-PCR-2.3.12/e-PCR
+  PATH_EPCR := ~/Documents/e-PCR-2.3.12-1/e-PCR
 --
 
 . *Install MUSCLE and set its path*
 +
 --
 MUSCLE is an open-domain multiple sequence aligner.  It is used by IGGPIPE only
-if you choose to search markers or LCRs for InDels by using the 'make InDels'
+if you choose to search markers or LCRs for Indels by using the 'make Indels'
 command, so if you don't do that you can skip this step, although you may as
 well install it. This version of IGGPIPE was tested with MUSCLE version v.8.31,
 although later versions will probably be fine. To install MUSCLE, look for it
@@ -600,14 +602,13 @@ containing the markers.
 The .pdf and .png files should be examined to see how they depict marker counts
 and densities.
 
-The tables at the end of this document describe the columns in these tab-separated
+The tables at the end of the RUN document describe the columns in these tab-separated
 data files.
 
 To make sure the pipeline ran correctly, compare the MarkersOverlapping_ file to the
-expected result, which is in file MarkersOverlapping.test.tsv in the IGGPIPE main
-directory:
+expected result, which is in subdirectory outTestHP11/goodTest:
 
-  diff MarkersOverlapping.test.tsv outTestHP11/MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv
+  diff outTestHP11/MarkersOverlapping_*.tsv outTestHP11/goodTest/
 
 This command should not produce any output, indicating the two files are identical.
 If it produces output indicating non-identity of the files, you have a problem.
@@ -624,63 +625,103 @@ directories in file paths, we found that we could use "/" in all the paths in
 the allParameters.ours file and allParameters.test file and it worked fine; we
 did not have to use "\" anywhere.
 
-Another common problem with Windows was in text file line endings, which are
-handled differently in Windows than in OSX and Linux.  We believe we have worked
-out these problems, but if you find mysterious cases where a file looks ok but
-doesn't work, you may need to change it to have Linux style line endings.
+Windows gave the most problems, and the most common problem with Windows was in
+text file line endings, which under Windows can be either "DOS" or "Unix" line
+endings.  IGGPIPE produces files with Unix line endings exclusively, but it
+generally tolerates input files with either type of line ending.  Most tools
+and programs you might use to examine the files will also tolerate either type
+of line ending, but occasionally, a program requires DOS line endings.  Be aware
+of this situation during troubleshooting, and consider whether the observed
+problem might be one with line endings.
 
-Another problem was program versions.  The e-PCR version for Windows was different
-than the one used for OSX and Linux, and this caused the final marker output files
-to be different than what was expected, resulting in output when the 'diff' command
-was run to check for file identity above.  If this happens, you should do difference
-testing on other test files as described next.
+Another problem can be program versions.  If you use an older or newer version
+of a program than what we used, the pipeline might fail, depending on what the
+changes are, or it might produce different output.  Look carefully at version
+numbers and check to see if the output differs for any program that has a different
+version number than what we used.
 
+If IGGPIPE produces a different marker output file than expected, as indicated by
+output being produced by the 'diff' command shown in the preceding step, you
+should do difference testing on other output files.  Each of the files whose
+prefixes and suffixes are listed in the previous step have a "good" version of
+the file containing the expected results, in folder outTestHP11/goodTest.  Each
+of those files can be compared to the output IGGPIPE produced when you ran it
+using a 'diff' command to see which ones are good. No output means the files match.
+For example:
 
-You may need to doubl
-the problem is most
-likely due to running a software package of a different version than what we used
-for testing. For example, on Windows an older version of e-PCR was all that was
-available, and this led to differences in the output.  If 
+  diff outTestHP11/LCRs_*.tsv outTestHP11/goodTest/
+
+If the final output file does not match, but one or more output files do match (starting
+with the first file listed in the previous step), then you can tell which step
+produced an incorrect result based on which file in the list is the first one that
+is incorrect.  The following 'make' steps produce the following output files (italicized
+output files are those available in the goodTest subdirectory for comparison to your files):
+
+[options="header"]
+|===================================================
+|'make' Command|Produces output file(s)
+|a. make PARAMS=myFilename getSeqInfo    GENOME=ALL|GenomeData/*.idlens
+|b. make PARAMS=myFilename getContigFile GENOME=ALL|GenomeData/*.contigs
+|c. make PARAMS=myFilename getKmers      GENOME=ALL|Kmers/Kmers_*.kmers
+|d. make PARAMS=myFilename kmerStats     GENOME=ALL|Kmers/Kmers_*.stats
+|e. make PARAMS=myFilename sortKmers     GENOME=ALL|Kmers/Kmers_*.sorted
+|f. make PARAMS=myFilename kmerIsect|Kmers/isect.kmers
+|g. make PARAMS=myFilename getGenomicPos GENOME=ALL|Kmers/Kmers_*.isect
+|h. make PARAMS=myFilename mergeKmers    GENOME=ALL|Kmers/Kmers_*.merge
+|i. make PARAMS=myFilename getCommonUniqueKmers|Kmers/common.unique.kmers
+|j. make PARAMS=myFilename findLCRs|'LCRs_*.tsv, BadKmers_*.tsv'
+|k. make PARAMS=myFilename findIndelGroups|'IndelGroupsOverlapping_*.tsv, IndelGroupsNonoverlapping_*.tsv'
+|l. make PARAMS=myFilename getDNAseqs    GENOME=ALL|'DNAseqs_*.dnaseqs'
+|m. make PARAMS=myFilename findPrimers|'NonvalidatedMarkers_*.tsv'
+|n. make PARAMS=myFilename ePCRtesting   GENOME=ALL|'MarkerErrors_*.tsv'
+|o. make PARAMS=myFilename removeBadMarkers|'MarkersOverlapping_*.tsv, MarkersNonoverlapping_*.tsv'
+|p. make PARAMS=myFilename plotMarkers|'MarkerCounts_*.pdf, MarkerDensity_*.png'
+|===================================================
+
+The different results might be due to running a software package of a different
+version than what we used for testing. For example, a different version of e-PCR
+might cause a mismatch starting at file 'MarkerErrors_*.tsv'. Another possibility
+to be aware of is that the files may in fact be identical except one might have
+Unix line ends and the other might have DOS line ends.
 --
 
-. *Run 'make InDels' to align markers and find InDels*
+. *Run 'make Indels' to align markers and find Indels*
 +
 --
 An R program that is NOT run as part of the pipeline when the 'make ... ALL' target
-is built, but which can be run using 'make ... InDels', is able to read a file of LCRs,
-non-overlapping InDelGroups, or non-overlapping Markers, extract the DNA sequences
+is built, but which can be run using 'make ... Indels', is able to read a file of LCRs,
+non-overlapping IndelGroups, or non-overlapping Markers, extract the DNA sequences
 from the genomes in each LCR or Marker region and align them, then locate all
-InDels in the aligned sequences and write their positions to a file.  The program
-is called alignAndGetIndels.R. Run it as follows:
+Indels in the aligned sequences and write their positions to a file.  The input file
+to be used is selected with parameter PATH_INDELS_INPUT_FILE in the allParameters.* file.
+The program to find Indels is called alignAndGetIndels.R. Run it as follows:
 
-  make PARAMS=allParameters.test InDels
+  make PARAMS=allParameters.test Indels
 
 Check that the output file exists with:
 
   ls outTestHP11/Markers*.indels.tsv
 
-This should list the file outTestHP11/
-MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv
+This should list the file 'outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv'
 
-You can examine it with Excel or a text editor to see the InDel data it contains.
+You can examine it with Excel or a text editor to see the Indel data it contains.
 --
 
-. *Run 'make plotInDels' to plot InDel information*
+. *Run 'make plotIndels' to plot Indel information*
 +
 --
 Another R program that is NOT run as part of the pipeline when the 'make ... ALL' target
-is built, but which can be run using 'make ... plotInDels', reads the InDels file produced
-by 'make ... InDels' and plots information from it in a pdf file. The program is called
+is built, but which can be run using 'make ... plotIndels', reads the Indels file produced
+by 'make ... Indels' and plots information from it in a pdf file. The program is called
 plotIndels.R. Run it as follows:
 
-  make PARAMS=allParameters.test plotInDels
+  make PARAMS=allParameters.test plotIndels
 
 Check that the output file exists with:
 
   ls outTestHP11/Markers*.indels.pdf
 
-This should list the file outTestHP11/
-MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.pdf
+This should list the file 'outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.pdf'
 
 You might want to open it and look at the plots.
 --
@@ -692,7 +733,8 @@ The LCRs_ file contains a list of common unique k-mers assigned to locally conse
 regions (LCRs), and it can be used to make a dotplot depicting alignment of the two
 genomes. The R program dotplot.R is provided to do this. It is driven by a parameter
 file, a sample of which has been provided, dotplot.template, that is set for using
-the test data just produced. Run dotplot.R as follows:
+the test data produced by running IGGPIPE with allParameters.test. Run dotplot.R
+as follows:
 
   Rscript code/R/dotplot.R dotplot.template
 
@@ -700,18 +742,19 @@ Check that the output file exists with:
 
   ls outTestHP11/LCRs_*.dotplot.png
 
-This should list the file outTestHP11/LCRs_K11k2L100D10_2000.dotplot.png, an image file.
+This should list the file 'outTestHP11/LCRs_K11k2L100D10_2000.dotplot.png', an image file.
 You may want to examine it (e.g. in the OSX Preview app) to see the dot plot.
 
 There are other sample parameter files in subdirectory 'dotplot', although the
-parameter file is fairly straightforward and you probably don't need other examples.
+parameter file is fairly straightforward and you probably don't need other examples
+to work from.
 --
 
 . *Run annotateFile.R to make new files containing annotated marker data in different formats*
 +
 --
 A common need is to add additional annotation information the table of markers. For
-example, you might be working with an introgression line population (as I was) and
+example, you might be working with an introgression line population and
 wish to annotate each marker with the names of the lines whose introgressions that
 marker lies within, along with the marker position relative to the introgression.
 Or, you might want to annotate each marker with the ID of the nearest gene and its
@@ -719,20 +762,25 @@ distance away. You may also want to change file format, from .tsv (tab-separated
 to .gff3 or .gtf for adding the markers to a browser track. All this can be done with
 the R program annotateFile.R that is provided with IGGPIPE. It is driven by a parameter
 file, a sample of which has been provided, annotate.template, that is set for using
-the test data just produced along with additional annotation test data in folder
-code/R/test_GFFfuncsAndMergeData. Run annotateFile.R as follows:
+the test data produced by running IGGPIPE with allParameters.test, along with
+additional annotation test data in folder code/R/test_GFFfuncsAndMergeData. Run
+annotateFile.R as follows:
 
   Rscript code/R/annotateFile.R annotate.template
 
 Check that the output file exists with:
 
-  ls MarkersAnnotated.*
+  ls outTestHP11/MarkersAnnotated.*
 
-This should list file MarkersAnnotated.test.tsv in the root IGGPIPE folder.
-You can examine this file with a text editor or Excel to see the new column.
+This should list file 'MarkersAnnotated.test.tsv' in the outTestHP11 folder.
+You can examine this file with a text editor or Excel to see the new column that
+was added compared to the input file 'MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv'.
 
 There are other sample parameter files in subdirectory 'annotate' which produce
-other types of files or do other types of file data manipulation.
+other types of files or do other types of file data manipulation.  The parameters
+can be challenging to set properly, especially when merging data from a separate
+file, so these sample files can be helpful. Also, when .gff3 files are used, they
+must conform well to the expected GFF3 format else an error is likely to occur.
 --
 
 . *Edit primer3settings.txt (optional)*
