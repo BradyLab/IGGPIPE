@@ -236,10 +236,12 @@ ifeq ($(CLEAN),)
 getSeqInfo: $(TARGET_IDLEN)
 	@echo
 	@echo "getSeqInfo file(s) for genome(s) $(GENOME) are up to date."
+	@echo
 else
 getSeqInfo:
 	@$(CMD_DELETE_WHEN_CLEANING) $(TARGET_IDLEN)
 	@echo "getSeqInfo output file(s) for genome(s) $(GENOME) removed."
+	@echo
 endif
 
 # IDLEN_FILES is multiple targets, one per genome.
@@ -274,10 +276,12 @@ ifeq ($(CLEAN),)
 getContigFile: $(TARGET_CONTIG)
 	@echo
 	@echo "getContigFile file(s) for genome(s) $(GENOME) are up to date."
+	@echo
 else
 getContigFile:
 	@$(CMD_DELETE_WHEN_CLEANING) $(TARGET_CONTIG)
 	@echo "getContigFile output file(s) for genome(s) $(GENOME) removed."
+	@echo
 endif
 
 # CONTIG_FILES is multiple targets, one per genome.
@@ -312,10 +316,12 @@ ifeq ($(CLEAN),)
 getKmers: $(TARGET_KMERS)
 	@echo
 	@echo "getKmers file(s) for genome(s) $(GENOME) are up to date."
+	@echo
 else
 getKmers:
 	@$(CMD_DELETE_WHEN_CLEANING) $(TARGET_KMERS)
 	@echo "getKmers output file(s) for genome(s) $(GENOME) removed."
+	@echo
 endif
 
 # KMERS_FILES is multiple targets, one per genome.
@@ -351,10 +357,12 @@ ifeq ($(CLEAN),)
 kmerStats: $(TARGET_STATS)
 	@echo
 	@echo "kmerStats file(s) for genome(s) $(GENOME) are up to date."
+	@echo
 else
 kmerStats:
 	@$(CMD_DELETE_WHEN_CLEANING) $(TARGET_STATS)
 	@echo "kmerStats output file(s) for genome(s) $(GENOME) removed."
+	@echo
 endif
 
 # KMERS_STATS_FILES is multiple targets, one per genome.
@@ -393,10 +401,12 @@ ifeq ($(CLEAN),)
 sortKmers: $(TARGET_SORTED_KMERS)
 	@echo
 	@echo "sortKmers file(s) for genome(s) $(GENOME) are up to date."
+	@echo
 else
 sortKmers:
 	@$(CMD_DELETE_WHEN_CLEANING) $(TARGET_SORTED_KMERS)
 	@echo "sortKmers output file(s) for genome(s) $(GENOME) removed."
+	@echo
 endif
 
 # SORTED_KMERS_FILES is multiple targets, one per genome.
@@ -430,10 +440,12 @@ ifeq ($(CLEAN),)
 kmerIsect: $(PATH_ISECT_KMERS)
 	@echo
 	@echo "kmerIsect files are up to date."
+	@echo
 else
 kmerIsect:
 	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_ISECT_KMERS)
 	@echo "kmerIsect output file(s) removed."
+	@echo
 endif
 
 # PATH_ISECT_KMERS target.
@@ -466,10 +478,12 @@ ifeq ($(CLEAN),)
 getGenomicPos: $(TARGET_ISECT)
 	@echo
 	@echo "getGenomicPos file(s) for genome(s) $(GENOME) are up to date."
+	@echo
 else
 getGenomicPos:
 	@$(CMD_DELETE_WHEN_CLEANING) $(TARGET_ISECT)
 	@echo "getGenomicPos output file(s) for genome(s) $(GENOME) removed."
+	@echo
 endif
 
 # ISECT_KMER_FILES is multiple targets, one per genome.
@@ -524,10 +538,12 @@ ifeq ($(CLEAN),)
 mergeKmers: $(TARGET_MERGE)
 	@echo
 	@echo "mergeKmers files for genome(s) $(GENOME) are up to date."
+	@echo
 else
 mergeKmers:
 	@$(CMD_DELETE_WHEN_CLEANING) $(TARGET_MERGE)
 	@echo "mergeKmers output file(s) for genome(s) $(GENOME) removed."
+	@echo
 endif
 
 # Define the target file recipe for genome 1 separately, it is different.
@@ -573,10 +589,12 @@ ifeq ($(CLEAN),)
 getCommonUniqueKmers: $(PATH_COMMON_UNIQUE_KMERS)
 	@echo
 	@echo "Common unique k-mers file is up to date."
+	@echo
 else
 getCommonUniqueKmers:
 	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_COMMON_UNIQUE_KMERS)
 	@echo "Common unique k-mers file removed."
+	@echo
 endif
 
 # Target for the sorted common unique k-mers file.
@@ -598,10 +616,12 @@ ifeq ($(CLEAN),)
 findLCRs: $(PATH_LCR_FILE) $(PATH_BAD_KMERS_FILE)
 	@echo
 	@echo "findLCRs files are up to date."
+	@echo
 else
 findLCRs:
 	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_LCR_FILE) $(PATH_BAD_KMERS_FILE)
 	@echo "findLCRs output file(s) removed."
+	@echo
 endif
 
 # PATH_LCR_FILE and PATH_BAD_KMERS_FILE targets are built at the same time.
@@ -637,10 +657,12 @@ ifeq ($(CLEAN),)
 findIndelGroups: $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) $(PATH_NONOVERLAPPING_INDEL_GROUPS_FILE)
 	@echo
 	@echo "findIndelGroups files are up to date."
+	@echo
 else
 findIndelGroups:
 	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) $(PATH_NONOVERLAPPING_INDEL_GROUPS_FILE)
 	@echo "findIndelGroups output file(s) removed."
+	@echo
 endif
 
 # PATH_OVERLAPPING_INDEL_GROUPS_FILE and PATH_NONOVERLAPPING_INDEL_GROUPS_FILE targets are built at the same time.
@@ -688,10 +710,12 @@ ifeq ($(CLEAN),)
 getDNAseqs: $(TARGET_DNASEQ)
 	@echo
 	@echo "getDNAseqs file(s) for genome(s) $(GENOME) are up to date."
+	@echo
 else
 getDNAseqs:
 	@$(CMD_DELETE_WHEN_CLEANING) $(TARGET_DNASEQ) $(DIR_GENOME_OUT_DATA)/extract*.txt $(DIR_GENOME_OUT_DATA)/seqs*.txt
 	@echo "getDNAseqs output file(s) for genome(s) $(GENOME) removed."
+	@echo
 endif
 
 # DNA_SEQ_FILES is multiple targets, one per genome.
@@ -724,10 +748,12 @@ ifeq ($(CLEAN),)
 findPrimers: $(PATH_NONVALIDATED_MARKER_FILE)
 	@echo
 	@echo "findPrimers files are up to date."
+	@echo
 else
 findPrimers:
 	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_NONVALIDATED_MARKER_FILE) $(PATH_PRIMER3_IN) $(PATH_PRIMER3_OUT)
 	@echo "findPrimers output file(s) removed."
+	@echo
 endif
 
 # PATH_NONVALIDATED_MARKER_FILE target.
@@ -767,10 +793,12 @@ ifeq ($(CLEAN),)
 ePCRtesting: $(TARGET_BAD_MARKER)
 	@echo
 	@echo "ePCRtesting file(s) for genome(s) $(GENOME) are up to date."
+	@echo
 else
 ePCRtesting:
 	@$(CMD_DELETE_WHEN_CLEANING) $(TARGET_BAD_MARKER) $(DIR_GENOME_OUT_DATA)/*.epcr.in $(DIR_GENOME_OUT_DATA)/*.epcr.out
 	@echo "ePCRtesting output file(s) for genome(s) $(GENOME) removed."
+	@echo
 endif
 
 # BAD_MARKER_FILES is multiple targets, one per genome.
@@ -802,10 +830,12 @@ ifeq ($(CLEAN),)
 removeBadMarkers: $(PATH_OVERLAPPING_MARKERS_FILE) $(PATH_NONOVERLAPPING_MARKERS_FILE)
 	@echo
 	@echo "removeBadMarkers files are up to date."
+	@echo
 else
 removeBadMarkers:
 	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_OVERLAPPING_MARKERS_FILE) $(PATH_NONOVERLAPPING_MARKERS_FILE)
 	@echo "removeBadMarkers output file(s) removed."
+	@echo
 endif
 
 # PATH_OVERLAPPING_MARKERS_FILE and PATH_NONOVERLAPPING_MARKERS_FILE targets are built at the same time.
@@ -848,10 +878,12 @@ ifeq ($(CLEAN),)
 plotMarkers: $(MARKER_COUNTS_FILE) $(MARKER_DENSITY_FILES)
 	@echo
 	@echo "plotMarkers files are up to date."
+	@echo
 else
 plotMarkers:
 	@$(CMD_DELETE_WHEN_CLEANING) $(MARKER_COUNTS_FILE) $(MARKER_DENSITY_FILES)
 	@echo "plotMarkers output file(s) removed."
+	@echo
 endif
 
 # MARKER_COUNTS_FILE and MARKER_DENSITY_FILES targets are built at the same time.
@@ -898,10 +930,12 @@ else ifeq ($(CLEAN),)
 Indels: $(PATH_INDELS_OUTPUT_FILE)
 	@echo
 	@echo "Indels files are up to date."
+	@echo
 else
 Indels:
 	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_INDELS_OUTPUT_FILE)
 	@echo "Indels output file(s) removed."
+	@echo
 endif
 
 # PATH_INDELS_OUTPUT_FILE target.
@@ -940,10 +974,12 @@ else ifeq ($(CLEAN),)
 plotIndels: $(PATH_INDELS_PLOT_FILE)
 	@echo
 	@echo "plotIndels file is up to date."
+	@echo
 else
 plotIndels:
 	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_INDELS_PLOT_FILE)
 	@echo "plotIndels output file(s) removed."
+	@echo
 endif
 
 # PATH_INDELS_PLOT_FILE target.
