@@ -650,7 +650,7 @@ using a 'diff' command to see which ones are good. No output means the files mat
 A shell script named 'diffKeyFiles.sh' is provided that runs 'diff' on each of these
 files. To use it with the allParameters.test output files:
 
-  source code/shell/diffKeyFiles.sh
+  source code/shell/diffKeyFiles.sh outTestHP11 goodTest
 
 It will show only a single line of output for each file, saying it diffed the file,
 if the files match.  If they don't match, you will get a lot of output from the
