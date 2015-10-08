@@ -1,7 +1,8 @@
 NOTES ONGOING.txt
 allPathParameters.ours
 logFiles/**
-out*/**
+out*/*
+!out*/good*/
 code/R/testOutput
 primer3settings.txt
 primer3settings.txt.tmp
