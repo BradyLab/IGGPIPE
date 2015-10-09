@@ -98,10 +98,9 @@ endif
 ################################################################################
 # Set variables for cleaning operations.
 ################################################################################
-# If variable CLEAN was defined as anything at all, set it to "CLEAN=1" so it can
-# be easily used with recursive invocations of make.
+# If variable CLEAN was defined as anything at all, set it to "1".
 ifneq ($(CLEAN),)
-override CLEAN := CLEAN=1
+override CLEAN := 1
 endif
 
 ################################################################################
@@ -133,59 +132,23 @@ ALL:
 	@echo
 	@echo "Removed all files from the output directory."
 	@echo
-else ifneq ($(CLEAN),)
-ALL: all_getSeqInfo all_getKmers all_kmerStats all_sortKmers all_getContigFile \
-    kmerIsect all_getGenomicPos all_mergeKmers getCommonUniqueKmers findLCRs \
-    findIndelGroups all_getDNAseqs findPrimers all_ePCRtesting removeBadMarkers \
+else ifeq ($(CLEAN),1)
+ALL: getSeqInfo getKmers kmerStats sortKmers getContigFile \
+    kmerIsect getGenomicPos mergeKmers getCommonUniqueKmers findLCRs \
+    findIndelGroups getDNAseqs findPrimers ePCRtesting removeBadMarkers \
     plotMarkers
 	@echo
 	@echo "ALL files are cleaned"
 	@echo
 else
-ALL: all_getSeqInfo all_getKmers all_kmerStats all_sortKmers all_getContigFile \
-    kmerIsect all_getGenomicPos all_mergeKmers getCommonUniqueKmers findLCRs \
-    findIndelGroups all_getDNAseqs findPrimers all_ePCRtesting removeBadMarkers \
+ALL: getSeqInfo getKmers kmerStats sortKmers getContigFile \
+    kmerIsect getGenomicPos mergeKmers getCommonUniqueKmers findLCRs \
+    findIndelGroups getDNAseqs findPrimers ePCRtesting removeBadMarkers \
     plotMarkers
 	@echo
 	@echo "ALL files are up to date"
 	@echo
 endif
-
-# Target for getting or cleaning sequence info for all genomes.
-all_getSeqInfo:
-	$(MAKE) PARAMS=$(PARAMS) $(CLEAN) getSeqInfo GENOME=ALL
-
-# Target for getting or cleaning contig files for all genomes.
-all_getContigFile:
-	$(MAKE) PARAMS=$(PARAMS) $(CLEAN) getContigFile GENOME=ALL
-
-# Target for getting or cleaning unique k-mers from all genomes.
-all_getKmers:
-	$(MAKE) PARAMS=$(PARAMS) $(CLEAN) getKmers GENOME=ALL
-
-# Target for getting or cleaning unique k-mer statistics for all genomes.
-all_kmerStats:
-	$(MAKE) PARAMS=$(PARAMS) $(CLEAN) kmerStats GENOME=ALL
-
-# Target for getting or cleaning sorted unique k-mers for all genomes.
-all_sortKmers:
-	$(MAKE) PARAMS=$(PARAMS) $(CLEAN) sortKmers GENOME=ALL
-
-# Target for getting or cleaning unique k-mer genomic position for all genomes.
-all_getGenomicPos:
-	$(MAKE) PARAMS=$(PARAMS) $(CLEAN) getGenomicPos GENOME=ALL
-
-# Target for merging common unique k-mer genomic positions files for all genomes.
-all_mergeKmers:
-	$(MAKE) PARAMS=$(PARAMS) $(CLEAN) mergeKmers GENOME=ALL
-
-# Target for getting or cleaning DNA for making primers for all genomes.
-all_getDNAseqs:
-	$(MAKE) PARAMS=$(PARAMS) $(CLEAN) getDNAseqs GENOME=ALL
-
-# Target for testing primers using ePCR on all genomes.
-all_ePCRtesting:
-	$(MAKE) PARAMS=$(PARAMS) $(CLEAN) ePCRtesting GENOME=ALL
 
 ################################################################################
 # Create output directories.
@@ -251,7 +214,7 @@ endif
 $(IDLEN_FILES) : $(PFX_GENOME_DATA_FILE)%.idlens : $$(PATH_GENOME_FASTA_$$*) | \
         $(DIR_GENOME_OUT_DATA) $(PATH_EXTRACT_SEQ_IDS)
 	@echo
-	@echo "*** getSeqInfo PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
+	@echo "*** getSeqInfo PARAMS=$(PARAMS) GENOME=$* ***"
 	@echo "Extracting sequence IDs and lengths from $< into $@"
 	$(TIME) $(CMD_PERL) $(PATH_EXTRACT_SEQ_IDS) $< $@ $(REDIR)
 	@echo "Finished."
@@ -291,7 +254,7 @@ endif
 $(CONTIG_FILES) : $(PFX_GENOME_DATA_FILE)%.contigs : $$(PATH_GENOME_FASTA_$$*) | \
         $(DIR_GENOME_OUT_DATA) $(PATH_FINDMERS)
 	@echo
-	@echo "*** getContigFile PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
+	@echo "*** getContigFile PARAMS=$(PARAMS) GENOME=$* ***"
 	@echo "Extracting contig positions and lengths from $< into $@"
 	$(TIME) $(PATH_FINDMERS) $(ARGS_FINDMER) -f $@ $< $(REDIR)
 	@echo "Finished."
@@ -331,7 +294,7 @@ endif
 $(KMERS_FILES) : $(PFX_KMERS_DATA_FILE)%.kmers : $$(PATH_GENOME_FASTA_$$*) | \
         $(DIR_KMERS)
 	@echo
-	@echo "*** getKmers PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
+	@echo "*** getKmers PARAMS=$(PARAMS) GENOME=$* ***"
 	@echo "Extracting unique $(K)-mers from $< into $(PFX_KMERS_DATA_FILE)$*.kmers_*"
 	$(TIME) $(CMD_JELLYFISH) count -C -m $(K) -s $(JELLYFISH_HASH_SIZE) -U 1 \
 	    -o $(PFX_KMERS_DATA_FILE)$*.kmers $< $(REDIR)
@@ -372,7 +335,7 @@ endif
 $(KMERS_STATS_FILES) : $(PFX_KMERS_DATA_FILE)%.stats : $(PFX_KMERS_DATA_FILE)%.kmers | \
         $(DIR_KMERS)
 	@echo
-	@echo "*** kmerStats PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
+	@echo "*** kmerStats PARAMS=$(PARAMS) GENOME=$* ***"
 	@echo "Getting statistics for $(K)-mers from $< into $@"
 	$(TIME) $(CMD_JELLYFISH) stats -v $< >$@ $(REDIR)
 	@echo "Finished."
@@ -416,7 +379,7 @@ endif
 $(SORTED_KMERS_FILES) : $(PFX_KMERS_DATA_FILE)%.sorted : $(PFX_KMERS_DATA_FILE)%.kmers | \
         $(DIR_KMERS)
 	@echo
-	@echo "*** sortKmers PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
+	@echo "*** sortKmers PARAMS=$(PARAMS) GENOME=$* ***"
 	@echo "Sorting text-based $(K)-mers from $< into $@"
 	@echo
 	@echo "Extracting text-based $(K)-mers from binary file $< into $@.tmp"
@@ -453,7 +416,7 @@ endif
 
 $(PATH_ISECT_KMERS) : $(SORTED_KMERS_FILES) | $(DIR_KMERS) $(PATH_KMER_ISECT)
 	@echo
-	@echo "*** kmerIsect PARAMS=$(PARAMS) $(CLEAN) ***"
+	@echo "*** kmerIsect PARAMS=$(PARAMS) ***"
 	@echo "Intersecting unique $(K)-mers from .sorted files into $@"
 	$(TIME) $(CMD_PERL) $(PATH_KMER_ISECT) $@ $^ $(REDIR)
 	@echo "Finished."
@@ -493,7 +456,7 @@ endif
 $(ISECT_KMER_FILES) : $(PFX_KMERS_DATA_FILE)%.isect : $(PATH_ISECT_KMERS) $$(PATH_GENOME_FASTA_$$*) | \
         $(DIR_KMERS) $(PATH_FINDMERS)
 	@echo
-	@echo "*** getGenomicPos PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
+	@echo "*** getGenomicPos PARAMS=$(PARAMS) GENOME=$* ***"
 	@echo "Finding genomic positions of common unique $(K)-mers in $< into $@"
 	@echo
 	@echo "Adding genomic positions to common unique $(K)-mers from $< into $@.tmp"
@@ -552,7 +515,7 @@ TARGET_MERGE_1 := $(word 1,$(MERGE_KMER_FILES))
 
 $(TARGET_MERGE_1) : $(PFX_KMERS_DATA_FILE)1.isect
 	@echo
-	@echo "*** mergeKmers PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
+	@echo "*** mergeKmers PARAMS=$(PARAMS) GENOME=$* ***"
 	@echo "Copy common unique $(K)-mers for genome 1 from $< to $@"
 	$(TIME) cp $< $@ $(REDIR)
 	@echo "Finished."
@@ -571,7 +534,7 @@ G_PREV := 0 $(GENOME_NUMBERS)
 $(TARGET_MERGE_OTHERS) : $(PFX_KMERS_DATA_FILE)%.merge : $(PFX_KMERS_DATA_FILE)%.isect \
         $(PFX_KMERS_DATA_FILE)$$(word %,$$(G_PREV)).merge
 	@echo
-	@echo "*** mergeKmers PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
+	@echo "*** mergeKmers PARAMS=$(PARAMS) GENOME=$* ***"
 	@echo "Merge common unique $(K)-mers for genomes $(word $*,$(G_PREV)) and $* to $@"
 	$(TIME) join -t '	' $(PFX_KMERS_DATA_FILE)$(word $*,$(G_PREV)).merge $< >$@ $(REDIR)
 	@echo "Finished."
@@ -600,7 +563,7 @@ endif
 
 # Target for the sorted common unique k-mers file.
 $(PATH_COMMON_UNIQUE_KMERS) : $(UNSORTED_COMMON_UNIQUE_KMERS)
-	@echo "*** getCommonUniqueKmers PARAMS=$(PARAMS) $(CLEAN) ***"
+	@echo "*** getCommonUniqueKmers PARAMS=$(PARAMS) ***"
 	@echo
 	@echo "Sort merged common unique $(K)-mers by reference genome position from $< into $(PATH_COMMON_UNIQUE_KMERS)"
 	$(TIME) sort -k 2,2 -k 5,5n -k 3,3n $< >$(PATH_COMMON_UNIQUE_KMERS) $(REDIR)
@@ -637,7 +600,7 @@ PTN_BAD_KMERS_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_BAD_KMERS_FILE)%
 # the common unique k-mers file.
 $(PTN_LCR_FILE) $(PTN_BAD_KMERS_FILE) : $(PATH_COMMON_UNIQUE_KMERS) | \
         $(DIR_IGGPIPE_OUT) $(PATH_FIND_LCRS)
-	@echo "*** findLCRs PARAMS=$(PARAMS) $(CLEAN) ***"
+	@echo "*** findLCRs PARAMS=$(PARAMS) ***"
 	@echo
 	@echo "Find locally conserved regions using common unique $(K)-mers from $< into $@"
 	$(TIME) $(CMD_RSCRIPT) $(PATH_FIND_LCRS) $(WD) $(PATH_COMMON_UNIQUE_KMERS) \
@@ -678,7 +641,7 @@ PTN_NONOVERLAPPING_INDELS_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_NONOVERLAPPING_INDEL_
 $(PTN_OVERLAPPING_INDELS_FILE) $(PTN_NONOVERLAPPING_INDELS_FILE) : $(PATH_LCR_FILE) $(IDLEN_FILES) | \
         $(DIR_IGGPIPE_OUT) $(PATH_FIND_INDEL_GROUPS)
 	@echo
-	@echo "*** findIndelGroups PARAMS=$(PARAMS) $(CLEAN) ***"
+	@echo "*** findIndelGroups PARAMS=$(PARAMS) ***"
 	@echo "Find Indel Groups using locally conserved regions in $< and write them to two output files"
 	$(TIME) $(CMD_RSCRIPT) $(PATH_FIND_INDEL_GROUPS) $(WD) \
 	    $(PATH_LCR_FILE) \
@@ -727,7 +690,7 @@ $(DNA_SEQ_FILES) : $(PFX_DNA_SEQS_PATH)_%.dnaseqs : $$(PATH_GENOME_FASTA_$$*) \
         $(DIR_IGGPIPE_OUT) $(DIR_GENOME_OUT_DATA) \
         $(PATH_GET_DNA_SEQS) $(PATH_GET_SEQS_FASTA)
 	@echo
-	@echo "*** getDNAseqs PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
+	@echo "*** getDNAseqs PARAMS=$(PARAMS) GENOME=$* ***"
 	@echo "Extract DNA sequence around Indel Groups and write to $@"
 	$(TIME) $(CMD_RSCRIPT) $(PATH_GET_DNA_SEQS) $(WD) \
 	    $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) $* \
@@ -762,7 +725,7 @@ endif
 $(PATH_NONVALIDATED_MARKER_FILE) : $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) $(DNA_SEQ_FILES) \
         $(DIR_PRIMER_DATA) $(PATH_FIND_PRIMERS) $(PATH_PRIMER3_SETTINGS)
 	@echo
-	@echo "*** findPrimers PARAMS=$(PARAMS) $(CLEAN) ***"
+	@echo "*** findPrimers PARAMS=$(PARAMS) ***"
 	@echo "Find primers around Indel Groups in $< and write to $@"
 	$(TIME) $(CMD_RSCRIPT) $(PATH_FIND_PRIMERS) $(WD) \
 		$(PATH_OVERLAPPING_INDEL_GROUPS_FILE) \
@@ -809,7 +772,7 @@ $(BAD_MARKER_FILES) : $(PFX_BAD_MARKER_ERROR_PATH)_%.bad.tsv : $$(PATH_GENOME_FA
         $(PATH_NONVALIDATED_MARKER_FILE) | $(DIR_IGGPIPE_OUT) $(DIR_GENOME_OUT_DATA) $(DIR_PRIMER_DATA) \
         $(PATH_EPCR_TESTING)
 	@echo
-	@echo "*** ePCRtesting PARAMS=$(PARAMS) $(CLEAN) GENOME=$* ***"
+	@echo "*** ePCRtesting PARAMS=$(PARAMS) GENOME=$* ***"
 	@echo "Use e-PCR to test marker primer pairs and write errors to $@"
 	$(TIME) $(CMD_RSCRIPT) $(PATH_EPCR_TESTING) $(WD) \
 	    $(PATH_NONVALIDATED_MARKER_FILE) $* $@ \
@@ -851,7 +814,7 @@ PTN_NONOVERLAPPING_MARKERS_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_NONOVERLAPPING_MARKE
 $(PTN_OVERLAPPING_MARKERS_FILE) $(PTN_NONOVERLAPPING_MARKERS_FILE) : $(PATH_NONVALIDATED_MARKER_FILE) $(BAD_MARKER_FILES) | \
         $(PATH_RMV_BAD_MARKERS)
 	@echo
-	@echo "*** removeBadMarkers PARAMS=$(PARAMS) $(CLEAN) ***"
+	@echo "*** removeBadMarkers PARAMS=$(PARAMS) ***"
 	@echo "Remove markers identified by e-PCR as bad from $< and write good ones to two output files"
 	$(TIME) $(CMD_RSCRIPT) $(PATH_RMV_BAD_MARKERS) $(WD) $(OVERLAP_REMOVAL) \
 	    $(PATH_NONVALIDATED_MARKER_FILE) \
@@ -898,7 +861,7 @@ PTN_DENSITY_FILES := $(foreach G,$(GENOME_LETTERS),$(PFX_MARKER_DENSITY_PATH)_$(
 $(PTN_COUNTS_FILE) $(PTN_DENSITY_FILES) : $(PATH_OVERLAPPING_MARKERS_FILE) $(PATH_NONOVERLAPPING_MARKERS_FILE) \
         $(IDLEN_FILES) | $(PATH_PLOT_MARKERS)
 	@echo
-	@echo "*** plotMarkers PARAMS=$(PARAMS) $(CLEAN) ***"
+	@echo "*** plotMarkers PARAMS=$(PARAMS) ***"
 	@echo "Make density plots of 'good' candidate IGG markers to file $@"
 	$(TIME) $(CMD_RSCRIPT) $(PATH_PLOT_MARKERS) $(WD) $(PLOT_NDAMIN) $(PLOT_ALPHA) \
 	    $(PATH_OVERLAPPING_MARKERS_FILE) \
@@ -944,7 +907,7 @@ endif
 $(PATH_INDELS_OUTPUT_FILE) : $(PATH_INDELS_INPUT_FILE) $(FASTA_FILES) | $(DIR_GENOME_OUT_DATA) \
         $(PATH_ALIGN_AND_GET_INDELS) $(PATH_GET_SEQS_FASTA)
 	@echo
-	@echo "*** Indels PARAMS=$(PARAMS) $(CLEAN) ***"
+	@echo "*** Indels PARAMS=$(PARAMS) ***"
 	@echo "Align sequences of $< and find Indels and write them to $@"
 	$(TIME) $(CMD_RSCRIPT) $(PATH_ALIGN_AND_GET_INDELS) $(WD) \
 	    $(PATH_INDELS_INPUT_FILE) $(PATH_INDELS_OUTPUT_FILE) \
@@ -987,7 +950,7 @@ endif
 
 $(PATH_INDELS_PLOT_FILE) : $(PATH_INDELS_OUTPUT_FILE) | $(PATH_PLOT_INDELS)
 	@echo
-	@echo "*** plotIndels PARAMS=$(PARAMS) $(CLEAN) ***"
+	@echo "*** plotIndels PARAMS=$(PARAMS) ***"
 	@echo "Make plots of Indel information to file $@"
 	$(TIME) $(CMD_RSCRIPT) $(PATH_PLOT_INDELS) $(WD) $(PATH_INDELS_OUTPUT_FILE) \
 	    $(PATH_INDELS_PLOT_FILE) $(REDIR)
