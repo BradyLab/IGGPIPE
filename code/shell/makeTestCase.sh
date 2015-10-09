@@ -32,7 +32,7 @@ fi
 
 set -x #echo on
 
-make PARAMS=allParameters.test $MAKETGT | tee logFiles/makeLog_Test_$MAKETGT.txt
+make PARAMS=allParameters.test $MAKETGT | tee logFiles/makeLog_Test_$CLEANTGT.txt
 
 if [[ $MAKETGT == "ALL" ]] ; then
     make PARAMS=allParameters.test plotIndels | tee logFiles/makeLog_Test_Indels.txt

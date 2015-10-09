@@ -153,39 +153,39 @@ endif
 
 # Target for getting or cleaning sequence info for all genomes.
 all_getSeqInfo:
-	@$(MAKE) PARAMS=$(PARAMS) $(CLEAN) getSeqInfo GENOME=ALL
+	$(MAKE) PARAMS=$(PARAMS) $(CLEAN) getSeqInfo GENOME=ALL
 
 # Target for getting or cleaning contig files for all genomes.
 all_getContigFile:
-	@$(MAKE) PARAMS=$(PARAMS) $(CLEAN) getContigFile GENOME=ALL
+	$(MAKE) PARAMS=$(PARAMS) $(CLEAN) getContigFile GENOME=ALL
 
 # Target for getting or cleaning unique k-mers from all genomes.
 all_getKmers:
-	@$(MAKE) PARAMS=$(PARAMS) $(CLEAN) getKmers GENOME=ALL
+	$(MAKE) PARAMS=$(PARAMS) $(CLEAN) getKmers GENOME=ALL
 
 # Target for getting or cleaning unique k-mer statistics for all genomes.
 all_kmerStats:
-	@$(MAKE) PARAMS=$(PARAMS) $(CLEAN) kmerStats GENOME=ALL
+	$(MAKE) PARAMS=$(PARAMS) $(CLEAN) kmerStats GENOME=ALL
 
 # Target for getting or cleaning sorted unique k-mers for all genomes.
 all_sortKmers:
-	@$(MAKE) PARAMS=$(PARAMS) $(CLEAN) sortKmers GENOME=ALL
+	$(MAKE) PARAMS=$(PARAMS) $(CLEAN) sortKmers GENOME=ALL
 
 # Target for getting or cleaning unique k-mer genomic position for all genomes.
 all_getGenomicPos:
-	@$(MAKE) PARAMS=$(PARAMS) $(CLEAN) getGenomicPos GENOME=ALL
+	$(MAKE) PARAMS=$(PARAMS) $(CLEAN) getGenomicPos GENOME=ALL
 
 # Target for merging common unique k-mer genomic positions files for all genomes.
 all_mergeKmers:
-	@$(MAKE) PARAMS=$(PARAMS) $(CLEAN) mergeKmers GENOME=ALL
+	$(MAKE) PARAMS=$(PARAMS) $(CLEAN) mergeKmers GENOME=ALL
 
 # Target for getting or cleaning DNA for making primers for all genomes.
 all_getDNAseqs:
-	@$(MAKE) PARAMS=$(PARAMS) $(CLEAN) getDNAseqs GENOME=ALL
+	$(MAKE) PARAMS=$(PARAMS) $(CLEAN) getDNAseqs GENOME=ALL
 
 # Target for testing primers using ePCR on all genomes.
 all_ePCRtesting:
-	@$(MAKE) PARAMS=$(PARAMS) $(CLEAN) ePCRtesting GENOME=ALL
+	$(MAKE) PARAMS=$(PARAMS) $(CLEAN) ePCRtesting GENOME=ALL
 
 ################################################################################
 # Create output directories.

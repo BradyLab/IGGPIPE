@@ -345,6 +345,14 @@ version number, look for it here:
 
   https://www.r-project.org
 
+Windows presented a separate problem.  If R is installed under the "Program Files"
+directory, which is the default for the R installer, an error occured with the
+message 'Error: could not find function "dir.exists"'.  The only way we could
+find around this problem was to 'reinstall R' under a different directory, such
+as under the 'cygwin' directory, or any directory that has no SPACE character
+in the directory path.  If you are working with Windows, install or reinstall R
+in such a directory.
+
 Explicit installation instructions are not given here.  Follow the instructions
 provided in the downloaded installation package, then re-run the "Rscript --version"
 command to verify that it is installed.
@@ -353,7 +361,17 @@ IGGPIPE does not use any extra R packages.
 
 The parameter CMD_RSCRIPT in the allPathParameters.ours file is already set to
 'Rscript', which is the command needed to run the Rscript program. You shouldn't
-need to change it.
+need to change it, UNLESS you are running Windows.  For Windows, set CMD_RSCRIPT
+to the full path to Rscript.exe.  The correct path to use can be obtained by
+changing into directory containing Rscript.exe and entering the commands:
+
+  readlink -f primer3_core.exe
+  cygpath -am  (output from readlink command above)
+
+The 'readlink' command produces a path as output, and you put that path as the
+argument to the 'cygpath' command, and it produces a path whose output is the
+value to assign to CMD_RSCRIPT parameter. The 'readlink' command path would
+probably also work.
 --
 
 . *Install Primer3*
@@ -383,16 +401,12 @@ file, for example:
 
   CMD_PRIMER3CORE := ~/Documents/primer3-2.3.6/primer3_core
 
-In Windows, the correct path to use can be obtained by changing into directory
-containing primer3_core.exe and entering the commands:
+For Windows, as in the previous step involving Rscript, use 'readlink' and
+'cygpath' to get the paths needed, first changing into the directory where
+primer3_core.exe is located, then:
 
-  readlink -f primer3_core.exe
+  readlink -f e-PCR.exe
   cygpath -am  (output from readlink command above)
-
-The 'readlink' command produces a path as output, and you put that path as the
-argument to the 'cygpath' command, and it produces a path whose output is the
-value to assign to CMD_PRIMER3CORE parameter. The 'readlink' command path would
-probably also work.
 
 A set of files containing thermodynamic settings is provided with the Primer3
 installation, in a subdirectory of the main Primer3 directory named 'primer3_config'.

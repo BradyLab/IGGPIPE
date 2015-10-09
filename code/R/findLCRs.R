@@ -224,7 +224,7 @@ inv(k, "k-mer size k")
 cumLcrDf = NULL
 NfoundLCRs = 0
 cumDiscardDf = NULL
-isEOF = FALSE
+isEOF = (nrow(kmerBufferDf) < MIN_KMERS_AT_ONCE)
 nextLCRnum = 1
 while (nrow(kmerBufferDf) > 0)
     {
@@ -238,17 +238,19 @@ while (nrow(kmerBufferDf) > 0)
     # the input file that are still awaiting transfer to 'candLCRdf'.
     ############################################################################
 
+    # At this point, kmerBufferDf has between 1 and MIN_KMERS_AT_ONCE rows.
     # Read more k-mers, we need at least one in kmerBufferDf after we move at
-    # least MIN_KMERS_AT_ONCE to candLCRdf.  After this, kmerBufferDf has MORE
-    # THAN MIN_KMERS_AT_ONCE rows, unless end of file.
+    # least MIN_KMERS_AT_ONCE to candLCRdf.  After this read, kmerBufferDf has
+    # between MIN_KMERS_AT_ONCE+1 and 2*MIN_KMERS_AT_ONCE rows, unless end of
+    # file.
     if (!isEOF)
         {
         cat("  Read...")
         tdf = read.table(inFile, header=FALSE, row.names=1, sep="\t", nrows=MIN_KMERS_AT_ONCE,
             col.names=c("kmers", colNames), colClasses=colClasses, stringsAsFactors=FALSE)
-        if (nrow(tdf) == 0)
+        if (nrow(tdf) < MIN_KMERS_AT_ONCE)
             isEOF = TRUE
-        else
+        if (nrow(tdf) > 0)
             {
             colnames(tdf) = colNames
             NkmersRead = NkmersRead + nrow(tdf)
@@ -258,14 +260,20 @@ while (nrow(kmerBufferDf) > 0)
         cat(" NkmersRead =", NkmersRead, " isEOF =", isEOF, "\n")
         }
 
-    # Move at least MIN_KMERS_AT_ONCE k-mers from kmerBufferDf to candLCRdf, but
-    # be sure to move ALL k-mers of a sequence ID.  The only time kmerBufferDf
-    # becomes empty here is when we reach the end of the file.
-    N = nrow(kmerBufferDf)
+    # At this point, if end of file has not been reached, kmerBufferDf has
+    # between MIN_KMERS_AT_ONCE+1 and 2*MIN_KMERS_AT_ONCE rows.  If end of
+    # file has been reached, it has between 1 and MIN_KMERS_AT_ONCE rows.
+    # Move at least MIN_KMERS_AT_ONCE k-mers from kmerBufferDf to candLCRdf (or
+    # all of kmerBufferDf if end of file), but be sure to move ALL k-mers of a
+    # sequence ID, reading additional k-mers if necessary to ensure that.  The
+    # only time kmerBufferDf can become empty here is when we reach the end of
+    # the file.  After this move, kmerBufferDf has 0 rows if end of file, or
+    # between 1 and MIN_KMERS_AT_ONCE rows if not end of file.
+    NtotalRows = nrow(kmerBufferDf)
     {
-    if (N <= MIN_KMERS_AT_ONCE)
+    if (NtotalRows <= MIN_KMERS_AT_ONCE)
         {
-        if (!isEOF) stop("findLCRs expected to be at end of file")
+        if (!isEOF) stop("Software error: findLCRs expected to be at end of file")
         candLCRdf = kmerBufferDf
         kmerBufferDf = kmerBufferDf[c(),]
         }
@@ -276,17 +284,16 @@ while (nrow(kmerBufferDf) > 0)
         # MIN_KMERS_AT_ONCE position.  If there are not enough sequence IDs,
         # read more lines until end of file or we find the next one.
         lastID = kmerBufferDf[MIN_KMERS_AT_ONCE, refIdCol]
-        nextIDidx = MIN_KMERS_AT_ONCE + match(FALSE, lastID == kmerBufferDf[(MIN_KMERS_AT_ONCE+1):N, refIdCol])
+        nextIDidx = MIN_KMERS_AT_ONCE + match(FALSE, lastID == kmerBufferDf[(MIN_KMERS_AT_ONCE+1):NtotalRows, refIdCol])
         cat("  Read...")
         cnt = 0
-        NtotalRows = nrow(kmerBufferDf)
         while (!isEOF && is.na(nextIDidx))
             {
             tdf = read.table(inFile, header=FALSE, row.names=1, sep="\t", nrows=MIN_KMERS_AT_ONCE,
                 col.names=c("kmers", colNames), colClasses=colClasses, stringsAsFactors=FALSE)
-            if (nrow(tdf) == 0)
+            if (nrow(tdf) < MIN_KMERS_AT_ONCE)
                 isEOF = TRUE
-            else
+            if (nrow(tdf) > 0)
                 {
                 colnames(tdf) = colNames
                 NkmersRead = NkmersRead + nrow(tdf)

@@ -19,7 +19,11 @@
 # letter K here.
 ################################################################################
 
-# K=15 worked well with file allParameters.Ta3, so try it here.
+# K=15 worked well with file allParameters.Ta3, so try it here.  However, after
+# running it, it turns out K=14 would have been fine.  K=15 produced 34 million
+# common unique k-mers, the same number that K=15 produced with tomato/pennellii.
+# This will be a good test to see what difference this makes in number of markers
+# that are non-overlapping.
 K := 15
 
 
@@ -79,7 +83,7 @@ GENOME_LETTERS_SQUISHED := $(shell echo "$(GENOME_LETTERS)" | sed "s/ //g")
 # that a different run with different genomes or k will produce output in a
 # different folder.  This directory will be created if it doesn't exist.
 
-DIR_IGGPIPE_OUT := outWheat$(GENOME_LETTERS_SQUISHED)$(K)
+DIR_IGGPIPE_OUT := outTa$(GENOME_LETTERS_SQUISHED)$(K)
 
 
 ################################################################################
