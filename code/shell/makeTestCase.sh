@@ -12,6 +12,8 @@ fi
 if [[ $1 != "NONE" ]] ; then
     echo "make PARAMS=allParameters.test CLEAN=1 $1"
     make PARAMS=allParameters.test CLEAN=1 $1
+    make PARAMS=allParameters.test CLEAN=1 plotIndels
+    rm -f $1/MarkersAnnotated_*
 fi
 
 set -x #echo on
