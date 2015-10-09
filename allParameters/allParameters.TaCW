@@ -1,8 +1,10 @@
 ################################################################################
 ################################################################################
 
-# This is an IGGPIPE parameter file example for doing an analysis of tomato vs
-# human genome, just to see what will happen.
+# This is an IGGPIPE parameter file example for doing an analysis of two
+# hexaploid wheat genomes: the IWGSC (International Wheat Genome Sequencing
+# Consortium) Chinese Spring V1.0 assembly with pseudomolecules plus scaffolds,
+# and the Joint Genome Institute assembly (scaffolds only) of Synthetic W7984.
 
 ################################################################################
 ################################################################################
@@ -17,7 +19,7 @@
 # letter K here.
 ################################################################################
 
-# Try with 15.
+# K=15 worked well with file allParameters.Ta3, so try it here.
 K := 15
 
 
@@ -53,10 +55,10 @@ GENOME_NUMBERS := 1 2
 # letter for each one.
 ################################################################################
 
-# Use H for Human, T for Tomato.
+# C = Chinese Spring, W = W7984
 
-GENOME_1 := H
-GENOME_2 := T
+GENOME_1 := C
+GENOME_2 := W
 
 
 # Combine the above letters together with one space between each letter.
@@ -77,7 +79,7 @@ GENOME_LETTERS_SQUISHED := $(shell echo "$(GENOME_LETTERS)" | sed "s/ //g")
 # that a different run with different genomes or k will produce output in a
 # different folder.  This directory will be created if it doesn't exist.
 
-DIR_IGGPIPE_OUT := outHumanTomato_$(K)
+DIR_IGGPIPE_OUT := outWheat$(GENOME_LETTERS_SQUISHED)$(K)
 
 
 ################################################################################
@@ -87,12 +89,25 @@ DIR_IGGPIPE_OUT := outHumanTomato_$(K)
 
 # Path to parent folder of all genome data.
 
+# (This example assumes that an environment variable named "BRADYLAB" has been
+# defined, that gives the path to a high-level directory.)
+DIR_GENOME_DATA := $(BRADYLAB)/Genomes/Ta
+
+
+# Triticum aestivum (Chinese Spring) IWGSC V1.0 genome subfolder.
+DIR_GENOME_1 := $(DIR_GENOME_DATA)/Genome_IWGSC1.0
+# Triticum aestivum (Synthetic W7984) Mar 28 genome subfolder.
+DIR_GENOME_2 := $(DIR_GENOME_DATA)/Genome_W7984_scaffoldsMar28
+
+
 # Paths of the N_GENOMES FASTA files containing the genome sequences being
 # analyzed.  Each variable name must be the string "PATH_GENOME_FASTA_" followed
 # by the genome number.
 
-PATH_GENOME_FASTA_1 := $(BRADYLAB)/Genomes/Hs/hg38/hg38.fa
-PATH_GENOME_FASTA_2 := $(BRADYLAB)/Genomes/Soly/ITAG2.4_release/ITAG2.4_genomic.fasta
+# Triticum aestivum (Chinese Spring) IWGSC V1.0 FASTA file.
+PATH_GENOME_FASTA_1 := $(DIR_GENOME_1)/Triticum_aestivum.IWGSC1.0+popseq.28.dna.genome.fa
+# Triticum aestivum (Synthetic W7984) Mar 28 FASTA file.
+PATH_GENOME_FASTA_2 := $(DIR_GENOME_2)/w7984.meraculous.scaffolds.Mar28_contamination_removed.fa
 
 
 # Directory in which to place output files that are generated from the FASTA files.
@@ -178,7 +193,7 @@ KMIN := 2
 # to the minimum acceptable amplicon size AMIN (defined below), although it
 # could be larger.  Smaller values make more LCRs and increase computation time.
 
-LMIN := 250
+LMIN := 200
 
 
 # Minimum distance in bp between two adjacent k-mers in an LCR.  If two k-mers are
@@ -195,18 +210,18 @@ DMIN := 5
 # indel within an Indel Group or LCR.  This is normally set equal to the maximum
 # acceptable amplicon size AMAX (defined below), although it could be larger.
 
-DMAX := 1500
+DMAX := 1000
 
 
 # Minimum IGG marker amplicon size in any genome.
 
-AMIN := 250
+AMIN := 200
 
 
 # Maximum IGG marker amplicon size in any genome.  The amplicon size will always
 # be less than DMAX also.  This also limits the maximum Indel Group size.
 
-AMAX := 1500
+AMAX := 1000
 
 
 # For a given IGG marker, when the smallest amplicon size is AMIN, this is the
@@ -235,7 +250,7 @@ ADMIN := 50
 #
 # For the purpose of finding Indel Groups only, this should be set equal to ADMIN.
 
-ADMAX := 300
+ADMAX := 200
 
 
 # Minimum number of distinct amplicon sizes for each marker.  Set this to the
@@ -300,7 +315,7 @@ MINFLANK := 0
 # Therefore you would set this to MIN if you want to bias towards getting
 # shorter amplicons, and to MAX to bias towards longer ones.
 
-OVERLAP_REMOVAL := MIN
+OVERLAP_REMOVAL := MAX
 
 
 # Number of base pairs of additional sequence to retrieve on each side of each
@@ -330,7 +345,7 @@ EXTENSION_LEN := 20
 # whose size is within this amount of the target amplicon size, then you want
 # that marker to be marked bad and deleted.
 
-EPCR_MAX_DEV := 2500
+EPCR_MAX_DEV := 3000
 
 
 # Size, in base pairs, of a "hash word" in the e-PCR program.  This parameter has
@@ -358,7 +373,7 @@ EPCR_WORD_SIZE := 9
 # mismatched bases, then you want that marker to be marked bad and deleted.
 # Larger values increase computation time and reduce number of markers obtained.
 
-EPCR_MAX_MISMATCH := 0
+EPCR_MAX_MISMATCH := 3
 
 
 # Maximum number of off-target primer match gaps, in base pairs, within the
@@ -368,7 +383,7 @@ EPCR_MAX_MISMATCH := 0
 # gaps in the mismatch, then you want that marker to be marked bad and deleted.
 # Larger values increase computation time.
 
-EPCR_MAX_GAPS := 0
+EPCR_MAX_GAPS := 1
 
 
 # For plotting number and density of final markers, this parameter sets the
@@ -376,7 +391,7 @@ EPCR_MAX_GAPS := 0
 # of genomes) of the markers to be plotted.  For example, if you are making both
 # 2-way and 3-way markers (3 genomes with NDAMIN=2) and want to plot only the
 # 3-way markers count/density, set this to 3.
-PLOT_NDAMIN := 3
+PLOT_NDAMIN := 2
 
 
 # For plotting number and density of final markers, this parameter sets the
@@ -607,8 +622,8 @@ PFX_MARKER_DENSITY_PATH := $(DIR_MAIN_OUTPUT)/$(PFX_MARKER_DENSITY_FILE)$(SFX_GO
 #PATH_INDELS_INPUT_FILE := $(PATH_LCR_FILE)
 #PATH_INDELS_INPUT_FILE := $(PATH_NONOVERLAPPING_INDEL_GROUPS_FILE)
 #PATH_INDELS_INPUT_FILE := $(PATH_NONOVERLAPPING_MARKERS_FILE)
-# Let's use the markers file.
-PATH_INDELS_INPUT_FILE := $(PATH_NONOVERLAPPING_MARKERS_FILE)
+# Let's use the LCR file.
+PATH_INDELS_INPUT_FILE := $(PATH_LCR_FILE)
 
 
 # Path of Indels output file, used only if 'make Indels' command is run to find
