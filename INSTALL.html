@@ -783,7 +783,7 @@ with the command:
 <pre><code>git checkout -b my_V1.0_branch v1.0"</code></pre>
 </div></div>
 <div class="paragraph"><p>You can then do the installation process using those files.</p></div>
-<div class="paragraph"><p>I will try to monitor for pull requests if you make useful changes.</p></div>
+<div class="paragraph"><p>We will try to monitor for pull requests if you make useful changes.</p></div>
 </div></div>
 </li>
 </ol></div>
@@ -795,14 +795,15 @@ with the command:
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-<strong>64-bit Mac OSX or Linux System</strong>
+<strong>64-bit Mac OSX, Linux, or Windows/Cygwin System</strong>
 </p>
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>This description focuses on installation on a 64-bit Mac OSX system.  Installation
 has also been tested on 64-bit Linux and 64-bit Windows, and we describe installation
 differences, but command line examples here are for Mac OSX, and Linux and Windows
-users are expected to be savvy enough to translate these to their system.
+users are expected to be savvy enough to translate these to their system. For
+Windows systems, the Cygwin Unix-like tools must be installed.
 IGGPIPE will not work on 32-bit Windows systems.</p></div>
 </div></div>
 </li>
@@ -813,12 +814,12 @@ IGGPIPE will not work on 32-bit Windows systems.</p></div>
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>Before starting the installation, consider whether the computer on which the
-software is to be installed has enough memory for the problem at hand. I have
-been running IGGPIPE using 16GB of RAM, and I&#8217;d recommend no less than that amount.
-For larger genomes or more genomes, you will possibly need more. My computer has
-a 2.4 GHz processor, which has been adequate. You should monitor memory usage while
-the pipeline is running, and if it becomes excessive for your computer, you know you
-will need more memory to run those genomes.</p></div>
+software is to be installed has enough memory for the problem at hand. We have
+been running IGGPIPE using 16GB of RAM, and we recommend no less than that amount.
+For larger genomes or more genomes, you will possibly need more. The computer we
+used has a 2.4 GHz processor, which has been adequate. You should monitor memory
+usage while the pipeline is running, and if it becomes excessive for your computer,
+you know you will need more memory to run those genomes.</p></div>
 </div></div>
 </li>
 <li>
@@ -829,7 +830,7 @@ will need more memory to run those genomes.</p></div>
 <div class="content">
 <div class="paragraph"><p>Most work here is done from the command line, by opening the Terminal application.
 You should be familiar with some basic command line commands such as <em>cd</em>, <em>ls</em>,
-<em>cp</em>, <em>rm</em>, <em>mv</em>, <em>sudo</em>, <em>less</em> or <em>more</em>, <em>head</em> and <em>tail</em>, <em>man</em>, and <em>mkdir</em>.
+<em>cp</em>, <em>rm</em>, <em>mv</em>, <em>sudo</em>, <em>less</em>, <em>head</em> and <em>tail</em>, <em>man</em>, and <em>mkdir</em>.
 If you do not know how to use the command line or don&#8217;t know these basic commands,
 take time to learn a bit. A suggested tutorial (on the long side, but spend as
 little or as much time as you need to feel you can get started here) from UC Davis
@@ -860,19 +861,21 @@ directory with this command:</p></div>
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>You must have a plain text editor you know how to use.  If nothing else, the
-simple editor <em>nano</em>, which comes with Mac and Linux systems, will work. On
+simple editor <em>nano</em>, which comes with Mac, Linux, and Cygwin, will work. On
 a Mac you can also use the <em>TextEdit</em> program (use Plain Text format).  For Mac,
-the free open-source
-TextWrangler program is strongly recommended, and its more capable version
-called BBEdit is totally worth the $50 price for anyone who regularly edits text files.
-TextWrangler is available from the Apple App Store (Applications, App Store) or
-from:</p></div>
+the free open-source TextWrangler program is strongly recommended, and its more
+capable version called BBEdit is totally worth the $50 price for anyone who
+regularly edits text files.  TextWrangler is available from the Apple App Store
+(Applications, App Store) or from:</p></div>
 <div class="paragraph"><p><a href="http://www.barebones.com/products/textwrangler">http://www.barebones.com/products/textwrangler</a></p></div>
+<div class="paragraph"><p>On Windows, <em>do not use Notepad</em>, as it will cause problems with DOS vs Unix line
+ends.  If you don&#8217;t want to use <em>nano</em>, look into Notepad++, a free text editor.</p></div>
 </div></div>
 </li>
 <li>
 <p>
-<strong>The following programs/applications will be installed if they aren&#8217;t already:</strong>
+<strong>The following programs/applications will be installed as part of this installation
+process if they aren&#8217;t already:</strong>
 </p>
 <div class="openblock">
 <div class="content">
@@ -958,26 +961,121 @@ findMers
 <div class="sectionbody">
 <div class="paragraph"><p><strong>If you want a Quick Start with minimal reading, just look for the command lines
 below and execute them, with occasional skimming of the text just above/below the
-commands.</strong></p></div>
+commands.</strong>
+&#8203;<br />
+&#8203;<br /></p></div>
 <div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+<strong>Install Xcode (Mac OSX only) or Cygwin (Windows only)</strong>
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>IGGPIPE makes use of a utility called <em>make</em>, and also, some of the applications used
+by IGGPIPE are distributed as source code that must be compiled and built into a runnable
+application on the user&#8217;s computer, which requires a C++ compiler (g\++ utility). On
+Linux, these utilities are already installed so you can skip this step.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<strong>Xcode (OSX)</strong>
+</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>On Mac OSX, the Apple Developer Toolkit named Xcode provides <em>make</em> and the other
+required utilities.  Xcode is available free from the Apple App Store
+(Applications, App Store).  If you don&#8217;t have Xcode installed already, run the App Store
+application, search for "Xcode", and double-click the <em>Install</em> button to install it,
+and even if you do have it installed, make sure you are updated with the latest version.
+We used version 6.4, although later versions should work fine.
+Installation takes quite a long time, during which it appears nothing is happening.</p></div>
+<div class="paragraph"><p>When Xcode install is finished, you can verify that it was installed successfully
+by finding the Xcode application icon in Applications and running it.  It may then
+display a box requesting your computer administrator password so it can install
+additional components. Then, close the Xcode application and go to the command line
+and enter the following command, which checks to see if the command line tools such
+as <em>make</em> and <em>g++</em> are installed, and if not, installs them:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>xcode-select --install</code></pre>
+</div></div>
+<div class="paragraph"><p>To verify they are installed, you can enter this command:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>g++</code></pre>
+</div></div>
+<div class="paragraph"><p>and you should see the error message "clang: error: no input files".
+&#8203;<br />
+&#8203;<br /></p></div>
+</div></div>
+</dd>
+<dt class="hdlist1">
+<strong>Cygwin (Windows)</strong>
+</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>On Windows, the open source Cygwin tools environment provides <em>make</em> and the other
+required utilities.  If you don&#8217;t already have Cygwin installed, it is available
+from:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>https://www.cygwin.com</code></pre>
+</div></div>
+<div class="paragraph"><p>You should follow the instructions there for installation of Cygwin.  Make sure
+you set the Cygwin installer so as to install:</p></div>
+<div class="olist loweralpha"><ol class="loweralpha">
+<li>
+<p>
+Perl
+</p>
+</li>
+<li>
+<p>
+Make - found under Devel (or just install all of Devel)
+</p>
+</li>
+<li>
+<p>
+Editors (for nano editor)
+</p>
+</li>
+<li>
+<p>
+bash - found under Shells
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>Many of these will be installed by default and the values will not need to be changed.
+To install a package, click the circle with arrows until it changes to a version number.
+This may not be a complete list of all the packages that need to be installed.
+Be watchful for command failures due to packages not having been installed, and
+if you find such a case, re-run the Cygwin installer and change the package you
+want from <em>skip</em> to <em>install</em>.</p></div>
+<div class="paragraph"><p>Although the R language is required for IGGPIPE, the version of R installed by
+Cygwin (available under the science category) will not be sufficient,
+and correct R installation instructions are given in a later step.
+&#8203;<br />
+&#8203;<br /></p></div>
+</div></div>
+</dd>
+</dl></div>
+</div></div>
+</li>
 <li>
 <p>
 <strong>Change to IGGPIPE directory</strong>
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>All work from the command line while installing IGGPIPE is generally done with
-the current directory set to the IGGPIPE directory where you download the IGGPIPE
-files:</p></div>
+<div class="paragraph"><p>Work from the command line from this point onwards. In OSX, the Terminal program in
+the Utilities folder gives you the command line, while under Windows/Cygwin, the
+Cygwin command line is the place to work.</p></div>
+<div class="paragraph"><p>Start by changing the current directory to the IGGPIPE directory where you
+downloaded the IGGPIPE files:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>cd whatever/IGGPIPE</code></pre>
-</div></div>
-<div class="paragraph"><p>In Windows under Cygwin, you must use the following command after changing to
-the IGGPIPE directory:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>cygpath -am</code></pre>
 </div></div>
 </div></div>
 </li>
@@ -1017,6 +1115,9 @@ command line to open your editor to edit the template file:</p></div>
 <div class="content">
 <pre><code>nano allPathParameters.ours</code></pre>
 </div></div>
+<div class="paragraph"><p>Under Windows, don&#8217;t use Notepad as it will cause problems with DOS versus Unix line ends.
+&#8203;<br />
+&#8203;<br /></p></div>
 </div></div>
 </li>
 <li>
@@ -1031,51 +1132,23 @@ command line to open your editor to edit the template file:</p></div>
 <pre><code>WD := $(BRADYLAB)/Genomes/kmers/IGGPIPE</code></pre>
 </div></div>
 <div class="paragraph"><p>Change the assigned value to the path of your IGGPIPE directory (where you unzipped
-the IGGPIPE files). For example, maybe it would look like this:</p></div>
+the IGGPIPE files).  You can find the correct path to use by changing into the
+IGGPIPE directory (already done above) and entering this command:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>pwd</code></pre>
+</div></div>
+<div class="paragraph"><p>Under Cygwin on Windows, this command will also work:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>cygpath -am .</code></pre>
+</div></div>
+<div class="paragraph"><p>(note the <em>.</em> for current directory)</p></div>
+<div class="paragraph"><p>For example, maybe your WD assignment would look like this:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>WD := /Users/johndoe/Documents/IGGPIPE</code></pre>
 </div></div>
-</div></div>
-</li>
-<li>
-<p>
-<strong>Install make and g++ (Xcode in Mac OSX, Cygwin in Windows)</strong>
-</p>
-<div class="openblock">
-<div class="content">
-<div class="paragraph"><p>IGGPIPE makes use of a utility called <em>make</em>, and also, some of the applications used
-by IGGPIPE are distributed as source code that must be compiled and built into a runnable
-application on the user&#8217;s computer, which requires a C++ compiler (g\++ utility). On
-Linux, these utilities are already installed so you can skip this step. On
-Mac OSX, the Apple Developer Toolkit named Xcode provides these utilities, and it is
-available free from the Apple App Store (Applications, App Store). On Windows, these
-utilities are provided by the Cygwin tools, available from:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>https://www.cygwin.com</code></pre>
-</div></div>
-<div class="paragraph"><p>For Mac OSX, if you don&#8217;t have Xcode installed already, run the App Store
-application, search for "Xcode", and double-click the <em>Install</em> button to install it,
-and even if you do have it installed, make sure you are updated with the latest version.
-I used version 6.4, although later versions should work fine.
-Installation takes quite a long time, during which it appears nothing is happening.
-When it is finished, you can verify that it was installed successfully
-by finding the Xcode application icon in Applications and running it.  It may then
-display a box requesting your computer administrator password so it can install
-additional components. Then, close the Xcode application and go to the command line
-and enter the following command, which checks to see if the command line tools such
-as <em>make</em> and <em>g++</em> are installed, and if not, installs them:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>xcode-select --install</code></pre>
-</div></div>
-<div class="paragraph"><p>To verify they are installed, you can enter this command:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>g++</code></pre>
-</div></div>
-<div class="paragraph"><p>and you should see the error message "clang: error: no input files".</p></div>
 </div></div>
 </li>
 <li>
@@ -1100,10 +1173,10 @@ you must do an installation.  You can find the Jellyfish at:</p></div>
 <div class="content">
 <pre><code>http://www.genome.umd.edu/jellyfish.html</code></pre>
 </div></div>
-<div class="paragraph"><p>I chose the "latest source and binaries" link, then downloaded the .tar.gz file.
-I double-clicked this file in Finder, in the Downloads folder, and it unpacked
-to produce a jellyfish folder. I moved this folder to a directory I made named
-<em>src</em> under my user root directory:</p></div>
+<div class="paragraph"><p>We chose the "latest source and binaries" link, then downloaded the .tar.gz file.
+Double-click this file in Finder, in the Downloads folder, and it unpacks
+to produce a jellyfish folder.  We chose to move this folder to a directory named
+<em>src</em> under our user root directory:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>cd ~
@@ -1114,8 +1187,16 @@ cp Downloads/jellyfish-2.2.3 src</code></pre>
 <div class="paragraph"><p>This version of IGGPIPE was tested with Jellyfish version 2.2.3.  Newer versions should
 work as well. <em>Older versions will not work, because Jellyfish changed its output file
 names. They used to end with "_0" but no longer do!</em></p></div>
-<div class="paragraph"><p>Now the jellyfish program must be compiled and built into an application, and installed
-on your computer.  I used these commands:</p></div>
+<div class="paragraph"><p>Now the Jellyfish program must be compiled into an application and then installed
+on your computer.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<strong>Compile</strong>
+</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>To compile and build Jellyfish on OSX, Linux, or Windows/Cygwin:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>cd ~/src/jellyfish-2.2.3
@@ -1146,14 +1227,25 @@ and adding the following lines <em>after #include &lt;jellyfish/rectangular_bina
     template std::string to_string&lt;long long int&gt;(long long int); // instantiate with long long int
 }</code></pre>
 </div></div>
-<div class="paragraph"><p>That allowed the <em>make</em> to succeed under Windows too.</p></div>
-<div class="paragraph"><p>Then, to install the code, use this command:</p></div>
+<div class="paragraph"><p>That allowed the <em>make</em> to succeed under Windows too.
+&#8203;<br />
+&#8203;<br /></p></div>
+</div></div>
+</dd>
+<dt class="hdlist1">
+<strong>Install</strong>
+</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>To install the Jellyfish program after compiling it, use this command:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>sudo make install</code></pre>
 </div></div>
-<div class="paragraph"><p>The <em>sudo</em> command prompts for a password, and I entered my computer&#8217;s administrator
-password.  The above command places the Jellyfish program in the PATH variable so
+<div class="paragraph"><p>The <em>sudo</em> command prompts for a password.  Enter your computer&#8217;s administrator
+password.  On Windows/Cygwin, leave <em>sudo</em> off the above command.</p></div>
+<div class="paragraph"><p>The <em>make install</em> command places the Jellyfish program in the PATH variable so
 that the program can be run with the command <em>jellyfish</em>. (Sometimes it is necessary
 to log out and back in for a PATH change to take effect). Rerun the "jellyfish --version"
 command to verify that Jellyfish is installed.</p></div>
@@ -1165,6 +1257,10 @@ that is set for it already will usually work fine.  However, if you
 are using a computer with lots of memory, you may want to change the value to take
 advantage of that.  It can be especially helpful if you are working with k-mer sizes
 or genome sizes that produce lots more than 25 million k-mers.</p></div>
+</div></div>
+</dd>
+</dl></div>
+<div class="paragraph"><p>&#8203;<br /></p></div>
 </div></div>
 </li>
 <li>
@@ -1196,7 +1292,9 @@ and log back in so that the Perl location can be added to the PATH, before the
 command will work.</p></div>
 <div class="paragraph"><p>The parameter CMD_PERL in the allPathParameters.ours file is already set to
 <em>perl</em>, which is the command needed to run the Perl program. You shouldn&#8217;t need
-to change it.</p></div>
+to change it.
+&#8203;<br />
+&#8203;<br /></p></div>
 </div></div>
 </li>
 <li>
@@ -1220,13 +1318,34 @@ version number, look for it here:</p></div>
 <div class="content">
 <pre><code>https://www.r-project.org</code></pre>
 </div></div>
-<div class="paragraph"><p>Explicit installation instructions are not given here.  Follow the instructions
+<div class="paragraph"><p>Explicit installation instructions for R are not given here.  Follow the instructions
 provided in the downloaded installation package, then re-run the "Rscript --version"
 command to verify that it is installed.</p></div>
+<div class="paragraph"><p>Windows presented a separate problem.  If R is installed under the "Program Files"
+directory, which is the default for the R installer, an error occurred with the
+message <em>Error: could not find function "dir.exists"</em>.  The only way we could
+find around this problem was to <em>reinstall R</em> under a different directory, such
+as under the <em>cygwin</em> directory, or any directory that has no SPACE character
+in the directory path.  If you are working with Windows, install or reinstall R
+in such a directory, installing the Windows R binary using the regular R Windows
+installer.  For example, we installed into directory C:/cygwin64/home/username/bin/</p></div>
 <div class="paragraph"><p>IGGPIPE does not use any extra R packages.</p></div>
 <div class="paragraph"><p>The parameter CMD_RSCRIPT in the allPathParameters.ours file is already set to
 <em>Rscript</em>, which is the command needed to run the Rscript program. You shouldn&#8217;t
-need to change it.</p></div>
+need to change it, UNLESS you are running Windows.  For Windows, set CMD_RSCRIPT
+to the full path to Rscript.exe.  The correct path to use can be obtained by
+changing into directory containing Rscript.exe and entering the commands:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>readlink -f primer3_core.exe
+cygpath -am  (output from readlink command above)</code></pre>
+</div></div>
+<div class="paragraph"><p>The <em>readlink</em> command produces a path as output, and you put that path as the
+argument to the <em>cygpath</em> command, and it produces a path whose output is the
+value to assign to CMD_RSCRIPT parameter. The <em>readlink</em> command path would
+probably also work.
+&#8203;<br />
+&#8203;<br /></p></div>
 </div></div>
 </li>
 <li>
@@ -1262,17 +1381,14 @@ file, for example:</p></div>
 <div class="content">
 <pre><code>CMD_PRIMER3CORE := ~/Documents/primer3-2.3.6/primer3_core</code></pre>
 </div></div>
-<div class="paragraph"><p>In Windows, the correct path to use can be obtained by changing into directory
-containing primer3_core.exe and entering the commands:</p></div>
+<div class="paragraph"><p>For Windows, as in the previous step involving Rscript, use <em>readlink</em> and
+<em>cygpath</em> to get the paths needed, first changing into the directory where
+primer3_core.exe is located, then:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>readlink -f primer3_core.exe
+<pre><code>readlink -f e-PCR.exe
 cygpath -am  (output from readlink command above)</code></pre>
 </div></div>
-<div class="paragraph"><p>The <em>readlink</em> command produces a path as output, and you put that path as the
-argument to the <em>cygpath</em> command, and it produces a path whose output is the
-value to assign to CMD_PRIMER3CORE parameter. The <em>readlink</em> command path would
-probably also work.</p></div>
 <div class="paragraph"><p>A set of files containing thermodynamic settings is provided with the Primer3
 installation, in a subdirectory of the main Primer3 directory named <em>primer3_config</em>.
 The parameter "DIR_PRIMER3CONFIG" in the allPathParameters.ours file, must be
@@ -1339,7 +1455,7 @@ directory, and if you run it, it will display a page full of usage info:</p></di
 <div class="content">
 <pre><code>e-PCR    (Run e-PCR to see if it works)</code></pre>
 </div></div>
-<div class="paragraph"><p>If you get errors from the <em>make</em> under OSX like I did, here are the changes I
+<div class="paragraph"><p>If you get errors from the <em>make</em> under OSX like we did, here are the changes we
 made that allowed the <em>make</em> to succeed:</p></div>
 <div class="olist loweralpha"><ol class="loweralpha">
 <li>
@@ -1408,11 +1524,11 @@ as a bin folder.</p></div>
 <pre><code>CMD_ALIGNER := ~/bin/muscle3.8.31_i86darwin64</code></pre>
 </div></div>
 <div class="paragraph"><p>For Windows, as in the previous step, use <em>readlink</em> and <em>cygpath</em> to get the paths
-needed, first changing into the directory where muscle3.8.31_i86darwin64.exe is
+needed, first changing into the directory where muscle3.8.31_i86win32.exe is
 located, then:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>readlink -f muscle3.8.31_i86darwin64.exe
+<pre><code>readlink -f muscle3.8.31_i86win32.exe
 cygpath -am  (output from readlink command above)</code></pre>
 </div></div>
 </div></div>
@@ -1444,7 +1560,9 @@ complete without error, and there will be a file named
 "findMers" in the directory, and when that file is run with the <em>findMers</em>
 command shown above following <em>make</em>, it will display a page of usage
 information. The path to "findMers" is already set correctly in the
-allPathParameters.ours file.</p></div>
+allPathParameters.ours file.
+&#8203;<br />
+&#8203;<br /></p></div>
 </div></div>
 </li>
 <li>
@@ -1534,7 +1652,9 @@ and this is the required version for running the test of IGGPIPE.</p></div>
 <div class="paragraph"><p>The RUN instructions for IGGPIPE indicate that primer3settings.txt should be
 edited if you want to change primer settings for your needs. However, whenever
 you want to run the test of IGGPIPE as shown below, you should re-do the above
-copy to use the pristine file for testing.</p></div>
+copy to use the pristine file for testing.
+&#8203;<br />
+&#8203;<br /></p></div>
 </div></div>
 </li>
 <li>
@@ -1567,7 +1687,9 @@ right side file text in the output, and you can also click in the box on the
 bottom that shows the merged text and edit it; when finished you can save the
 merged text to a new file or overwrite one of the two compared files, using
 File, Save Merge. Since we don&#8217;t want to merge these files, exit FileMerge
-without saving anything.</p></div>
+without saving anything.
+&#8203;<br />
+&#8203;<br /></p></div>
 </div></div>
 </li>
 <li>
@@ -1594,7 +1716,7 @@ file logFiles/makeLog.test.txt. You can examine this file after the run to see w
 specifically happened at each step, for example with this command:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>more logFiles/makeLog.test.txt</code></pre>
+<pre><code>less logFiles/makeLog.test.txt</code></pre>
 </div></div>
 <div class="paragraph"><p>Note that the output includes timestamps telling how long each step took to run.</p></div>
 <div class="paragraph"><p>If the pipeline fails, an error message of some kind is displayed, and <em>make</em> stops.
@@ -1664,14 +1786,16 @@ and densities.</p></div>
 <div class="paragraph"><p>The tables at the end of the RUN document describe the columns in these tab-separated
 data files.</p></div>
 <div class="paragraph"><p>To make sure the pipeline ran correctly, compare the MarkersOverlapping_ file to the
-expected result, which is in subdirectory outTestHP11/goodTest:</p></div>
+expected result, which is in subdirectory goodTest:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>diff outTestHP11/MarkersOverlapping_*.tsv outTestHP11/goodTest/</code></pre>
+<pre><code>cmp outTestHP11/MarkersOverlapping_*.tsv goodTest/MarkersOverlapping_*.tsv</code></pre>
 </div></div>
 <div class="paragraph"><p>This command should not produce any output, indicating the two files are identical.
 If it produces output indicating non-identity of the files, you have a problem, so
-proceed to the next step, troubleshooting.</p></div>
+proceed to the next step, troubleshooting.
+&#8203;<br />
+&#8203;<br /></p></div>
 </div></div>
 </li>
 <li>
@@ -1719,25 +1843,25 @@ changes are, or it might produce different output.  Look carefully at version
 numbers and check to see if the output differs for any program that has a different
 version number than what we used.</p></div>
 <div class="paragraph"><p>If IGGPIPE produces a different marker output file than expected, as indicated by
-output being produced by the <em>diff</em> command shown in the preceding step, you
+output being produced by the <em>cmp</em> command shown in the preceding step, you
 should do difference testing on other output files.  Each of the files whose
 prefixes and suffixes are listed in the previous step have a "good" version of
-the file containing the expected results, in folder outTestHP11/goodTest.  Each
+the file containing the expected results, in folder goodTest.  Each
 of those files can be compared to the output IGGPIPE produced when you ran it
-using a <em>diff</em> command to see which ones are good. No output means the files match.
-A shell script named <em>diffKeyFiles.sh</em> is provided that runs <em>diff</em> on each of these
+using a <em>cmp</em> command to see which ones are good. No output means the files match.
+A shell script named <em>cmpKeyFiles.sh</em> is provided that runs <em>cmp</em> on each of these
 files. To use it with the allParameters.test output files:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>source code/shell/diffKeyFiles.sh outTestHP11 goodTest</code></pre>
+<pre><code>source code/shell/cmpKeyFiles.sh outTestHP11 goodTest</code></pre>
 </div></div>
-<div class="paragraph"><p>It will show only a single line of output for each file, saying it diffed the file,
+<div class="paragraph"><p>It will show only a single line of output for each file, saying it compared the file,
 if the files match.  If they don&#8217;t match, you will get a lot of output from the
-mismatches.  A single file can be diffed with this command, for example to diff the
-LCRs_ file:</p></div>
+mismatches.  A single file can be compared with this command, for example to compare
+the LCRs_ file:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>diff outTestHP11/LCRs_*.tsv outTestHP11/goodTest/</code></pre>
+<pre><code>cmp outTestHP11/LCRs_*.tsv goodTest/LCRs_*.tsv</code></pre>
 </div></div>
 <div class="paragraph"><p>If the final output file does not match, but one or more output files do match (starting
 with the first file listed in the previous step), then you can tell which step
@@ -1829,7 +1953,9 @@ cellspacing="0" cellpadding="4">
 version than what we used for testing. For example, a different version of e-PCR
 might cause a mismatch starting at file <em>MarkerErrors_*.tsv</em>. Another possibility
 to be aware of is that the files may in fact be identical except one might have
-Unix line ends and the other might have DOS line ends.</p></div>
+Unix line ends and the other might have DOS line ends.
+&#8203;<br />
+&#8203;<br /></p></div>
 </div></div>
 </li>
 <li>
@@ -1855,7 +1981,9 @@ The program to find Indels is called alignAndGetIndels.R. Run it as follows:</p>
 <pre><code>ls outTestHP11/Markers*.indels.tsv</code></pre>
 </div></div>
 <div class="paragraph"><p>This should list the file <em>outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv</em></p></div>
-<div class="paragraph"><p>You can examine it with Excel or a text editor to see the Indel data it contains.</p></div>
+<div class="paragraph"><p>You can examine it with Excel or a text editor to see the Indel data it contains.
+&#8203;<br />
+&#8203;<br /></p></div>
 </div></div>
 </li>
 <li>
@@ -1878,7 +2006,9 @@ plotIndels.R. Run it as follows:</p></div>
 <pre><code>ls outTestHP11/Markers*.indels.pdf</code></pre>
 </div></div>
 <div class="paragraph"><p>This should list the file <em>outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.pdf</em></p></div>
-<div class="paragraph"><p>You might want to open it and look at the plots.</p></div>
+<div class="paragraph"><p>You might want to open it and look at the plots.
+&#8203;<br />
+&#8203;<br /></p></div>
 </div></div>
 </li>
 <li>
@@ -1906,7 +2036,9 @@ as follows:</p></div>
 You may want to examine it (e.g. in the OSX Preview app) to see the dot plot.</p></div>
 <div class="paragraph"><p>There are other sample parameter files in subdirectory <em>dotplot</em>, although the
 parameter file is fairly straightforward and you probably don&#8217;t need other examples
-to work from.</p></div>
+to work from.
+&#8203;<br />
+&#8203;<br /></p></div>
 </div></div>
 </li>
 <li>
@@ -1946,7 +2078,9 @@ was added compared to the input file
 other types of files or do other types of file data manipulation.  The parameters
 can be challenging to set properly, especially when merging data from a separate
 file, so these sample files can be helpful. Also, when .gff3 files are used, they
-must conform well to the expected GFF3 format else an error is likely to occur.</p></div>
+must conform well to the expected GFF3 format else an error is likely to occur.
+&#8203;<br />
+&#8203;<br /></p></div>
 </div></div>
 </li>
 <li>
@@ -2025,7 +2159,7 @@ Contact me, Ted Toal, <a href="mailto:twtoal@ucdavis.edu">twtoal@ucdavis.edu</a>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-10-08 18:20:38 PDT
+Last updated 2015-10-09 15:34:08 PDT
 </div>
 </div>
 </body>

@@ -23,18 +23,19 @@ with the command:
 
 You can then do the installation process using those files.
 
-I will try to monitor for pull requests if you make useful changes.
+We will try to monitor for pull requests if you make useful changes.
 --
 
 *Requirements for installing IGGPIPE*
 -------------------------------------
-. *64-bit Mac OSX or Linux System*
+. *64-bit Mac OSX, Linux, or Windows/Cygwin System*
 +
 --
 This description focuses on installation on a 64-bit Mac OSX system.  Installation
 has also been tested on 64-bit Linux and 64-bit Windows, and we describe installation
 differences, but command line examples here are for Mac OSX, and Linux and Windows
-users are expected to be savvy enough to translate these to their system.
+users are expected to be savvy enough to translate these to their system. For
+Windows systems, the Cygwin Unix-like tools must be installed.
 IGGPIPE will not work on 32-bit Windows systems.
 --
 
@@ -42,12 +43,12 @@ IGGPIPE will not work on 32-bit Windows systems.
 +
 --
 Before starting the installation, consider whether the computer on which the
-software is to be installed has enough memory for the problem at hand. I have
-been running IGGPIPE using 16GB of RAM, and I'd recommend no less than that amount.
-For larger genomes or more genomes, you will possibly need more. My computer has
-a 2.4 GHz processor, which has been adequate. You should monitor memory usage while
-the pipeline is running, and if it becomes excessive for your computer, you know you
-will need more memory to run those genomes.
+software is to be installed has enough memory for the problem at hand. We have
+been running IGGPIPE using 16GB of RAM, and we recommend no less than that amount.
+For larger genomes or more genomes, you will possibly need more. The computer we
+used has a 2.4 GHz processor, which has been adequate. You should monitor memory
+usage while the pipeline is running, and if it becomes excessive for your computer,
+you know you will need more memory to run those genomes.
 --
 
 . *Work from the command line*
@@ -55,7 +56,7 @@ will need more memory to run those genomes.
 --
 Most work here is done from the command line, by opening the Terminal application.
 You should be familiar with some basic command line commands such as 'cd', 'ls',
-'cp', 'rm', 'mv', 'sudo', 'less' or 'more', 'head' and 'tail', 'man', and 'mkdir'.
+'cp', 'rm', 'mv', 'sudo', 'less', 'head' and 'tail', 'man', and 'mkdir'.
 If you do not know how to use the command line or don't know these basic commands,
 take time to learn a bit. A suggested tutorial (on the long side, but spend as
 little or as much time as you need to feel you can get started here) from UC Davis
@@ -79,18 +80,21 @@ directory with this command:
 +
 --
 You must have a plain text editor you know how to use.  If nothing else, the
-simple editor 'nano', which comes with Mac and Linux systems, will work. On
+simple editor 'nano', which comes with Mac, Linux, and Cygwin, will work. On
 a Mac you can also use the 'TextEdit' program (use Plain Text format).  For Mac,
-the free open-source
-TextWrangler program is strongly recommended, and its more capable version
-called BBEdit is totally worth the $50 price for anyone who regularly edits text files.
-TextWrangler is available from the Apple App Store (Applications, App Store) or
-from:
+the free open-source TextWrangler program is strongly recommended, and its more
+capable version called BBEdit is totally worth the $50 price for anyone who
+regularly edits text files.  TextWrangler is available from the Apple App Store
+(Applications, App Store) or from:
 
 http://www.barebones.com/products/textwrangler
+
+On Windows, 'do not use Notepad', as it will cause problems with DOS vs Unix line
+ends.  If you don't want to use 'nano', look into Notepad++, a free text editor.
 --
 
-. *The following programs/applications will be installed if they aren't already:*
+. *The following programs/applications will be installed as part of this installation
+process if they aren't already:*
 +
 --
 .. Xcode (V6.4 works) (Apple App Store; 'make' and 'g++')
@@ -121,21 +125,90 @@ http://www.barebones.com/products/textwrangler
 *If you want a Quick Start with minimal reading, just look for the command lines
 below and execute them, with occasional skimming of the text just above/below the
 commands.*
+{zwsp} +
+{zwsp} +
 
+. *Install Xcode (Mac OSX only) or Cygwin (Windows only)*
++
+--
+IGGPIPE makes use of a utility called 'make', and also, some of the applications used
+by IGGPIPE are distributed as source code that must be compiled and built into a runnable
+application on the user's computer, which requires a C\++ compiler (g\++ utility). On
+Linux, these utilities are already installed so you can skip this step.
 
+*Xcode (OSX)*::
++
+--
+On Mac OSX, the Apple Developer Toolkit named Xcode provides 'make' and the other
+required utilities.  Xcode is available free from the Apple App Store
+(Applications, App Store).  If you don't have Xcode installed already, run the App Store
+application, search for "Xcode", and double-click the 'Install' button to install it,
+and even if you do have it installed, make sure you are updated with the latest version.
+We used version 6.4, although later versions should work fine.
+Installation takes quite a long time, during which it appears nothing is happening.
+
+When Xcode install is finished, you can verify that it was installed successfully
+by finding the Xcode application icon in Applications and running it.  It may then
+display a box requesting your computer administrator password so it can install
+additional components. Then, close the Xcode application and go to the command line
+and enter the following command, which checks to see if the command line tools such
+as 'make' and 'g++' are installed, and if not, installs them:
+
+  xcode-select --install
+
+To verify they are installed, you can enter this command:
+
+  g++
+
+and you should see the error message "clang: error: no input files".
+{zwsp} +
+{zwsp} +
+--
+
+*Cygwin (Windows)*::
++
+--
+On Windows, the open source Cygwin tools environment provides 'make' and the other
+required utilities.  If you don't already have Cygwin installed, it is available
+from:
+
+  https://www.cygwin.com
+
+You should follow the instructions there for installation of Cygwin.  Make sure
+you set the Cygwin installer so as to install:
+
+.. Perl
+.. Make - found under Devel (or just install all of Devel)
+.. Editors (for nano editor)
+.. bash - found under Shells
+
+Many of these will be installed by default and the values will not need to be changed.
+To install a package, click the circle with arrows until it changes to a version number.
+This may not be a complete list of all the packages that need to be installed.
+Be watchful for command failures due to packages not having been installed, and
+if you find such a case, re-run the Cygwin installer and change the package you
+want from 'skip' to 'install'.
+
+Although the R language is required for IGGPIPE, the version of R installed by
+Cygwin (available under the science category) will not be sufficient,
+and correct R installation instructions are given in a later step.
+{zwsp} +
+{zwsp} +
+--
+--
+
+[start=2]
 . *Change to IGGPIPE directory*
 +
 --
-All work from the command line while installing IGGPIPE is generally done with
-the current directory set to the IGGPIPE directory where you download the IGGPIPE
-files:
+Work from the command line from this point onwards. In OSX, the Terminal program in
+the Utilities folder gives you the command line, while under Windows/Cygwin, the
+Cygwin command line is the place to work.
+
+Start by changing the current directory to the IGGPIPE directory where you
+downloaded the IGGPIPE files:
 
   cd whatever/IGGPIPE
-
-In Windows under Cygwin, you must use the following command after changing to
-the IGGPIPE directory:
-
-  cygpath -am
 --
 
 . *Copy allPathParameters.template file to new file allPathParameters.ours*
@@ -166,6 +239,10 @@ For example, if your text editor is nano, you might use this
 command line to open your editor to edit the template file:
 
   nano allPathParameters.ours
+
+Under Windows, don't use Notepad as it will cause problems with DOS versus Unix line ends.
+{zwsp} +
+{zwsp} +
 --
 
 . *Set WD to your IGGPIPE directory in the allPathParameters.ours file*
@@ -176,43 +253,20 @@ Find the WD parameter in the allPathParameters.ours file, which looks like:
   WD := $(BRADYLAB)/Genomes/kmers/IGGPIPE
 
 Change the assigned value to the path of your IGGPIPE directory (where you unzipped
-the IGGPIPE files). For example, maybe it would look like this:
+the IGGPIPE files).  You can find the correct path to use by changing into the
+IGGPIPE directory (already done above) and entering this command:
+
+  pwd
+
+Under Cygwin on Windows, this command will also work:
+
+  cygpath -am .
+
+(note the '.' for current directory)
+
+For example, maybe your WD assignment would look like this:
 
   WD := /Users/johndoe/Documents/IGGPIPE
---
-
-. *Install make and g++ (Xcode in Mac OSX, Cygwin in Windows)*
-+
---
-IGGPIPE makes use of a utility called 'make', and also, some of the applications used
-by IGGPIPE are distributed as source code that must be compiled and built into a runnable
-application on the user's computer, which requires a C\++ compiler (g\++ utility). On
-Linux, these utilities are already installed so you can skip this step. On
-Mac OSX, the Apple Developer Toolkit named Xcode provides these utilities, and it is
-available free from the Apple App Store (Applications, App Store). On Windows, these
-utilities are provided by the Cygwin tools, available from:
-
-  https://www.cygwin.com
-
-For Mac OSX, if you don't have Xcode installed already, run the App Store
-application, search for "Xcode", and double-click the 'Install' button to install it,
-and even if you do have it installed, make sure you are updated with the latest version.
-I used version 6.4, although later versions should work fine.
-Installation takes quite a long time, during which it appears nothing is happening.
-When it is finished, you can verify that it was installed successfully
-by finding the Xcode application icon in Applications and running it.  It may then
-display a box requesting your computer administrator password so it can install
-additional components. Then, close the Xcode application and go to the command line
-and enter the following command, which checks to see if the command line tools such
-as 'make' and 'g++' are installed, and if not, installs them:
-
-  xcode-select --install
-
-To verify they are installed, you can enter this command:
-
-  g++
-
-and you should see the error message "clang: error: no input files".
 --
 
 . *Install Jellyfish*
@@ -232,10 +286,10 @@ you must do an installation.  You can find the Jellyfish at:
 
   http://www.genome.umd.edu/jellyfish.html
 
-I chose the "latest source and binaries" link, then downloaded the .tar.gz file.
-I double-clicked this file in Finder, in the Downloads folder, and it unpacked
-to produce a jellyfish folder. I moved this folder to a directory I made named
-'src' under my user root directory:
+We chose the "latest source and binaries" link, then downloaded the .tar.gz file.
+Double-click this file in Finder, in the Downloads folder, and it unpacks
+to produce a jellyfish folder.  We chose to move this folder to a directory named
+'src' under our user root directory:
 
   cd ~
   pwd
@@ -246,8 +300,14 @@ This version of IGGPIPE was tested with Jellyfish version 2.2.3.  Newer versions
 work as well. 'Older versions will not work, because Jellyfish changed its output file
 names. They used to end with "_0" but no longer do!'
 
-Now the jellyfish program must be compiled and built into an application, and installed
-on your computer.  I used these commands:
+Now the Jellyfish program must be compiled into an application and then installed
+on your computer.
+
+
+*Compile*::
++
+--
+To compile and build Jellyfish on OSX, Linux, or Windows/Cygwin:
 
   cd ~/src/jellyfish-2.2.3
   ./configure
@@ -279,13 +339,21 @@ namespace std {
 ..........................
 
 That allowed the 'make' to succeed under Windows too.
+{zwsp} +
+{zwsp} +
+--
 
-Then, to install the code, use this command:
+*Install*::
++
+--
+To install the Jellyfish program after compiling it, use this command:
 
   sudo make install
 
-The 'sudo' command prompts for a password, and I entered my computer's administrator
-password.  The above command places the Jellyfish program in the PATH variable so
+The 'sudo' command prompts for a password.  Enter your computer's administrator
+password.  On Windows/Cygwin, leave 'sudo' off the above command.
+
+The 'make install' command places the Jellyfish program in the PATH variable so
 that the program can be run with the command 'jellyfish'. (Sometimes it is necessary
 to log out and back in for a PATH change to take effect). Rerun the "jellyfish --version"
 command to verify that Jellyfish is installed.
@@ -299,6 +367,8 @@ that is set for it already will usually work fine.  However, if you
 are using a computer with lots of memory, you may want to change the value to take
 advantage of that.  It can be especially helpful if you are working with k-mer sizes
 or genome sizes that produce lots more than 25 million k-mers.
+--
+{zwsp} +
 --
 
 . *Install Perl*
@@ -327,6 +397,8 @@ command will work.
 The parameter CMD_PERL in the allPathParameters.ours file is already set to
 'perl', which is the command needed to run the Perl program. You shouldn't need
 to change it.
+{zwsp} +
+{zwsp} +
 --
 
 . *Install R*
@@ -345,17 +417,18 @@ version number, look for it here:
 
   https://www.r-project.org
 
+Explicit installation instructions for R are not given here.  Follow the instructions
+provided in the downloaded installation package, then re-run the "Rscript --version"
+command to verify that it is installed.
+
 Windows presented a separate problem.  If R is installed under the "Program Files"
-directory, which is the default for the R installer, an error occured with the
+directory, which is the default for the R installer, an error occurred with the
 message 'Error: could not find function "dir.exists"'.  The only way we could
 find around this problem was to 'reinstall R' under a different directory, such
 as under the 'cygwin' directory, or any directory that has no SPACE character
 in the directory path.  If you are working with Windows, install or reinstall R
-in such a directory.
-
-Explicit installation instructions are not given here.  Follow the instructions
-provided in the downloaded installation package, then re-run the "Rscript --version"
-command to verify that it is installed.
+in such a directory, installing the Windows R binary using the regular R Windows
+installer.  For example, we installed into directory C:/cygwin64/home/username/bin/
 
 IGGPIPE does not use any extra R packages.
 
@@ -372,6 +445,8 @@ The 'readlink' command produces a path as output, and you put that path as the
 argument to the 'cygpath' command, and it produces a path whose output is the
 value to assign to CMD_RSCRIPT parameter. The 'readlink' command path would
 probably also work.
+{zwsp} +
+{zwsp} +
 --
 
 . *Install Primer3*
@@ -468,7 +543,7 @@ directory, and if you run it, it will display a page full of usage info:
 
   e-PCR    (Run e-PCR to see if it works)
 
-If you get errors from the 'make' under OSX like I did, here are the changes I
+If you get errors from the 'make' under OSX like we did, here are the changes we
 made that allowed the 'make' to succeed:
 
   .. Edit file mmap.cpp and remove "//" from the start of the line that reads
@@ -520,10 +595,10 @@ Now assign the parameter "CMD_ALIGNER" in the allPathParameters.ours file, for e
   CMD_ALIGNER := ~/bin/muscle3.8.31_i86darwin64
 
 For Windows, as in the previous step, use 'readlink' and 'cygpath' to get the paths
-needed, first changing into the directory where muscle3.8.31_i86darwin64.exe is
+needed, first changing into the directory where muscle3.8.31_i86win32.exe is
 located, then:
 
-  readlink -f muscle3.8.31_i86darwin64.exe
+  readlink -f muscle3.8.31_i86win32.exe
   cygpath -am  (output from readlink command above)
 --
 
@@ -551,6 +626,8 @@ complete without error, and there will be a file named
 command shown above following 'make', it will display a page of usage
 information. The path to "findMers" is already set correctly in the
 allPathParameters.ours file.
+{zwsp} +
+{zwsp} +
 --
 
 . *Test trashing and choose deletion method*
@@ -614,6 +691,8 @@ The RUN instructions for IGGPIPE indicate that primer3settings.txt should be
 edited if you want to change primer settings for your needs. However, whenever
 you want to run the test of IGGPIPE as shown below, you should re-do the above
 copy to use the pristine file for testing.
+{zwsp} +
+{zwsp} +
 --
 
 . *Enable Access to FileMerge (optional and Mac only)*
@@ -646,6 +725,8 @@ bottom that shows the merged text and edit it; when finished you can save the
 merged text to a new file or overwrite one of the two compared files, using
 File, Save Merge. Since we don't want to merge these files, exit FileMerge
 without saving anything.
+{zwsp} +
+{zwsp} +
 --
 
 . *Run IGGPIPE using the test parameters in allParameters.test and check for success*
@@ -669,7 +750,7 @@ The 'tee' command routes the piped log output from 'make' to the console and to 
 file logFiles/makeLog.test.txt. You can examine this file after the run to see what
 specifically happened at each step, for example with this command:
 
-  more logFiles/makeLog.test.txt
+  less logFiles/makeLog.test.txt
 
 Note that the output includes timestamps telling how long each step took to run.
 
@@ -706,11 +787,13 @@ data files.
 To make sure the pipeline ran correctly, compare the MarkersOverlapping_ file to the
 expected result, which is in subdirectory goodTest:
 
-  diff outTestHP11/MarkersOverlapping_*.tsv goodTest/
+  cmp outTestHP11/MarkersOverlapping_*.tsv goodTest/MarkersOverlapping_*.tsv
 
 This command should not produce any output, indicating the two files are identical.
 If it produces output indicating non-identity of the files, you have a problem, so
 proceed to the next step, troubleshooting.
+{zwsp} +
+{zwsp} +
 --
 
 . *Troubleshooting*
@@ -755,23 +838,23 @@ numbers and check to see if the output differs for any program that has a differ
 version number than what we used.
 
 If IGGPIPE produces a different marker output file than expected, as indicated by
-output being produced by the 'diff' command shown in the preceding step, you
+output being produced by the 'cmp' command shown in the preceding step, you
 should do difference testing on other output files.  Each of the files whose
 prefixes and suffixes are listed in the previous step have a "good" version of
 the file containing the expected results, in folder goodTest.  Each
 of those files can be compared to the output IGGPIPE produced when you ran it
-using a 'diff' command to see which ones are good. No output means the files match.
-A shell script named 'diffKeyFiles.sh' is provided that runs 'diff' on each of these
+using a 'cmp' command to see which ones are good. No output means the files match.
+A shell script named 'cmpKeyFiles.sh' is provided that runs 'cmp' on each of these
 files. To use it with the allParameters.test output files:
 
-  source code/shell/diffKeyFiles.sh outTestHP11 goodTest
+  source code/shell/cmpKeyFiles.sh outTestHP11 goodTest
 
-It will show only a single line of output for each file, saying it diffed the file,
+It will show only a single line of output for each file, saying it compared the file,
 if the files match.  If they don't match, you will get a lot of output from the
-mismatches.  A single file can be diffed with this command, for example to diff the
-LCRs_ file:
+mismatches.  A single file can be compared with this command, for example to compare
+the LCRs_ file:
 
-  diff outTestHP11/LCRs_*.tsv goodTest/
+  cmp outTestHP11/LCRs_*.tsv goodTest/LCRs_*.tsv
 
 If the final output file does not match, but one or more output files do match (starting
 with the first file listed in the previous step), then you can tell which step
@@ -805,6 +888,8 @@ version than what we used for testing. For example, a different version of e-PCR
 might cause a mismatch starting at file 'MarkerErrors_*.tsv'. Another possibility
 to be aware of is that the files may in fact be identical except one might have
 Unix line ends and the other might have DOS line ends.
+{zwsp} +
+{zwsp} +
 --
 
 . *Run 'make Indels' to align markers and find Indels*
@@ -827,6 +912,8 @@ Check that the output file exists with:
 This should list the file 'outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv'
 
 You can examine it with Excel or a text editor to see the Indel data it contains.
+{zwsp} +
+{zwsp} +
 --
 
 . *Run 'make plotIndels' to plot Indel information*
@@ -846,6 +933,8 @@ Check that the output file exists with:
 This should list the file 'outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.pdf'
 
 You might want to open it and look at the plots.
+{zwsp} +
+{zwsp} +
 --
 
 . *Run dotplot.R to make a dot plot*
@@ -870,6 +959,8 @@ You may want to examine it (e.g. in the OSX Preview app) to see the dot plot.
 There are other sample parameter files in subdirectory 'dotplot', although the
 parameter file is fairly straightforward and you probably don't need other examples
 to work from.
+{zwsp} +
+{zwsp} +
 --
 
 . *Run annotateFile.R to make new files containing annotated marker data in different formats*
@@ -906,6 +997,8 @@ other types of files or do other types of file data manipulation.  The parameter
 can be challenging to set properly, especially when merging data from a separate
 file, so these sample files can be helpful. Also, when .gff3 files are used, they
 must conform well to the expected GFF3 format else an error is likely to occur.
+{zwsp} +
+{zwsp} +
 --
 
 . *Edit primer3settings.txt (optional)*

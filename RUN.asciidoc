@@ -38,7 +38,7 @@ Most work here is done from the command line, by opening the Terminal applicatio
 Commands will be shown here and you may be able to get by with no knowledge of the
 command line, other than knowing how to start it (by starting the Terminal app
 on the Mac). However, ideally you should be familiar with some basic command
-line commands such as 'cd', 'ls', 'cp', 'rm', 'mv', 'sudo', 'less' or 'more',
+line commands such as 'cd', 'ls', 'cp', 'rm', 'mv', 'sudo', 'less',
 'head' and 'tail', 'man', and 'mkdir'. If you do not know how to use the command
 line or don't know these basic commands, you may want to take some time to learn
 a bit. Here are two short tutorial web sites:
@@ -228,7 +228,7 @@ Use this command to get a listing of complete usage information for running
 
   make usage
 
-That command will use the 'more' command to display file 'help.txt'. Press the
+That command will use the 'less' command to display file 'help.txt'. Press the
 space bar to move through the text, or press 'q' to exit from the help text.
 
 If at any point you want to remove ALL files already generated and start anew,
@@ -255,7 +255,7 @@ commands '| tee logFiles/make_kmerIsect_HP14.txt', as in this example:
 Then, after 'make' finishes, you can examine that log file at any time to see
 what the pipeline output was, for example:
 
-  more logFiles/make_kmerIsect_HP14.txt
+  less logFiles/make_kmerIsect_HP14.txt
 
 You should use the 'tee' command each time you
 run the pipeline unless you are sure you won't want to reexamine the output
@@ -296,7 +296,7 @@ Assuming the first steps completed successfully, count the number of k-mers in
 the common unique k-mer file, which is located in the 'Kmers' subfolder of the
 output folder you specified in your allParameters file for parameter DIR_IGGPIPE_OUT.
 The name of the file is 'isect.kmers' and it is a text file containing one k-mer
-per line and nothing else. You can look at it with the 'more' or 'less' command
+per line and nothing else. You can look at it with the 'less' command
 if you want to. To count the number of k-mers in it, use the 'wc -l'
 command, which counts lines in a file, like this (replacing 'outFolderForMyProject'
 with your output folder name):

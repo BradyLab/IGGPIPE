@@ -73,7 +73,7 @@ endif
 # If user invokes 'make usage', show usage info.
 ################################################################################
 usage:
-	more help.txt
+	less help.txt
 
 ################################################################################
 # If user invokes 'make clean', give him some instructions on how to clean.
