@@ -373,12 +373,26 @@ It comes pre-built for OSX and Windows but may need to be compiled for Linux.
 Make sure you download the correct version (primer3, not primer3plus). Put the
 downloaded directory wherever you want on your computer. The file named
 primer3_core (primer3_core.exe on Windows) in the root directory of the
-downloaded package is the executable program file.
+downloaded package is the executable program file.  In Windows it is necessary
+to change the file to be executable, with this command:
+
+  chmod u+x primer3_core.exe
 
 Now assign the parameter "CMD_PRIMER3CORE" in the allPathParameters.ours
 file, for example:
 
   CMD_PRIMER3CORE := ~/Documents/primer3-2.3.6/primer3_core
+
+In Windows, the correct path to use can be obtained by changing into directory
+containing primer3_core.exe and entering the commands:
+
+  readlink -f primer3_core.exe
+  cygpath -am  (output from readlink command above)
+
+The 'readlink' command produces a path as output, and you put that path as the
+argument to the 'cygpath' command, and it produces a path whose output is the
+value to assign to CMD_PRIMER3CORE parameter. The 'readlink' command path would
+probably also work.
 
 A set of files containing thermodynamic settings is provided with the Primer3
 installation, in a subdirectory of the main Primer3 directory named 'primer3_config'.
@@ -386,6 +400,11 @@ The parameter "DIR_PRIMER3CONFIG" in the allPathParameters.ours file, must be
 set to the full path to this directory.  For example:
 
   DIR_PRIMER3CONFIG := /Users/tedtoal/src/primer3-2.3.6/primer3_config
+
+In Windows, the correct path to use can be obtained by changing into the primer3_config
+directory and entering the command:
+
+  cygpath -am
 --
 
 . *Install e-PCR*
@@ -413,12 +432,18 @@ should be able to run e-PCR without further ado.  At the time we downloaded vers
 2.3.12-1, it was only available as source code and it was necessary to run 'make'
 to compile and build the program.
 
-Version 2.3.12-1 had two problems with it that required editing of the source code
-in order for the 'make' operation to complete successfully under OSX. Perhaps these
+Refer to the file 'BUILD.html' in the e-PCR source directory for instructions on
+compiling the source.
+
+Under Windows, the program was able to be built with this command:
+
+  make LF64LDFLAGS= LF64CCFLAGS=-DNATIVE_LARGEFILES links depend all OPTIMIZE=6
+
+Under Mac OSX, there were compile failures that required editing of the source code
+in order for the 'make' operation to complete successfully. Perhaps these
 problems will have been fixed in the version you download (or perhaps a binary
 version will be available at the time you download). Test by trying to build e-PCR.
-Refer to the file 'BUILD.html' in the e-PCR source directory for instructions on
-compiling the source.  For Mac OSX, the source was compiled by changing into the
+For Mac OSX, the source was compiled by changing into the
 directory where the files were unzipped and entering the following command:
 
   cd e-PCR-2.3.12-1
@@ -429,8 +454,8 @@ directory, and if you run it, it will display a page full of usage info:
 
   e-PCR    (Run e-PCR to see if it works)
 
-If you get errors from the 'make' like I did, here are the changes I made that
-allowed the 'make' to succeed:
+If you get errors from the 'make' under OSX like I did, here are the changes I
+made that allowed the 'make' to succeed:
 
   .. Edit file mmap.cpp and remove "//" from the start of the line that reads
         "//#include <sstream>"
@@ -452,6 +477,12 @@ Now assign the parameter "CMD_EPCR" in the allPathParameters.ours file, for
 example:
 
   CMD_EPCR := ~/Documents/e-PCR-2.3.12-1/e-PCR
+
+For Windows, as in the previous step, use 'readlink' and 'cygpath' to get the paths
+needed, first changing into the directory where e-PCR.exe is located, then:
+
+  readlink -f e-PCR.exe
+  cygpath -am  (output from readlink command above)
 --
 
 . *Install MUSCLE*
@@ -473,6 +504,13 @@ as a bin folder.
 Now assign the parameter "CMD_ALIGNER" in the allPathParameters.ours file, for example:
 
   CMD_ALIGNER := ~/bin/muscle3.8.31_i86darwin64
+
+For Windows, as in the previous step, use 'readlink' and 'cygpath' to get the paths
+needed, first changing into the directory where muscle3.8.31_i86darwin64.exe is
+located, then:
+
+  readlink -f muscle3.8.31_i86darwin64.exe
+  cygpath -am  (output from readlink command above)
 --
 
 . *Build findMers*
@@ -671,6 +709,9 @@ directories in file paths, we found that we could use "/" in all the paths in
 the allParameters.ours file and allParameters.test file and it worked fine; we
 did not have to use "\" anywhere.
 
+In Windows, if you need to know the path that you should place into a CMD_
+variable as the full path to a .exe file, use 'readlink -f (exe filename)'.
+
 Windows gave the most problems, and the most common problem with Windows was in
 text file line endings, which under Windows can be either "DOS" or "Unix" line
 endings.  IGGPIPE produces files with Unix line endings exclusively, but it
@@ -678,7 +719,20 @@ generally tolerates input files with either type of line ending.  Most tools
 and programs you might use to examine the files will also tolerate either type
 of line ending, but occasionally, a program requires DOS line endings.  Be aware
 of this situation during troubleshooting, and consider whether the observed
-problem might be one with line endings.
+problem might be one with line endings.  You can determine whether a file has
+DOS line endings with the command:
+
+  cat -v filename | head
+
+If the file has DOS line endings, you will see the character ^M at the end of
+each line. Otherwise, it has Unix line endings. To convert a file with DOS line
+endings to one with Unix line endings:
+
+  tr -d '\r' < filenameDOS > filenameUnix
+
+To convert a file with Unix line endings to one with DOS line endings:
+
+  awk 'sub("$", "\r")' filenameUnix > filenameDOS
 
 Another problem can be program versions.  If you use an older or newer version
 of a program than what we used, the pipeline might fail, depending on what the

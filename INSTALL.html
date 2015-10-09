@@ -1250,13 +1250,29 @@ it. Look for it here:</p></div>
 Make sure you download the correct version (primer3, not primer3plus). Put the
 downloaded directory wherever you want on your computer. The file named
 primer3_core (primer3_core.exe on Windows) in the root directory of the
-downloaded package is the executable program file.</p></div>
+downloaded package is the executable program file.  In Windows it is necessary
+to change the file to be executable, with this command:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>chmod u+x primer3_core.exe</code></pre>
+</div></div>
 <div class="paragraph"><p>Now assign the parameter "CMD_PRIMER3CORE" in the allPathParameters.ours
 file, for example:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>CMD_PRIMER3CORE := ~/Documents/primer3-2.3.6/primer3_core</code></pre>
 </div></div>
+<div class="paragraph"><p>In Windows, the correct path to use can be obtained by changing into directory
+containing primer3_core.exe and entering the commands:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>readlink -f primer3_core.exe
+cygpath -am  (output from readlink command above)</code></pre>
+</div></div>
+<div class="paragraph"><p>The <em>readlink</em> command produces a path as output, and you put that path as the
+argument to the <em>cygpath</em> command, and it produces a path whose output is the
+value to assign to CMD_PRIMER3CORE parameter. The <em>readlink</em> command path would
+probably also work.</p></div>
 <div class="paragraph"><p>A set of files containing thermodynamic settings is provided with the Primer3
 installation, in a subdirectory of the main Primer3 directory named <em>primer3_config</em>.
 The parameter "DIR_PRIMER3CONFIG" in the allPathParameters.ours file, must be
@@ -1264,6 +1280,12 @@ set to the full path to this directory.  For example:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>DIR_PRIMER3CONFIG := /Users/tedtoal/src/primer3-2.3.6/primer3_config</code></pre>
+</div></div>
+<div class="paragraph"><p>In Windows, the correct path to use can be obtained by changing into the primer3_config
+directory and entering the command:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>cygpath -am</code></pre>
 </div></div>
 </div></div>
 </li>
@@ -1293,12 +1315,18 @@ computer.</p></div>
 should be able to run e-PCR without further ado.  At the time we downloaded version
 2.3.12-1, it was only available as source code and it was necessary to run <em>make</em>
 to compile and build the program.</p></div>
-<div class="paragraph"><p>Version 2.3.12-1 had two problems with it that required editing of the source code
-in order for the <em>make</em> operation to complete successfully under OSX. Perhaps these
+<div class="paragraph"><p>Refer to the file <em>BUILD.html</em> in the e-PCR source directory for instructions on
+compiling the source.</p></div>
+<div class="paragraph"><p>Under Windows, the program was able to be built with this command:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>make LF64LDFLAGS= LF64CCFLAGS=-DNATIVE_LARGEFILES links depend all OPTIMIZE=6</code></pre>
+</div></div>
+<div class="paragraph"><p>Under Mac OSX, there were compile failures that required editing of the source code
+in order for the <em>make</em> operation to complete successfully. Perhaps these
 problems will have been fixed in the version you download (or perhaps a binary
 version will be available at the time you download). Test by trying to build e-PCR.
-Refer to the file <em>BUILD.html</em> in the e-PCR source directory for instructions on
-compiling the source.  For Mac OSX, the source was compiled by changing into the
+For Mac OSX, the source was compiled by changing into the
 directory where the files were unzipped and entering the following command:</p></div>
 <div class="literalblock">
 <div class="content">
@@ -1311,8 +1339,8 @@ directory, and if you run it, it will display a page full of usage info:</p></di
 <div class="content">
 <pre><code>e-PCR    (Run e-PCR to see if it works)</code></pre>
 </div></div>
-<div class="paragraph"><p>If you get errors from the <em>make</em> like I did, here are the changes I made that
-allowed the <em>make</em> to succeed:</p></div>
+<div class="paragraph"><p>If you get errors from the <em>make</em> under OSX like I did, here are the changes I
+made that allowed the <em>make</em> to succeed:</p></div>
 <div class="olist loweralpha"><ol class="loweralpha">
 <li>
 <p>
@@ -1346,6 +1374,13 @@ example:</p></div>
 <div class="content">
 <pre><code>CMD_EPCR := ~/Documents/e-PCR-2.3.12-1/e-PCR</code></pre>
 </div></div>
+<div class="paragraph"><p>For Windows, as in the previous step, use <em>readlink</em> and <em>cygpath</em> to get the paths
+needed, first changing into the directory where e-PCR.exe is located, then:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>readlink -f e-PCR.exe
+cygpath -am  (output from readlink command above)</code></pre>
+</div></div>
 </div></div>
 </li>
 <li>
@@ -1371,6 +1406,14 @@ as a bin folder.</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>CMD_ALIGNER := ~/bin/muscle3.8.31_i86darwin64</code></pre>
+</div></div>
+<div class="paragraph"><p>For Windows, as in the previous step, use <em>readlink</em> and <em>cygpath</em> to get the paths
+needed, first changing into the directory where muscle3.8.31_i86darwin64.exe is
+located, then:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>readlink -f muscle3.8.31_i86darwin64.exe
+cygpath -am  (output from readlink command above)</code></pre>
 </div></div>
 </div></div>
 </li>
@@ -1643,6 +1686,8 @@ be found.  Note that with Windows, which uses "\" rather than "/" to separate
 directories in file paths, we found that we could use "/" in all the paths in
 the allParameters.ours file and allParameters.test file and it worked fine; we
 did not have to use "\" anywhere.</p></div>
+<div class="paragraph"><p>In Windows, if you need to know the path that you should place into a CMD_
+variable as the full path to a .exe file, use <em>readlink -f (exe filename)</em>.</p></div>
 <div class="paragraph"><p>Windows gave the most problems, and the most common problem with Windows was in
 text file line endings, which under Windows can be either "DOS" or "Unix" line
 endings.  IGGPIPE produces files with Unix line endings exclusively, but it
@@ -1650,7 +1695,24 @@ generally tolerates input files with either type of line ending.  Most tools
 and programs you might use to examine the files will also tolerate either type
 of line ending, but occasionally, a program requires DOS line endings.  Be aware
 of this situation during troubleshooting, and consider whether the observed
-problem might be one with line endings.</p></div>
+problem might be one with line endings.  You can determine whether a file has
+DOS line endings with the command:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>cat -v filename | head</code></pre>
+</div></div>
+<div class="paragraph"><p>If the file has DOS line endings, you will see the character ^M at the end of
+each line. Otherwise, it has Unix line endings. To convert a file with DOS line
+endings to one with Unix line endings:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>tr -d '\r' &lt; filenameDOS &gt; filenameUnix</code></pre>
+</div></div>
+<div class="paragraph"><p>To convert a file with Unix line endings to one with DOS line endings:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>awk 'sub("$", "\r")' filenameUnix &gt; filenameDOS</code></pre>
+</div></div>
 <div class="paragraph"><p>Another problem can be program versions.  If you use an older or newer version
 of a program than what we used, the pipeline might fail, depending on what the
 changes are, or it might produce different output.  Look carefully at version
@@ -1963,7 +2025,7 @@ Contact me, Ted Toal, <a href="mailto:twtoal@ucdavis.edu">twtoal@ucdavis.edu</a>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-10-08 17:24:48 PDT
+Last updated 2015-10-08 18:20:38 PDT
 </div>
 </div>
 </body>
