@@ -133,7 +133,7 @@ ALL:
 	@echo
 	@echo "Removed all files from the output directory."
 	@echo
-else ifne ($(CLEAN),)
+else ifneq ($(CLEAN),)
 ALL: all_getSeqInfo all_getKmers all_kmerStats all_sortKmers all_getContigFile \
     kmerIsect all_getGenomicPos all_mergeKmers getCommonUniqueKmers findLCRs \
     findIndelGroups all_getDNAseqs findPrimers all_ePCRtesting removeBadMarkers \
