@@ -2,7 +2,7 @@
 # Sample parameter file for annotateFile.R to convert a .tsv file of IGG
 # markers into a .gff3 file that could be used to display markers as a browser
 # track.  Specifically:
-#   1. Reads input file from outTestHP11/goodTest:
+#   1. Reads input file from goodTest directory:
 #       MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv
 #   2. Adds column "ID" containing a unique row ID equal to "ID_nn_YYY" where
 #       "nn" is the integer part of the Hid column and "YYY" is a sequence number
@@ -44,7 +44,7 @@
 # (if one is done) and is the "target" data written to the output file.
 
 inputFileT:
-    path := "outTestHP11/goodTest/MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv"
+    path := "goodTest/MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv"
     type := tsv
     quote := ""
     comment := ""

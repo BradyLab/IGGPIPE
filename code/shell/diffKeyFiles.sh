@@ -1,27 +1,26 @@
-# Run diff on key files in directory $1 to $1/$2
+# Run diff on key files in directory $1 to $2
 
 if [[ -z $1 || -z $2 ]] ; then
     echo "Missing argument 1 and/or 2"
-    echo "Usage: source diffKeyFiles.sh <srcDestDir> <diffSubdir>"
+    echo "Usage: source diffKeyFiles.sh <srcDir> <diffDir>"
     echo "Example: source code/shell/diffKeyFiles.sh outTestHP11 goodTest"
     return
 fi
 
-mkdir -p $1/$2
+mkdir -p $2
 
 function checkIfFilesExistAndDiff {
-    MAINDIR=$1
-    SUBDIR=$2
+    SRCDIR=$1
+    DIFDIR=$2
     PATTERN=$3
-    DEST=$MAINDIR/$SUBDIR/
-    FILES=$MAINDIR/$PATTERN
+    FILES=$SRCDIR/$PATTERN
     for f in $FILES
     do
         if [ ! -f $f ]; then
             echo "File $f does not exist, not diffed"
         else
             echo "Diffing $f"
-            diff $f $DEST
+            diff $f $DIFDIR/
         fi
     done
     }

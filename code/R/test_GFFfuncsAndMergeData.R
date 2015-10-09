@@ -20,7 +20,7 @@ source("Include_MergeDataUsingPosition.R")
 
 # Read a test file data: a file of markers generated between Soly and Sope on
 # the first 14 Mbp of ch01 and ch02.
-dfMarkers = read.table("../../outTestHP11/goodTest/MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv",
+dfMarkers = read.table("../../goodTest/MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv",
     header=TRUE, sep="\t", stringsAsFactors=FALSE)
 head(dfMarkers)
 

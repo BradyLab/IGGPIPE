@@ -1,27 +1,26 @@
-# Copy key files in output directory $1 to $1/$2
+# Copy key files in output directory $1 to $2
 
 if [[ -z $1 || -z $2 ]] ; then
     echo "Missing argument 1 and/or 2"
-    echo "Usage: source copyKeyFiles.sh <srcDestDir> <destSubdir>"
+    echo "Usage: source copyKeyFiles.sh <srcDir> <destDir>"
     echo "Example: source code/shell/copyKeyFiles.sh outTestHP11 goodTest"
     return
 fi
 
-mkdir -p $1/$2
+mkdir -p $2
 
 function checkIfFilesExistAndCopy {
-    MAINDIR=$1
-    SUBDIR=$2
+    SRCDIR=$1
+    DSTDIR=$2
     PATTERN=$3
-    DEST=$MAINDIR/$SUBDIR/
-    FILES=$MAINDIR/$PATTERN
+    FILES=$SRCDIR/$PATTERN
     for f in $FILES
     do
         if [ ! -f $f ]; then
             echo "File $f does not exist, not copied"
         else
             echo "Copying $f"
-            cp $f $DEST
+            cp $f $DSTDIR/
         fi
     done
     }

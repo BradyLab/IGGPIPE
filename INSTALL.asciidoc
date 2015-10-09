@@ -704,9 +704,9 @@ The tables at the end of the RUN document describe the columns in these tab-sepa
 data files.
 
 To make sure the pipeline ran correctly, compare the MarkersOverlapping_ file to the
-expected result, which is in subdirectory outTestHP11/goodTest:
+expected result, which is in subdirectory goodTest:
 
-  diff outTestHP11/MarkersOverlapping_*.tsv outTestHP11/goodTest/
+  diff outTestHP11/MarkersOverlapping_*.tsv goodTest/
 
 This command should not produce any output, indicating the two files are identical.
 If it produces output indicating non-identity of the files, you have a problem, so
@@ -758,7 +758,7 @@ If IGGPIPE produces a different marker output file than expected, as indicated b
 output being produced by the 'diff' command shown in the preceding step, you
 should do difference testing on other output files.  Each of the files whose
 prefixes and suffixes are listed in the previous step have a "good" version of
-the file containing the expected results, in folder outTestHP11/goodTest.  Each
+the file containing the expected results, in folder goodTest.  Each
 of those files can be compared to the output IGGPIPE produced when you ran it
 using a 'diff' command to see which ones are good. No output means the files match.
 A shell script named 'diffKeyFiles.sh' is provided that runs 'diff' on each of these
@@ -771,7 +771,7 @@ if the files match.  If they don't match, you will get a lot of output from the
 mismatches.  A single file can be diffed with this command, for example to diff the
 LCRs_ file:
 
-  diff outTestHP11/LCRs_*.tsv outTestHP11/goodTest/
+  diff outTestHP11/LCRs_*.tsv goodTest/
 
 If the final output file does not match, but one or more output files do match (starting
 with the first file listed in the previous step), then you can tell which step

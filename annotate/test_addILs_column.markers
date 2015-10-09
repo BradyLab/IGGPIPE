@@ -3,7 +3,7 @@
 # test file and writes the result to a new file.  The ILs column gives the ILs
 # whose introgression contains the marker, and the position of the marker within
 # the IL as a percentage of the distance along the introgression.  Specifically:
-#   1. Reads inputFileT file from directory outTestHP11/goodTest:
+#   1. Reads inputFileT file from directory goodTest:
 #       MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv
 #   2. Reads code/R/test_GFFfuncsAndMergeData/ILintrogressions.tsv as inputFileS
 #   3. Adds a new column to the inputFileS data, massaging the numeric "chr" column
@@ -19,7 +19,7 @@
 ################################################################################
 
 inputFileT:
-    path := "outTestHP11/goodTest/MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv"
+    path := "goodTest/MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv"
     type := tsv
 
 ################################################################################

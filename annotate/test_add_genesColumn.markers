@@ -3,7 +3,7 @@
 # test file and write the result to a new file.  The "genes" column gives the
 # genes overlapping or within 3000 bp up/downstream of each marker, and the
 # position of the gene in base-pairs from the marker.  Specifically:
-#   1. Reads inputFileT file from outTestHP11/goodTest:
+#   1. Reads inputFileT file from goodTest directory:
 #       MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv
 #   2. Reads code/R/test_GFFfuncsAndMergeData/ITAG2.4_test.gff3 as inputFileS,
 #       containing a truncated gene model list for the test data used for markers.
@@ -20,7 +20,7 @@
 ################################################################################
 
 inputFileT:
-    path := "outTestHP11/goodTest/MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv"
+    path := "goodTest/MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv"
     type := tsv
 
 ################################################################################
