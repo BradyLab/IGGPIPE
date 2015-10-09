@@ -824,11 +824,14 @@ annotateFile.R as follows:
 
 Check that the output file exists with:
 
-  ls outTestHP11/MarkersAnnotated.*
+  ls outTestHP11/MarkersAnnotated*
 
-This should list file 'MarkersAnnotated.test.tsv' in the outTestHP11 folder.
+This should list file
+'MarkersAnnotated_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv'
+in the outTestHP11 folder.
 You can examine this file with a text editor or Excel to see the new column that
-was added compared to the input file 'MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv'.
+was added compared to the input file
+'MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv'.
 
 There are other sample parameter files in subdirectory 'annotate' which produce
 other types of files or do other types of file data manipulation.  The parameters
