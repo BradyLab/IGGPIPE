@@ -298,7 +298,7 @@ extensionLen = (nchar(df[1, refDnaSeqCol]) - kmerLen)/2
 catnow("Matching k-mers 1...")
 kmer1idxs = match(dfMarkers$kmer1, df$kmer)
 catnow("\n")
-catnow("Matching k-mers 1...")
+catnow("Matching k-mers 2...")
 kmer2idxs = match(dfMarkers$kmer2, df$kmer)
 catnow("\n")
 

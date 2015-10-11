@@ -24,6 +24,7 @@ if [[ $CLEANTGT != "NONE" ]] ; then
 fi
 
 if [[ $CLEANTGT == "ALL" ]] ; then
+    echo "make PARAMS=allParameters.test CLEAN=1 IndelsSNPs"
     echo "make PARAMS=allParameters.test CLEAN=1 plotIndels"
     make PARAMS=allParameters.test CLEAN=1 plotIndels
     echo "rm -f $CLEANTGT/MarkersAnnotated_*"

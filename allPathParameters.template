@@ -165,7 +165,7 @@ PATH_FIND_PRIMERS := $(DIR_R)/findPrimers.R
 PATH_EPCR_TESTING := $(DIR_R)/ePCRtesting.R
 PATH_RMV_BAD_MARKERS := $(DIR_R)/removeBadMarkers.R
 PATH_PLOT_MARKERS := $(DIR_R)/plotMarkers.R
-PATH_ALIGN_AND_GET_INDELS := $(DIR_R)/alignAndGetIndels.R
+PATH_PATH_ALIGN_AND_GET_INDELS_SNPS := $(DIR_R)/alignAndGetIndelsSNPs.R
 PATH_PLOT_INDELS := $(DIR_R)/plotIndels.R
 
 ################################################################################

@@ -1506,7 +1506,7 @@ cygpath -am  (output from readlink command above)</code></pre>
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>MUSCLE is an open-domain multiple sequence aligner.  It is used by IGGPIPE only
-if you choose to search markers or LCRs for Indels by using the <em>make Indels</em>
+if you choose to search markers or LCRs for Indels and SNPs by using the <em>make IndelsSNPs</em>
 command, so if you don&#8217;t do that you can skip this step, although you may as
 well install it. This version of IGGPIPE was tested with MUSCLE version v.8.31,
 although later versions will probably be fine. To install MUSCLE, look for it
@@ -1577,7 +1577,7 @@ There are two different ways it can delete files: it can actually delete them,
 or it can move them to a trash folder where they can be found and undeleted
 if necessary. A script file (code/shell/trash.sh) is provided to move files to
 the Mac OSX trash
-folder, but for linux or Windows, you must either modify that script file so
+folder, but for Linux or Windows, you must either modify that script file so
 that it will work with your operating system, or choose the other method that
 simply deletes files.</p></div>
 <div class="paragraph"><p>You must choose which of these methods you want. Since the trash folder method is
@@ -1866,8 +1866,8 @@ the LCRs_ file:</p></div>
 <div class="paragraph"><p>If the final output file does not match, but one or more output files do match (starting
 with the first file listed in the previous step), then you can tell which step
 produced an incorrect result based on which file in the list is the first one that
-is incorrect.  The following <em>make</em> steps produce the following output files (italicized
-output files are those available in the goodTest subdirectory for comparison to your files):</p></div>
+is incorrect.  The following <em>make</em> steps produce the following output files <em>(italicized
+output files are those available in the goodTest subdirectory for comparison to your files)</em>:</p></div>
 <div class="tableblock">
 <table rules="all"
 width="100%"
@@ -1877,29 +1877,29 @@ cellspacing="0" cellpadding="4">
 <col width="50%" />
 <thead>
 <tr>
-<th align="left" valign="top"><em>make</em> Command</th>
+<th align="left" valign="top"><em>make</em> command or other command</th>
 <th align="left" valign="top">Produces output file(s)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left" valign="top"><p class="table">a. make PARAMS=myFilename getSeqInfo    GENOME=ALL</p></td>
+<td align="left" valign="top"><p class="table">a. make PARAMS=myFilename getSeqInfo</p></td>
 <td align="left" valign="top"><p class="table">GenomeData/*.idlens</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">b. make PARAMS=myFilename getContigFile GENOME=ALL</p></td>
+<td align="left" valign="top"><p class="table">b. make PARAMS=myFilename getContigFile</p></td>
 <td align="left" valign="top"><p class="table">GenomeData/*.contigs</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">c. make PARAMS=myFilename getKmers      GENOME=ALL</p></td>
+<td align="left" valign="top"><p class="table">c. make PARAMS=myFilename getKmers</p></td>
 <td align="left" valign="top"><p class="table">Kmers/Kmers_*.kmers</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">d. make PARAMS=myFilename kmerStats     GENOME=ALL</p></td>
+<td align="left" valign="top"><p class="table">d. make PARAMS=myFilename kmerStats</p></td>
 <td align="left" valign="top"><p class="table">Kmers/Kmers_*.stats</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">e. make PARAMS=myFilename sortKmers     GENOME=ALL</p></td>
+<td align="left" valign="top"><p class="table">e. make PARAMS=myFilename sortKmers</p></td>
 <td align="left" valign="top"><p class="table">Kmers/Kmers_*.sorted</p></td>
 </tr>
 <tr>
@@ -1907,11 +1907,11 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Kmers/isect.kmers</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">g. make PARAMS=myFilename getGenomicPos GENOME=ALL</p></td>
+<td align="left" valign="top"><p class="table">g. make PARAMS=myFilename getGenomicPos</p></td>
 <td align="left" valign="top"><p class="table">Kmers/Kmers_*.isect</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">h. make PARAMS=myFilename mergeKmers    GENOME=ALL</p></td>
+<td align="left" valign="top"><p class="table">h. make PARAMS=myFilename mergeKmers</p></td>
 <td align="left" valign="top"><p class="table">Kmers/Kmers_*.merge</p></td>
 </tr>
 <tr>
@@ -1927,7 +1927,7 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table"><em>IndelGroupsOverlapping_*.tsv, IndelGroupsNonoverlapping_*.tsv</em></p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">l. make PARAMS=myFilename getDNAseqs    GENOME=ALL</p></td>
+<td align="left" valign="top"><p class="table">l. make PARAMS=myFilename getDNAseqs</p></td>
 <td align="left" valign="top"><p class="table"><em>DNAseqs_*.dnaseqs</em></p></td>
 </tr>
 <tr>
@@ -1935,7 +1935,7 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table"><em>NonvalidatedMarkers_*.tsv</em></p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">n. make PARAMS=myFilename ePCRtesting   GENOME=ALL</p></td>
+<td align="left" valign="top"><p class="table">n. make PARAMS=myFilename ePCRtesting</p></td>
 <td align="left" valign="top"><p class="table"><em>MarkerErrors_*.tsv</em></p></td>
 </tr>
 <tr>
@@ -1946,10 +1946,36 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">p. make PARAMS=myFilename plotMarkers</p></td>
 <td align="left" valign="top"><p class="table"><em>MarkerCounts_*.pdf, MarkerDensity_*.png</em></p></td>
 </tr>
+<tr>
+<td align="left" valign="top"><p class="table">q. make PARAMS=myFilename IndelsSNPs</p></td>
+<td align="left" valign="top"><p class="table"><em>MarkersNonoverlapping_*.indels.tsv, MarkersNonoverlapping_*.snps.tsv</em></p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">r. make PARAMS=myFilename plotIndels</p></td>
+<td align="left" valign="top"><p class="table"><em>MarkersNonoverlapping_*.indels.pdf</em></p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">s. Rscript code/R/dotplot.R dotplot.template</p></td>
+<td align="left" valign="top"><p class="table"><em>LCRs_*.dotplot.png</em></p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">t. Rscript code/R/annotateFile.R annotate.template</p></td>
+<td align="left" valign="top"><p class="table"><em>MarkersAnnotated_*.tsv</em></p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">u. Rscript code/R/annotateFile.R annotate/HP11_isInNearColumn.markers</p></td>
+<td align="left" valign="top"><p class="table"><em>MarkersAnnotated_WithInNearFeatures_*.indels.tsv</em></p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">v. Rscript code/R/annotateFile.R annotate/HP11_to_gff3.markers</p></td>
+<td align="left" valign="top"><p class="table"><em>MarkersAnnotated_GFF3_*.gff3</em></p></td>
+</tr>
 </tbody>
 </table>
 </div>
-<div class="paragraph"><p>The different results might be due to running a software package of a different
+<div class="paragraph"><p>(Note that some of the files listed above are produced by steps to be described below).</p></div>
+<div class="paragraph"><p>Different results between the goodTest directory files and your outTestHP11
+directory files might be due to running a software package of a different
 version than what we used for testing. For example, a different version of e-PCR
 might cause a mismatch starting at file <em>MarkerErrors_*.tsv</em>. Another possibility
 to be aware of is that the files may in fact be identical except one might have
@@ -1960,28 +1986,31 @@ Unix line ends and the other might have DOS line ends.
 </li>
 <li>
 <p>
-<strong>Run <em>make Indels</em> to align markers and find Indels</strong>
+<strong>Run <em>make IndelsSNPs</em> to align markers and find Indels and SNPs</strong>
 </p>
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>An R program that is NOT run as part of the pipeline when the <em>make &#8230; ALL</em> target
-is built, but which can be run using <em>make &#8230; Indels</em>, is able to read a file of LCRs,
+is built, but which can be run using <em>make &#8230; IndelsSNPs</em>, is able to read a file of LCRs,
 non-overlapping IndelGroups, or non-overlapping Markers, extract the DNA sequences
 from the genomes in each LCR or Marker region and align them, then locate all
-Indels in the aligned sequences and write their positions to a file.  The input file
-to be used is selected with parameter PATH_INDELS_INPUT_FILE in the allParameters.* file.
-The program to find Indels is called alignAndGetIndels.R. Run it as follows:</p></div>
+Indels and SNPs in the aligned sequences and write their positions to an Indels file
+and a SNPs file.  The input file to be used is selected with parameter
+PATH_INDELS_SNPS_INPUT_FILE in the allParameters.* file.
+The program to find Indels and SNPs is called alignAndGetIndelsSNPs.R. Run it as follows:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.test Indels</code></pre>
+<pre><code>make PARAMS=allParameters.test IndelsSNPs</code></pre>
 </div></div>
-<div class="paragraph"><p>Check that the output file exists with:</p></div>
+<div class="paragraph"><p>Check that the output files exist with:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>ls outTestHP11/Markers*.indels.tsv</code></pre>
+<pre><code>ls outTestHP11/Markers*.indels.tsv
+ls outTestHP11/Markers*.snps.tsv</code></pre>
 </div></div>
-<div class="paragraph"><p>This should list the file <em>outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv</em></p></div>
-<div class="paragraph"><p>You can examine it with Excel or a text editor to see the Indel data it contains.
+<div class="paragraph"><p>This should list the files <em>outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv</em>
+and  <em>outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.snps.tsv</em></p></div>
+<div class="paragraph"><p>You can examine them with Excel or a text editor to see the Indel and SNP data they contain.
 &#8203;<br />
 &#8203;<br /></p></div>
 </div></div>
@@ -1994,7 +2023,7 @@ The program to find Indels is called alignAndGetIndels.R. Run it as follows:</p>
 <div class="content">
 <div class="paragraph"><p>Another R program that is NOT run as part of the pipeline when the <em>make &#8230; ALL</em> target
 is built, but which can be run using <em>make &#8230; plotIndels</em>, reads the Indels file produced
-by <em>make &#8230; Indels</em> and plots information from it in a pdf file. The program is called
+by <em>make &#8230; IndelsSNPs</em> and plots information from it in a pdf file. The program is called
 plotIndels.R. Run it as follows:</p></div>
 <div class="literalblock">
 <div class="content">
@@ -2159,7 +2188,7 @@ Contact me, Ted Toal, <a href="mailto:twtoal@ucdavis.edu">twtoal@ucdavis.edu</a>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-10-09 15:34:08 PDT
+Last updated 2015-10-11 11:04:28 PDT
 </div>
 </div>
 </body>

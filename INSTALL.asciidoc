@@ -578,7 +578,7 @@ needed, first changing into the directory where e-PCR.exe is located, then:
 +
 --
 MUSCLE is an open-domain multiple sequence aligner.  It is used by IGGPIPE only
-if you choose to search markers or LCRs for Indels by using the 'make Indels'
+if you choose to search markers or LCRs for Indels and SNPs by using the 'make IndelsSNPs'
 command, so if you don't do that you can skip this step, although you may as
 well install it. This version of IGGPIPE was tested with MUSCLE version v.8.31,
 although later versions will probably be fine. To install MUSCLE, look for it
@@ -639,7 +639,7 @@ There are two different ways it can delete files: it can actually delete them,
 or it can move them to a trash folder where they can be found and undeleted
 if necessary. A script file (code/shell/trash.sh) is provided to move files to
 the Mac OSX trash
-folder, but for linux or Windows, you must either modify that script file so
+folder, but for Linux or Windows, you must either modify that script file so
 that it will work with your operating system, or choose the other method that
 simply deletes files.
 
@@ -859,31 +859,40 @@ the LCRs_ file:
 If the final output file does not match, but one or more output files do match (starting
 with the first file listed in the previous step), then you can tell which step
 produced an incorrect result based on which file in the list is the first one that
-is incorrect.  The following 'make' steps produce the following output files (italicized
-output files are those available in the goodTest subdirectory for comparison to your files):
+is incorrect.  The following 'make' steps produce the following output files '(italicized
+output files are those available in the goodTest subdirectory for comparison to your files)':
 
 [options="header"]
 |===================================================
-|'make' Command|Produces output file(s)
-|a. make PARAMS=myFilename getSeqInfo    GENOME=ALL|GenomeData/*.idlens
-|b. make PARAMS=myFilename getContigFile GENOME=ALL|GenomeData/*.contigs
-|c. make PARAMS=myFilename getKmers      GENOME=ALL|Kmers/Kmers_*.kmers
-|d. make PARAMS=myFilename kmerStats     GENOME=ALL|Kmers/Kmers_*.stats
-|e. make PARAMS=myFilename sortKmers     GENOME=ALL|Kmers/Kmers_*.sorted
+|'make' command or other command|Produces output file(s)
+|a. make PARAMS=myFilename getSeqInfo|GenomeData/*.idlens
+|b. make PARAMS=myFilename getContigFile|GenomeData/*.contigs
+|c. make PARAMS=myFilename getKmers|Kmers/Kmers_*.kmers
+|d. make PARAMS=myFilename kmerStats|Kmers/Kmers_*.stats
+|e. make PARAMS=myFilename sortKmers|Kmers/Kmers_*.sorted
 |f. make PARAMS=myFilename kmerIsect|Kmers/isect.kmers
-|g. make PARAMS=myFilename getGenomicPos GENOME=ALL|Kmers/Kmers_*.isect
-|h. make PARAMS=myFilename mergeKmers    GENOME=ALL|Kmers/Kmers_*.merge
+|g. make PARAMS=myFilename getGenomicPos|Kmers/Kmers_*.isect
+|h. make PARAMS=myFilename mergeKmers|Kmers/Kmers_*.merge
 |i. make PARAMS=myFilename getCommonUniqueKmers|Kmers/common.unique.kmers
 |j. make PARAMS=myFilename findLCRs|'LCRs_*.tsv, BadKmers_*.tsv'
 |k. make PARAMS=myFilename findIndelGroups|'IndelGroupsOverlapping_*.tsv, IndelGroupsNonoverlapping_*.tsv'
-|l. make PARAMS=myFilename getDNAseqs    GENOME=ALL|'DNAseqs_*.dnaseqs'
+|l. make PARAMS=myFilename getDNAseqs|'DNAseqs_*.dnaseqs'
 |m. make PARAMS=myFilename findPrimers|'NonvalidatedMarkers_*.tsv'
-|n. make PARAMS=myFilename ePCRtesting   GENOME=ALL|'MarkerErrors_*.tsv'
+|n. make PARAMS=myFilename ePCRtesting|'MarkerErrors_*.tsv'
 |o. make PARAMS=myFilename removeBadMarkers|'MarkersOverlapping_*.tsv, MarkersNonoverlapping_*.tsv'
 |p. make PARAMS=myFilename plotMarkers|'MarkerCounts_*.pdf, MarkerDensity_*.png'
+|q. make PARAMS=myFilename IndelsSNPs|'MarkersNonoverlapping_*.indels.tsv, MarkersNonoverlapping_*.snps.tsv'
+|r. make PARAMS=myFilename plotIndels|'MarkersNonoverlapping_*.indels.pdf'
+|s. Rscript code/R/dotplot.R dotplot.template|'LCRs_*.dotplot.png'
+|t. Rscript code/R/annotateFile.R annotate.template|'MarkersAnnotated_*.tsv'
+|u. Rscript code/R/annotateFile.R annotate/HP11_isInNearColumn.markers|'MarkersAnnotated_WithInNearFeatures_*.indels.tsv'
+|v. Rscript code/R/annotateFile.R annotate/HP11_to_gff3.markers|'MarkersAnnotated_GFF3_*.gff3'
 |===================================================
 
-The different results might be due to running a software package of a different
+(Note that some of the files listed above are produced by steps to be described below).
+
+Different results between the goodTest directory files and your outTestHP11
+directory files might be due to running a software package of a different
 version than what we used for testing. For example, a different version of e-PCR
 might cause a mismatch starting at file 'MarkerErrors_*.tsv'. Another possibility
 to be aware of is that the files may in fact be identical except one might have
@@ -892,26 +901,29 @@ Unix line ends and the other might have DOS line ends.
 {zwsp} +
 --
 
-. *Run 'make Indels' to align markers and find Indels*
+. *Run 'make IndelsSNPs' to align markers and find Indels and SNPs*
 +
 --
 An R program that is NOT run as part of the pipeline when the 'make ... ALL' target
-is built, but which can be run using 'make ... Indels', is able to read a file of LCRs,
+is built, but which can be run using 'make ... IndelsSNPs', is able to read a file of LCRs,
 non-overlapping IndelGroups, or non-overlapping Markers, extract the DNA sequences
 from the genomes in each LCR or Marker region and align them, then locate all
-Indels in the aligned sequences and write their positions to a file.  The input file
-to be used is selected with parameter PATH_INDELS_INPUT_FILE in the allParameters.* file.
-The program to find Indels is called alignAndGetIndels.R. Run it as follows:
+Indels and SNPs in the aligned sequences and write their positions to an Indels file
+and a SNPs file.  The input file to be used is selected with parameter
+PATH_INDELS_SNPS_INPUT_FILE in the allParameters.* file.
+The program to find Indels and SNPs is called alignAndGetIndelsSNPs.R. Run it as follows:
 
-  make PARAMS=allParameters.test Indels
+  make PARAMS=allParameters.test IndelsSNPs
 
-Check that the output file exists with:
+Check that the output files exist with:
 
   ls outTestHP11/Markers*.indels.tsv
+  ls outTestHP11/Markers*.snps.tsv
 
-This should list the file 'outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv'
+This should list the files 'outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv'
+and  'outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.snps.tsv'
 
-You can examine it with Excel or a text editor to see the Indel data it contains.
+You can examine them with Excel or a text editor to see the Indel and SNP data they contain.
 {zwsp} +
 {zwsp} +
 --
@@ -921,7 +933,7 @@ You can examine it with Excel or a text editor to see the Indel data it contains
 --
 Another R program that is NOT run as part of the pipeline when the 'make ... ALL' target
 is built, but which can be run using 'make ... plotIndels', reads the Indels file produced
-by 'make ... Indels' and plots information from it in a pdf file. The program is called
+by 'make ... IndelsSNPs' and plots information from it in a pdf file. The program is called
 plotIndels.R. Run it as follows:
 
   make PARAMS=allParameters.test plotIndels

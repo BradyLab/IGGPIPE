@@ -397,6 +397,17 @@ PLOT_NDAMIN := 3
 PLOT_ALPHA := 0.5
 
 
+# For finding Indels and SNPs with 'make IndelsSNPs', this parameter sets the
+# maximum number of SNPs, in terms of fraction of the total sequence length,
+# that may exist between any pair of genomes and still examine the sequence set
+# for Indels and SNPs.  If more than this fraction of SNPs is found, that
+# sequence set is ignored.  Sequence sets are either LCRs, Indel Groups, or
+# Markers (set by a later parameter).  Set this to reject sequence sets that
+# have an anomalously high number of SNPs, which might indicate a false positive
+# LCR, Indel Group, or marker.
+MAX_SNPS_FRAC := 0.1
+
+
 ################################################################################
 # Paths of primer data files.
 ################################################################################
@@ -605,27 +616,28 @@ PFX_MARKER_DENSITY_PATH := $(DIR_MAIN_OUTPUT)/$(PFX_MARKER_DENSITY_FILE)$(SFX_GO
 
 
 # Path of input file for aligning LCRs or IndelGroups or Markers and locating the
-# Indels in the alignment.  Used only if 'make Indels' command is run.  This path
-# can be any of three different files, shown here commented out: the LCRs file,
-# the non-overlapping IndelGroups file, or the non-overlapping markers file.
-# The output file containing the Indel positions is the same name as the input
-# file with the .suffix replaced with the suffix ".indels.tsv".
-# Copy and uncomment the ONE you want to use to find Indels if you intend to run
-# 'make Indels'.
+# Indels and SNPs in the alignment.  Used only if 'make IndelsSNPs' command is run.
+# This path can be any of three different files, shown here commented out: the LCRs
+# file, the non-overlapping IndelGroups file, or the non-overlapping markers file.
+# The output files containing the Indel AND SNP positions are the same name as the
+# input file with the .suffix replaced with the suffix ".indels.tsv" and ".snps.tsv".
+# Copy and uncomment the ONE you want to use to find Indels and SNPs if you intend
+# to run 'make IndelsSNPs'.
 
-#PATH_INDELS_INPUT_FILE := $(PATH_LCR_FILE)
-#PATH_INDELS_INPUT_FILE := $(PATH_NONOVERLAPPING_INDEL_GROUPS_FILE)
-#PATH_INDELS_INPUT_FILE := $(PATH_NONOVERLAPPING_MARKERS_FILE)
+#PATH_INDELS_SNPS_INPUT_FILE := $(PATH_LCR_FILE)
+#PATH_INDELS_SNPS_INPUT_FILE := $(PATH_NONOVERLAPPING_INDEL_GROUPS_FILE)
+#PATH_INDELS_SNPS_INPUT_FILE := $(PATH_NONOVERLAPPING_MARKERS_FILE)
 # Let's use the markers file.
-PATH_INDELS_INPUT_FILE := $(PATH_NONOVERLAPPING_MARKERS_FILE)
+PATH_INDELS_SNPS_INPUT_FILE := $(PATH_NONOVERLAPPING_MARKERS_FILE)
 
 
-# Path of Indels output file, used only if 'make Indels' command is run to find
-# actual Indel positions.
+# Path of Indels and SNPs output files, used only if 'make IndelsSNPs' command is
+# run to find Indels and SNPs.
 
-# Replace the ".<suffix>" on PATH_INDELS_INPUT_FILE with ".indels.<suffix>" to
-# form the output file name.
-PATH_INDELS_OUTPUT_FILE := $(basename $(PATH_INDELS_INPUT_FILE)).indels$(suffix $(PATH_INDELS_INPUT_FILE))
+# Replace the ".<suffix>" on PATH_INDELS_SNPS_INPUT_FILE with ".indels.<suffix>"
+# and ".snps.<suffix>" to form the output file names.
+PATH_INDELS_OUTPUT_FILE := $(basename $(PATH_INDELS_SNPS_INPUT_FILE)).indels$(suffix $(PATH_INDELS_SNPS_INPUT_FILE))
+PATH_SNPS_OUTPUT_FILE := $(basename $(PATH_INDELS_SNPS_INPUT_FILE)).snps$(suffix $(PATH_INDELS_SNPS_INPUT_FILE))
 
 
 # Path of Indels plot file, used only if 'make plotIndels' command is run to plot
@@ -691,7 +703,7 @@ INVESTIGATE_RMVBADMARKERS := FALSE
 
 # Produce debug output when extracting and aligning sequences and locating Indels.
 
-INVESTIGATE_ALIGN_AND_GET_INDELS := FALSE
+INVESTIGATE_PATH_ALIGN_AND_GET_INDELS_SNPS := FALSE
 
 
 ################################################################################

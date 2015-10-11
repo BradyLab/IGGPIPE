@@ -850,19 +850,13 @@ plotMarkers:
 	@echo
 endif
 
-# MARKER_COUNTS_FILE and MARKER_DENSITY_FILES targets are built at the same time.
-# Define target names with % in them, so we can create a pattern target.  The %
-# tells make that all the target files are made at one time by the recipe.  Here
-# the only thing in common between the names is ".plot.", which is what % matches.
-PTN_COUNTS_FILE := $(PFX_MARKER_COUNTS_PATH)%pdf
-PTN_DENSITY_FILES := $(foreach G,$(GENOME_LETTERS),$(PFX_MARKER_DENSITY_PATH)_$(G)%png)
+# MARKER_COUNTS_FILE and MARKER_DENSITY_FILES target.
 
-# Use the patterns in a pattern target.
-$(PTN_COUNTS_FILE) $(PTN_DENSITY_FILES) : $(PATH_OVERLAPPING_MARKERS_FILE) $(PATH_NONOVERLAPPING_MARKERS_FILE) \
+$(MARKER_COUNTS_FILE) $(MARKER_DENSITY_FILES) : $(PATH_OVERLAPPING_MARKERS_FILE) $(PATH_NONOVERLAPPING_MARKERS_FILE) \
         $(IDLEN_FILES) | $(PATH_PLOT_MARKERS)
 	@echo
 	@echo "*** plotMarkers PARAMS=$(PARAMS) ***"
-	@echo "Make density plots of 'good' candidate IGG markers to file $@"
+	@echo "Make density plots of 'good' candidate IGG markers to output files"
 	$(TIME) $(CMD_RSCRIPT) $(PATH_PLOT_MARKERS) $(WD) $(PLOT_NDAMIN) $(PLOT_ALPHA) \
 	    $(PATH_OVERLAPPING_MARKERS_FILE) \
 	    $(PATH_NONOVERLAPPING_MARKERS_FILE) \
@@ -872,48 +866,49 @@ $(PTN_COUNTS_FILE) $(PTN_DENSITY_FILES) : $(PATH_OVERLAPPING_MARKERS_FILE) $(PAT
 	@echo "Finished."
 
 ################################################################################
-# Indels: Read input file and perform alignments, then search them for Indels.
+# IndelsSNPs: Read input file and perform alignments, then search them for
+# Indels and SNPs.
 ################################################################################
 
 # A list of all FASTA files already defined above: FASTA_FILES
 
 # Do this to avoid case annoyance.
-indels: Indels
+indelsSNPs: IndelsSNPs
 
-# Phony target to make or clean PATH_INDELS_OUTPUT_FILE file.
-# If variable PARAMS is not defined, show basic usage info, else make Indels
+# Phony target to make or clean PATH_INDELS_OUTPUT_FILE and PATH_SNPS_OUTPUT_FILE files.
+# If variable PARAMS is not defined, show basic usage info, else make IndelsSNPs
 # output file target.
 ifeq ($(PARAMS),)
-Indels:
+IndelsSNPs:
 	@echo
 	@echo "You must specify a PARAMS file:"
 	@echo
-	@echo "$(INDENT)make PARAMS=<allParametersFile> Indels"
+	@echo "$(INDENT)make PARAMS=<allParametersFile> IndelsSNPs"
 	@echo 
 else ifeq ($(CLEAN),)
-Indels: $(PATH_INDELS_OUTPUT_FILE)
+IndelsSNPs: $(PATH_INDELS_OUTPUT_FILE) $(PATH_SNPS_OUTPUT_FILE)
 	@echo
-	@echo "Indels files are up to date."
+	@echo "Indels and SNPs files are up to date."
 	@echo
 else
-Indels:
-	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_INDELS_OUTPUT_FILE)
-	@echo "Indels output file(s) removed."
+IndelsSNPs:
+	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_INDELS_OUTPUT_FILE) $(PATH_SNPS_OUTPUT_FILE)
+	@echo "Indels and SNPs output file(s) removed."
 	@echo
 endif
 
-# PATH_INDELS_OUTPUT_FILE target.
+# PATH_INDELS_OUTPUT_FILE and PATH_SNPS_OUTPUT_FILE target.
 
-$(PATH_INDELS_OUTPUT_FILE) : $(PATH_INDELS_INPUT_FILE) $(FASTA_FILES) | $(DIR_GENOME_OUT_DATA) \
-        $(PATH_ALIGN_AND_GET_INDELS) $(PATH_GET_SEQS_FASTA)
+$(PATH_INDELS_OUTPUT_FILE) $(PATH_SNPS_OUTPUT_FILE) : $(PATH_INDELS_SNPS_INPUT_FILE) $(FASTA_FILES) | \
+        $(DIR_GENOME_OUT_DATA) $(PATH_PATH_ALIGN_AND_GET_INDELS_SNPS) $(PATH_GET_SEQS_FASTA)
 	@echo
-	@echo "*** Indels PARAMS=$(PARAMS) ***"
-	@echo "Align sequences of $< and find Indels and write them to $@"
-	$(TIME) $(CMD_RSCRIPT) $(PATH_ALIGN_AND_GET_INDELS) $(WD) \
-	    $(PATH_INDELS_INPUT_FILE) $(PATH_INDELS_OUTPUT_FILE) \
+	@echo "*** IndelsSNPs PARAMS=$(PARAMS) ***"
+	@echo "Align sequences of $< and find Indels and SNPs and write them to output files"
+	$(TIME) $(CMD_RSCRIPT) $(PATH_PATH_ALIGN_AND_GET_INDELS_SNPS) $(WD) \
+	    $(PATH_INDELS_SNPS_INPUT_FILE) $(PATH_INDELS_OUTPUT_FILE) $(PATH_SNPS_OUTPUT_FILE) \
 	    $(DIR_GENOME_OUT_DATA) \
 		$(CMD_PERL) $(PATH_GET_SEQS_FASTA) \
-		$(CMD_ALIGNER) $(INVESTIGATE_ALIGN_AND_GET_INDELS) \
+		$(CMD_ALIGNER) $(MAX_SNPS_FRAC) $(INVESTIGATE_PATH_ALIGN_AND_GET_INDELS_SNPS) \
 		$(FASTA_FILES) $(REDIR)
 	@echo "Finished."
 
@@ -922,7 +917,7 @@ $(PATH_INDELS_OUTPUT_FILE) : $(PATH_INDELS_INPUT_FILE) $(FASTA_FILES) | $(DIR_GE
 ################################################################################
 
 # Do this to avoid case annoyance.
-plotindels: plotIndels
+plotIndels: plotIndels
 
 # Phony target to make or clean PATH_INDELS_PLOT_FILE file.
 # If variable PARAMS is not defined, show basic usage info, else make plotIndels

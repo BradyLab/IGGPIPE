@@ -41,10 +41,11 @@ else if (testing == 1)
     args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
         "outTestHP11/LCRs_K11k2L100D10_2000.tsv",
         "outTestHP11/LCRs_K11k2L100D10_2000.indels.tsv",
+        "outTestHP11/LCRs_K11k2L100D10_2000.snps.tsv",
         "outTestHP11/GenomeData",
         "/Users/tedtoal/perl5/perlbrew/perls/perl-5.14.2/bin/perl",
         "code/perl/getSeqsFromFasta.pl",
-        aligner, TRUE,
+        aligner, 0.1, TRUE,
         "testFASTA/ITAG2.4_test.fasta", "testFASTA/SpennV2.0_test.fasta")
     }
 else if (testing == 2)
@@ -52,10 +53,11 @@ else if (testing == 2)
     args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
         "outTestHP11/IndelGroupsNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0.tsv",
         "outTestHP11/IndelGroupsNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0.indels.tsv",
+        "outTestHP11/IndelGroupsNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0.snps.tsv",
         "outTestHP11/GenomeData",
         "/Users/tedtoal/perl5/perlbrew/perls/perl-5.14.2/bin/perl",
         "code/perl/getSeqsFromFasta.pl",
-        aligner, TRUE,
+        aligner, 0.1, TRUE,
         "testFASTA/ITAG2.4_test.fasta", "testFASTA/SpennV2.0_test.fasta")
     }
 else if (testing == 3)
@@ -63,23 +65,24 @@ else if (testing == 3)
     args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
         "outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv",
         "outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv",
+        "outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.snps.tsv",
         "outTestHP11/GenomeData",
         "/Users/tedtoal/perl5/perlbrew/perls/perl-5.14.2/bin/perl",
         "code/perl/getSeqsFromFasta.pl",
-        aligner, TRUE,
+        aligner, 0.1, TRUE,
         "testFASTA/ITAG2.4_test.fasta", "testFASTA/SpennV2.0_test.fasta")
     }
 else stop("Unknown value for 'testing'")
 }
 
-NexpectedMin = 10
+NexpectedMin = 11
 if (length(args) < NexpectedMin)
     {
     usage = c(
         "Read a data frame of LCRs, Indel Groups, or markers, extract DNA sequences from all",
         "genomes between the start and end position of each one, align the sequences, and",
-        "extract from the alignments the size of each Indel that larger than the specified",
-        "minimum size.  Write a new file containing the Indel positions, with columns 'ID',",
+        "extract from the alignments the size of each Indel and SNP, writing them to output",
+        "files.  The Indel output file contains the Indel positions, with columns 'ID',",
         "'phases', 'idx', 'Xdel', 'Xid', 'Xstart', and 'Xend', and with one row per Indel.",
         "The 'ID' column contains a unique ID that ties the row back to the input file row(s)",
         "from which it originated.  For LCR input files, the ID is the LCR number.  For Indel",
@@ -96,7 +99,8 @@ if (length(args) < NexpectedMin)
         "region where one or more genomes shows an indel at some base position is counted as",
         "one Indel.  The number of Indels found in the region for a given input row is equal to",
         "the maximum value found in the 'idx' column of all rows with that 'ID'.",
-        "The 'Xdel', 'Xid', 'Xstart', and 'Xend' columns give the total number of deleted bps",
+        "There is one column of 'Xdel', 'Xid', 'Xstart', and 'Xend' for each genome, with X",
+        "replaced by the genome letter.  These columns give the total number of deleted bps",
         "within the Indel in each genome (Xdel), the sequence ID of the Indel in each genome (Xid)",
         "and the overall Indel starting and ending position in each genome (Xstart and Xend).",
         "Xstart and Xend are the positions of the bps just before the Indel (before the first gap",
@@ -114,20 +118,30 @@ if (length(args) < NexpectedMin)
         "deletions if Xend-Xstart-1 = 0, and otherwise it has a mixture of at least one insertion and",
         "one deletion within the Indel interval.",
         "",
-        "Usage: Rscript alignAndGetIndels.R <wd> <inputFile> <outputFile> <extractDir> \\",
-        "       <perlPath> <getSeqsFromFasta> <alignerPath> <investigate> \\",
-        "       <fastaFile1> <fastaFile2> ...",
+        "The SNP output file contains the SNP positions and values, with columns 'ID', 'phases',",
+        "'idx', 'Xid', 'Xpos', and 'Xval', and with one row per SNP.  The first three of those are",
+        "defined exactly the same as with the Indel output file as described above.  The 'Xid' and",
+        "'Xpos' columns (one set per genome) give the sequence ID and position of the SNP, and the",
+        "'Xval' column gives the SNP value as a single base letter ATCG.",
+        "",
+        "Usage: Rscript alignAndGetIndelsSNPs.R <wd> <inputFile> <outIndelFile> <outSNPfile> \\",
+        "       <extractDir> <perlPath> <getSeqsFromFasta> <alignerPath> <maxSNPsFrac> \\",
+        "       <investigate> <fastaFile1> <fastaFile2> ...",
         "",
         "Arguments:",
         "   <wd> : Path of R working directory, specify other file paths relative to this.",
         "   <inputFile>    : Input file containing LCRs, Indel groups, or markers.",
-        "   <outputFile>   : Output file to which to write data frame of Indel information.",
+        "   <outIndelFile> : Output file to which to write data frame of Indel information.",
+        "   <outSNPfile>   : Output file to which to write data frame of SNP information.",
         "   <extractDir>   : Directory to hold DNA sequence extraction files.",
         "   <perlPath>     : Full path of the Perl language interpreter program",
         "   <getSeqsFromFasta> : Full path of the Perl script getSeqsFromFasta.pl",
         ifelse(useClustal,
             "   <alignerPath>  : Full path of the sequence alignment program 'clustalW2'",
             "   <alignerPath>  : Full path of the sequence alignment program 'muscle'"),
+        "   <maxSNPsFrac>  : Maximum allowed fraction of total sequence that can be SNPs.",
+        "                    More than this many SNPs causes that LCR/IndelGroup/Marker to be",
+        "                    ignored.  Use 1 to allow any number of SNPs.",
         "   <investigate>  : FALSE for normal operation, TRUE for more verbose debugging output.",
         "   <fastaFile1>   : Genome 1 FASTA file.",
         "   <fastaFile2>   : Genome 2 FASTA file.",
@@ -138,7 +152,7 @@ if (length(args) < NexpectedMin)
     stop("Try again with correct number of arguments")
     }
 
-catnow("alignAndGetIndels.R arguments:\n")
+catnow("alignAndGetIndelsSNPs.R arguments:\n")
 workingDirectory = args[1]
 catnow("  workingDirectory: ", workingDirectory, "\n")
 if (!dir.exists(workingDirectory))
@@ -150,31 +164,39 @@ catnow("  inputFile: ", inputFile, "\n")
 if (!file.exists(inputFile))
     stop("File doesn't exist: ", inputFile)
 
-outputFile = args[3]
-catnow("  outputFile: ", outputFile, "\n")
+outIndelFile = args[3]
+catnow("  outIndelFile: ", outIndelFile, "\n")
 
-extractDir = args[4]
+outSNPfile = args[4]
+catnow("  outSNPfile: ", outSNPfile, "\n")
+
+extractDir = args[5]
 catnow("  extractDir: ", extractDir, "\n")
 if (!dir.exists(extractDir))
     stop("Directory doesn't exist: ", extractDir)
 
-perlPath = args[5]
+perlPath = args[6]
 catnow("  perlPath: ", perlPath, "\n")
 
-getSeqsFromFasta = args[6]
+getSeqsFromFasta = args[7]
 catnow("  getSeqsFromFasta: ", getSeqsFromFasta, "\n")
 if (!file.exists(getSeqsFromFasta))
     stop("File doesn't exist: ", getSeqsFromFasta)
 
-alignerPath = args[7]
+alignerPath = args[8]
 catnow("  alignerPath: ", alignerPath, "\n")
 
-investigate = as.logical(args[8])
+maxSNPsFrac = as.numeric(args[9])
+catnow("  maxSNPsFrac: ", maxSNPsFrac, "\n")
+if (is.na(maxSNPsFrac) || maxSNPsFrac < 0 || maxSNPsFrac > 1)
+    stop("maxSNPsFrac must be between 0 and 1")
+
+investigate = as.logical(args[10])
 catnow("  investigate: ", investigate, "\n")
 if (is.na(investigate))
     stop("investigate must be TRUE or FALSE")
 
-fastaFiles = args[-(1:8)]
+fastaFiles = args[-(1:10)]
 if (length(fastaFiles) < 2)
     stop("Must have at least two FASTA files specified")
 catnow("  fastaFiles:\n")
@@ -456,6 +478,14 @@ else
     }
 }
 
+# Make genome column name vectors for df.
+idCols = paste(genomeLtrs, "id", sep="")
+names(idCols) = genomeLtrs
+pos1Cols = paste(genomeLtrs, "pos1", sep="")
+names(pos1Cols) = genomeLtrs
+pos2Cols = paste(genomeLtrs, "pos2", sep="")
+names(pos2Cols) = genomeLtrs
+
 # Put columns in desired order.
 df = df[, c("ID", "phases", c(rbind(idCols, pos1Cols, pos2Cols)))]
 if (nrow(df) == 0)
@@ -522,7 +552,6 @@ getSeqs_args = sapply(genomeLtrs, function(genome)
 catnow("Retrieving sequences at each LCR or marker for each genome.\n")
 for (genome in genomeLtrs)
     {
-    inv(cmdLines[genome], "Perl command line")
     inv(extractPosFiles[genome], "extraction positions file")
     inv(seqFiles[genome], "DNA sequences file")
     catnow("  Genome ", genome, "command line:\n")
@@ -599,8 +628,9 @@ if (any(!startKmerMatches) || any(!endKmerMatches))
 
 ################################################################################
 # Remove all df rows for which the DNA sequences are identical for all genomes,
-# since there will be no Indels in such sequences.  There will be many of these
-# if the input file was an LCR file, none if it was an Indel Group or marker file.
+# since there will be no Indels or SNPs in such sequences.  There will be many
+# of these if the input file was an LCR file, none if it was an Indel Group or
+# marker file.
 ################################################################################
 
 allIdentical = rep(TRUE, nrow(df))
@@ -612,8 +642,8 @@ df = df[!allIdentical,]
 # Now perform and analyze alignments.  For each row of df, write a FASTA file
 # containing the sequences for each genome, then invoke the sequence alignment
 # program in "alignerPath" to perform a multiple alignment.  Read the alignment
-# back, parse it to extract the positions of all Indels, and create new data
-# frame dfIndels containing them.
+# back, parse it to extract the positions of all Indels and SNPs, and create new
+# data frames dfIndels and dfSNPs containing them.
 ################################################################################
 
 # Doing a for loop here may take a LONG time.
@@ -622,20 +652,32 @@ tempFastaFileName = paste(extractDir, "align.fa", sep=PATHSEP)
 tempAlignFileName = paste(extractDir, "align.fasta", sep=PATHSEP)
 tempStdoutFileName = ifelse(useClustal, paste(extractDir, "align.stdout", sep=PATHSEP), "") # ClustalW2.  Muscle is quiet.
 
-# Make missing genome column name vectors for dfIndels.
+# Output data frames, initially empty.
+dfIndels = NULL
+dfSNPs = NULL
+
+# Make genome column name vectors for dfIndels and dfSNPs for those X columns we
+# don't already have vectors for.
 #    ID, phases, idx, Xdel, Xid, Xstart, Xend
+#    ID, phases, idx, Xid, Xpos, Xval
 delCols = paste(genomeLtrs, "del", sep="")
 names(delCols) = genomeLtrs
 startCols = paste(genomeLtrs, "start", sep="")
 names(startCols) = genomeLtrs
 endCols = paste(genomeLtrs, "end", sep="")
 names(endCols) = genomeLtrs
+posCols = paste(genomeLtrs, "pos", sep="")
+names(posCols) = genomeLtrs
+valCols = paste(genomeLtrs, "val", sep="")
+names(valCols) = genomeLtrs
+
+# Count number of df rows in which there were too many SNPs in the alignment (> maxSNPsFrac).
+tooManySNPs = 0
 
 # Start the loop.  This may take forever!
-dfIndels = NULL
 logEveryN = 100
 logCount = 0
-catnow("Performing", nrow(df), "alignments and extracting Indel positions\n")
+catnow("Performing", nrow(df), "alignments and extracting Indels and SNPs\n")
 
 # Timing note: with Muscle, and with 459 alignments, total time without anything
 # below EXCEPT the Muscle alignment was 1:05 minutes, and with everything below
@@ -645,6 +687,11 @@ catnow("Performing", nrow(df), "alignments and extracting Indel positions\n")
 for (i in 1:nrow(df))
     {
     #catnow("i =", i, "of", nrow(df), "\n")
+
+    # Logging.
+    logCount = logCount + 1
+    if (logCount %% logEveryN == 0)
+        cat(" N =", logCount, "of", nrow(df), "\n")
 
     # Write sequences to FASTA file.
     idLines = paste(">", genomeLtrs, sep="")
@@ -706,6 +753,56 @@ for (i in 1:nrow(df))
         stop("Expected all sequences to be the same size")
     alignMtx = matrix(unlist(strsplit(alignSeqs, "", fixed=TRUE)), ncol=Ngenomes, dimnames=list(NULL, genomeLtrs))
 
+    # Check to see if the number of SNPs exceeds maxSNPsFrac in any genome.  If so, skip this one.
+    seqLens = apply(alignMtx[,-1,drop=FALSE], 2, function(V) sum(V != "-"))
+    maxSNPsAllowed = max(as.integer(seqLens * maxSNPsFrac))
+    refV = alignMtx[,1]
+    isSNP = apply(alignMtx[,-1,drop=FALSE], 2, function(V) (V != "-" & refV != "-" & V != refV))
+    if (ncol(isSNP) == 1)
+        isSNP = isSNP[,1] # Converts to vector.
+    else
+        isSNP = apply(isSNP, 1, any)
+    numSNPs = sum(isSNP)
+    if (numSNPs > maxSNPsAllowed)
+        {
+        tooManySNPs = tooManySNPs+1
+        next
+        }
+
+    # Create a data frame of SNPs and append it to dfSNPs.
+    if (numSNPs > 0)
+        {
+        phases = df$phases[i]
+        dfs = data.frame(ID=df$ID[i], phases=phases, idx=1:numSNPs, stringsAsFactors=FALSE)
+
+        # We will need the position offset of each SNP in each genome.  This offset ignores
+        # the gaps in the alignment.
+        offsetMtx = apply(alignMtx, 2, function(V) (cumsum(V != "-") - 1)) # Subtract 1 so first offset is 0.
+
+        # Get SNP columns for each genome.
+        for (j in 1:Ngenomes)
+            {
+            genome = genomeLtrs[j]
+            phase = substring(phases, j, j)
+            dfs[, idCols[genome]] = df[i, idCols[genome]]
+
+            # For positions, we must add the offset in that genome to the starting position in it.
+            SNPoffset.genome = offsetMtx[isSNP, j]
+
+            # Genomes with negative phase require that the position account for
+            # the fact that the aligned sequence was reverse complemented after
+            # being extracted from the genome position given by pos1Cols/pos2Cols.
+            if (phase == "+")
+                dfs[, posCols[genome]] = df[i, pos1Cols[genome]] + SNPoffset.genome
+            else
+                dfs[, posCols[genome]] = df[i, pos2Cols[genome]] - SNPoffset.genome
+
+            # And finally, the SNP value.
+            dfs[, valCols[genome]] = alignMtx[isSNP, j]
+            }
+        dfSNPs = rbind.fast(dfSNPs, dfs)
+        }
+
     # Here is how we will find Indels.  If a base position has no "-" gap characters
     # in any genome, that base position is not part of an Indel, else it is.  The
     # Indel spans all consecutive bases where one or more genomes has a "-".
@@ -733,12 +830,15 @@ for (i in 1:nrow(df))
         # Create a data frame of Indels and append it to dfIndels.
         phases = df$phases[i]
         dfi = data.frame(ID=df$ID[i], phases=phases, idx=1:Nindels, stringsAsFactors=FALSE)
+
+        # Get Indel columns for each genome.
         for (j in 1:Ngenomes)
             {
             genome = genomeLtrs[j]
             phase = substring(phases, j, j)
             dfi[, delCols[genome]] = gapCount[[genome]]
             dfi[, idCols[genome]] = df[i, idCols[genome]]
+
             # For start and end positions, we must SUBTRACT THE NUMBER OF GAPS IN EACH GENOME.
             # This number is held in "gapCount", but we must do it properly.  The first count
             # is not subtracted from the first start position but is subtracted from all
@@ -747,6 +847,7 @@ for (i in 1:nrow(df))
             gapSubtract = cumsum(gapCount[[genome]])
             indelBaseBeforeStart.genome = indelBaseBeforeStart - c(0, gapSubtract[-Nindels])
             indelBaseAfterEnd.genome = indelBaseAfterEnd - gapSubtract
+
             # Genomes with negative phase require that the start/end positions be
             # adjusted for the fact that the aligned sequence was reverse complemented
             # after being extracted from the genome position given by pos1Cols/pos2Cols.
@@ -763,25 +864,27 @@ for (i in 1:nrow(df))
             }
         dfIndels = rbind.fast(dfIndels, dfi)
         }
-
-    # Logging.
-    logCount = logCount + 1
-    if (logCount %% logEveryN == 0)
-        cat(" N =", logCount, "of", nrow(df), "\n")
     }
 dfIndels = rbind.fast.finish(dfIndels)
-catnow("Finished alignments.\n")
-inv(dim(dfIndels), "dim(dfIndels)")
+dfSNPs = rbind.fast.finish(dfSNPs)
+catnow("Finished aligning sequences for Indel Groups and locating Indels and SNPs\n")
+catnow("Total number of Indels is ", nrow(dfIndels), "\n")
+catnow("Total number of SNPs is ", nrow(dfSNPs), "\n")
+catnow(" ", tooManySNPs, "LCR/IndelGroup/Marker alignments had too many SNPs and were ignored.\n")
 
 ########################################
 # Finish up.
 ########################################
 
-# Write the data frame to the output file.
-write.table.winSafe(dfIndels, outputFile, row.names=FALSE, quote=FALSE, sep="\t")
-# dfIndels = read.table(outputFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
+# Write the data frame to the output files.
+write.table.winSafe(dfIndels, outIndelFile, row.names=FALSE, quote=FALSE, sep="\t")
+# dfIndels = read.table(outIndelFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
+write.table.winSafe(dfSNPs, outSNPfile, row.names=FALSE, quote=FALSE, sep="\t")
+# dfSNPs = read.table(outSNPfile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
 
-catnow("Finished aligning sequences for Indel Groups and locating Indels, output file:\n", outputFile, "\n")
+catnow("Finished\n")
+catnow("Indel output file:\n", outIndelFile, "\n")
+catnow("SNP output file:\n", outSNPfile, "\n")
 }
 
 ################################################################################
