@@ -882,7 +882,7 @@ process if they aren&#8217;t already:</strong>
 <div class="olist loweralpha"><ol class="loweralpha">
 <li>
 <p>
-Xcode (V6.4 works) (Apple App Store; <em>make</em> and <em>g++</em>)
+Xcode (V7.0.1 works) (Apple App Store; <em>make</em> and <em>g++</em>)
 </p>
 </li>
 <li>
@@ -987,7 +987,7 @@ required utilities.  Xcode is available free from the Apple App Store
 (Applications, App Store).  If you don&#8217;t have Xcode installed already, run the App Store
 application, search for "Xcode", and double-click the <em>Install</em> button to install it,
 and even if you do have it installed, make sure you are updated with the latest version.
-We used version 6.4, although later versions should work fine.
+We used version 7.0.1, although later versions should work fine.
 Installation takes quite a long time, during which it appears nothing is happening.</p></div>
 <div class="paragraph"><p>When Xcode install is finished, you can verify that it was installed successfully
 by finding the Xcode application icon in Applications and running it.  It may then
@@ -1187,24 +1187,47 @@ cp Downloads/jellyfish-2.2.3 src</code></pre>
 <div class="paragraph"><p>This version of IGGPIPE was tested with Jellyfish version 2.2.3.  Newer versions should
 work as well. <em>Older versions will not work, because Jellyfish changed its output file
 names. They used to end with "_0" but no longer do!</em></p></div>
-<div class="paragraph"><p>Now the Jellyfish program must be compiled into an application and then installed
-on your computer.</p></div>
+<div class="paragraph"><p>Now the Jellyfish program must be configured, then compiled into an application,
+then installed on your computer.</p></div>
 <div class="dlist"><dl>
+<dt class="hdlist1">
+<strong>Configure</strong>
+</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>To configure the Jellyfish build components on OSX, Linux, or Windows/Cygwin:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>(change into Jellyfish directory)
+./configure</code></pre>
+</div></div>
+<div class="paragraph"><p>The command worked without error on Linux and Windows, but an error occurred on OSX:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>config.status: error: cannot find input file: `tests/compat.sh.in'</code></pre>
+</div></div>
+<div class="paragraph"><p>We ignored this error and continued on with the installation, and it worked fine.
+&#8203;<br />
+&#8203;<br /></p></div>
+</div></div>
+</dd>
 <dt class="hdlist1">
 <strong>Compile</strong>
 </dt>
 <dd>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>To compile and build Jellyfish on OSX, Linux, or Windows/Cygwin:</p></div>
+<div class="paragraph"><p>To compile Jellyfish on OSX, Linux, or Windows/Cygwin:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>cd ~/src/jellyfish-2.2.3
-./configure
+<pre><code>(change into Jellyfish directory)
 make</code></pre>
 </div></div>
-<div class="paragraph"><p>The commands worked without error on OSX and Linux, but compile errors ("impossible
-constraint" errors) occurred on Windows. We fixed these by editing file <em>file_header.hpp</em>
+<div class="paragraph"><p>The <em>make</em> command worked without error on OSX and Linux, but compile errors ("impossible
+constraint" errors) occurred on Windows. Also, the Jellyfish installation README file
+said that this would not work on OSX, although it did work for us.</p></div>
+<div class="paragraph"><p>We fixed the Windows compile errors by editing file <em>file_header.hpp</em>
 and adding the following lines <em>after #include &lt;jellyfish/rectangular_binary_matrix.hpp&gt;</em>:</p></div>
 <div class="literalblock">
 <div class="content">
@@ -1227,7 +1250,26 @@ and adding the following lines <em>after #include &lt;jellyfish/rectangular_bina
     template std::string to_string&lt;long long int&gt;(long long int); // instantiate with long long int
 }</code></pre>
 </div></div>
-<div class="paragraph"><p>That allowed the <em>make</em> to succeed under Windows too.
+<div class="paragraph"><p>That allowed the <em>make</em> to succeed under Windows.</p></div>
+<div class="paragraph"><p>The Jellyfish README says the following about compilation under OSX, despite the fact
+that we were able to compile successfully:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>To install on Mac OS X: Jellyfish 2.0 does not compile with Apple's
+Xcode GCC 4.2. Instead, the easiest thing to do is to install GCC 4.8
+using MacPorts (http://www.macports.org) using the following commands:
+
+        sudo port install gcc48
+        sudo port install gcc_select
+        sudo port select -set gcc mp-gcc48
+
+The first command installs GCC version 4.8. The third command makes
+that version of GCC the default, and the second installs a package that
+makes the third command work. After the above, you should be able to
+run './configure ; make' as normal.</code></pre>
+</div></div>
+<div class="paragraph"><p>You may have to do some work here to get Jellyfish compiled on your OSX system, but
+then again you might be lucky like we were.
 &#8203;<br />
 &#8203;<br /></p></div>
 </div></div>
@@ -2188,7 +2230,7 @@ Contact me, Ted Toal, <a href="mailto:twtoal@ucdavis.edu">twtoal@ucdavis.edu</a>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-10-11 11:04:28 PDT
+Last updated 2015-10-12 12:17:03 PDT
 </div>
 </div>
 </body>

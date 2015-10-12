@@ -97,7 +97,7 @@ ends.  If you don't want to use 'nano', look into Notepad++, a free text editor.
 process if they aren't already:*
 +
 --
-.. Xcode (V6.4 works) (Apple App Store; 'make' and 'g++')
+.. Xcode (V7.0.1 works) (Apple App Store; 'make' and 'g++')
 .. Jellyfish V2 or later (V2.2.3 works) (http://www.genome.umd.edu/jellyfish.html)
 .. Perl V5 or later (V5.16.0 works) (https://www.perl.org/get.html)
 .. R V3 or later (V3.2.1 works) (https://www.r-project.org)
@@ -144,7 +144,7 @@ required utilities.  Xcode is available free from the Apple App Store
 (Applications, App Store).  If you don't have Xcode installed already, run the App Store
 application, search for "Xcode", and double-click the 'Install' button to install it,
 and even if you do have it installed, make sure you are updated with the latest version.
-We used version 6.4, although later versions should work fine.
+We used version 7.0.1, although later versions should work fine.
 Installation takes quite a long time, during which it appears nothing is happening.
 
 When Xcode install is finished, you can verify that it was installed successfully
@@ -300,21 +300,40 @@ This version of IGGPIPE was tested with Jellyfish version 2.2.3.  Newer versions
 work as well. 'Older versions will not work, because Jellyfish changed its output file
 names. They used to end with "_0" but no longer do!'
 
-Now the Jellyfish program must be compiled into an application and then installed
-on your computer.
+Now the Jellyfish program must be configured, then compiled into an application,
+then installed on your computer.
 
+
+*Configure*::
++
+--
+To configure the Jellyfish build components on OSX, Linux, or Windows/Cygwin:
+
+  (change into Jellyfish directory)
+  ./configure
+
+The command worked without error on Linux and Windows, but an error occurred on OSX:
+
+  config.status: error: cannot find input file: `tests/compat.sh.in'
+
+We ignored this error and continued on with the installation, and it worked fine.
+{zwsp} +
+{zwsp} +
+--
 
 *Compile*::
 +
 --
-To compile and build Jellyfish on OSX, Linux, or Windows/Cygwin:
+To compile Jellyfish on OSX, Linux, or Windows/Cygwin:
 
-  cd ~/src/jellyfish-2.2.3
-  ./configure
+  (change into Jellyfish directory)
   make
 
-The commands worked without error on OSX and Linux, but compile errors ("impossible
-constraint" errors) occurred on Windows. We fixed these by editing file 'file_header.hpp'
+The 'make' command worked without error on OSX and Linux, but compile errors ("impossible
+constraint" errors) occurred on Windows. Also, the Jellyfish installation README file
+said that this would not work on OSX, although it did work for us.
+
+We fixed the Windows compile errors by editing file 'file_header.hpp'
 and adding the following lines 'after #include <jellyfish/rectangular_binary_matrix.hpp>':
 
 ..........................
@@ -338,7 +357,28 @@ namespace std {
 }
 ..........................
 
-That allowed the 'make' to succeed under Windows too.
+That allowed the 'make' to succeed under Windows.
+
+The Jellyfish README says the following about compilation under OSX, despite the fact
+that we were able to compile successfully:
+
+..........................
+To install on Mac OS X: Jellyfish 2.0 does not compile with Apple's
+Xcode GCC 4.2. Instead, the easiest thing to do is to install GCC 4.8
+using MacPorts (http://www.macports.org) using the following commands:
+
+        sudo port install gcc48
+        sudo port install gcc_select
+        sudo port select -set gcc mp-gcc48
+
+The first command installs GCC version 4.8. The third command makes
+that version of GCC the default, and the second installs a package that
+makes the third command work. After the above, you should be able to
+run './configure ; make' as normal.
+..........................
+
+You may have to do some work here to get Jellyfish compiled on your OSX system, but
+then again you might be lucky like we were.
 {zwsp} +
 {zwsp} +
 --

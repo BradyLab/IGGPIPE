@@ -1297,8 +1297,7 @@ in file primer3settings.txt.</p></div>
 <pre><code>make PARAMS=allParameters.XY findPrimers    (replacing with your allParameters name)</code></pre>
 </div></div>
 <div class="paragraph"><p>Depending on the number of Indel Groups, this can take a <em>long</em> time. We have seen it
-take two days to finish running all Indel Groups through Primer3. This is
-where extra memory can be helpful.</p></div>
+take two days to finish running all Indel Groups through Primer3.</p></div>
 <div class="paragraph"><p>If it completes successfully, the end of the command output will show the message:</p></div>
 <div class="literalblock">
 <div class="content">
@@ -1339,8 +1338,7 @@ in or more genomes, and writes new files with the validated IGG marker primer pa
 <pre><code>make PARAMS=allParameters.XY removeBadMarkers    (replacing with your allParameters name)</code></pre>
 </div></div>
 <div class="paragraph"><p>Depending on the number of primer pairs, this can take a <em>long</em> time. We have seen it
-take two days <em>per genome</em> to finish running all primer pairs through e-PCR. This is
-where extra memory can be helpful.</p></div>
+take two days <em>per genome</em> to finish running all primer pairs through e-PCR.</p></div>
 <div class="paragraph"><p>If it completes successfully, the end of the command output will show the message:</p></div>
 <div class="literalblock">
 <div class="content">
@@ -1482,55 +1480,55 @@ cellspacing="0" cellpadding="4">
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">j. make PARAMS=myFilename findLCRs</p></td>
-<td align="left" valign="top"><p class="table"><em>LCRs_*.tsv, BadKmers_*.tsv</em></p></td>
+<td align="left" valign="top"><p class="table">LCRs_*.tsv, BadKmers_*.tsv</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">k. make PARAMS=myFilename findIndelGroups</p></td>
-<td align="left" valign="top"><p class="table"><em>IndelGroupsOverlapping_*.tsv, IndelGroupsNonoverlapping_*.tsv</em></p></td>
+<td align="left" valign="top"><p class="table">IndelGroupsOverlapping_*.tsv, IndelGroupsNonoverlapping_*.tsv</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">l. make PARAMS=myFilename getDNAseqs</p></td>
-<td align="left" valign="top"><p class="table"><em>DNAseqs_*.dnaseqs</em></p></td>
+<td align="left" valign="top"><p class="table">DNAseqs_*.dnaseqs</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">m. make PARAMS=myFilename findPrimers</p></td>
-<td align="left" valign="top"><p class="table"><em>NonvalidatedMarkers_*.tsv</em></p></td>
+<td align="left" valign="top"><p class="table">NonvalidatedMarkers_*.tsv</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">n. make PARAMS=myFilename ePCRtesting</p></td>
-<td align="left" valign="top"><p class="table"><em>MarkerErrors_*.tsv</em></p></td>
+<td align="left" valign="top"><p class="table">MarkerErrors_*.tsv</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">o. make PARAMS=myFilename removeBadMarkers</p></td>
-<td align="left" valign="top"><p class="table"><em>MarkersOverlapping_*.tsv, MarkersNonoverlapping_*.tsv</em></p></td>
+<td align="left" valign="top"><p class="table">MarkersOverlapping_*.tsv, MarkersNonoverlapping_*.tsv</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">p. make PARAMS=myFilename plotMarkers</p></td>
-<td align="left" valign="top"><p class="table"><em>MarkerCounts_*.pdf, MarkerDensity_*.png</em></p></td>
+<td align="left" valign="top"><p class="table">MarkerCounts_*.pdf, MarkerDensity_*.png</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">q. make PARAMS=myFilename IndelsSNPs</p></td>
-<td align="left" valign="top"><p class="table"><em>MarkersNonoverlapping_*.indels.tsv, MarkersNonoverlapping_*.snps.tsv</em></p></td>
+<td align="left" valign="top"><p class="table">MarkersNonoverlapping_*.indels.tsv, MarkersNonoverlapping_*.snps.tsv</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">r. make PARAMS=myFilename plotIndels</p></td>
-<td align="left" valign="top"><p class="table"><em>MarkersNonoverlapping_*.indels.pdf</em></p></td>
+<td align="left" valign="top"><p class="table">MarkersNonoverlapping_*.indels.pdf</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">s. Rscript code/R/dotplot.R dotplot.template</p></td>
-<td align="left" valign="top"><p class="table"><em>LCRs_*.dotplot.png</em></p></td>
+<td align="left" valign="top"><p class="table">LCRs_*.dotplot.png</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">t. Rscript code/R/annotateFile.R annotate.template</p></td>
-<td align="left" valign="top"><p class="table"><em>MarkersAnnotated_*.tsv</em></p></td>
+<td align="left" valign="top"><p class="table">MarkersAnnotated_*.tsv</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">u. Rscript code/R/annotateFile.R annotate/HP11_isInNearColumn.markers</p></td>
-<td align="left" valign="top"><p class="table"><em>MarkersAnnotated_WithInNearFeatures_*.indels.tsv</em></p></td>
+<td align="left" valign="top"><p class="table">MarkersAnnotated_WithInNearFeatures_*.indels.tsv</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">v. Rscript code/R/annotateFile.R annotate/HP11_to_gff3.markers</p></td>
-<td align="left" valign="top"><p class="table"><em>MarkersAnnotated_GFF3_*.gff3</em></p></td>
+<td align="left" valign="top"><p class="table">MarkersAnnotated_GFF3_*.gff3</p></td>
 </tr>
 </tbody>
 </table>
@@ -2165,7 +2163,7 @@ in that region is max idx value.</p></td>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-10-11 11:17:17 PDT
+Last updated 2015-10-11 11:25:14 PDT
 </div>
 </div>
 </body>
