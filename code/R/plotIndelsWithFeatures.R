@@ -25,7 +25,7 @@ source(paste(thisDir, "Include_Common.R", sep=""))
 # Get arguments.
 testing = 0
 #testing = 1 # For testing only.  .test
-#testing = 2 # For testing only.  .HPlong
+#testing = 2 # For testing only.  .HPlongITAG2.4
 {
 if (testing == 0)
     args = commandArgs(TRUE)
@@ -52,7 +52,7 @@ if (length(args) != Nexpected)
     usage = c(
         "Read a data frame of Indel information that has had gene feature information added to it, and",
         "make plots of various aspects of the data.  NOTE: This is currently specific to S. lycopersicum.",
-        "See annotate/HPlong_addFeatureIDs.nonoverlappingIndelGroups for parameters used to create the",
+        "See annotate/HPlongITAG2.4_addFeatureIDs.nonoverlappingIndelGroups for parameters used to create the",
         "input file for this.",
         "",
         "Usage: Rscript plotIndelsWithFeatures.R <wd> <IndelsFile> <pdfPlotFile> <nearInBp> <maxIndelLen> <genomeNames>",

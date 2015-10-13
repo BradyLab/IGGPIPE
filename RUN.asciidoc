@@ -133,8 +133,7 @@ marking items that may need to be changed.
 Each "#@@" comment says whether it must be changed, might need to
 be changed, or probably will never need to be changed, etc. Many of these items
 typically will never need to be changed, so the actual number of changes that need
-to be made is smaller than it might first appear. Some of the parameters have
-already been set correctly during installation of IGGPIPE.  However, it is
+to be made is smaller than it might first appear.  It is
 recommended that rather than hurrying, you take time to read through
 the file, as the comments explain the purpose of each parameter, and you will
 want to know this information, at least for key parameters, to select the right
@@ -152,6 +151,8 @@ definitely want to review and consider are:
 .. N_GENOMES
 .. GENOME_NUMBERS
 .. GENOME_1, GENOME_2, etc.
+.. DIR_IGGPIPE_OUT
+.. PATH_GENOME_FASTA_1, PATH_GENOME_FASTA_2, etc.
 .. LMIN
 .. DMAX
 .. AMIN and AMAX
@@ -160,6 +161,19 @@ definitely want to review and consider are:
 .. OVERLAP_REMOVAL
 .. EPCR_MAX_DEV
 .. EPCR_MAX_MISMATCH and EPCR_MAX_GAPS
+
+The parameter DIR_IGGPIPE_OUT is the path of the folder where all output will be
+placed.  You don't need to change this parameter but you should note what its value
+will be, and change it if you want to.
+
+The parameters PATH_GENOME_FASTA_1, PATH_GENOME_FASTA_2, and so on, up to the number
+of genomes being analyzed, are the paths to the FASTA files for the genomes to be
+analyzed.  If any of these contain scaffolds, you may want to consider whether you
+should remove smaller scaffolds.  The e-PCR portion of the pipeline takes an
+inordinately long amount of time to run when there are tens to hundreds of thousands
+of scaffolds.  If this is your case, and if many of the scaffolds are very small and
+not likely to contribute to viable markers, you should remove them from the FASTA file
+to be analyzed.
 
 After finishing changes, save the modified allParameters.XY file.
 --

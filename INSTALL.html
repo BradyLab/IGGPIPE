@@ -987,8 +987,9 @@ required utilities.  Xcode is available free from the Apple App Store
 (Applications, App Store).  If you don&#8217;t have Xcode installed already, run the App Store
 application, search for "Xcode", and double-click the <em>Install</em> button to install it,
 and even if you do have it installed, make sure you are updated with the latest version.
-We used version 7.0.1, although later versions should work fine.
-Installation takes quite a long time, during which it appears nothing is happening.</p></div>
+We used version 7.0.1, although later versions should work fine. <em>Earlier versions
+produce errors trying to compile Jellyfish</em>, so be sure you have version 7.0.1 or later.</p></div>
+<div class="paragraph"><p>Installation takes quite a long time, during which it appears nothing is happening.</p></div>
 <div class="paragraph"><p>When Xcode install is finished, you can verify that it was installed successfully
 by finding the Xcode application icon in Applications and running it.  It may then
 display a box requesting your computer administrator password so it can install
@@ -1226,7 +1227,8 @@ make</code></pre>
 </div></div>
 <div class="paragraph"><p>The <em>make</em> command worked without error on OSX and Linux, but compile errors ("impossible
 constraint" errors) occurred on Windows. Also, the Jellyfish installation README file
-said that this would not work on OSX, although it did work for us.</p></div>
+said that this would not work on OSX.  We found that it does not work on older OSX and
+Xcode versions, but it definitely does work on OSX 10.10.5 with Xcode 7.0.1.</p></div>
 <div class="paragraph"><p>We fixed the Windows compile errors by editing file <em>file_header.hpp</em>
 and adding the following lines <em>after #include &lt;jellyfish/rectangular_binary_matrix.hpp&gt;</em>:</p></div>
 <div class="literalblock">
@@ -1268,8 +1270,8 @@ that version of GCC the default, and the second installs a package that
 makes the third command work. After the above, you should be able to
 run './configure ; make' as normal.</code></pre>
 </div></div>
-<div class="paragraph"><p>You may have to do some work here to get Jellyfish compiled on your OSX system, but
-then again you might be lucky like we were.
+<div class="paragraph"><p>Those steps might allow you to compile Jellyfish with an older version of OSX and
+Xcode.
 &#8203;<br />
 &#8203;<br /></p></div>
 </div></div>
@@ -2230,7 +2232,7 @@ Contact me, Ted Toal, <a href="mailto:twtoal@ucdavis.edu">twtoal@ucdavis.edu</a>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-10-12 12:17:03 PDT
+Last updated 2015-10-13 16:12:19 PDT
 </div>
 </div>
 </body>

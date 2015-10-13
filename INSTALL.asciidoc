@@ -144,7 +144,9 @@ required utilities.  Xcode is available free from the Apple App Store
 (Applications, App Store).  If you don't have Xcode installed already, run the App Store
 application, search for "Xcode", and double-click the 'Install' button to install it,
 and even if you do have it installed, make sure you are updated with the latest version.
-We used version 7.0.1, although later versions should work fine.
+We used version 7.0.1, although later versions should work fine. 'Earlier versions
+produce errors trying to compile Jellyfish', so be sure you have version 7.0.1 or later.
+
 Installation takes quite a long time, during which it appears nothing is happening.
 
 When Xcode install is finished, you can verify that it was installed successfully
@@ -303,7 +305,6 @@ names. They used to end with "_0" but no longer do!'
 Now the Jellyfish program must be configured, then compiled into an application,
 then installed on your computer.
 
-
 *Configure*::
 +
 --
@@ -331,7 +332,8 @@ To compile Jellyfish on OSX, Linux, or Windows/Cygwin:
 
 The 'make' command worked without error on OSX and Linux, but compile errors ("impossible
 constraint" errors) occurred on Windows. Also, the Jellyfish installation README file
-said that this would not work on OSX, although it did work for us.
+said that this would not work on OSX.  We found that it does not work on older OSX and
+Xcode versions, but it definitely does work on OSX 10.10.5 with Xcode 7.0.1.
 
 We fixed the Windows compile errors by editing file 'file_header.hpp'
 and adding the following lines 'after #include <jellyfish/rectangular_binary_matrix.hpp>':
@@ -377,8 +379,8 @@ makes the third command work. After the above, you should be able to
 run './configure ; make' as normal.
 ..........................
 
-You may have to do some work here to get Jellyfish compiled on your OSX system, but
-then again you might be lucky like we were.
+Those steps might allow you to compile Jellyfish with an older version of OSX and
+Xcode.
 {zwsp} +
 {zwsp} +
 --

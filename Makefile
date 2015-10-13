@@ -917,7 +917,7 @@ $(PATH_INDELS_OUTPUT_FILE) $(PATH_SNPS_OUTPUT_FILE) : $(PATH_INDELS_SNPS_INPUT_F
 ################################################################################
 
 # Do this to avoid case annoyance.
-plotIndels: plotIndels
+plotindels: plotIndels
 
 # Phony target to make or clean PATH_INDELS_PLOT_FILE file.
 # If variable PARAMS is not defined, show basic usage info, else make plotIndels

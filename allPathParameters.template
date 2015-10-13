@@ -7,7 +7,7 @@
 
 
 # Path of the working directory.  CHANGE THIS TO YOUR IGGPIPE DIRECTORY.
-WD := $(BRADYLAB)/Genomes/kmers/IGGPIPE
+WD := $(BRADYLAB)/Genomes/IGGPIPE
 
 
 # Command to invoke the 'jellyfish' program.  Usually on PATH so this is ok.
