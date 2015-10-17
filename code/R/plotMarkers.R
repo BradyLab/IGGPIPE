@@ -17,7 +17,7 @@ XSEP = ifelse(PATHSEP == "\\", "\\\\", PATHSEP)
 RE = paste("^.*--file=(([^", XSEP, "]*", XSEP, ")*)[^", XSEP, "]+$", sep="")
 args = commandArgs(FALSE)
 thisDir = sub(RE, "\\1", args[grepl("--file=", args)])
-#thisDir = "~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE/code/R/" # For testing only.
+#thisDir = "~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE/code/R/" # For testing only.
 
 # Source the necessary include files from the same directory containing this file.
 source(paste(thisDir, "Include_Common.R", sep=""))
@@ -26,12 +26,13 @@ source(paste(thisDir, "Include_Common.R", sep=""))
 testing = 0
 #testing = 1 # For testing only.  .test
 #testing = 2 # For testing only.  .HP
+#testing = 3 # For testing only.  .TaCW
 {
 if (testing == 0)
     args = commandArgs(TRUE)
 else if (testing == 1)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE", 2, 0.3,
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE", 2, 0.3,
         "outTestHP11/MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv",
         "outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv",
         "outTestHP11/MarkerCounts_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1",
@@ -40,12 +41,21 @@ else if (testing == 1)
     }
 else if (testing == 2)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE", 2, 0.25,
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE", 2, 0.25,
         "outHP14/MarkersOverlapping_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.tsv",
         "outHP14/MarkersNonoverlapping_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.tsv",
         "outHP14/MarkerCounts_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1",
         "outHP14/MarkerDensity_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1",
         "outHP14/GenomeData/Genome_1.idlens", "outHP14/GenomeData/Genome_2.idlens")
+    }
+else if (testing == 3)
+    {
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE", 2, 0.5,
+        "outTaCW15/MarkersOverlapping_K15k2L200D5_1000A200_1000d50_200N2F0X20V3000W9M3G1.tsv",
+        "outTaCW15/MarkersNonoverlapping_K15k2L200D5_1000A200_1000d50_200N2F0X20V3000W9M3G1.tsv",
+        "outTaCW15/MarkerCounts_K15k2L200D5_1000A200_1000d50_200N2F0X20V3000W9M3G1",
+        "outTaCW15/MarkerDensity_K15k2L200D5_1000A200_1000d50_200N2F0X20V3000W9M3G1",
+        "outTaCW15/GenomeData/Genome_1.idlens", "outTaCW15/GenomeData/Genome_2.idlens")
     }
 else stop("Unknown value for 'testing'")
 }
@@ -223,6 +233,7 @@ par(mgp=c(3,1,1))
 
 ########################################
 # Plot counts of markers on chromosomes as either a bar or line plot.
+# Any chromosome or scaffold that has 0 markers is not plotted.
 ########################################
 
 for (genome in genomeLtrs)
@@ -230,14 +241,11 @@ for (genome in genomeLtrs)
     id.Col = idCol[genome]
     pct.Col = pctCol[genome]
     pos1.Col = ampPos1Col[genome]
-    V = tapply(1:nrow(dfMarkers), dfMarkers[,id.Col], function(ii)
-        return(length(ii)/(idlens[[genome]][dfMarkers[ii[1], id.Col], "len"])))
-    V2 = tapply(1:nrow(dfNoOverlaps), dfNoOverlaps[,id.Col], function(ii)
-        return(length(ii)/(idlens[[genome]][dfNoOverlaps[ii[1], id.Col], "len"])))
-    V[setdiff(rownames(idlens[[genome]]), names(V))] = 0
-    V2[setdiff(rownames(idlens[[genome]]), names(V2))] = 0
-    V = V[rownames(idlens[[genome]])]
-    V2 = V2[rownames(idlens[[genome]])]
+    NeachID = table(dfMarkers[,id.Col])
+    V = NeachID/(idlens[[genome]][names(NeachID), "len"])
+    NeachID2 = table(dfNoOverlaps[,id.Col])
+    V2 = NeachID2/(idlens[[genome]][names(NeachID2), "len"])
+    V2 = V2[names(NeachID)]
     # Make either a bar plot or a line plot, depending on number of chromosomes/scaffolds.
     if (length(V) <= 50) # Reasonable maximum number of chromosomes.
         {
@@ -250,10 +258,20 @@ for (genome in genomeLtrs)
         }
     else # Assume thousands of scaffolds, do a sorted plot of number per Mbp of scaffold.
         {
-        ord = order(V)
+        # Divide them into 50 bins and average the bins.
+        binSize = as.integer(length(V)/50)
+        Nbins = as.integer(length(V)/binSize)
+        start.idxs = seq(1, by=binSize, length.out=Nbins)
+        end.idxs = c(start.idxs[-1]-1, length(V))
+        V = sapply(1:length(start.idxs), function(i) mean(V[start.idxs[i]:end.idxs[i]]))
+        ylim = range(c(V, V2), na.rm=TRUE)
+        ylim[2] = ylim[2] * 1.1
+        V2[is.na(V2)] = 0
+        V2 = sapply(1:length(start.idxs), function(i) mean(V2[start.idxs[i]:end.idxs[i]]))
+        ord = order(V, decreasing=TRUE)
         V = V[ord]
         V2 = V2[ord]
-        plot(1:length(V), V, type="l", col="black", cex.main=1.5, cex.axis=1.2,
+        plot(1:length(V), V, type="l", ylim=ylim, col="black", cex.main=1.5, cex.axis=1.2, log="y",
             xlab="Number of FASTA Sequences", ylab="Density of IGG markers per 1 Mbp", cex.lab=2,
             main=paste("Density of IGG markers in FASTA sequences of genome '", genome, "'", sep=""))
         lines(1:length(V2), V2, col="blue")
@@ -271,10 +289,11 @@ for (genome in otherGenomeLtrs)
 maxDif = max(abs(ampDifs))
 xpretty = pretty(c(-maxDif, +maxDif), 20)
 xlim = range(xpretty)
+par(mai=c(1,1,1,5))
 par(mgp=c(3,1,0))
 hist(ampDifs, xlim=xlim, breaks=50,
     xlab=paste("Amplicon length difference from genome", refGenomeLtr, sep=""),
-    main="Distribution of amplicon length differences")
+    main="Distribution of amplicon length differences", cex.lab=1.5, cex.axis=1.5)
 
 ########################################
 # Close pdf file.

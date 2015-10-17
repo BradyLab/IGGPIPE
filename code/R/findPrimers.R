@@ -17,7 +17,7 @@ XSEP = ifelse(PATHSEP == "\\", "\\\\", PATHSEP)
 RE = paste("^.*--file=(([^", XSEP, "]*", XSEP, ")*)[^", XSEP, "]+$", sep="")
 args = commandArgs(FALSE)
 thisDir = sub(RE, "\\1", args[grepl("--file=", args)])
-#thisDir = "~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE/code/R/" # For testing only.
+#thisDir = "~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE/code/R/" # For testing only.
 
 # Source the necessary include files from the same directory containing this file.
 source(paste(thisDir, "Include_Common.R", sep=""))
@@ -32,7 +32,7 @@ if (testing == 0)
     args = commandArgs(TRUE)
 else if (testing == 1)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
         "outTestHP11/IndelGroupsOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0.tsv",
         "outTestHP11/GenomeData/DNAseqs_K11k2L100D10_2000A100_2000d10_100N2F0X20",
         "outTestHP11/NonvalidatedMarkers_K11k2L100D10_2000A100_2000d10_100N2F0X20.tsv",
@@ -42,7 +42,7 @@ else if (testing == 1)
     }
 else if (testing == 2)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
         "outHP14/IndelGroupsOverlapping_K14k2L400D10_1500A400_1500d50_300N2F0.tsv",
         "outHP14/GenomeData/DNAseqs_K14k2L400D10_1500A400_1500d50_300N2F0X20",
         "outHP14/NonvalidatedMarkers_K14k2L400D10_1500A400_1500d50_300N2F0X20.tsv",
@@ -52,7 +52,7 @@ else if (testing == 2)
     }
 else if (testing == 3)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
         "outHPT14/IndelGroupsOverlapping_K14k2L300D5_1500A300_1500d50_300N2F0.tsv",
         "outHPT14/GenomeData/DNAseqs_K14k2L300D5_1500A300_1500d50_300N2F0X15",
         "outHPT14/NonvalidatedMarkers_K14k2L300D5_1500A300_1500d50_300N2F0X15.tsv",
@@ -138,6 +138,7 @@ if (is.na(investigate))
 catnow("Reading Indel Group file...")
 dfMarkers = read.table(indelFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
 catnow("\n")
+catnow("Number of Indel Groups read:", nrow(dfMarkers), "\n")
 if (nrow(dfMarkers) == 0)
     stop("There are no Indel Groups.")
 inv(dim(dfMarkers), "input markers dim")
@@ -413,7 +414,7 @@ primerRegions = paste("SEQUENCE_PRIMER_PAIR_OK_REGION_LIST=1,", seqLen, ",", seq
 primerRegions = rep(primerRegions, nrow(dfMarkers))
 recordSeps = rep("=", nrow(dfMarkers))
 records = c(rbind(thermo, seqIDs, primerTemplates, primerRegions, recordSeps))
-numSeqIDs = length(seqIDs)
+numPrimerSeqIDs = length(seqIDs)
 rm(seqIDs, primerTemplates, primerRegions, recordSeps)
 writeLines.winSafe(records, primer3DataFile)
 rm(records)
@@ -425,13 +426,13 @@ catnow("\n")
 
 if (!file.exists(primer3settings)) stop("Primer3 settings file ", primer3settings, " not found")
 primer3_args = c("-p3_settings_file", primer3settings)
-catnow("Running command to design primers:\n")
+catnow("Running command to design primers for", numPrimerSeqIDs, "primers:\n")
 catnow("  ", primer3core, " ", paste(primer3_args, collapse=" "), "\n")
 estimateTime = FALSE
 if (estimateTime)
     {
     maxSecondsPerPrimer = 0.025
-    totalSeconds = round(maxSecondsPerPrimer * numSeqIDs)
+    totalSeconds = round(maxSecondsPerPrimer * numPrimerSeqIDs)
     maxMinutes = ceiling(totalSeconds/60)
     catnow("Expect this to take up to", maxMinutes, "minutes on a slower computer.\n")
     }
@@ -770,7 +771,8 @@ catnow("\n")
 catnow("Writing output file...")
 write.table.winSafe(dfMarkers, tsvMarkerFile, col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
 # dfMarkers = read.table(tsvMarkerFile, header=TRUE, sep="\t", stringsAsFactors=FALSE)
-catnow("\n\n")
+catnow("\n")
+catnow("Number of markers with primers written to output file:", nrow(dfMarkers), "\n")
 catnow("Finished adding primer sequences to Indel Groups, candidate marker output file:\n", tsvMarkerFile, "\n")
 }
 

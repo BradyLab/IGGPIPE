@@ -17,7 +17,7 @@ XSEP = ifelse(PATHSEP == "\\", "\\\\", PATHSEP)
 RE = paste("^.*--file=(([^", XSEP, "]*", XSEP, ")*)[^", XSEP, "]+$", sep="")
 args = commandArgs(FALSE)
 thisDir = sub(RE, "\\1", args[grepl("--file=", args)])
-#thisDir = "~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE/code/R/" # For testing only.
+#thisDir = "~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE/code/R/" # For testing only.
 
 # Source the necessary include files from the same directory containing this file.
 source(paste(thisDir, "Include_Common.R", sep=""))
@@ -34,7 +34,7 @@ if (testing == 0)
     args = commandArgs(TRUE)
 else if (testing == 1)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
         "outTestHP11/LCRs_K11k2L100D10_2000.tsv", 100, 2000, 10, 100, 2, 0,
         "MAX",
         "outTestHP11/IndelGroupsOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0.tsv",
@@ -44,7 +44,7 @@ else if (testing == 1)
     }
 else if (testing == 2)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
         "outHP14/LCRs_K14k2L400D10_1500.tsv", 100, 2000, 10, 100, 2, 0,
         "MAX",
         "outHP14/IndelGroupsOverlapping_K14k2L400D10_1500A400_1500d50_300N2F0.tsv",
@@ -54,7 +54,7 @@ else if (testing == 2)
     }
 else if (testing == 3)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
         "outHP14/LCRs_K14k2L100D1_3000.tsv", 100, 3000, 100, 100, 2, 0,
         "MIN",
         "outHP14/IndelGroupsOverlapping_K14k2L100D1_3000A100_3000d100_100N2F0.tsv",
@@ -207,6 +207,8 @@ df = read.table(inFile, header=TRUE, sep="\t", quote="", row.names=1,
     strip.white=FALSE, blank.lines.skip=FALSE, comment.char="",
     allowEscapes=FALSE, flush=FALSE, stringsAsFactors=FALSE)
 }
+catnow("Number of k-mers read from input file:", nrow(df),
+    "  Number of LCRs:", length(unique(df$LCR)), "\n")
 inv(dim(df), "input data dim")
 inv(colnames(df), "input data columns")
 inv(head(df), "input data head")
@@ -270,19 +272,20 @@ df = df[order(df$LCR),]
 # Add column NkmerFromLCRstart containing the number of this k-mer from the START
 # of the LCR, the first one being 1.
 numKmersInLCR = tapply(1:nrow(df), df$LCR, length)
-
-# Following needs unlist() and c() depending on whether all elements of numKmersInLCR are equal
+# Following needs unlist() and c() depending on whether all elements of numKmersInLCR
+# are equal.
 df$NkmerFromLCRstart = unlist(c(sapply(numKmersInLCR, function(N) 1:N)), use.names=FALSE)
 
 # Add column NkmerFromLCRend containing the number of this k-mer from the END of
 # the LCR, the last one being 1.
-# Following needs unlist() and c() depending on whether all elements of numKmersInLCR are equal
+# Following needs unlist() and c() depending on whether all elements of numKmersInLCR
+# are equal.
 df$NkmerFromLCRend = unlist(c(sapply(numKmersInLCR, function(N) N:1)), use.names=FALSE)
 
 # Add columns "(genome).difPos" giving absolute difference in "(genome).pos"
-# from one df row to the next, i.e. is the spacing between one k-mer and the
-# next.  All positions are either increasing or decreasing within one genome
-# of one LCR.  The first k-mer of each LCR has a value of 0 for these columns.
+# from one df row to the next, i.e. the spacing between one k-mer and the next.
+# All positions are either increasing or decreasing within one genome of one LCR.
+# The first k-mer of each LCR has a value of 0 for these columns.
 for (genome in genomes)
     {
     df[,difPosCol[genome]] = abs(df[,posCol[genome]] - c(0, df[-nrow(df), posCol[genome]]))
@@ -444,8 +447,21 @@ rm(cumSum, difDifAtStartKmer, cumSumThruStartKmer, cumSumThruEndKmer, cumSumLCRs
 # When the vector sizes reach 0 we are finished.
 #
 
-rightSideKmers = (1:nrow(df))[df$NkmerFromLCRstart > minFlank+1 & df$NkmerFromLCRend > minFlank]
+# Remove the minFlank rows at start and end of each LCR from df, not needed any more.
+df = df[df$NkmerFromLCRstart > minFlank & df$NkmerFromLCRend > minFlank,]
+
+# Make vector of valid right-side k-mer indexes.
+rightSideKmers = (1:nrow(df))[df$NkmerFromLCRstart > minFlank+1]
+# Make vector of valid left-side k-mer indexes.
 leftSideKmers = rightSideKmers-1
+
+# Make a column that is a simple flag indicating first valid left-side k-mer of each LCR.
+df$firstLeftSideKmer = (df$NkmerFromLCRstart == minFlank+1)
+
+# Remove columns not needed any more.
+df = df[, !colnames(df) %in% c("NkmerFromLCRstart", "NkmerFromLCRend")]
+
+# Finish initializing for testing left/right k-mer pairs, then start the testing loop.
 if (testing != 0 && FALSE)
     {
     x = sample(1:length(rightSideKmers), 200)
@@ -592,9 +608,10 @@ while (length(rightSideKmers) > 0)
             }
         }
 
-    # Remove k-mer pairs where the left-side k-mer is at k-mer position minFlank+1
-    # from the start of the LCR.
-    keepKmer = (df$NkmerFromLCRstart[leftSideKmers] > minFlank+1)
+    # Remove k-mer index pairs where the left-side k-mer is at k-mer position
+    # minFlank+1 from the start of the LCR, which is the first valid left-side
+    # k-mer.
+    keepKmer = !df$firstLeftSideKmer[leftSideKmers]
     leftSideKmers = leftSideKmers[keepKmer]
     rightSideKmers = rightSideKmers[keepKmer]
 
@@ -694,7 +711,7 @@ write.table.winSafe(dfIGs, outOverlappingIndelGroups, row.names=FALSE, quote=FAL
 catnow("\n")
 
 catnow("\n")
-catnow("Found", nrow(dfIGs), "Indel Group region k-mer pairs with distance between", Amin, "and", Amax, "and\n")
+catnow("Found", nrow(dfIGs), "overlapping Indel Group region k-mer pairs with distance between", Amin, "and", Amax, "and\n")
 catnow("delta distance at least", ADmin, "at distance", Amin, "and at least", ADmax, "at distance", Amax, "\n")
 catnow("in genomes", genomes, " (Indel Group regions can overlap, with each perhaps containing multiple actual Indel Groups)\n")
 catnow("\n")
@@ -719,6 +736,10 @@ inv(nrow(dfIGs), "\nNumber of Indel Groups including overlapping ones")
 
 dfIGs = removeOverlappingRows(dfIGs, "Indel Group", "genome", genomes, idCol.I, pos1Col.I, pos2Col.I, verbose=TRUE)
 
+catnow("\n")
+catnow("Found", nrow(dfIGs), "non-overlapping Indel Group region k-mer pairs\n")
+catnow("\n")
+
 ########################################
 # Write the non-overlapping Indel Group data to a file.
 ########################################
@@ -726,8 +747,7 @@ dfIGs = removeOverlappingRows(dfIGs, "Indel Group", "genome", genomes, idCol.I, 
 catnow("Writing Indel Groups to output file...")
 write.table.winSafe(dfIGs, outNonoverlappingIndelGroups, row.names=FALSE, quote=FALSE, sep="\t")
 # dfIGs = read.table(outNonoverlappingIndelGroups, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
-catnow("\n")
-
+catnow("Finished\n")
 }
 
 ################################################################################

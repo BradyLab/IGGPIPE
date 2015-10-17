@@ -723,7 +723,7 @@ endif
 # PATH_NONVALIDATED_MARKER_FILE target.
 
 $(PATH_NONVALIDATED_MARKER_FILE) : $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) $(DNA_SEQ_FILES) \
-        $(DIR_PRIMER_DATA) $(PATH_FIND_PRIMERS) $(PATH_PRIMER3_SETTINGS)
+        $(PATH_PRIMER3_SETTINGS) | $(DIR_PRIMER_DATA) $(PATH_FIND_PRIMERS)
 	@echo
 	@echo "*** findPrimers PARAMS=$(PARAMS) ***"
 	@echo "Find primers around Indel Groups in $< and write to $@"

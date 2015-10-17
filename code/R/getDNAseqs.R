@@ -17,7 +17,7 @@ XSEP = ifelse(PATHSEP == "\\", "\\\\", PATHSEP)
 RE = paste("^.*--file=(([^", XSEP, "]*", XSEP, ")*)[^", XSEP, "]+$", sep="")
 args = commandArgs(FALSE)
 thisDir = sub(RE, "\\1", args[grepl("--file=", args)])
-#thisDir = "~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE/code/R/" # For testing only.
+#thisDir = "~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE/code/R/" # For testing only.
 
 # Source the necessary include files from the same directory containing this file.
 source(paste(thisDir, "Include_Common.R", sep=""))
@@ -31,7 +31,7 @@ if (testing == 0)
     args = commandArgs(TRUE)
 else if (testing == 1)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
         "outTestHP11/IndelGroupsOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0.tsv",
         1, "outTestHP11/GenomeData/DNAseqs_K11k2L100D10_2000A100_2000d10_100N2F0X20_1.dnaseqs",
         "outTestHP11/GenomeData", 20,
@@ -41,7 +41,7 @@ else if (testing == 1)
     }
 else if (testing == 2)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
         "outTestHP11/IndelGroupsOverlapping_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0.tsv",
         2, "outTestHP11/GenomeData/DNAseqs_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0X20_2.dnaseqs",
         "outTestHP11/GenomeData", 20,
@@ -142,6 +142,7 @@ catnow("Preparing to retrieve k-mer-vicinity sequences from FASTA file\n")
 
 # Read indel k-mer pairs data.
 df = read.table(indelFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
+catnow("Number of input file Indel Groups read:", nrow(df), "\n")
 if (nrow(df) == 0)
     stop("There are no Indel Groups.")
 inv(dim(df), "input data dim")
@@ -407,7 +408,7 @@ df = df[, colnames(df) != "ctg"]
 # Write the data frame to the output file.
 write.table.winSafe(df, seqOutFile, row.names=FALSE, quote=FALSE, sep="\t")
 # df = read.table(seqOutFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
-
+catnow("Number of DNA sequences written to output file:", nrow(df), "\n")
 catnow("Finished retrieving DNA sequences for Indel Groups, output file:\n", seqOutFile, "\n")
 }
 

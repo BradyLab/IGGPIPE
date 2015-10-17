@@ -214,13 +214,18 @@ do.call.rbind.fast = function(L, stringsAsFactors=FALSE)
 #   P10.StartEnd: TRUE if sequence must start and end with a power of 10, FALSE
 #       if it may start or end with 2* or 5* a power of 10 (depending of course
 #       on 'include').
+#   scale: multiply the largest x-value by this, and divide the smallest x-value
+#       by this, to get the range to try to actually plot (this allows extra plot
+#       space above and below the highest/lowest points plotted).
 #
 # Returns: the computed sequence.
 ################################################################################
-pretty.log = function(x, include="X125", P10.StartEnd=FALSE)
+pretty.log = function(x, include="X125", P10.StartEnd=FALSE, scale=1.2)
     {
     x = as.numeric(x)
     r = range(x)
+    r[1] = r[1]/scale
+    r[2] = r[2]*scale
 
     # Compute first element of the sequence.
     x1 = log10(r[1])

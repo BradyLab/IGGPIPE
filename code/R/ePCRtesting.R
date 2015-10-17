@@ -17,7 +17,7 @@ XSEP = ifelse(PATHSEP == "\\", "\\\\", PATHSEP)
 RE = paste("^.*--file=(([^", XSEP, "]*", XSEP, ")*)[^", XSEP, "]+$", sep="")
 args = commandArgs(FALSE)
 thisDir = sub(RE, "\\1", args[grepl("--file=", args)])
-#thisDir = "~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE/code/R/" # For testing only.
+#thisDir = "~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE/code/R/" # For testing only.
 
 # Source the necessary include files from the same directory containing this file.
 source(paste(thisDir, "Include_Common.R", sep=""))
@@ -31,7 +31,7 @@ if (testing == 0)
     args = commandArgs(TRUE)
 else if (testing == 1)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
         "outTestHP11/NonvalidatedMarkers_K11k2L100D10_2000A100_2000d10_100N2F0X20.tsv",
         1, "outTestHP11/MarkerErrors_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1_H.bad.tsv",
         "outTestHP11/GenomeData", "/Users/tedtoal/bin/e-PCR", 3000, 8, 3, 1,
@@ -39,7 +39,7 @@ else if (testing == 1)
     }
 else if (testing == 2)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
         "outTestHP11/NonvalidatedMarkers_K11k2L100D10_2000A100_2000d10_100N2F0X20.tsv",
         2, "outTestHP11/MarkerErrors_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1_P.bad.tsv",
         "outTestHP11/GenomeData", "/Users/tedtoal/bin/e-PCR", 3000, 8, 3, 1,
@@ -143,6 +143,7 @@ catnow("Preparing to do electronic PCR using primers of genome", genomeNum, "on 
 
 # Read candidate marker data including primers.
 df = read.table(tsvMarkerFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
+catnow("Number of candidate markers read from input file:", nrow(df), "\n")
 if (nrow(df) == 0)
     stop("There are no candidate markers.")
 inv(dim(df), "input data dim")
@@ -205,8 +206,9 @@ ePCR_args = c("-v-", "-p+", "-t3", "-m", maxDeviation, "-w", wordSize,
     "-n", maxMismatches, "-g", maxGaps, "-o", ePCRoutputFile, ePCRinputFile, fastaFile)
 inv(nrow(dfEPCR), "nrow(dfEPCR)")
 inv(ePCR_args, "e-PCR arguments")
-catnow("Running e-PCR command to search for marker primer sequences from FASTA file:\n")
+catnow("Running e-PCR command to search for", nrow(dfEPCR), "marker primer sequences from FASTA file:\n")
 catnow("  ", ePCRpath, " ", paste(ePCR_args, collapse=" "), "\n")
+rm(dfEPCR)
 stat = system2(ePCRpath, ePCR_args)
 if (stat != 0)
     stop("Program ", ePCRpath, " exited with error status ", stat)
@@ -292,6 +294,7 @@ else
 write.table.winSafe(dfRemove, badMarkerFile, row.names=FALSE, quote=FALSE, sep="\t")
 # dfRemove = read.table(badMarkerFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
 
+catnow("Number of markers written to bad marker file:", nrow(dfRemove), "\n")
 catnow("Finished testing primers of candidate markers for genome", genomeNum, "\n")
 catnow("Markers to remove are in file:\n", badMarkerFile, "\n")
 }

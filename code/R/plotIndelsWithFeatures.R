@@ -17,7 +17,7 @@ XSEP = ifelse(PATHSEP == "\\", "\\\\", PATHSEP)
 RE = paste("^.*--file=(([^", XSEP, "]*", XSEP, ")*)[^", XSEP, "]+$", sep="")
 args = commandArgs(FALSE)
 thisDir = sub(RE, "\\1", args[grepl("--file=", args)])
-#thisDir = "~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE/code/R/" # For testing only.
+#thisDir = "~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE/code/R/" # For testing only.
 
 # Source the necessary include files from the same directory containing this file.
 source(paste(thisDir, "Include_Common.R", sep=""))
@@ -31,14 +31,14 @@ if (testing == 0)
     args = commandArgs(TRUE)
 else if (testing == 1)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
         "outTestHP11/MarkersNonoverlappingWithInNearFeatures_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv",
         "outTestHP11/MarkersNonoverlappingWithInNearFeatures_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.pdf",
         1000, 2000, "S.lycopersicum,S.pennellii")
     }
 else if (testing == 2)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/kmers/IGGPIPE",
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
         "outHP14/IndelGroupsNonoverlappingWithInNearFeatures_K14k2L100D1_3000A100_3000d100_100N2F0.indels.tsv",
         "outHP14/MarkersNonoverlappingWithInNearFeatures_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.indels.pdf",
         1000, 3000, "S.lycopersicum,S.pennellii")
@@ -238,8 +238,8 @@ names(featureLtys) = features
 # Create pdf file.
 ########################################
 
-pdf(pdfPlotFile, height=8, width=11)
-par(mar=c(7,6,4,2))
+pdf(pdfPlotFile, height=8, width=6)
+par(mar=c(9,8,6,3))
 
 ########################################
 # Make a bar plot (one bar per genome) showing the number of indels occurring
@@ -272,15 +272,15 @@ if (ypretty[1] >= 1000)
 ypretty = format(ypretty, scientific=FALSE)
 
 # Make the bar plot.
-barplot(countMtx, beside=TRUE, col=genomeCols, axes=FALSE, log="y", las=2,
+barplot(countMtx, beside=TRUE, col=genomeCols, axes=FALSE, log="y", las=2, cex.names=1.5,
     main="Distribution of indel locations",
     ylab="")
-title(paste("upstream and downstream defined as within ", nearInBp, " bp of 5'UTR/CDS/3'UTR", sep=""), line=0.5, cex.main=0.9)
-axis(2, at=yat, labels=ypretty, las=2)
-mtext(ylab, 2, line=4)
+title(paste("upstream/downstream defined as within ", nearInBp, " bp of 5'UTR/CDS/3'UTR", sep=""), line=1.5, cex.main=0.8)
+axis(2, at=yat, labels=ypretty, las=2, cex.axis=1.5)
+mtext(ylab, 2, line=6, cex=1.5)
 
 # Legend.
-legend("topleft", genomeNames, fill=genomeCols)
+legend("topleft", genomeNames, fill=genomeCols, cex=2)
 
 ########################################
 # Make a line plot (one line per genome) where x-axis positions where points are
@@ -310,6 +310,7 @@ for (genome in genomeLtrs)
 
 # Compute axis labels.
 xlim = c(1, Nbins)
+xlab = paste("Deletion size range (bp)\n0=insertion, max detectable ~ ", maxIndelLen, " bp", sep="")
 ypretty = pretty.log(countMtx)
 ylim = range(ypretty)
 yat = ypretty
@@ -322,18 +323,17 @@ if (ypretty[1] >= 1000)
 ypretty = format(ypretty, scientific=FALSE)
 
 # Start the plot.
-plot(NA, type="n", xlim=xlim, ylim=ylim, axes=FALSE, log="y",
-    main="Distribution of indel deletion sizes",
-    xlab=paste("Deletion size range (bp), 0=insertion, max detectable ~ ", maxIndelLen, " bp", sep=""),
-    ylab="")
-axis(1, at=1:Nbins, labels=binRanges)
-axis(2, at=yat, labels=ypretty, las=2)
-mtext(ylab, 2, line=4)
+plot(NA, type="n", xlim=xlim, ylim=ylim, axes=FALSE, log="y", xlab="", ylab="",
+    main="Distribution of indel deletion sizes")
+mtext(binRanges, 1, at=1:Nbins, line=0, las=2, cex=1.5)
+mtext(xlab, 1, line=7.5, cex=1.5)
+axis(2, at=yat, labels=ypretty, las=2, cex.axis=1.5)
+mtext(ylab, 2, line=4, cex=1.5)
 
 # Loop and plot line/points for each genome.
 for (genome in genomeLtrs)
     {
-    lines(2:Nbins, countMtx[genome, -1], col=genomeCols[genome], lwd=2, lty=genomeLtys[genome])
+    lines(2:Nbins, countMtx[genome, -1], col=genomeCols[genome], lwd=3, lty=genomeLtys[genome])
     points(1:Nbins, countMtx[genome,], col=genomeCols[genome], pch=20, cex=2)
     }
 
@@ -342,7 +342,7 @@ segments(1:Nbins, ylim[1], 1:Nbins, ylim[2], col=gridCol)
 segments(0, yat, xlim[2], yat, col=gridCol)
 
 # Legend.
-legend("topright", genomeNames, pch=20, col=genomeCols, pt.cex=2, lwd=2, lty=genomeLtys, seg.len=5, bty="n")
+legend("topright", genomeNames, pch=20, col=genomeCols, pt.cex=2, lwd=3, lty=genomeLtys, seg.len=5, bty="n", cex=2)
 
 ########################################
 # Similar to the previous, except show a line for each feature type, and make a
@@ -367,6 +367,7 @@ for (genome in genomeLtrs)
 
 # Compute axis labels.
 xlim = c(1, Nbins)
+xlab = paste("Deletion size range (bp)\n0=insertion, max detectable ~ ", maxIndelLen, " bp", sep="")
 ypretty = pretty.log(counts)
 ylim = range(ypretty)
 yat = ypretty
@@ -382,15 +383,14 @@ ypretty = format(ypretty, scientific=FALSE)
 for (genome in genomeLtrs)
     {
     # Start the plot.
-    plot(NA, type="n", xlim=xlim, ylim=ylim, axes=FALSE, log="y",
-        main=paste("Distribution of indel deletion sizes among features in genome ",
-            genomeNames[genome], "\n(features are from S. lycopersicum gene model file)", sep=""),
-        xlab=paste("Deletion size range (bp), 0=insertion, max detectable ~ ", maxIndelLen, " bp", sep=""),
-        ylab="")
-    title(paste("upstream and downstream defined as within ", nearInBp, " bp of 5'UTR/CDS/3'UTR", sep=""), line=-0.5, cex.main=0.9)
-    axis(1, at=1:Nbins, labels=binRanges)
+    plot(NA, type="n", xlim=xlim, ylim=ylim, axes=FALSE, log="y", xlab="", ylab="",
+        main=paste("Distribution of indel sizes in genome ",
+            genomeNames[genome], " features\n(features are from S. lycopersicum gene model file)", sep=""))
+    title(paste("upstream/downstream defined as within ", nearInBp, " bp of 5'UTR/CDS/3'UTR", sep=""), line=0.5, cex.main=0.8)
+    mtext(binRanges, 1, at=1:Nbins, line=0, las=2, cex=1.5)
+    mtext(xlab, 1, line=7.5, cex=1.5)
     axis(2, at=yat, labels=ypretty, las=2)
-    mtext(ylab, 2, line=4)
+    mtext(ylab, 2, line=4, cex=1.5)
 
     # Loop for each feature type.
     for (feat in features)
