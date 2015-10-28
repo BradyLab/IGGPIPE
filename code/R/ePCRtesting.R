@@ -26,6 +26,7 @@ source(paste(thisDir, "Include_Common.R", sep=""))
 testing = 0
 #testing = 1 # For testing only, outTestHP11, genome 1.
 #testing = 2 # For testing only, outTestHP11, genome 2.
+#testing = 3 # For testing only, outHPT14_400_1500_50_300, genome 2.
 {
 if (testing == 0)
     args = commandArgs(TRUE)
@@ -33,7 +34,7 @@ else if (testing == 1)
     {
     args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
         "outTestHP11/NonvalidatedMarkers_K11k2L100D10_2000A100_2000d10_100N2F0X20.tsv",
-        1, "outTestHP11/MarkerErrors_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1_H.bad.tsv",
+        1, "outTestHP11/MarkerErrors_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1_1.bad.tsv",
         "outTestHP11/GenomeData", "/Users/tedtoal/bin/e-PCR", 3000, 8, 3, 1,
         "testFASTA/ITAG2.4_test.fasta", TRUE)
     }
@@ -41,9 +42,17 @@ else if (testing == 2)
     {
     args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
         "outTestHP11/NonvalidatedMarkers_K11k2L100D10_2000A100_2000d10_100N2F0X20.tsv",
-        2, "outTestHP11/MarkerErrors_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1_P.bad.tsv",
+        2, "outTestHP11/MarkerErrors_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1_2.bad.tsv",
         "outTestHP11/GenomeData", "/Users/tedtoal/bin/e-PCR", 3000, 8, 3, 1,
         "testFASTA/Spenn2.0_test.fasta", TRUE)
+    }
+else if (testing == 3)
+    {
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
+        "outHPT14_400_1500_50_300/NonvalidatedMarkers_K14k4L400D1_1500A400_1500d50_300N2F0X10.tsv",
+        2, "outHPT14_400_1500_50_300/MarkerErrors_K14k4L400D1_1500A400_1500d50_300N2F0X10V2500W8M0G0_2.bad.tsv",
+        "outHPT14_400_1500_50_300/GenomeData", "/Users/tedtoal/bin/e-PCR", 2500, 8, 0, 0,
+        "/Users/tedtoal/Documents/UCDavis/BradyLab/Genomes/Sope/V1genome/Sope.V1.fasta", TRUE)
     }
 else stop("Unknown value for 'testing'")
 }
@@ -222,6 +231,11 @@ if (stat != 0)
 if (!file.exists(ePCRoutputFile)) stop("e-PCR output file not found: ", ePCRoutputFile)
 dfAmps = read.table(ePCRoutputFile, header=FALSE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
 colnames(dfAmps) = c("id", "rowNum", "strand", "posL", "posR", "lenExpLens", "mismatches", "gaps", "info")
+
+# The "id" may have "|" characters in it.  If so, since our Perl readFastaSeq() assumes
+# that such a character terminates the ID, we must discard everything from the first
+# such character onwards in each ID.
+dfAmps$id = sub("\\|.*$", "", dfAmps$id)
 
 # Group the results by df row number.
 L = split(1:nrow(dfAmps), dfAmps$rowNum)

@@ -12,7 +12,7 @@ use TedsLibrary ':all';
 my $n = @ARGV;
 if ($n < 3) {
 	print("Read N lists of unique k-mers obtained from N genomes, intersect them,\n");
-	print("intersection size, and write intersecting k-mers to an intersection file.\n");
+	print("and write intersecting k-mers to an intersection file.\n");
 	print("The k-mer lists are assumed to be in alphabetical order.  If Jellyfish is\n");
 	print("used to obtain the k-mers, it seems to output k-mers in alphabetical order\n");
 	print("if the number of them is not too big, but when it gets large, it stops doing\n");

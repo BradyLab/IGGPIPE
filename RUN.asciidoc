@@ -127,7 +127,7 @@ line:
   nano allParameters.XY
 
 If you are in a hurry, you don't need to read anything in the file, but
-can simply *search for "#@@"*, which are comment lines
+can simply *search for "\#\#\#"*, which are comment lines
 marking items that may need to be changed.
 
 Each "#@@" comment says whether it must be changed, might need to

@@ -25,7 +25,8 @@ source(paste(thisDir, "Include_RemoveOverlapping.R", sep=""))
 
 # Get arguments.
 testing = 0
-#testing = 1 # For testing only.
+#testing = 1 # For testing only. outTestHP11
+#testing = 2 # For testing only. outHPT14_400_1500_50_300
 {
 if (testing == 0)
     args = commandArgs(TRUE)
@@ -33,9 +34,18 @@ else if (testing == 1)
     {
     args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE", "MIN",
         "outTestHP11/NonvalidatedMarkers_K11k2L100D10_2000A100_2000d10_100N2F0X20.tsv",
-        "outTestHP11/MarkerErrors_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1_",
+        "outTestHP11/MarkerErrors_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1",
         "outTestHP11/MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv",
         "outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv",
+        TRUE)
+    }
+else if (testing == 2)
+    {
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE", "MIN",
+        "outHPT14_400_1500_50_300/NonvalidatedMarkers_K14k4L400D1_1500A400_1500d50_300N2F0X10.tsv",
+        "outHPT14_400_1500_50_300/MarkerErrors_K14k4L400D1_1500A400_1500d50_300N2F0X10V2500W8M0G0",
+        "outHPT14_400_1500_50_300/MarkersOverlapping_K14k4L400D1_1500A400_1500d50_300N2F0X10V2500W8M0G0.tsv",
+        "outHPT14_400_1500_50_300/MarkersNonoverlapping_K14k4L400D1_1500A400_1500d50_300N2F0X10V2500W8M0G0.tsv",
         TRUE)
     }
 else stop("Unknown value for 'testing'")

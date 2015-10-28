@@ -27,6 +27,7 @@ testing = 0
 #testing = 1 # For testing only, outTestHP11 LCRs
 #testing = 2 # For testing only, outTestHP11 IndelGroupsNonoverlapping
 #testing = 3 # For testing only, outTestHP11 MarkersNonoverlapping
+#testing = 4 # For testing only, outTaCW15 LCRs
 {
 # Which aligner?  I had problems with ClustalW2, see comments later.
 useClustal = FALSE
@@ -71,6 +72,19 @@ else if (testing == 3)
         "code/perl/getSeqsFromFasta.pl",
         aligner, 0.1, TRUE,
         "testFASTA/ITAG2.4_test.fasta", "testFASTA/SpennV2.0_test.fasta")
+    }
+else if (testing == 4)
+    {
+    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
+        "outTaCW15/LCRs_K15k2L200D5_1000.tsv",
+        "outTaCW15/LCRs_K15k2L200D5_1000.indels.tsv",
+        "outTaCW15/LCRs_K15k2L200D5_1000.snps.tsv",
+        "outTaCW15/GenomeData",
+        "/Users/tedtoal/perl5/perlbrew/perls/perl-5.14.2/bin/perl",
+        "code/perl/getSeqsFromFasta.pl",
+        aligner, 0.1, TRUE,
+        "/Users/tedtoal/Documents/UCDavis/BradyLab/Genomes/Ta/Genome_IWGSC1.0/Triticum_aestivum.IWGSC1.0+popseq.28.dna.genome.fa",
+        "/Users/tedtoal/Documents/UCDavis/BradyLab/Genomes/Ta/Genome_W7984_scaffoldsMar28/w7984.meraculous.scaffolds.Mar28_contamination_removed.fa")
     }
 else stop("Unknown value for 'testing'")
 }
@@ -138,7 +152,7 @@ if (length(args) < NexpectedMin)
         ifelse(useClustal,
             "   <alignerPath>  : Full path of the sequence alignment program 'clustalW2'",
             "   <alignerPath>  : Full path of the sequence alignment program 'muscle'"),
-        "   <maxSNPsFrac>  : Maximum allowed fraction of total sequence that can be SNPs.",
+        "   <maxSNPsFrac>  : Maximum allowed fraction of total non-insert sequence that can be SNPs.",
         "                    More than this many SNPs causes that LCR/IndelGroup/Marker to be",
         "                    ignored.  Use 1 to allow any number of SNPs.",
         "   <investigate>  : FALSE for normal operation, TRUE for more verbose debugging output.",
@@ -278,7 +292,9 @@ if (any(colnames(df) == "LCR"))
     # Remove strand columns, don't need them any more.
     df = df[, !colnames(df) %in% strandCols]
 
-    # Break the LCR up into one or more output rows and build the rows.
+    # Break the LCR up into one or more output rows and build the rows.  A single
+    # LCR can be so long that we can't align it.  Keep the maximum length of the
+    # output rows short enough that we will be able to align them.
     maxOutLen = 500 # Try to keep output length less than this.
     df = df[order(df$LCR, df[, refIdCol], df[, refPosCol]),] # Make sure df is sorted by reference genome within each LCR.
     # Get indexes indicating starting and ending row of each LCR.  Note that it
@@ -292,7 +308,9 @@ if (any(colnames(df) == "LCR"))
     startRows = c()
     endRows = c()
     # curStarts are df row indexes of rows that will be the start k-mers of the
-    # next output data frame rows, initially the first df row of each LCR.
+    # next output data frame rows, initially the first df row of each LCR, and
+    # subsequently the same row that was the end k-mer of the previous output row.
+    # (The output rows of one LCR will overlap by one k-mer).
     curStarts = startLCR
     # curEnds are df row indexes of the rows currently being tested to see if they
     # should be end-of-span k-mers, initially the SECOND df row of each LCR.
@@ -313,30 +331,19 @@ if (any(colnames(df) == "LCR"))
         # Remove them from curStarts/curEnds.
         curStarts = curStarts[!isEndLCR]
         curEnds = curEnds[!isEndLCR]
-        # If curEnds+1 is the last row of the LCR, move those curStarts/curEnds+1 to
-        # startRows/endRows.  (We can't decide to end at curEnds because maxOutLen
-        # is exceeded, if the following k-mer is the end of the LCR, because each
-        # output row must have at least two k-mers).
-        nextCurEnds = curEnds+1
-        isEndLCR = (nextCurEnds %in% endLCR)
-        startRows = c(startRows, curStarts[isEndLCR])
-        endRows = c(endRows, nextCurEnds[isEndLCR])
-        # Remove them from curStarts/curEnds.
-        curStarts = curStarts[!isEndLCR]
-        curEnds = curEnds[!isEndLCR]
         # If curEnds+1 exceeds maxOutLen, move those curStarts/curEnds to
         # startRows/endRows.
-        # Check to see if the k-mer following the curEnds k-mer .
+        # Check to see if the k-mer following the curEnds k-mer would cause the next
+        # output row length to exceed the maximum.  If so, make a new output row
+        # ending at the current k-mer.  
         nextCurEnds = curEnds+1
         nextExceedsMax = (df[nextCurEnds, refPosCol] - df[curStarts, refPosCol] > maxOutLen)
         startRows = c(startRows, curStarts[nextExceedsMax])
         endRows = c(endRows, curEnds[nextExceedsMax])
-        # Remove them from curStarts/curEnds, but add new start/end rows to curStarts/curEnds
-        # equal to nextCurEnds/nextCurEnds of those rows, noting that we will in the next step
-        #increment curEnd to nextCurEnds+1, which is a valid index since we know that nextCurEnds
-        # is not the end of the LCR.
-        curStarts = c(curStarts[!nextExceedsMax], nextCurEnds[nextExceedsMax])
-        curEnds = c(curEnds[!nextExceedsMax], nextCurEnds[nextExceedsMax])
+        # And, remove the start k-mer from curStarts and replace it with the end k-mer
+        # in curEnds, so that the next row will start with the same k-mer that this row
+        # ends with.
+        curStarts = c(curStarts[!nextExceedsMax], curEnds[nextExceedsMax])
         # Finally, advance curEnds by one position.
         curEnds = curEnds+1
         }
@@ -744,31 +751,39 @@ names(valCols) = genomeLtrs
 # Count number of df rows in which there were too many SNPs in the alignment (> maxSNPsFrac).
 tooManySNPs = 0
 
-# Start the loop.  This may take forever!
-logEveryN = 100
-logCount = 0
-catnow("Performing", nrow(df), "alignments and extracting Indels and SNPs\n")
-
 # Prepare for assembling sequence lines into FASTA file.
 idLines = paste(">", genomeLtrs, sep="")
 names(idLines) = genomeLtrs
 maxLineChars = 80
+
+# Open the output files and write results to them as we go along.  Use "wb" so
+# it will write Unix line ends even under Windows.
+indelsFile = file(outIndelFile, "wb")
+SNPsFile = file(outSNPfile, "wb")
+writeColNamesIndels = TRUE
+writeColNamesSNPs = TRUE
+
+# Write data to output file after every outEveryN lines of df have been aligned.
+outEveryN = 100
+catnow("Performing", nrow(df), "alignments and extracting Indels and SNPs\n")
+
+# Do garbage collection every gcEveryN, which must be multiple of outEveryN.
+gcEveryN = 10000
 
 # Timing note: with Muscle, and with 459 alignments, total time without anything
 # below EXCEPT the Muscle alignment was 1:05 minutes, and with everything below
 # was 1:11 minutes.  So most of the time is the alignment time.  ClustalW2 was
 # probably even slower.
 
+# Start the loop.  This may take forever!
+Nindels = 0
+Nsnps = 0
 NalignerFails = 0
 NalignerGarbage = 0
-for (i in 1:nrow(df))
+for (alignCount in 1:nrow(df))
     {
-    #catnow("i =", i, "of", nrow(df), "\n")
-
-    # Logging.
-    logCount = logCount + 1
-    if (logCount %% logEveryN == 0)
-        cat(" N =", logCount, "of", nrow(df), "\n")
+    #catnow("alignCount =", alignCount, "of", nrow(df), "\n")
+    d = df[alignCount,]
 
     # Write sequences to FASTA file.  Split lines so each is no longer than
     # maxLineChars bases, both for convenience examining and because aligner
@@ -776,7 +791,7 @@ for (i in 1:nrow(df))
     outLines = c()
     for (genome in genomeLtrs)
         {
-        sequence = df[i, seqCols[genome]]
+        sequence = d[, seqCols[genome]]
         Len = nchar(sequence)
         startChar = seq(1, Len, by=maxLineChars)
         endChar = startChar + maxLineChars - 1
@@ -851,11 +866,13 @@ for (i in 1:nrow(df))
         stop("Expected all sequences to be the same size")
     alignMtx = matrix(unlist(strsplit(alignSeqs, "", fixed=TRUE)), ncol=Ngenomes, dimnames=list(NULL, genomeLtrs))
 
-    # Check to see if the number of SNPs exceeds maxSNPsFrac in any genome.  If so, skip this one.
-    seqLens = apply(alignMtx[,-1,drop=FALSE], 2, function(V) sum(V != "-"))
+    # Check to see if the number of SNPs exceeds maxSNPsFrac in any genome.  If
+    # so, skip this one.  We calculate seqLens as the total number of bases in
+    # that genome that have non-"-" for both it and the reference genome.
+    refV = alignMtx[, 1, drop=TRUE]
+    seqLens = apply(alignMtx[(refV != "-"), -1, drop=FALSE], 2, function(V) sum(V != "-"))
     maxSNPsAllowed = max(as.integer(seqLens * maxSNPsFrac))
-    refV = alignMtx[,1]
-    isSNP = apply(alignMtx[,-1,drop=FALSE], 2, function(V) (V != "-" & refV != "-" & V != refV))
+    isSNP = apply(alignMtx[, -1, drop=FALSE], 2, function(V) (V != "-" & refV != "-" & V != refV))
     if (ncol(isSNP) == 1)
         isSNP = isSNP[,1] # Converts to vector.
     else
@@ -870,8 +887,8 @@ for (i in 1:nrow(df))
     # Create a data frame of SNPs and append it to dfSNPs.
     if (numSNPs > 0)
         {
-        phases = df$phases[i]
-        dfs = data.frame(ID=df$ID[i], phases=phases, idx=1:numSNPs, stringsAsFactors=FALSE)
+        phases = d$phases
+        dfs = data.frame(ID=d$ID, phases=phases, idx=1:numSNPs, stringsAsFactors=FALSE)
 
         # We will need the position offset of each SNP in each genome.  This offset ignores
         # the gaps in the alignment.
@@ -882,7 +899,7 @@ for (i in 1:nrow(df))
             {
             genome = genomeLtrs[j]
             phase = substring(phases, j, j)
-            dfs[, idCols[genome]] = df[i, idCols[genome]]
+            dfs[, idCols[genome]] = d[, idCols[genome]]
 
             # For positions, we must add the offset in that genome to the starting position in it.
             SNPoffset.genome = offsetMtx[isSNP, j]
@@ -891,9 +908,9 @@ for (i in 1:nrow(df))
             # the fact that the aligned sequence was reverse complemented after
             # being extracted from the genome position given by pos1Cols/pos2Cols.
             if (phase == "+")
-                dfs[, posCols[genome]] = df[i, pos1Cols[genome]] + SNPoffset.genome
+                dfs[, posCols[genome]] = d[, pos1Cols[genome]] + SNPoffset.genome
             else
-                dfs[, posCols[genome]] = df[i, pos2Cols[genome]] - SNPoffset.genome
+                dfs[, posCols[genome]] = d[, pos2Cols[genome]] - SNPoffset.genome
 
             # And finally, the SNP value.
             dfs[, valCols[genome]] = alignMtx[isSNP, j]
@@ -907,16 +924,16 @@ for (i in 1:nrow(df))
     gaps = apply(alignMtx, 1, function(V) any(V == "-"))
     indelStarts = which(c(TRUE, !gaps[-N]) & gaps) # Previous bp not a gap and this bp is a gap
     indelEnds = which(c(!gaps[-1], TRUE) & gaps) # Next bp not a gap and this bp is a gap
-    Nindels = length(indelStarts)
-    if (length(indelEnds) != Nindels)
+    numIndels = length(indelStarts)
+    if (length(indelEnds) != numIndels)
         stop("Programming error, expected equal number of starts/ends")
-    if (Nindels > 0)
+    if (numIndels > 0)
         {
         # Each Indel in each genome has a number of gaps ("-" characters) between the
         # Indel start and end position, and we need to count these.
         gapCount = list()
         for (genome in genomeLtrs)
-            gapCount[[genome]] = sapply(1:Nindels, function(i) sum(alignMtx[indelStarts[i]:indelEnds[i], genome] == "-"))
+            gapCount[[genome]] = sapply(1:numIndels, function(i) sum(alignMtx[indelStarts[i]:indelEnds[i], genome] == "-"))
 
         # We use the base BEFORE the Indel as its starting position and the base AFTER the
         # Indel as its ending position.  If the alignment includes gaps at the start or end,
@@ -926,8 +943,8 @@ for (i in 1:nrow(df))
         indelBaseAfterEnd = indelEnds + 1
 
         # Create a data frame of Indels and append it to dfIndels.
-        phases = df$phases[i]
-        dfi = data.frame(ID=df$ID[i], phases=phases, idx=1:Nindels, stringsAsFactors=FALSE)
+        phases = d$phases
+        dfi = data.frame(ID=d$ID, phases=phases, idx=1:numIndels, stringsAsFactors=FALSE)
 
         # Get Indel columns for each genome.
         for (j in 1:Ngenomes)
@@ -935,7 +952,7 @@ for (i in 1:nrow(df))
             genome = genomeLtrs[j]
             phase = substring(phases, j, j)
             dfi[, delCols[genome]] = gapCount[[genome]]
-            dfi[, idCols[genome]] = df[i, idCols[genome]]
+            dfi[, idCols[genome]] = d[, idCols[genome]]
 
             # For start and end positions, we must SUBTRACT THE NUMBER OF GAPS IN EACH GENOME.
             # This number is held in "gapCount", but we must do it properly.  The first count
@@ -943,7 +960,7 @@ for (i in 1:nrow(df))
             # subsequent positions.  The second count is not subtracted from the first or second
             # start position of first end position, but is subtracted from the rest.  Etc.
             gapSubtract = cumsum(gapCount[[genome]])
-            indelBaseBeforeStart.genome = indelBaseBeforeStart - c(0, gapSubtract[-Nindels])
+            indelBaseBeforeStart.genome = indelBaseBeforeStart - c(0, gapSubtract[-numIndels])
             indelBaseAfterEnd.genome = indelBaseAfterEnd - gapSubtract
 
             # Genomes with negative phase require that the start/end positions be
@@ -951,40 +968,70 @@ for (i in 1:nrow(df))
             # after being extracted from the genome position given by pos1Cols/pos2Cols.
             if (phase == "+")
                 {
-                dfi[, startCols[genome]] = df[i, pos1Cols[genome]] + indelBaseBeforeStart.genome - 1
-                dfi[, endCols[genome]] = df[i, pos1Cols[genome]] + indelBaseAfterEnd.genome - 1
+                dfi[, startCols[genome]] = d[, pos1Cols[genome]] + indelBaseBeforeStart.genome - 1
+                dfi[, endCols[genome]] = d[, pos1Cols[genome]] + indelBaseAfterEnd.genome - 1
                 }
             else
                 {
-                dfi[, startCols[genome]] = df[i, pos2Cols[genome]] - indelBaseBeforeStart.genome + 1
-                dfi[, endCols[genome]] = df[i, pos2Cols[genome]] - indelBaseAfterEnd.genome + 1
+                dfi[, startCols[genome]] = d[, pos2Cols[genome]] - indelBaseBeforeStart.genome + 1
+                dfi[, endCols[genome]] = d[, pos2Cols[genome]] - indelBaseAfterEnd.genome + 1
                 }
             }
         dfIndels = rbind.fast(dfIndels, dfi)
         }
+
+    # Output the data.
+    if (alignCount %% outEveryN == 0)
+        {
+        cat(" N =", alignCount, "of", nrow(df))
+        dfIndels = rbind.fast.finish(dfIndels)
+        if (!is.null(dfIndels) && nrow(dfIndels) > 0)
+            {
+            Nindels = Nindels + nrow(dfIndels)
+            write.table(dfIndels, indelsFile, row.names=FALSE, col.names=writeColNamesIndels, quote=FALSE, sep="\t")
+            writeColNamesIndels = FALSE
+            dfIndels = NULL
+            }
+        dfSNPs = rbind.fast.finish(dfSNPs)
+        if (!is.null(dfSNPs) && nrow(dfSNPs) > 0)
+            {
+            Nsnps = Nsnps + nrow(dfSNPs)
+            write.table(dfSNPs, SNPsFile, row.names=FALSE, col.names=writeColNamesSNPs, quote=FALSE, sep="\t")
+            writeColNamesSNPs = FALSE
+            dfSNPs = NULL
+            }
+        if (alignCount %% gcEveryN == 0)
+            {
+            cat(" GC...")
+            gc()
+            }
+        cat("\n")
+        }
     }
+
+# Output the remaining data if any.
 dfIndels = rbind.fast.finish(dfIndels)
+if (!is.null(dfIndels) && nrow(dfIndels) > 0)
+    {
+    Nindels = Nindels + nrow(dfIndels)
+    write.table(dfIndels, indelsFile, row.names=FALSE, col.names=writeColNamesIndels, quote=FALSE, sep="\t")
+    }
 dfSNPs = rbind.fast.finish(dfSNPs)
+if (!is.null(dfSNPs) && nrow(dfSNPs) > 0)
+    {
+    Nsnps = Nsnps + nrow(dfSNPs)
+    write.table(dfSNPs, SNPsFile, row.names=FALSE, col.names=writeColNamesSNPs, quote=FALSE, sep="\t")
+    }
+close(indelsFile)
+close(SNPsFile)
+
+# Display statistics.
 catnow("Finished aligning sequences for Indel Groups and locating Indels and SNPs\n")
-catnow("Total number of Indels is ", nrow(dfIndels), "\n")
-catnow("Total number of SNPs is ", nrow(dfSNPs), "\n")
-if (nrow(dfIndels) == 0 || nrow(dfSNPs) == 0)
-    stop("No Indels and/or SNPs")
+catnow("Total number of Indels is ", Nindels, "\n")
+catnow("Total number of SNPs is ", Nsnps, "\n")
 catnow("Number of LCR/IndelGroup/Marker alignments that had too many SNPs and were ignored:", tooManySNPs, "\n")
 catnow("Aligner program failed ", NalignerFails, " times\n")
 catnow("Aligner program output not recognizable ", NalignerGarbage, " times\n")
-
-########################################
-# Finish up.
-########################################
-
-# Write the data frame to the output files.
-write.table.winSafe(dfIndels, outIndelFile, row.names=FALSE, quote=FALSE, sep="\t")
-# dfIndels = read.table(outIndelFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
-write.table.winSafe(dfSNPs, outSNPfile, row.names=FALSE, quote=FALSE, sep="\t")
-# dfSNPs = read.table(outSNPfile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
-
-catnow("Finished\n")
 catnow("Indel output file:\n", outIndelFile, "\n")
 catnow("SNP output file:\n", outSNPfile, "\n")
 }

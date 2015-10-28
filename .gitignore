@@ -12,6 +12,7 @@ primer3settings.txt
 primer3settings.txt.tmp
 saveOutputFiles/**
 findMers
+goodHP14/**
 *.o
 *.d
 *.xml

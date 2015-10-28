@@ -137,8 +137,10 @@ if (is.na(ADmin) || ADmin < 1)
 
 ADmax = as.integer(args[6])
 catnow("  ADmax: ", ADmax, "\n")
-if (is.na(ADmax) || ADmax < 1)
-    stop("ADmax must be >= 1")
+if (is.na(ADmax) || ADmax < ADmin)
+    stop("ADmax must be >= ADmin")
+if (ADmax >= Amax-Amin)
+    stop("ADmax must be < Amax-Amin")
 
 NDAmin = as.integer(args[7])
 catnow("  NDAmin: ", NDAmin, "\n")
@@ -191,11 +193,20 @@ for (idlensFile in idlensFiles)
 # size of A1 and the next-larger amplicon size A2 is a linear function of A1.
 # Compute the offset and scale factor for this linear relationship.
 # Relationship: amplicon difference D = m * amplicon size A + b
-par.m = (ADmax-ADmin)/(Amax-Amin)
+#par.m = (ADmax-ADmin)/(Amax-Amin)
+# I'm revising the above so that minAmplDiff can always be called with the SMALLER
+# amplicon size, and will give the ADmax difference when called with Amax-ADmax.
+par.m = (ADmax-ADmin)/(Amax-Amin-ADmax)
 par.b = ADmin - par.m*Amin
 minAmplDiff = function(Asize) par.m*Asize+par.b # Asize can be a vector.
-#minAmplDiff(400)
-#minAmplDiff(1500)
+#Amin = 400
+#Amax = 1500
+#ADmin = 50
+#ADmax = 300
+#ADmax = 1099
+#minAmplDiff(Amin)
+#minAmplDiff(Amax)
+#minAmplDiff(Amax-ADmax)
 
 # Read LCR k-mer data.
 {

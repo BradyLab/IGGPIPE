@@ -138,30 +138,30 @@ for (i in 1:Npairs)
     g2 = pair[2]
     delCol1 = delCol[g1]
     delCol2 = delCol[g2]
-    ampliconLens = tapply(1:nrow(dfIndels), dfIndels$ID, function(ii)
+    sizeDiffs = tapply(1:nrow(dfIndels), dfIndels$ID, function(ii)
         abs(sum(dfIndels[ii,delCol1])-sum(dfIndels[ii,delCol2])))
     numIndels = tapply(1:nrow(dfIndels), dfIndels$ID, length)
     numIndels = numIndels + rnorm(length(numIndels), 0, 0.1) # Add some jitter.
-    xlim = range(pretty(c(0, ampliconLens)))
+    xlim = range(pretty(c(0, sizeDiffs)))
     ylim = range(pretty(c(0, numIndels)))
-    N = length(ampliconLens)
+    N = length(sizeDiffs)
     if (N > maxPlotPoints)
         {
         idxs = sample(1:N, maxPlotPoints)
         N = maxPlotPoints
-        ampliconLens = ampliconLens[idxs]
+        sizeDiffs = sizeDiffs[idxs]
         numIndels = numIndels[idxs]
         }
-    plot(ampliconLens, numIndels, type="p", xlim=xlim, ylim=ylim, cex=0.5, pch=20,
+    plot(sizeDiffs, numIndels, type="p", xlim=xlim, ylim=ylim, cex=0.5, pch=20,
         main=paste("Scatter plot of amplicon/LCR size diff. vs. number of indels, genomes ",
             g1, " and ", g2, sep=""),
-        xlab="Amplicon size difference (bp)", ylab="Number of Indels")
+        xlab="Amplicon/LCR size difference (bp)", ylab="Number of Indels")
     catnow("Plotted", N, "points in plot 1\n") 
-    meanAmpliconLen = mean(ampliconLens)
+    meanSizeDiff = mean(sizeDiffs)
     meanNumIndels = mean(numIndels)
-    catnow("meanAmpliconLen =", meanAmpliconLen, " meanNumIndels =", meanNumIndels, "\n")
-    points(meanAmpliconLen, meanNumIndels, pch=20, cex=2, col="tan")
-    text(meanAmpliconLen, meanNumIndels, "Mean", cex=2, col="tan", pos=4)
+    catnow("meanSizeDiff =", meanSizeDiff, " meanNumIndels =", meanNumIndels, "\n")
+    points(meanSizeDiff, meanNumIndels, pch=20, cex=2, col="tan")
+    text(meanSizeDiff, meanNumIndels, "Mean", cex=2, col="tan", pos=4)
     }
 
 ########################################
@@ -177,7 +177,7 @@ for (i in 1:Npairs)
     g2 = pair[2]
     delCol1 = delCol[g1]
     delCol2 = delCol[g2]
-    ampliconLens = unlist(tapply(1:nrow(dfIndels), dfIndels$ID, function(ii)
+    sizeDiffs = unlist(tapply(1:nrow(dfIndels), dfIndels$ID, function(ii)
         rep(abs(sum(dfIndels[ii,delCol1])-sum(dfIndels[ii,delCol2])), length(ii))))
     indelLens = unlist(tapply(1:nrow(dfIndels), dfIndels$ID, function(ii)
         {
@@ -188,26 +188,26 @@ for (i in 1:Npairs)
         return(V)
         }))
     indelLens = indelLens + rnorm(length(indelLens), 0, 0.1) # Add some jitter.
-    xlim = range(pretty(c(0, ampliconLens)))
+    xlim = range(pretty(c(0, sizeDiffs)))
     ylim = range(pretty(c(0, indelLens)))
-    N = length(ampliconLens)
+    N = length(sizeDiffs)
     if (N > maxPlotPoints)
         {
         idxs = sample(1:N, maxPlotPoints)
         N = maxPlotPoints
-        ampliconLens = ampliconLens[idxs]
+        sizeDiffs = sizeDiffs[idxs]
         indelLens = indelLens[idxs]
         }
-    plot(ampliconLens, indelLens, type="p", xlim=xlim, ylim=ylim, cex=0.5, pch=20,
+    plot(sizeDiffs, indelLens, type="p", xlim=xlim, ylim=ylim, cex=0.5, pch=20,
         main=paste("Scatter plot of amplicon/LCR size diff. vs. indels size, genomes ",
             g1, " and ", g2, sep=""),
         xlab="Amplicon size difference (bp)", ylab="Indels size (bp)")
     catnow("Plotted", N, "points in plot 2\n") 
-    meanAmpliconLen = mean(ampliconLens)
+    meanSizeDiff = mean(sizeDiffs)
     meanIndelsLens = mean(indelLens)
-    catnow("meanAmpliconLen =", meanAmpliconLen, " meanIndelsLens =", meanIndelsLens, "\n")
-    points(meanAmpliconLen, meanIndelsLens, pch=20, cex=2, col="tan")
-    text(meanAmpliconLen, meanIndelsLens, "Mean", cex=2, col="tan", pos=4)
+    catnow("meanSizeDiff =", meanSizeDiff, " meanIndelsLens =", meanIndelsLens, "\n")
+    points(meanSizeDiff, meanIndelsLens, pch=20, cex=2, col="tan")
+    text(meanSizeDiff, meanIndelsLens, "Mean", cex=2, col="tan", pos=4)
     }
 
 ########################################
