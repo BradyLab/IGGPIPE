@@ -142,12 +142,6 @@ DIR_FINDMERS := code/cpp/findMers
 PATH_FINDMERS := $(DIR_FINDMERS)/findMers
 
 
-# Arguments for running the 'findMers' program.
-# THIS DOES NOT NEED TO BE CHANGED.
-
-ARGS_FINDMER := -c
-
-
 # Path of the directory containing pipeline Perl scripts.
 # THIS DOES NOT NEED TO BE CHANGED.
 

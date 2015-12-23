@@ -13,6 +13,9 @@
         C - 01
         G - 10
 
+    An option is available to intersect two k-mer lists and find positions of the
+    resulting intersection k-mers.
+
     Algorithm:
         1. Read the k-mer file and initialize a table.  The table has 2^2k
             entries, one for each POSSIBLE k-mer, and each entry is 2 bits.
@@ -22,11 +25,16 @@
                 1 - k-mer not yet seen in input FASTA sequence
                 2 - k-mer seen once in input FASTA sequence
                 3 - k-mer seen more than once in input FASTA sequence
-        2. Read input FASTA sequence file, one sequence at a time, run through
+        2. If k-mer intersection option is specified, read the second k-mer file
+            and intersect it with the k-mer table initialized above.  Change any
+            k-mer whose value is 1 to a value of 2 to indicate that the k-mer
+            appears in both files.  When finished, reset all k-mers whose value
+            is 1 to a value of 0, and all k-mers whose value is 2 to a value of 1.
+        3. Read input FASTA sequence file, one sequence at a time, run through
             the sequence and generate each k-mer and reverse-complement k-mer,
             look them up in the k-mer table, and if found adjust the table entry
             and write the k-mer and its position to the k-mer position output file.
-        3. When finished, list any k-mers from the text file that were not seen
+        4. When finished, list any k-mers from the text file that were not seen
             in the input sequences or were seen more than once.
 
         A k-mer that is its own reverse complement is not counted twice when seen.
@@ -108,7 +116,9 @@ static void usage(void)
         "",
         "       The k-mers are required to be DNA base k-mers, i.e. alphabet ATCG.",
         "       Also, if the k-mers are unique, none should be the reverse complement",
-        "       of another.",
+        "       of another.  There may be additional data on each line of the k-mer",
+        "       file (or the -i option's k-mer file), separated from the k-mer by at",
+        "       least one space or tab character, and that data is ignored/discarded.",
         "",
         "       A k-mer position output file is written, with each line being a k-mer,",
         "       a tab, a sequence name (from the input FASTA sequence file), a tab, a",
@@ -124,17 +134,21 @@ static void usage(void)
         "               -v2 for that and output indicating # Mb processed",
         "               -v3 for that and verbose operational output",
         "",
-        "           -n unseen_kmers_file",
-        "               Output to this file a list of k-mers from input file that were not seen in FASTA seqs",
+        "           -i <INTERSECT_KMER_FILE>",
+        "               Intersect k-mers in this file with those in <KMER_FILE> and only",
+        "               report position(s) of the intersect k-mers",
         "",
-        "           -m multiple_kmers_file",
-        "               Output to this file a list of k-mers from input file that were seen more than once in FASTA seqs",
+        "           -n <UNSEEN_KMERS_FILE>",
+        "               Output to this file a list of k-mers from input file that were not",
+        "               seen in FASTA seqs",
         "",
-        "           -f contig_file",
-        "               Output to this file a list of contig positions/lengths for the FASTA seqs",
+        "           -m <MULTIPLE_KMERS_FILE>",
+        "               Output to this file a list of k-mers from input file that were seen",
+        "               more than once in FASTA seqs",
         "",
-        "           -c",
-        "               Contig file and k-mer position file use 'contig' instead of 'frag' in column names",
+        "           -f <CONTIG_FILE>",
+        "               Output to this file a list of contig positions and lengths for the",
+        "               FASTA seqs",
         "",
         "       FASTA_FILE",
         "               Input FASTA sequences file name",
@@ -142,7 +156,7 @@ static void usage(void)
         "       KMER_FILE",
         "               Optional input k-mer text file name (size of k determined from first k-mer)",
         "               This option might not be specified if the reason for running the program is",
-        "               to produce a contig_file output file.",
+        "               to produce the <CONTIG_FILE> output file.",
         "",
         "       KMER_POS_FILE",
         "               Optional name of text file to receive tab-separated k-mer position",
@@ -222,6 +236,9 @@ static void cvtKmerBinaryToStr(unsigned k, kmer Kmer, char* buf)
 static ubyte* readKmerFile(const char* KMERfile, unsigned& k, unsigned& numKmers,
     unsigned& tblSizeBytes, unsigned verbosity)
     {
+    kmer tblIdx;
+    unsigned tblShift;
+
     // Read first k-mer to get k.
     InputFile kfile;
     if (!kfile.Open(KMERfile))
@@ -236,7 +253,8 @@ static ubyte* readKmerFile(const char* KMERfile, unsigned& k, unsigned& numKmers
         cout << "No k-mers in file " << KMERfile << "\n";
         exit(EXIT_FAILURE);
         }
-    k = strlen(line);
+    char* token = strtok(line, " \t"); // Discard anything after first space/tab on the line.
+    k = strlen(token);
     if (k < MIN_K || k > MAX_K)
         {
         cout << "First k-mer in file " << KMERfile << " gives out-of-range size k=" << k << "\n";
@@ -252,21 +270,23 @@ static ubyte* readKmerFile(const char* KMERfile, unsigned& k, unsigned& numKmers
     numKmers = 0;
     while (kfile.good()) // Until end of file.
         {
-        // First convert k-mer string in line[] into binary k-mer in Kmer.
+        // First convert k-mer string in 'token' into binary k-mer in Kmer.
         kmer Kmer;
         char badChar;
-        if (!cvtKmerStrToBinary(k, line, Kmer, badChar))
+        if (!cvtKmerStrToBinary(k, token, Kmer, badChar))
             {
             cout << "Unexpected k-mer character '" << badChar << "' in file " << KMERfile << "\n";
             exit(EXIT_FAILURE);
             }
         numKmers++;
         // Now initialize the table entry.
-        kmer tblIdx = Kmer >> TBL_KMER_IDX_SHIFT;
-        unsigned tblShift = (Kmer & TBL_KMER_IDX_MASK)*TBL_BITS_PER_KMER;
+        tblIdx = Kmer >> TBL_KMER_IDX_SHIFT;
+        tblShift = (Kmer & TBL_KMER_IDX_MASK)*TBL_BITS_PER_KMER;
         kmerTbl[tblIdx] |= TBL_KMER_UNSEEN << tblShift;
         // Read next k-mer.
         kfile.getline(line, sizeof(line));
+        // Discard anything after first space/tab on the line.
+        token = strtok(line, " \t");
         }
     if (!kfile.eof())
         {
@@ -278,6 +298,105 @@ static ubyte* readKmerFile(const char* KMERfile, unsigned& k, unsigned& numKmers
     if (verbosity >= 1)
         cout << "Number of " << k << "-mers in file " << KMERfile << " is " << numKmers << "\n";
     return(kmerTbl);
+    }
+
+// Like readKmerFile(), but intersect the k-mers that are read from the file with
+// the k-mers already in the table.  Set k-mers not in this file to 0 in the table.
+// Exit with fatal error if unable to read the file.  If successful, the number of
+// k-mers read from the file is returned in argument numKmers2, and the return value
+// is the number of k-mers remaining in the table.
+static unsigned intersectKmerFile(const char* KMER2file, unsigned k, ubyte* kmerTbl,
+    unsigned tblSizeBytes, unsigned verbosity, unsigned& numKmers2)
+    {
+    kmer tblIdx;
+    unsigned tblShift;
+
+    // Read first k-mer to get k and make sure it matches argument k value.
+    InputFile kfile2;
+    if (!kfile2.Open(KMER2file))
+        {
+        cout << "Can't open file " << KMER2file << "\n";
+        exit(EXIT_FAILURE);
+        }
+    char line[MAX_K*100];
+    kfile2.getline(line, sizeof(line));
+    if (!kfile2.good())
+        {
+        cout << "No k-mers in file " << KMER2file << "\n";
+        exit(EXIT_FAILURE);
+        }
+    char* token = strtok(line, " \t"); // Discard anything after first space/tab on the line.
+    unsigned k2 = strlen(token);
+    if (k2 != k)
+        {
+        cout << "First k-mer in file " << KMER2file << " does not have k=" << k << " bases\n";
+        exit(EXIT_FAILURE);
+        }
+
+    // Read the k-mers and change value of each that is 1 in the table to 2.
+    numKmers2 = 0;
+    unsigned numIsectKmers = 0;
+    while (kfile2.good()) // Until end of file.
+        {
+        // First convert k-mer string in 'token' into binary k-mer in Kmer.
+        kmer Kmer;
+        char badChar;
+        if (!cvtKmerStrToBinary(k, token, Kmer, badChar))
+            {
+            cout << "Unexpected k-mer character '" << badChar << "' in file " << KMER2file << "\n";
+            exit(EXIT_FAILURE);
+            }
+        numKmers2++;
+        // Test the table entry to see if it is 1 = TBL_KMER_UNSEEN.
+        tblIdx = Kmer >> TBL_KMER_IDX_SHIFT;
+        tblShift = (Kmer & TBL_KMER_IDX_MASK)*TBL_BITS_PER_KMER;
+        unsigned v = (kmerTbl[tblIdx] >> tblShift) & TBL_KMER_BIT_MASK;
+        if (v == TBL_KMER_UNSEEN)
+            {
+            // The k-mer is in the table, change the table entry to 2 = TBL_KMER_SEEN_ONCE.
+            kmerTbl[tblIdx] = (kmerTbl[tblIdx] & ~(TBL_KMER_BIT_MASK << tblShift)) |
+                (TBL_KMER_SEEN_ONCE << tblShift);
+            ++numIsectKmers;
+            }
+        // Read next k-mer.
+        kfile2.getline(line, sizeof(line));
+        // Discard anything after first space/tab on the line.
+        token = strtok(line, " \t");
+        }
+    if (!kfile2.eof())
+        {
+        cout << "Unknown error reading file " << KMER2file << "\n";
+        exit(EXIT_FAILURE);
+        }
+    // Close the k-mer file.
+    kfile2.Close();
+    if (verbosity >= 1)
+        {
+        cout << "Number of " << k << "-mers in file " << KMER2file << " is " << numKmers2 << "\n";
+        cout << "Number of " << k << "-mers in intersection is " << numIsectKmers << "\n";
+        }
+
+    // Go back through the table and change k-mers with value 1 = TBL_KMER_UNSEEN to value
+    // 0 = TBL_UNKNOWN_KMER and with value 2 = TBL_KMER_SEEN_ONCE to 1 = TBL_KMER_UNSEEN.
+    kmer tblSizeKmers = tblSizeBytes * TBL_KMERS_PER_BYTE;
+    tblIdx = 0;
+    tblShift = 0;
+    for (kmer Kmer = 0; Kmer < tblSizeKmers; Kmer++)
+        {
+        unsigned v = (kmerTbl[tblIdx] >> tblShift) & TBL_KMER_BIT_MASK;
+        if (v == TBL_KMER_UNSEEN || v == TBL_KMER_SEEN_ONCE)
+            kmerTbl[tblIdx] = (kmerTbl[tblIdx] & ~(TBL_KMER_BIT_MASK << tblShift)) |
+                ((v-1) << tblShift);
+
+        tblShift += TBL_BITS_PER_KMER;
+        if (tblShift == BITS_PER_BYTE)
+            {
+            tblShift = 0;
+            tblIdx++;
+            }
+        }
+
+    return(numIsectKmers);
     }
 
 // Read one sequence from FASTA sequence file and store its contigs in a vector.
@@ -524,14 +643,11 @@ static void outputContigInfo(S& seqID, seqcontigs* seqContigs, const char* CONTI
 //      kmerTbl: pointer to k-mer table, or NULL to not search for k-mers.
 //      FASTAfile: name of FASTA file to read.
 //      CONTIGfile: name of contig file to create, or NULL to not create it.
-//      CONTIGfileHeader: header to use in contig file.
 //      KMERPOSfile: name of k-mer position file to create, or NULL to not create it.
-//      KMERPOSfileHeader: header to use in k-mer position file.
 // On return, the table has been modified to reflect the k-mers that were found
 // in the FASTA sequences.
 static void processFASTAfile(unsigned k, ubyte *kmerTbl, const char* FASTAfile,
-    const char* CONTIGfile, const char* CONTIGfileHeader,
-    const char* KMERPOSfile, const char* KMERPOSfileHeader, unsigned verbosity)
+    const char* CONTIGfile, const char* KMERPOSfile, unsigned verbosity)
     {
     // Open FASTA file and read first line = ID line of first sequence.
     InputFile ffile;
@@ -557,7 +673,7 @@ static void processFASTAfile(unsigned k, ubyte *kmerTbl, const char* FASTAfile,
             cout << "Can't create file " << CONTIGfile << "\n";
             exit(EXIT_FAILURE);
             }
-        contigfile << CONTIGfileHeader << "\n";
+        contigfile << "seqID\tpos\tcontig\tlen\n";
         }
 
     // Create k-mer position output file and write header line.
@@ -569,7 +685,7 @@ static void processFASTAfile(unsigned k, ubyte *kmerTbl, const char* FASTAfile,
             cout << "Can't create file " << KMERPOSfile << "\n";
             exit(EXIT_FAILURE);
             }
-        kmerposfile << KMERPOSfileHeader << "\n";
+        kmerposfile << "kmer\tseqID\tpos\tstrand\tcontig\tcontigPos\n";
         }
 
     // Loop processing input FASTA sequences until there are no more.
@@ -625,7 +741,7 @@ static void processFASTAfile(unsigned k, ubyte *kmerTbl, const char* FASTAfile,
 
 // List any k-mers not seen or seen more than once.
 static void writeUnseenAndMultipleKmersAndSummary(unsigned k, ubyte* kmerTbl,
-    unsigned tblSizeBytes, unsigned verbosity, const char* unseenKmersFile, const char* multipleKmersFile)
+    unsigned tblSizeBytes, unsigned verbosity, const char* UNSEEN_KMERSfile, const char* MULTIPLE_KMERSfile)
     {
     kmer tblSizeKmers = tblSizeBytes * TBL_KMERS_PER_BYTE;
     kmer tblIdx = 0;
@@ -636,23 +752,23 @@ static void writeUnseenAndMultipleKmersAndSummary(unsigned k, ubyte* kmerTbl,
     unsigned numFoundMore = 0;
 
     // Create unseen k-mer output file.
-    OutputFile unseenkmersfile;
-    if (unseenKmersFile != NULL)
+    OutputFile unseen_kmers_file;
+    if (UNSEEN_KMERSfile != NULL)
         {
-        if (!unseenkmersfile.Create(unseenKmersFile))
+        if (!unseen_kmers_file.Create(UNSEEN_KMERSfile))
             {
-            cout << "Can't create file " << unseenKmersFile << "\n";
+            cout << "Can't create file " << UNSEEN_KMERSfile << "\n";
             exit(EXIT_FAILURE);
             }
         }
 
     // Create multiple k-mer output file.
-    OutputFile multiplekmersfile;
-    if (multipleKmersFile != NULL)
+    OutputFile multiple_kmers_file;
+    if (MULTIPLE_KMERSfile != NULL)
         {
-        if (!multiplekmersfile.Create(multipleKmersFile))
+        if (!multiple_kmers_file.Create(MULTIPLE_KMERSfile))
             {
-            cout << "Can't create file " << multipleKmersFile << "\n";
+            cout << "Can't create file " << MULTIPLE_KMERSfile << "\n";
             exit(EXIT_FAILURE);
             }
         }
@@ -671,15 +787,15 @@ static void writeUnseenAndMultipleKmersAndSummary(unsigned k, ubyte* kmerTbl,
             numFoundOnce++;
         else if (v == TBL_KMER_SEEN_MANY)
             numFoundMore++;
-        if (unseenKmersFile && v == TBL_KMER_UNSEEN)
+        if (UNSEEN_KMERSfile != NULL && v == TBL_KMER_UNSEEN)
             {
             cvtKmerBinaryToStr(k, Kmer, buf);
-            unseenkmersfile << buf << "\n";
+            unseen_kmers_file << buf << "\n";
             }
-        else if (multipleKmersFile && v == TBL_KMER_SEEN_MANY)
+        else if (MULTIPLE_KMERSfile != NULL && v == TBL_KMER_SEEN_MANY)
             {
             cvtKmerBinaryToStr(k, Kmer, buf);
-            multiplekmersfile << buf << "\n";
+            multiple_kmers_file << buf << "\n";
             }
         // Next k-mer.
         tblShift += TBL_BITS_PER_KMER;
@@ -691,12 +807,12 @@ static void writeUnseenAndMultipleKmersAndSummary(unsigned k, ubyte* kmerTbl,
         }
 
     // Close the unseen k-mer output file.
-    if (unseenKmersFile != NULL)
-        unseenkmersfile.Close();
+    if (UNSEEN_KMERSfile != NULL)
+        unseen_kmers_file.Close();
 
     // Close the multiple k-mer output file.
-    if (multipleKmersFile != NULL)
-        multiplekmersfile.Close();
+    if (MULTIPLE_KMERSfile != NULL)
+        multiple_kmers_file.Close();
 
     // Final summary.
     if (verbosity >= 1)
@@ -736,12 +852,11 @@ int main(int argc, char* const argv[])
     char* q;
 
     // Option variables.
-    unsigned verbosity = 0;          // -v
-    const char* unseenKmersFile = NULL;    // -n
-    const char* multipleKmersFile = NULL;  // -m
-    const char* CONTIGfile = NULL;     // -c or -f
-    const char* CONTIGfileHeader = "seqID\tpos\tfrag\tlen"; // changed by -c
-    const char* KMERPOSfileHeader = "kmer\tseqID\tpos\tstrand\tfrag\tfragPos"; // changed by -c
+    unsigned verbosity = 0;                 // -v
+    const char* UNSEEN_KMERSfile = NULL;    // -n
+    const char* MULTIPLE_KMERSfile = NULL;  // -m
+    const char* CONTIGfile = NULL;          // -f
+    const char* KMER2file = NULL;           // -i
 
     // Options.
     int a1; // argv first index.
@@ -757,17 +872,16 @@ int main(int argc, char* const argv[])
                         usage();
                     break;
                 case 'n':
-                    unseenKmersFile = getOptionValueString(argc, argv, a1, a2);
+                    UNSEEN_KMERSfile = getOptionValueString(argc, argv, a1, a2);
                     break;
                 case 'm':
-                    multipleKmersFile = getOptionValueString(argc, argv, a1, a2);
+                    MULTIPLE_KMERSfile = getOptionValueString(argc, argv, a1, a2);
                     break;
                 case 'f':
                     CONTIGfile = getOptionValueString(argc, argv, a1, a2);
                     break;
-                case 'c':
-                    CONTIGfileHeader = "seqID\tpos\tcontig\tlen";
-                    KMERPOSfileHeader = "kmer\tseqID\tpos\tstrand\tcontig\tcontigPos";
+                case 'i':
+                    KMER2file = getOptionValueString(argc, argv, a1, a2);
                     break;
                 }
         }
@@ -796,16 +910,23 @@ int main(int argc, char* const argv[])
         kmerTbl = readKmerFile(KMERfile, k, numKmers, tblSizeBytes, verbosity);
 
     /*
-        2. Read input FASTA sequence file and look up k-mers in table.
+        2. If k-mer intersection option, read and intersect second k-mer file.
     */
-    processFASTAfile(k, kmerTbl, FASTAfile, CONTIGfile, CONTIGfileHeader,
-        KMERPOSfile, KMERPOSfileHeader, verbosity);
+    unsigned numKmers2 = 0;
+    unsigned numIsectKmers = 0;
+    if (KMERfile != NULL && KMER2file != NULL)
+        numIsectKmers = intersectKmerFile(KMER2file, k, kmerTbl, tblSizeBytes, verbosity, numKmers2);
 
     /*
-        3. If a k-mer table was produced, display summary info and write out k-mers not seen or seen more than once.
+        3. Read input FASTA sequence file and look up k-mers in table.
+    */
+    processFASTAfile(k, kmerTbl, FASTAfile, CONTIGfile, KMERPOSfile, verbosity);
+
+    /*
+        4. If a k-mer table was produced, display summary info and write out k-mers not seen or seen more than once.
     */
     if (kmerTbl != NULL)
-        writeUnseenAndMultipleKmersAndSummary(k, kmerTbl, tblSizeBytes, verbosity, unseenKmersFile, multipleKmersFile);
+        writeUnseenAndMultipleKmersAndSummary(k, kmerTbl, tblSizeBytes, verbosity, UNSEEN_KMERSfile, MULTIPLE_KMERSfile);
 
     return 0;
     }

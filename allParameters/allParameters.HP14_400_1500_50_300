@@ -14,7 +14,7 @@
 # Value of "k" to use, i.e. the length of a k-mer in base-pairs.  Too small a
 # value will result in too few common unique k-mers.  The computation time and
 # memory requirements increase dramatically as this is increased.  A value of
-# K=14 has worked wellfor the tomato genome without using too much memory.  A
+# K=14 has worked well for the tomato genome without using too much memory.  A
 # significantly larger genome might require use of K=15.  Use an upper-case
 # letter K here.
 ################################################################################

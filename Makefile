@@ -256,7 +256,7 @@ $(CONTIG_FILES) : $(PFX_GENOME_DATA_FILE)%.contigs : $$(PATH_GENOME_FASTA_$$*) |
 	@echo
 	@echo "*** getContigFile PARAMS=$(PARAMS) GENOME=$* ***"
 	@echo "Extracting contig positions and lengths from $< into $@"
-	$(TIME) $(PATH_FINDMERS) $(ARGS_FINDMER) -f $@ $< $(REDIR)
+	$(TIME) $(PATH_FINDMERS) -f $@ $< $(REDIR)
 	@echo "Finished."
 
 ################################################################################
@@ -382,15 +382,16 @@ $(SORTED_KMERS_FILES) : $(PFX_KMERS_DATA_FILE)%.sorted : $(PFX_KMERS_DATA_FILE)%
 	@echo "*** sortKmers PARAMS=$(PARAMS) GENOME=$* ***"
 	@echo "Sorting text-based $(K)-mers from $< into $@"
 	@echo
-	@echo "Extracting text-based $(K)-mers from binary file $< into $@.tmp"
-	$(TIME) $(CMD_JELLYFISH) dump -c -o $@.tmp $< $(REDIR)
-	@echo "Sorting text-based $(K)-mers from $@.tmp into $@.tsv."
-	$(TIME) sort $@.tmp >$@.tsv $(REDIR)
-	@echo "Removing $@.tmp"
-	$(TIME) rm $@.tmp $(REDIR)
+	@echo "Extracting text-based $(K)-mers from binary file $< into $<.txt"
+	$(TIME) $(CMD_JELLYFISH) dump -c -o $<.txt $< $(REDIR)
+	@echo "Sorting text-based $(K)-mers from $<.txt into $@.tsv."
+	$(TIME) sort $<.txt >$@.tsv $(REDIR)
+	@echo "Removing $<.txt"
+	$(TIME) rm $<.txt $(REDIR)
 	@echo "Extracting field 1 ($(K)-mer) from $@.tsv to $@"
 	$(TIME) cut -f 1 -d " " $@.tsv >$@ $(REDIR)
-	@rm $@.tsv
+	@echo "Removing $@.tsv"
+	$(TIME) rm $@.tsv $(REDIR)
 	@echo "Finished."
 
 ################################################################################
@@ -459,12 +460,12 @@ $(ISECT_KMER_FILES) : $(PFX_KMERS_DATA_FILE)%.isect : $(PATH_ISECT_KMERS) $$(PAT
 	@echo "*** getGenomicPos PARAMS=$(PARAMS) GENOME=$* ***"
 	@echo "Finding genomic positions of common unique $(K)-mers in $< into $@"
 	@echo
-	@echo "Adding genomic positions to common unique $(K)-mers from $< into $@.tmp"
-	$(TIME) $(PATH_FINDMERS) $(ARGS_FINDMER) -v2 $(PATH_GENOME_FASTA_$*) $< $@.tmp $(REDIR)
-	@echo "Sorting by $(K)-mer from $@.tmp into $@, removing header line"
-	$(TIME) tail -n +2 $@.tmp | sort >$@ $(REDIR)
-	@echo "Removing $@.tmp"
-	$(TIME) rm $@.tmp $(REDIR)
+	@echo "Adding genomic positions to common unique $(K)-mers from $< into $@.pos"
+	$(TIME) $(PATH_FINDMERS) -v2 $(PATH_GENOME_FASTA_$*) $< $@.pos $(REDIR)
+	@echo "Sorting by $(K)-mer from $@.pos into $@, removing header line"
+	$(TIME) tail -n +2 $@.pos | sort >$@ $(REDIR)
+	@echo "Removing $@.pos"
+	$(TIME) rm $@.pos $(REDIR)
 	@echo "Finished."
 
 ################################################################################
