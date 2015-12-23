@@ -152,7 +152,6 @@ DIR_PERL := code/perl
 # THESE DO NOT NEED TO BE CHANGED.
 
 PATH_EXTRACT_SEQ_IDS := $(DIR_PERL)/extractSeqIdsAndLengths.pl
-PATH_KMER_ISECT := $(DIR_PERL)/kmerIsect.pl
 PATH_GET_SEQS_FASTA := $(DIR_PERL)/getSeqsFromFasta.pl
 
 

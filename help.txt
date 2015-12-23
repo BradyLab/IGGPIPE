@@ -32,20 +32,18 @@ on to the next step.  To do this, run the following 'make' commands in the
 order shown.  Each step specifies a different target name, and each one will
 show the names of file(s) that are produced.
 
-     make PARAMS=myFilename getSeqInfo    GENOME=ALL
-     make PARAMS=myFilename getContigFile GENOME=ALL
-     make PARAMS=myFilename getKmers      GENOME=ALL
-     make PARAMS=myFilename kmerStats     GENOME=ALL
-     make PARAMS=myFilename sortKmers     GENOME=ALL
-     make PARAMS=myFilename kmerIsect
-     make PARAMS=myFilename getGenomicPos GENOME=ALL
-     make PARAMS=myFilename mergeKmers    GENOME=ALL
+     make PARAMS=myFilename getSeqInfo              GENOME=ALL
+     make PARAMS=myFilename getContigFile           GENOME=ALL
+     make PARAMS=myFilename getKmers                GENOME=ALL
+     make PARAMS=myFilename kmerStats               GENOME=ALL
+     make PARAMS=myFilename getGenomicPosIsect      GENOME=ALL
+     make PARAMS=myFilename mergeKmers              GENOME=ALL
      make PARAMS=myFilename getCommonUniqueKmers
      make PARAMS=myFilename findLCRs
      make PARAMS=myFilename findIndelGroups
      make PARAMS=myFilename getDNAseqsForPrimers    GENOME=ALL
      make PARAMS=myFilename findPrimers
-     make PARAMS=myFilename ePCRtesting   GENOME=ALL
+     make PARAMS=myFilename ePCRtesting             GENOME=ALL
      make PARAMS=myFilename removeBadMarkers
      make PARAMS=myFilename plotMarkers
 
@@ -57,13 +55,13 @@ have trouble, try doing it with GENOME=1 first.
 
 You may want to run the first several steps, then check the number of common
 unique k-mers to make sure you have plenty (say 8 million or more) but not too
-many (say 40 million or more). You can run those steps and check the k-mer count
-with:
+many (say 40 million or more). You can run those steps and check the common
+unique k-mer count (with genome 1 positions) with:
 
-     make PARAMS=myFilename kmerIsect
-     wc -l myOutFolder/Kmers/isect.kmers
+     make PARAMS=myFilename getGenomicPosIsect GENOME=1
+     wc -l myOutFolder/Kmers/Kmers_1.isect
 
-The 'wc' command shows a line count of file 'isect.kmers', which contains one
+The 'wc' command shows a line count of file 'Kmers_1.isect', which contains one
 unique k-mer per line.  If you have too few k-mers you should increase K by 1
 and try again, and if you have too many, decrease it by 1 and try again.
 

@@ -148,12 +148,6 @@ DIR_KMERS := $(DIR_IGGPIPE_OUT)/Kmers
 PFX_KMERS_DATA_FILE := $(DIR_KMERS)/Kmers_
 
 
-# Path of the k-mer text file containing the intersection of unique k-mers which
-# are common to all genomes.  This file will be created.
-
-PATH_ISECT_KMERS := $(DIR_KMERS)/isect.kmers
-
-
 # Path of the k-mer text file containing the common unique k-mers with genomic
 # positions in each genome, sorted by reference genome position.  This file will
 # be created.

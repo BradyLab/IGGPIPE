@@ -133,18 +133,16 @@ ALL:
 	@echo "Removed all files from the output directory."
 	@echo
 else ifeq ($(CLEAN),1)
-ALL: getSeqInfo getKmers kmerStats sortKmers getContigFile \
-    kmerIsect getGenomicPos mergeKmers getCommonUniqueKmers findLCRs \
-    findIndelGroups getDNAseqsForPrimers findPrimers ePCRtesting removeBadMarkers \
-    plotMarkers
+ALL: getSeqInfo getKmers kmerStats getContigFile getGenomicPosIsect mergeKmers \
+	getCommonUniqueKmers findLCRs findIndelGroups getDNAseqsForPrimers findPrimers \
+	ePCRtesting removeBadMarkers plotMarkers
 	@echo
 	@echo "ALL files are cleaned"
 	@echo
 else
-ALL: getSeqInfo getKmers kmerStats sortKmers getContigFile \
-    kmerIsect getGenomicPos mergeKmers getCommonUniqueKmers findLCRs \
-    findIndelGroups getDNAseqsForPrimers findPrimers ePCRtesting removeBadMarkers \
-    plotMarkers
+ALL: getSeqInfo getKmers kmerStats getContigFile getGenomicPosIsect mergeKmers \
+	getCommonUniqueKmers findLCRs findIndelGroups getDNAseqsForPrimers findPrimers \
+	ePCRtesting removeBadMarkers plotMarkers
 	@echo
 	@echo "ALL files are up to date"
 	@echo
@@ -266,38 +264,54 @@ $(CONTIG_FILES) : $(PFX_GENOME_DATA_FILE)%.contigs : $$(PATH_GENOME_FASTA_$$*) |
 # A list of all FASTA files already defined above: FASTA_FILES
 
 # A list of all .kmers files to be produced.
-KMERS_FILES := $(foreach G,$(GENOME_NUMBERS),$(PFX_KMERS_DATA_FILE)$(G).kmers)
+KMERS_BINARY_FILES := $(foreach G,$(GENOME_NUMBERS),$(PFX_KMERS_DATA_FILE)$(G).kmers)
+
+# A list of all .kmers.txt files to be produced.
+KMERS_TEXT_FILES := $(foreach G,$(GENOME_NUMBERS),$(PFX_KMERS_DATA_FILE)$(G).kmers.txt)
 
 # Target .kmers file(s) for genome GENOME.
 ifeq ($(GENOME),ALL)
-TARGET_KMERS := $(KMERS_FILES)
+TARGET_BINARY_KMERS := $(KMERS_BINARY_FILES)
 else
-TARGET_KMERS := $(PFX_KMERS_DATA_FILE)$(GENOME).kmers
+TARGET_BINARY_KMERS := $(PFX_KMERS_DATA_FILE)$(GENOME).kmers
 endif
 
-# Phony target to make or clean TARGET_KMERS file(s).
+# Target .kmers.txt file(s) for genome GENOME.
+ifeq ($(GENOME),ALL)
+TARGET_TEXT_KMERS := $(KMERS_TEXT_FILES)
+else
+TARGET_TEXT_KMERS := $(PFX_KMERS_DATA_FILE)$(GENOME).kmers.txt
+endif
+
+# Phony target to make or clean TARGET_BINARY_KMERS and TARGET_TEXT_KMERS file(s).
 ifeq ($(CLEAN),)
-getKmers: $(TARGET_KMERS)
+getKmers: $(TARGET_TEXT_KMERS)
 	@echo
 	@echo "getKmers file(s) for genome(s) $(GENOME) are up to date."
 	@echo
 else
 getKmers:
-	@$(CMD_DELETE_WHEN_CLEANING) $(TARGET_KMERS)
+	@$(CMD_DELETE_WHEN_CLEANING) $(TARGET_BINARY_KMERS) $(TARGET_TEXT_KMERS)
 	@echo "getKmers output file(s) for genome(s) $(GENOME) removed."
 	@echo
 endif
 
-# KMERS_FILES is multiple targets, one per genome.
+# KMERS_BINARY_FILES is multiple targets, one per genome.
 # Here, % is a genome number.
 
-$(KMERS_FILES) : $(PFX_KMERS_DATA_FILE)%.kmers : $$(PATH_GENOME_FASTA_$$*) | \
-        $(DIR_KMERS)
+$(KMERS_BINARY_FILES) : $(PFX_KMERS_DATA_FILE)%.kmers : $$(PATH_GENOME_FASTA_$$*) | $(DIR_KMERS)
 	@echo
 	@echo "*** getKmers PARAMS=$(PARAMS) GENOME=$* ***"
-	@echo "Extracting unique $(K)-mers from $< into $(PFX_KMERS_DATA_FILE)$*.kmers_*"
-	$(TIME) $(CMD_JELLYFISH) count -C -m $(K) -s $(JELLYFISH_HASH_SIZE) -U 1 \
-	    -o $(PFX_KMERS_DATA_FILE)$*.kmers $< $(REDIR)
+	@echo "Extracting unique $(K)-mers from $< into binary file $@"
+	$(TIME) $(CMD_JELLYFISH) count -C -m $(K) -s $(JELLYFISH_HASH_SIZE) -U 1 -o $@ $< $(REDIR)
+	@echo "Finished."
+
+# KMERS_TEXT_FILES is multiple targets, one per genome.
+# Here, % is a genome number.
+
+$(KMERS_TEXT_FILES) : $(PFX_KMERS_DATA_FILE)%.kmers.txt : $(PFX_KMERS_DATA_FILE)$$*.kmers | $(DIR_KMERS)
+	@echo "Converting $(K)-mers from binary file $< into text format in file $@"
+	$(TIME) $(CMD_JELLYFISH) dump -c -o $@ $< $(REDIR)
 	@echo "Finished."
 
 ################################################################################
@@ -345,88 +359,14 @@ $(KMERS_STATS_FILES) : $(PFX_KMERS_DATA_FILE)%.stats : $(PFX_KMERS_DATA_FILE)%.k
 	@echo
 
 ################################################################################
-# sortKmers: Get sorted unique k-mers.  Argument: GENOME
-################################################################################
-
-# A list of all .kmers files already defined above: KMERS_FILES
-
-# A list of all .sorted files to be produced.
-SORTED_KMERS_FILES := $(foreach G,$(GENOME_NUMBERS),$(PFX_KMERS_DATA_FILE)$(G).sorted)
-
-# Target .sorted file(s) for genome GENOME.
-ifeq ($(GENOME),ALL)
-TARGET_SORTED_KMERS := $(SORTED_KMERS_FILES)
-else
-TARGET_SORTED_KMERS := $(PFX_KMERS_DATA_FILE)$(GENOME).sorted
-endif
-
-# Phony target to make or clean TARGET_SORTED_KMERS file(s).
-ifeq ($(CLEAN),)
-sortKmers: $(TARGET_SORTED_KMERS)
-	@echo
-	@echo "sortKmers file(s) for genome(s) $(GENOME) are up to date."
-	@echo
-else
-sortKmers:
-	@$(CMD_DELETE_WHEN_CLEANING) $(TARGET_SORTED_KMERS)
-	@echo "sortKmers output file(s) for genome(s) $(GENOME) removed."
-	@echo
-endif
-
-# SORTED_KMERS_FILES is multiple targets, one per genome.
-# Here, % is a genome number.
-
-$(SORTED_KMERS_FILES) : $(PFX_KMERS_DATA_FILE)%.sorted : $(PFX_KMERS_DATA_FILE)%.kmers | \
-        $(DIR_KMERS)
-	@echo
-	@echo "*** sortKmers PARAMS=$(PARAMS) GENOME=$* ***"
-	@echo "Sorting text-based $(K)-mers from $< into $@"
-	@echo
-	@echo "Extracting text-based $(K)-mers from binary file $< into $<.txt"
-	$(TIME) $(CMD_JELLYFISH) dump -c -o $<.txt $< $(REDIR)
-	@echo "Sorting text-based $(K)-mers from $<.txt into $@.tsv."
-	$(TIME) sort $<.txt >$@.tsv $(REDIR)
-	@echo "Removing $<.txt"
-	$(TIME) rm $<.txt $(REDIR)
-	@echo "Extracting field 1 ($(K)-mer) from $@.tsv to $@"
-	$(TIME) cut -f 1 -d " " $@.tsv >$@ $(REDIR)
-	@echo "Removing $@.tsv"
-	$(TIME) rm $@.tsv $(REDIR)
-	@echo "Finished."
-
-################################################################################
-# kmerIsect: Get intersection of unique k-mers in all genomes.
-################################################################################
-
-# A list of all sorted k-mer files already defined above: SORTED_KMERS_FILES
-
-# Phony target to make or clean PATH_ISECT_KMERS file(s).
-ifeq ($(CLEAN),)
-kmerIsect: $(PATH_ISECT_KMERS)
-	@echo
-	@echo "kmerIsect files are up to date."
-	@echo
-else
-kmerIsect:
-	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_ISECT_KMERS)
-	@echo "kmerIsect output file(s) removed."
-	@echo
-endif
-
-# PATH_ISECT_KMERS target.
-
-$(PATH_ISECT_KMERS) : $(SORTED_KMERS_FILES) | $(DIR_KMERS) $(PATH_KMER_ISECT)
-	@echo
-	@echo "*** kmerIsect PARAMS=$(PARAMS) ***"
-	@echo "Intersecting unique $(K)-mers from .sorted files into $@"
-	$(TIME) $(CMD_PERL) $(PATH_KMER_ISECT) $@ $^ $(REDIR)
-	@echo "Finished."
-
-################################################################################
-# getGenomicPos: Get genomic position of common unique k-mers.  Argument: GENOME
+# getGenomicPosIsect: Intersect unique k-mers to get common unique k-mers, and
+# add genomic positions to them.  Argument: GENOME
 ################################################################################
 
 # A list of all FASTA files already defined above: FASTA_FILES
+
+# A list of all .kmers.txt files preceded by "-i "
+KMERS_TEXT_FILES_i := $(foreach G,$(GENOME_NUMBERS),-i $(PFX_KMERS_DATA_FILE)$(G).kmers.txt)
 
 # A list of all .isect files to be produced.
 ISECT_KMER_FILES := $(foreach G,$(GENOME_NUMBERS),$(PFX_KMERS_DATA_FILE)$(G).isect)
@@ -440,28 +380,28 @@ endif
 
 # Phony target to make or clean TARGET_ISECT file(s).
 ifeq ($(CLEAN),)
-getGenomicPos: $(TARGET_ISECT)
+getGenomicPosIsect: $(TARGET_ISECT)
 	@echo
-	@echo "getGenomicPos file(s) for genome(s) $(GENOME) are up to date."
+	@echo "getGenomicPosIsect file(s) for genome(s) $(GENOME) are up to date."
 	@echo
 else
-getGenomicPos:
+getGenomicPosIsect:
 	@$(CMD_DELETE_WHEN_CLEANING) $(TARGET_ISECT)
-	@echo "getGenomicPos output file(s) for genome(s) $(GENOME) removed."
+	@echo "getGenomicPosIsect output file(s) for genome(s) $(GENOME) removed."
 	@echo
 endif
 
 # ISECT_KMER_FILES is multiple targets, one per genome.
 # Here, % is a genome number.
 
-$(ISECT_KMER_FILES) : $(PFX_KMERS_DATA_FILE)%.isect : $(PATH_ISECT_KMERS) $$(PATH_GENOME_FASTA_$$*) | \
+$(ISECT_KMER_FILES) : $(PFX_KMERS_DATA_FILE)%.isect : $(KMERS_TEXT_FILES) $$(PATH_GENOME_FASTA_$$*) | \
         $(DIR_KMERS) $(PATH_FINDMERS)
 	@echo
-	@echo "*** getGenomicPos PARAMS=$(PARAMS) GENOME=$* ***"
-	@echo "Finding genomic positions of common unique $(K)-mers in $< into $@"
+	@echo "*** getGenomicPosIsect PARAMS=$(PARAMS) GENOME=$* ***"
+	@echo "Intersect unique k-mers in $< and get genomic positions of common unique $(K)-mers into $@"
 	@echo
 	@echo "Adding genomic positions to common unique $(K)-mers from $< into $@.pos"
-	$(TIME) $(PATH_FINDMERS) -v2 $(PATH_GENOME_FASTA_$*) $< $@.pos $(REDIR)
+	$(TIME) $(PATH_FINDMERS) -v2 $(KMERS_TEXT_FILES_i) $(PATH_GENOME_FASTA_$*) $(K) $@.pos $(REDIR)
 	@echo "Sorting by $(K)-mer from $@.pos into $@, removing header line"
 	$(TIME) tail -n +2 $@.pos | sort >$@ $(REDIR)
 	@echo "Removing $@.pos"

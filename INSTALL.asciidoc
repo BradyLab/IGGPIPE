@@ -911,25 +911,23 @@ output files are those available in the goodTest subdirectory for comparison to 
 |b. make PARAMS=myFilename getContigFile|GenomeData/*.contigs
 |c. make PARAMS=myFilename getKmers|Kmers/Kmers_*.kmers
 |d. make PARAMS=myFilename kmerStats|Kmers/Kmers_*.stats
-|e. make PARAMS=myFilename sortKmers|Kmers/Kmers_*.sorted
-|f. make PARAMS=myFilename kmerIsect|Kmers/isect.kmers
-|g. make PARAMS=myFilename getGenomicPos|Kmers/Kmers_*.isect
-|h. make PARAMS=myFilename mergeKmers|Kmers/Kmers_*.merge
-|i. make PARAMS=myFilename getCommonUniqueKmers|Kmers/common.unique.kmers
-|j. make PARAMS=myFilename findLCRs|'LCRs_*.tsv, BadKmers_*.tsv'
-|k. make PARAMS=myFilename findIndelGroups|'IndelGroupsOverlapping_*.tsv, IndelGroupsNonoverlapping_*.tsv'
-|l. make PARAMS=myFilename getDNAseqsForPrimers|'IndelGroupsOverlapping_*.dnaseqs'
-|m. make PARAMS=myFilename findPrimers|'NonvalidatedMarkers_*.tsv'
-|n. make PARAMS=myFilename ePCRtesting|'MarkerErrors_*.tsv'
-|o. make PARAMS=myFilename removeBadMarkers|'MarkersOverlapping_*.tsv, MarkersNonoverlapping_*.tsv'
-|p. make PARAMS=myFilename plotMarkers|'MarkerCounts_*.pdf, MarkerDensity_*.png'
-|q. make PARAMS=myFilename getDNAseqsForIndelsSNPs|*.withseqs.tsv
-|r. make PARAMS=myFilename IndelsSNPs|*.indels.tsv, *.snps.tsv
-|s. make PARAMS=myFilename plotIndels|*.indels.pdf
-|t. Rscript code/R/dotplot.R dotplot.template|LCRs_*.dotplot.png
-|u. Rscript code/R/annotateFile.R annotate.template|MarkersAnnotated_*.tsv
-|v. Rscript code/R/annotateFile.R annotate/HP11_isInNearColumn.markers|MarkersAnnotated_WithInNearFeatures_*.indels.tsv
-|w. Rscript code/R/annotateFile.R annotate/HP11_to_gff3.markers|MarkersAnnotated_GFF3_*.gff3
+|e. make PARAMS=myFilename getGenomicPosIsect|Kmers/Kmers_*.isect
+|f. make PARAMS=myFilename mergeKmers|Kmers/Kmers_*.merge
+|g. make PARAMS=myFilename getCommonUniqueKmers|Kmers/common.unique.kmers
+|h. make PARAMS=myFilename findLCRs|'LCRs_*.tsv, BadKmers_*.tsv'
+|i. make PARAMS=myFilename findIndelGroups|'IndelGroupsOverlapping_*.tsv, IndelGroupsNonoverlapping_*.tsv'
+|j. make PARAMS=myFilename getDNAseqsForPrimers|'IndelGroupsOverlapping_*.dnaseqs'
+|k. make PARAMS=myFilename findPrimers|'NonvalidatedMarkers_*.tsv'
+|l. make PARAMS=myFilename ePCRtesting|'MarkerErrors_*.tsv'
+|m. make PARAMS=myFilename removeBadMarkers|'MarkersOverlapping_*.tsv, MarkersNonoverlapping_*.tsv'
+|n. make PARAMS=myFilename plotMarkers|'MarkerCounts_*.pdf, MarkerDensity_*.png'
+|o. make PARAMS=myFilename getDNAseqsForIndelsSNPs|*.withseqs.tsv
+|p. make PARAMS=myFilename IndelsSNPs|*.indels.tsv, *.snps.tsv
+|q. make PARAMS=myFilename plotIndels|*.indels.pdf
+|r. Rscript code/R/dotplot.R dotplot.template|LCRs_*.dotplot.png
+|s. Rscript code/R/annotateFile.R annotate.template|MarkersAnnotated_*.tsv
+|t. Rscript code/R/annotateFile.R annotate/HP11_isInNearColumn.markers|MarkersAnnotated_WithInNearFeatures_*.indels.tsv
+|u. Rscript code/R/annotateFile.R annotate/HP11_to_gff3.markers|MarkersAnnotated_GFF3_*.gff3
 |===================================================
 
 (Note that some of the files listed above are produced by steps to be described below).

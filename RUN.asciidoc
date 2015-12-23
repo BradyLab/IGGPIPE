@@ -260,16 +260,16 @@ make a folder to contain these "log" files:
 
   mkdir logFiles
 
-To use 'tee', choose a log file name, let's say 'make_kmerIsect_HP14.txt',
-and then add at the end of your 'make' command line the extra
-commands '| tee logFiles/make_kmerIsect_HP14.txt', as in this example:
+To use 'tee', choose a log file name, let's say 'make_HP14.txt', and then add at
+the end of your 'make' command line the extra
+commands '| tee logFiles/make_HP14.txt', as in this example:
 
-  make PARAMS=allParameters.XY kmerIsect | tee logFiles/make_kmerIsect_HP14.txt
+  make PARAMS=allParameters.XY ALL | tee logFiles/make_HP14.txt
 
 Then, after 'make' finishes, you can examine that log file at any time to see
 what the pipeline output was, for example:
 
-  less logFiles/make_kmerIsect_HP14.txt
+  less logFiles/make_HP14.txt
 
 You should use the 'tee' command each time you
 run the pipeline unless you are sure you won't want to reexamine the output
@@ -284,38 +284,40 @@ improvements to IGGPIPE in error handling and in its input data format
 flexibility to help future users that encounter the error.
 --
 
-. *Run IGGPIPE with the command "make PARAMS=allParameters.XY kmerIsect"*
+. *Run IGGPIPE with the command "make PARAMS=allParameters.XY getGenomicPosIsect GENOME=1"*
 +
 --
 The first several steps in the pipeline extract unique k-mers from the FASTA
-files of the genomes, and intersect these to produce a list of common unique
-k-mers. To run these steps, use this command:
+files of the genomes, intersect these to produce a list of common unique
+k-mers, and add genomic positions to them for each of the genomes. To run these
+steps, use this command:
 
   cd ~/Documents/IGGPIPE    (or whatever is appropriate for your system)
-  make PARAMS=allParameters.XY kmerIsect    (replacing with your allParameters name)
+  make PARAMS=allParameters.XY getGenomicPosIsect GENOME=1    (replacing with your allParameters name)
 
 or, better yet, log to a file also:
 
-  make PARAMS=allParameters.XY kmerIsect | tee logFiles/make_kmerIsect_HP14.txt
+  make PARAMS=allParameters.XY getGenomicPosIsect GENOME=1 | tee logFiles/make_getGenomicPosIsect_HP14.txt
 
 If it completes successfully, the end of the command output will show the message:
 
-  kmerIsect files are up to date.
+  getGenomicPosIsect file(s) for genome(s) 1 are up to date.
 
 If it says something else, indicating an error occurred, examine the output
 carefully and try to diagnose and fix the error, then enter the above 'make'
 command again to retry the failed step.
 
 Assuming the first steps completed successfully, count the number of k-mers in
-the common unique k-mer file, which is located in the 'Kmers' subfolder of the
-output folder you specified in your allParameters file for parameter DIR_IGGPIPE_OUT.
-The name of the file is 'isect.kmers' and it is a text file containing one k-mer
-per line and nothing else. You can look at it with the 'less' command
-if you want to. To count the number of k-mers in it, use the 'wc -l'
-command, which counts lines in a file, like this (replacing 'outFolderForMyProject'
-with your output folder name):
+the common unique k-mer file for genome 1, which is located in the 'Kmers' subfolder
+of the output folder you specified in your allParameters file for parameter
+DIR_IGGPIPE_OUT.
+The name of the file is 'Kmers_1.isect' and it is a text file containing one k-mer
+per line, with the position information for that k-mer following the k-mer on the line.
+You can look at it with the 'less' command if you want to. To count the number of
+k-mers in it, use the 'wc -l' command, which counts lines in a file, like this
+(replacing 'outFolderForMyProject' with your output folder name):
 
-     wc -l outFolderForMyProject/Kmers/isect.kmers
+     wc -l outFolderForMyProject/Kmers/Kmers_1.isect
 
 If it shows that you have, say, several million or more, that is good. A few
 million or less might be too few to generate enough markers. Tens of millions
@@ -328,7 +330,8 @@ might need to edit the parameter file and decrease K by 1. With the tomato/penne
 genomes, K=14 was a
 good number. With Arabidopsis thaliana Col-0 and Ler-0 accessions, which were
 much more similar to one another than tomato/pennellii, a value of K=13 worked
-better. For very large genomes, you might need to increase K by 1. Since the
+better, because K=14 produced so many k-mers that computation time was excessive.
+For very large genomes, you might need to increase K by 1. Since the
 number of k-mers goes up dramatically with increasing K, you probably will never
 raise K above 15, perhaps 16. The default setting in the parameter file for the
 output directory parameter DIR_IGGPIPE_OUT is to include the value of K in the
@@ -583,25 +586,23 @@ Here is a summary of the filenames produced by each 'make' step, in pipeline ord
 |b. make PARAMS=myFilename getContigFile|GenomeData/*.contigs
 |c. make PARAMS=myFilename getKmers|Kmers/Kmers_*.kmers
 |d. make PARAMS=myFilename kmerStats|Kmers/Kmers_*.stats
-|e. make PARAMS=myFilename sortKmers|Kmers/Kmers_*.sorted
-|f. make PARAMS=myFilename kmerIsect|Kmers/isect.kmers
-|g. make PARAMS=myFilename getGenomicPos|Kmers/Kmers_*.isect
-|h. make PARAMS=myFilename mergeKmers|Kmers/Kmers_*.merge
-|i. make PARAMS=myFilename getCommonUniqueKmers|Kmers/common.unique.kmers
-|j. make PARAMS=myFilename findLCRs|LCRs_*.tsv, BadKmers_*.tsv
-|k. make PARAMS=myFilename findIndelGroups|IndelGroupsOverlapping_*.tsv, IndelGroupsNonoverlapping_*.tsv
-|l. make PARAMS=myFilename getDNAseqsForPrimers|IndelGroupsOverlapping_*.dnaseqs
-|m. make PARAMS=myFilename findPrimers|NonvalidatedMarkers_*.tsv
-|n. make PARAMS=myFilename ePCRtesting|MarkerErrors_*.tsv
-|o. make PARAMS=myFilename removeBadMarkers|MarkersOverlapping_*.tsv, MarkersNonoverlapping_*.tsv
-|p. make PARAMS=myFilename plotMarkers|MarkerCounts_*.pdf, MarkerDensity_*.png
-|q. make PARAMS=myFilename getDNAseqsForIndelsSNPs|*.withseqs.tsv
-|r. make PARAMS=myFilename IndelsSNPs|*.indels.tsv, *.snps.tsv
-|s. make PARAMS=myFilename plotIndels|*.indels.pdf
-|t. Rscript code/R/dotplot.R dotplot.template|LCRs_*.dotplot.png
-|u. Rscript code/R/annotateFile.R annotate.template|MarkersAnnotated_*.tsv
-|v. Rscript code/R/annotateFile.R annotate/HP11_isInNearColumn.markers|MarkersAnnotated_WithInNearFeatures_*.indels.tsv
-|w. Rscript code/R/annotateFile.R annotate/HP11_to_gff3.markers|MarkersAnnotated_GFF3_*.gff3
+|e. make PARAMS=myFilename getGenomicPosIsect|Kmers/Kmers_*.isect
+|f. make PARAMS=myFilename mergeKmers|Kmers/Kmers_*.merge
+|g. make PARAMS=myFilename getCommonUniqueKmers|Kmers/common.unique.kmers
+|h. make PARAMS=myFilename findLCRs|LCRs_*.tsv, BadKmers_*.tsv
+|i. make PARAMS=myFilename findIndelGroups|IndelGroupsOverlapping_*.tsv, IndelGroupsNonoverlapping_*.tsv
+|j. make PARAMS=myFilename getDNAseqsForPrimers|IndelGroupsOverlapping_*.dnaseqs
+|k. make PARAMS=myFilename findPrimers|NonvalidatedMarkers_*.tsv
+|l. make PARAMS=myFilename ePCRtesting|MarkerErrors_*.tsv
+|m. make PARAMS=myFilename removeBadMarkers|MarkersOverlapping_*.tsv, MarkersNonoverlapping_*.tsv
+|n. make PARAMS=myFilename plotMarkers|MarkerCounts_*.pdf, MarkerDensity_*.png
+|o. make PARAMS=myFilename getDNAseqsForIndelsSNPs|*.withseqs.tsv
+|p. make PARAMS=myFilename IndelsSNPs|*.indels.tsv, *.snps.tsv
+|q. make PARAMS=myFilename plotIndels|*.indels.pdf
+|r. Rscript code/R/dotplot.R dotplot.template|LCRs_*.dotplot.png
+|s. Rscript code/R/annotateFile.R annotate.template|MarkersAnnotated_*.tsv
+|t. Rscript code/R/annotateFile.R annotate/HP11_isInNearColumn.markers|MarkersAnnotated_WithInNearFeatures_*.indels.tsv
+|u. Rscript code/R/annotateFile.R annotate/HP11_to_gff3.markers|MarkersAnnotated_GFF3_*.gff3
 |===================================================
 
 (Note that some of the files listed above are produced by steps to be described below).

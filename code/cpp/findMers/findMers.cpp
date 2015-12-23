@@ -13,23 +13,27 @@
         C - 01
         G - 10
 
-    An option is available to intersect two k-mer lists and find positions of the
-    resulting intersection k-mers.
+    One or more k-mer lists is read and intersected (if more than one), and then
+    the positions of the resulting k-mers are found and written to an output
+    file.
 
     Algorithm:
-        1. Read the k-mer file and initialize a table.  The table has 2^2k
-            entries, one for each POSSIBLE k-mer, and each entry is 2 bits.
-            The values are as follows:
-                0 - this is not a k-mer from the input k-mer text file (else it
+        1. Initialize the k-mer table.  The table has 2^2k entries, one for each
+            POSSIBLE k-mer, and each entry is 2 bits.  The values are as follows:
+                0 - this is not a k-mer from an input k-mer text file (else it
                     is one).
                 1 - k-mer not yet seen in input FASTA sequence
                 2 - k-mer seen once in input FASTA sequence
                 3 - k-mer seen more than once in input FASTA sequence
-        2. If k-mer intersection option is specified, read the second k-mer file
-            and intersect it with the k-mer table initialized above.  Change any
-            k-mer whose value is 1 to a value of 2 to indicate that the k-mer
-            appears in both files.  When finished, reset all k-mers whose value
-            is 1 to a value of 0, and all k-mers whose value is 2 to a value of 1.
+            The table is initialized with values of 1 for all k-mers, in
+            preparation for step 2.
+        2. Read one or more k-mer input files and intersect the k-mers with those
+            in the k-mer table initialized above.  To do the intersection, change
+            all k-mers from the file whose value is one in the table to a value
+            of 2 to indicate that the k-mer appears in the input file.  When
+            finished with each k-mer file, reset all table entries with a value
+            of 1 to 0, and all with value 2 to 1, so that the only k-mers with a
+            value of 1 are those seen in all input k-mer files.
         3. Read input FASTA sequence file, one sequence at a time, run through
             the sequence and generate each k-mer and reverse-complement k-mer,
             look them up in the k-mer table, and if found adjust the table entry
@@ -75,6 +79,8 @@
 #define MAX_K   16
 typedef ubyte4 kmer; // 32 bits holds 16-mer
 
+#define MAX_KMER_FILES 200 // Actually it is just 3 probably.
+
 // Define types to hold a set of sequence contigs, each consisting of a string of ATCG's
 // encoded using 2 bits per base, with any non-ATCG character splitting the sequence into
 // multiple contigs.  (I.e. N's break up the FASTA sequence into contigs).
@@ -103,29 +109,30 @@ static void usage(void)
     static const char* const usage[] =
         {
         "NAME",
-        "       findMers - locate k-mers in FASTA sequences",
+        "       findMers - locate k-mers in FASTA sequences or make contig file",
         "",
         "SYNOPSIS",
-        "       findMers [OPTIONS] <FASTA_FILE> [<KMER_FILE> [<KMER_POS_FILE>]]",
+        "       findMers [OPTIONS] <FASTA_FILE> [<K> <KMER_POS_FILE>]",
         "",
         "DESCRIPTION",
-        "       Find the position(s) within FASTA file sequences of a simple text-file",
-        "       list of k-mers.  The intent is that the k-mers in the list are known",
-        "       to be unique, but this will be double-checked and reported if not true,",
-        "       and even if not unique, all positions of each k-mer will be found.",
+        "       Find the position(s) within FASTA file sequences of specified k-mers.",
+        "       The intent is that the specified k-mers are known to be unique, but",
+        "       this will be double-checked and reported if not true, and even if not",
+        "       unique, all positions of each k-mer will be found.",
         "",
         "       The k-mers are required to be DNA base k-mers, i.e. alphabet ATCG.",
         "       Also, if the k-mers are unique, none should be the reverse complement",
-        "       of another.  There may be additional data on each line of the k-mer",
-        "       file (or the -i option's k-mer file), separated from the k-mer by at",
-        "       least one space or tab character, and that data is ignored/discarded.",
+        "       of another.",
         "",
-        "       A k-mer position output file is written, with each line being a k-mer,",
-        "       a tab, a sequence name (from the input FASTA sequence file), a tab, a",
-        "       1-based k-mer start position, a tab, and a '+' or '-' indicating whether",
-        "       the k-mer was found on the + or - strand.  The starting position is the",
-        "       5' position on the strand where the k-mer is found.  The first line is a",
-        "       header line.",
+        "       A k-mer position output file is written, with each line containing six",
+        "       values separated by tabs, with a header line at the beginning giving the",
+        "       column names, which are:",
+        "           kmer: the k-mer sequence",
+        "           seqID: the ID of the sequence containing the k-mer (from FASTA file)",
+        "           pos: 1-based k-mer start position (5' side) within the sequence",
+        "           strand: '+' or '-' indicating if k-mer is on the + or - strand",
+        "           contig: 1-based number of the ID's contig containing the k-mer",
+        "           contigPos: 1-based k-mer start position within the contig",
         "",
         "       OPTIONS",
         "           -v verbosity",
@@ -134,9 +141,17 @@ static void usage(void)
         "               -v2 for that and output indicating # Mb processed",
         "               -v3 for that and verbose operational output",
         "",
-        "           -i <INTERSECT_KMER_FILE>",
-        "               Intersect k-mers in this file with those in <KMER_FILE> and only",
-        "               report position(s) of the intersect k-mers",
+        "           -i <KMER_FILE>",
+        "               Input text file containing k-mers, one per line, with the k-mer",
+        "               sequence starting in column 1.  There may be additional data on",
+        "               each line, separated from the k-mer by at least one space or tab",
+        "               character, and that data is ignored and discarded.  This option",
+        "               can be specified multiple times, and the k-mers within all such",
+        "               files are intersected, and positions are reported only for the",
+        "               k-mers present in all the files.  The <K> and <KMER_POS_FILE>",
+        "               arguments must be specified if and only if there is at least one",
+        "               -i argument.  If none are specified, then presumably the -f option",
+        "               is specified, as that is the only other thing this program can do.",
         "",
         "           -n <UNSEEN_KMERS_FILE>",
         "               Output to this file a list of k-mers from input file that were not",
@@ -148,17 +163,15 @@ static void usage(void)
         "",
         "           -f <CONTIG_FILE>",
         "               Output to this file a list of contig positions and lengths for the",
-        "               FASTA seqs",
+        "               FASTA sequences",
         "",
-        "       FASTA_FILE",
+        "       <FASTA_FILE>",
         "               Input FASTA sequences file name",
         "",
-        "       KMER_FILE",
-        "               Optional input k-mer text file name (size of k determined from first k-mer)",
-        "               This option might not be specified if the reason for running the program is",
-        "               to produce the <CONTIG_FILE> output file.",
+        "       <K>",
+        "               The value of k, must match the k-mer length in any -i files.",
         "",
-        "       KMER_POS_FILE",
+        "       <KMER_POS_FILE>",
         "               Optional name of text file to receive tab-separated k-mer position",
         "               information.  If not specified, no such file is produced.",
         "",
@@ -228,18 +241,34 @@ static void cvtKmerBinaryToStr(unsigned k, kmer Kmer, char* buf)
     buf[k] = 0;
     }
 
-// Read k-mer file and initialize k-mer table.  Exit with fatal error if unable
-// to read the file.  If successful, the value of k is returned (k-mer size) in
-// argument k, the number of k-mers in the file in argument numKmers, the size
-// of the k-mer table in bytes in argument tblSizeBytes, and the return value
-// is a pointer to the k-mer table.
-static ubyte* readKmerFile(const char* KMERfile, unsigned& k, unsigned& numKmers,
-    unsigned& tblSizeBytes, unsigned verbosity)
+// Initialize k-mer table.  Return the number of k-mers in the table in argument
+// tblSizeKmers, the size of the table in bytes in argument tblSizeBytes, and the
+// return value is a pointer to the k-mer table.
+static ubyte* initKmerTable(unsigned k, kmer& tblSizeKmers, unsigned& tblSizeBytes)
+    {
+    tblSizeKmers = pow(NUM_BASES, k);
+    tblSizeBytes = (unsigned) ((ubyte8)tblSizeKmers / TBL_KMERS_PER_BYTE);
+    ubyte* kmerTbl = new ubyte[tblSizeBytes];
+    ubyte V = 0;
+    for (unsigned i = 0; i < TBL_KMERS_PER_BYTE; i++)
+        V = (V << TBL_BITS_PER_KMER) + 1; // Note 1 = TBL_KMER_UNSEEN, but initial use is for intersecting k-mers.
+    std::fill_n(kmerTbl, tblSizeBytes, V); 
+    return(kmerTbl);
+    }
+
+// Read a file of k-mers and intersect them with the k-mers already in the k-mers table.
+// Set k-mers not in this file to 0 = TBL_UNKNOWN_KMER in the table, and set k-mers
+// that were in the file AND already in the table to 1 = TBL_KMER_UNSEEN.  Exit with
+// fatal error if unable to read the file.  If successful, the number of k-mers read
+// from the file is returned in argument numKmers, and the return value is the number
+// of k-mers with value TBL_KMER_UNSEEN in the table.
+static unsigned intersectKmerFile(const char* KMERfile, unsigned k, ubyte* kmerTbl,
+    kmer tblSizeKmers, unsigned tblSizeBytes, unsigned& numKmers)
     {
     kmer tblIdx;
     unsigned tblShift;
 
-    // Read first k-mer to get k.
+    // Read first k-mer to get k and make sure it matches argument k value.
     InputFile kfile;
     if (!kfile.Open(KMERfile))
         {
@@ -254,19 +283,14 @@ static ubyte* readKmerFile(const char* KMERfile, unsigned& k, unsigned& numKmers
         exit(EXIT_FAILURE);
         }
     char* token = strtok(line, " \t"); // Discard anything after first space/tab on the line.
-    k = strlen(token);
-    if (k < MIN_K || k > MAX_K)
+    unsigned k2 = strlen(token);
+    if (k2 != k)
         {
-        cout << "First k-mer in file " << KMERfile << " gives out-of-range size k=" << k << "\n";
+        cout << "First k-mer in file " << KMERfile << " does not have k=" << k << " bases\n";
         exit(EXIT_FAILURE);
         }
 
-    // Create the table.
-    tblSizeBytes = (unsigned) ((ubyte8)pow(NUM_BASES, k) * TBL_BITS_PER_KMER / BITS_PER_BYTE);
-    ubyte* kmerTbl = new ubyte[tblSizeBytes];
-    std::fill_n(kmerTbl, tblSizeBytes, 0); // Note TBL_UNKNOWN_KMER = 0
-
-    // Read the k-mers and initialize the table.
+    // Read the k-mers and change value of each that is 1 in the table to 2.
     numKmers = 0;
     while (kfile.good()) // Until end of file.
         {
@@ -279,112 +303,43 @@ static ubyte* readKmerFile(const char* KMERfile, unsigned& k, unsigned& numKmers
             exit(EXIT_FAILURE);
             }
         numKmers++;
-        // Now initialize the table entry.
+
+        // Test the table entry to see if it is 1 (= TBL_KMER_UNSEEN).
         tblIdx = Kmer >> TBL_KMER_IDX_SHIFT;
         tblShift = (Kmer & TBL_KMER_IDX_MASK)*TBL_BITS_PER_KMER;
-        kmerTbl[tblIdx] |= TBL_KMER_UNSEEN << tblShift;
+        unsigned v = (kmerTbl[tblIdx] >> tblShift) & TBL_KMER_BIT_MASK;
+
+        // If the k-mer is in the table, change the table entry to 2 (= TBL_KMER_SEEN_ONCE).
+        if (v == 1)
+            kmerTbl[tblIdx] = (kmerTbl[tblIdx] & ~(TBL_KMER_BIT_MASK << tblShift)) | (2 << tblShift);
+
         // Read next k-mer.
         kfile.getline(line, sizeof(line));
+
         // Discard anything after first space/tab on the line.
         token = strtok(line, " \t");
         }
+
     if (!kfile.eof())
         {
         cout << "Unknown error reading file " << KMERfile << "\n";
         exit(EXIT_FAILURE);
         }
+
     // Close the k-mer file.
     kfile.Close();
-    if (verbosity >= 1)
-        cout << "Number of " << k << "-mers in file " << KMERfile << " is " << numKmers << "\n";
-    return(kmerTbl);
-    }
-
-// Like readKmerFile(), but intersect the k-mers that are read from the file with
-// the k-mers already in the table.  Set k-mers not in this file to 0 in the table.
-// Exit with fatal error if unable to read the file.  If successful, the number of
-// k-mers read from the file is returned in argument numKmers2, and the return value
-// is the number of k-mers remaining in the table.
-static unsigned intersectKmerFile(const char* KMER2file, unsigned k, ubyte* kmerTbl,
-    unsigned tblSizeBytes, unsigned verbosity, unsigned& numKmers2)
-    {
-    kmer tblIdx;
-    unsigned tblShift;
-
-    // Read first k-mer to get k and make sure it matches argument k value.
-    InputFile kfile2;
-    if (!kfile2.Open(KMER2file))
-        {
-        cout << "Can't open file " << KMER2file << "\n";
-        exit(EXIT_FAILURE);
-        }
-    char line[MAX_K*100];
-    kfile2.getline(line, sizeof(line));
-    if (!kfile2.good())
-        {
-        cout << "No k-mers in file " << KMER2file << "\n";
-        exit(EXIT_FAILURE);
-        }
-    char* token = strtok(line, " \t"); // Discard anything after first space/tab on the line.
-    unsigned k2 = strlen(token);
-    if (k2 != k)
-        {
-        cout << "First k-mer in file " << KMER2file << " does not have k=" << k << " bases\n";
-        exit(EXIT_FAILURE);
-        }
-
-    // Read the k-mers and change value of each that is 1 in the table to 2.
-    numKmers2 = 0;
-    unsigned numIsectKmers = 0;
-    while (kfile2.good()) // Until end of file.
-        {
-        // First convert k-mer string in 'token' into binary k-mer in Kmer.
-        kmer Kmer;
-        char badChar;
-        if (!cvtKmerStrToBinary(k, token, Kmer, badChar))
-            {
-            cout << "Unexpected k-mer character '" << badChar << "' in file " << KMER2file << "\n";
-            exit(EXIT_FAILURE);
-            }
-        numKmers2++;
-        // Test the table entry to see if it is 1 = TBL_KMER_UNSEEN.
-        tblIdx = Kmer >> TBL_KMER_IDX_SHIFT;
-        tblShift = (Kmer & TBL_KMER_IDX_MASK)*TBL_BITS_PER_KMER;
-        unsigned v = (kmerTbl[tblIdx] >> tblShift) & TBL_KMER_BIT_MASK;
-        if (v == TBL_KMER_UNSEEN)
-            {
-            // The k-mer is in the table, change the table entry to 2 = TBL_KMER_SEEN_ONCE.
-            kmerTbl[tblIdx] = (kmerTbl[tblIdx] & ~(TBL_KMER_BIT_MASK << tblShift)) |
-                (TBL_KMER_SEEN_ONCE << tblShift);
-            ++numIsectKmers;
-            }
-        // Read next k-mer.
-        kfile2.getline(line, sizeof(line));
-        // Discard anything after first space/tab on the line.
-        token = strtok(line, " \t");
-        }
-    if (!kfile2.eof())
-        {
-        cout << "Unknown error reading file " << KMER2file << "\n";
-        exit(EXIT_FAILURE);
-        }
-    // Close the k-mer file.
-    kfile2.Close();
-    if (verbosity >= 1)
-        {
-        cout << "Number of " << k << "-mers in file " << KMER2file << " is " << numKmers2 << "\n";
-        cout << "Number of " << k << "-mers in intersection is " << numIsectKmers << "\n";
-        }
 
     // Go back through the table and change k-mers with value 1 = TBL_KMER_UNSEEN to value
     // 0 = TBL_UNKNOWN_KMER and with value 2 = TBL_KMER_SEEN_ONCE to 1 = TBL_KMER_UNSEEN.
-    kmer tblSizeKmers = tblSizeBytes * TBL_KMERS_PER_BYTE;
     tblIdx = 0;
     tblShift = 0;
+    unsigned numIsectKmers = 0;
     for (kmer Kmer = 0; Kmer < tblSizeKmers; Kmer++)
         {
         unsigned v = (kmerTbl[tblIdx] >> tblShift) & TBL_KMER_BIT_MASK;
-        if (v == TBL_KMER_UNSEEN || v == TBL_KMER_SEEN_ONCE)
+        if (v == 2)
+            numIsectKmers++;
+        if (v == 1 || v == 2)
             kmerTbl[tblIdx] = (kmerTbl[tblIdx] & ~(TBL_KMER_BIT_MASK << tblShift)) |
                 ((v-1) << tblShift);
 
@@ -740,10 +695,10 @@ static void processFASTAfile(unsigned k, ubyte *kmerTbl, const char* FASTAfile,
     }
 
 // List any k-mers not seen or seen more than once.
-static void writeUnseenAndMultipleKmersAndSummary(unsigned k, ubyte* kmerTbl,
-    unsigned tblSizeBytes, unsigned verbosity, const char* UNSEEN_KMERSfile, const char* MULTIPLE_KMERSfile)
+static void writeUnseenAndMultipleKmersAndSummary(unsigned k,
+    ubyte* kmerTbl, kmer tblSizeKmers, unsigned tblSizeBytes, unsigned verbosity,
+    const char* UNSEEN_KMERSfile, const char* MULTIPLE_KMERSfile)
     {
-    kmer tblSizeKmers = tblSizeBytes * TBL_KMERS_PER_BYTE;
     kmer tblIdx = 0;
     unsigned tblShift = 0;
     unsigned numInputKmers = 0;
@@ -856,7 +811,8 @@ int main(int argc, char* const argv[])
     const char* UNSEEN_KMERSfile = NULL;    // -n
     const char* MULTIPLE_KMERSfile = NULL;  // -m
     const char* CONTIGfile = NULL;          // -f
-    const char* KMER2file = NULL;           // -i
+    const char* KMERfiles[MAX_KMER_FILES];  // -i
+    unsigned numKMERfiles = 0;              // -i
 
     // Options.
     int a1; // argv first index.
@@ -881,7 +837,7 @@ int main(int argc, char* const argv[])
                     CONTIGfile = getOptionValueString(argc, argv, a1, a2);
                     break;
                 case 'i':
-                    KMER2file = getOptionValueString(argc, argv, a1, a2);
+                    KMERfiles[numKMERfiles++] = getOptionValueString(argc, argv, a1, a2);
                     break;
                 }
         }
@@ -892,30 +848,63 @@ int main(int argc, char* const argv[])
 
     // Arguments.
     const char* FASTAfile = argv[a1+0];
-    const char* KMERfile = NULL;
-    const char* KMERPOSfile = NULL;
+    if (numKMERfiles == 0 && argc > a1+1)
+        {
+        cout << "No -i option but argument <k> was specified\n";
+        exit(EXIT_FAILURE);
+        }
+    if (numKMERfiles > 0 && argc < a1+3)
+        {
+        cout << "The -i option was specified but arguments <k> and <KMER_POS_FILE> were not\n";
+        exit(EXIT_FAILURE);
+        }
+
+    unsigned k = 0;
     if (argc > a1+1)
-        KMERfile = argv[a1+1];
+        {
+        k = (unsigned) strtoul(argv[a1+1], &q, 0);
+        if (k < MIN_K || k > MAX_K)
+            {
+            cout << "Out-of-range size k=" << k << ", must be " << MIN_K << ".." << MAX_K << "\n";
+            exit(EXIT_FAILURE);
+            }
+        }
+
+    const char* KMERPOSfile = NULL;
     if (argc > a1+2)
         KMERPOSfile = argv[a1+2];
 
     /*
-        1. If KMERfile was specified, read the k-mer file and initialize k-mer table.
+        1. If one or more KMERfiles was specified, initialize the k-mer table.
     */
-    unsigned k = 0;
-    unsigned numKmers = 0;
+    kmer tblSizeKmers = 0;
     unsigned tblSizeBytes = 0;
     ubyte* kmerTbl = NULL;
-    if (KMERfile != NULL)
-        kmerTbl = readKmerFile(KMERfile, k, numKmers, tblSizeBytes, verbosity);
+    if (numKMERfiles > 0)
+        {
+        kmerTbl = initKmerTable(k, tblSizeKmers, tblSizeBytes);
+        if (verbosity >= 1)
+            cout << "k-mer table size is " << tblSizeKmers << " " << k << "-mers and " << tblSizeBytes << " bytes\n";
+        }
 
     /*
-        2. If k-mer intersection option, read and intersect second k-mer file.
+        2. If one or more KMERfiles was specified, read and intersect the k-mer files.
     */
-    unsigned numKmers2 = 0;
-    unsigned numIsectKmers = 0;
-    if (KMERfile != NULL && KMER2file != NULL)
-        numIsectKmers = intersectKmerFile(KMER2file, k, kmerTbl, tblSizeBytes, verbosity, numKmers2);
+    if (numKMERfiles > 0)
+        {
+        unsigned numKmers = 0;
+        unsigned numIsectKmers = 0;
+        for (unsigned i = 0; i < numKMERfiles; i++)
+            {
+            const char* KMERfile = KMERfiles[i];
+            numIsectKmers = intersectKmerFile(KMERfile, k, kmerTbl, tblSizeKmers, tblSizeBytes, numKmers);
+            if (verbosity >= 1)
+                cout << "Number of " << k << "-mers in file " << KMERfile << " is " << numKmers << "\n";
+            }
+        if (verbosity >= 1)
+            cout << "Number of " << k << "-mers in intersection of " << numKMERfiles <<
+                " k-mer files is " << numIsectKmers << "\n";
+        }
 
     /*
         3. Read input FASTA sequence file and look up k-mers in table.
@@ -926,7 +915,7 @@ int main(int argc, char* const argv[])
         4. If a k-mer table was produced, display summary info and write out k-mers not seen or seen more than once.
     */
     if (kmerTbl != NULL)
-        writeUnseenAndMultipleKmersAndSummary(k, kmerTbl, tblSizeBytes, verbosity, UNSEEN_KMERSfile, MULTIPLE_KMERSfile);
+        writeUnseenAndMultipleKmersAndSummary(k, kmerTbl, tblSizeKmers, tblSizeBytes, verbosity, UNSEEN_KMERSfile, MULTIPLE_KMERSfile);
 
     return 0;
     }
