@@ -43,7 +43,7 @@ show the names of file(s) that are produced.
      make PARAMS=myFilename getCommonUniqueKmers
      make PARAMS=myFilename findLCRs
      make PARAMS=myFilename findIndelGroups
-     make PARAMS=myFilename getDNAseqs    GENOME=ALL
+     make PARAMS=myFilename getDNAseqsForPrimers    GENOME=ALL
      make PARAMS=myFilename findPrimers
      make PARAMS=myFilename ePCRtesting   GENOME=ALL
      make PARAMS=myFilename removeBadMarkers
@@ -114,5 +114,6 @@ If you want to analyze an LCR, Indel Group, or marker file for Indels and SNPs
 which one), then use these commands to analyze for Indels and SNPs and to plot
 Indel information:
 
+     make PARAMS=myFilename getDNAseqsForIndelsSNPs
      make PARAMS=myFilename IndelsSNPs
      make PARAMS=myFilename plotIndels

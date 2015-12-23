@@ -1,3 +1,4 @@
+IGGPIPE.bbprojectd
 NOTES ONGOING.txt
 primer3settings.old.txt
 allPathParameters.ours
@@ -20,3 +21,5 @@ goodHP14/**
 temp.*
 x.*
 new.*
+align.fa
+align.fasta

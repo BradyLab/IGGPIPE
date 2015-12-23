@@ -918,17 +918,18 @@ output files are those available in the goodTest subdirectory for comparison to 
 |i. make PARAMS=myFilename getCommonUniqueKmers|Kmers/common.unique.kmers
 |j. make PARAMS=myFilename findLCRs|'LCRs_*.tsv, BadKmers_*.tsv'
 |k. make PARAMS=myFilename findIndelGroups|'IndelGroupsOverlapping_*.tsv, IndelGroupsNonoverlapping_*.tsv'
-|l. make PARAMS=myFilename getDNAseqs|'DNAseqs_*.dnaseqs'
+|l. make PARAMS=myFilename getDNAseqsForPrimers|'IndelGroupsOverlapping_*.dnaseqs'
 |m. make PARAMS=myFilename findPrimers|'NonvalidatedMarkers_*.tsv'
 |n. make PARAMS=myFilename ePCRtesting|'MarkerErrors_*.tsv'
 |o. make PARAMS=myFilename removeBadMarkers|'MarkersOverlapping_*.tsv, MarkersNonoverlapping_*.tsv'
 |p. make PARAMS=myFilename plotMarkers|'MarkerCounts_*.pdf, MarkerDensity_*.png'
-|q. make PARAMS=myFilename IndelsSNPs|'MarkersNonoverlapping_*.indels.tsv, MarkersNonoverlapping_*.snps.tsv'
-|r. make PARAMS=myFilename plotIndels|'MarkersNonoverlapping_*.indels.pdf'
-|s. Rscript code/R/dotplot.R dotplot.template|'LCRs_*.dotplot.png'
-|t. Rscript code/R/annotateFile.R annotate.template|'MarkersAnnotated_*.tsv'
-|u. Rscript code/R/annotateFile.R annotate/HP11_isInNearColumn.markers|'MarkersAnnotated_WithInNearFeatures_*.indels.tsv'
-|v. Rscript code/R/annotateFile.R annotate/HP11_to_gff3.markers|'MarkersAnnotated_GFF3_*.gff3'
+|q. make PARAMS=myFilename getDNAseqsForIndelsSNPs|*.withseqs.tsv
+|r. make PARAMS=myFilename IndelsSNPs|*.indels.tsv, *.snps.tsv
+|s. make PARAMS=myFilename plotIndels|*.indels.pdf
+|t. Rscript code/R/dotplot.R dotplot.template|LCRs_*.dotplot.png
+|u. Rscript code/R/annotateFile.R annotate.template|MarkersAnnotated_*.tsv
+|v. Rscript code/R/annotateFile.R annotate/HP11_isInNearColumn.markers|MarkersAnnotated_WithInNearFeatures_*.indels.tsv
+|w. Rscript code/R/annotateFile.R annotate/HP11_to_gff3.markers|MarkersAnnotated_GFF3_*.gff3
 |===================================================
 
 (Note that some of the files listed above are produced by steps to be described below).
@@ -946,21 +947,23 @@ Unix line ends and the other might have DOS line ends.
 . *Run 'make IndelsSNPs' to align markers and find Indels and SNPs*
 +
 --
-An R program that is NOT run as part of the pipeline when the 'make ... ALL' target
-is built, but which can be run using 'make ... IndelsSNPs', is able to read a file of LCRs,
-non-overlapping IndelGroups, or non-overlapping Markers, extract the DNA sequences
-from the genomes in each LCR or Marker region and align them, then locate all
-Indels and SNPs in the aligned sequences and write their positions to an Indels file
-and a SNPs file.  The input file to be used is selected with parameter
-PATH_INDELS_SNPS_INPUT_FILE in the allParameters.* file.
-The program to find Indels and SNPs is called alignAndGetIndelsSNPs.R. Run it as follows:
+Pipeline software is also provided to read a file of
+LCRs, non-overlapping Indel Groups, or non-overlapping Markers, extract the DNA sequences
+from the genomes in each LCR or Marker region and align them, then locate all Indels
+and SNPs in the aligned sequences and write their positions to files.  This part of the
+pipeline is NOT run when the 'make ... ALL' target is built.  Run it as follows:
 
-  make PARAMS=allParameters.test IndelsSNPs
+  make PARAMS=allParameters.XY getDNAseqsForIndelsSNPs    (replacing with your allParameters name)
+  make PARAMS=allParameters.XY IndelsSNPs    (replacing with your allParameters name)
+
+This produces three files in your output folder whose names end with "withseqs.tsv",
+"indels.tsv" and ".snps.tsv", the latter two containing tables of all Indels and SNPs
+found in the marker regions.
 
 Check that the output files exist with:
 
-  ls outTestHP11/Markers*.indels.tsv
-  ls outTestHP11/Markers*.snps.tsv
+  ls outTestHP11/NonoverlappingMarkers*.indels.tsv
+  ls outTestHP11/NonoverlappingMarkers*.snps.tsv
 
 This should list the files 'outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv'
 and  'outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.snps.tsv'

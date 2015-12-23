@@ -34,7 +34,7 @@ else if (testing == 1)
     {
     args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
         "outTestHP11/IndelGroupsOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0.tsv",
-        "outTestHP11/GenomeData/DNAseqs_K11k2L100D10_2000A100_2000d10_100N2F0X20",
+        "outTestHP11/GenomeData/IndelGroupsOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20",
         "outTestHP11/NonvalidatedMarkers_K11k2L100D10_2000A100_2000d10_100N2F0X20.tsv",
         "~/bin/primer3_core", "primer3settings.txt",
         "/Users/tedtoal/src/primer3-2.3.6/primer3_config",
@@ -44,7 +44,7 @@ else if (testing == 2)
     {
     args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
         "outHP14/IndelGroupsOverlapping_K14k2L400D10_1500A400_1500d50_300N2F0.tsv",
-        "outHP14/GenomeData/DNAseqs_K14k2L400D10_1500A400_1500d50_300N2F0X20",
+        "outHP14/GenomeData/IndelGroupsOverlapping_K14k2L400D10_1500A400_1500d50_300N2F0X20",
         "outHP14/NonvalidatedMarkers_K14k2L400D10_1500A400_1500d50_300N2F0X20.tsv",
         "~/bin/primer3_core", "primer3settings.txt",
         "/Users/tedtoal/src/primer3-2.3.6/primer3_config",
@@ -54,7 +54,7 @@ else if (testing == 3)
     {
     args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
         "outHPT14/IndelGroupsOverlapping_K14k2L300D5_1500A300_1500d50_300N2F0.tsv",
-        "outHPT14/GenomeData/DNAseqs_K14k2L300D5_1500A300_1500d50_300N2F0X15",
+        "outHPT14/GenomeData/IndelGroupsOverlapping_K14k2L300D5_1500A300_1500d50_300N2F0X15",
         "outHPT14/NonvalidatedMarkers_K14k2L300D5_1500A300_1500d50_300N2F0X15.tsv",
         "~/bin/primer3_core", "primer3settings.txt",
         "/Users/tedtoal/src/primer3-2.3.6/primer3_config",

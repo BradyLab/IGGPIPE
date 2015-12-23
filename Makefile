@@ -135,7 +135,7 @@ ALL:
 else ifeq ($(CLEAN),1)
 ALL: getSeqInfo getKmers kmerStats sortKmers getContigFile \
     kmerIsect getGenomicPos mergeKmers getCommonUniqueKmers findLCRs \
-    findIndelGroups getDNAseqs findPrimers ePCRtesting removeBadMarkers \
+    findIndelGroups getDNAseqsForPrimers findPrimers ePCRtesting removeBadMarkers \
     plotMarkers
 	@echo
 	@echo "ALL files are cleaned"
@@ -143,7 +143,7 @@ ALL: getSeqInfo getKmers kmerStats sortKmers getContigFile \
 else
 ALL: getSeqInfo getKmers kmerStats sortKmers getContigFile \
     kmerIsect getGenomicPos mergeKmers getCommonUniqueKmers findLCRs \
-    findIndelGroups getDNAseqs findPrimers ePCRtesting removeBadMarkers \
+    findIndelGroups getDNAseqsForPrimers findPrimers ePCRtesting removeBadMarkers \
     plotMarkers
 	@echo
 	@echo "ALL files are up to date"
@@ -652,7 +652,7 @@ $(PTN_OVERLAPPING_INDELS_FILE) $(PTN_NONOVERLAPPING_INDELS_FILE) : $(PATH_LCR_FI
 	@echo "Finished."
 
 ################################################################################
-# getDNAseqs: Extract DNA sequence around Indel Groups, for making primers.
+# getDNAseqsForPrimers: Extract DNA sequence around Indel Groups, for making primers.
 ################################################################################
 
 # A list of all FASTA files already defined above: FASTA_FILES
@@ -671,14 +671,14 @@ endif
 
 # Phony target to make or clean TARGET_DNASEQ file(s).
 ifeq ($(CLEAN),)
-getDNAseqs: $(TARGET_DNASEQ)
+getDNAseqsForPrimers: $(TARGET_DNASEQ)
 	@echo
-	@echo "getDNAseqs file(s) for genome(s) $(GENOME) are up to date."
+	@echo "getDNAseqsForPrimers file(s) for genome(s) $(GENOME) are up to date."
 	@echo
 else
-getDNAseqs:
+getDNAseqsForPrimers:
 	@$(CMD_DELETE_WHEN_CLEANING) $(TARGET_DNASEQ) $(DIR_GENOME_OUT_DATA)/extract*.txt $(DIR_GENOME_OUT_DATA)/seqs*.txt
-	@echo "getDNAseqs output file(s) for genome(s) $(GENOME) removed."
+	@echo "getDNAseqsForPrimers output file(s) for genome(s) $(GENOME) removed."
 	@echo
 endif
 
@@ -688,11 +688,11 @@ endif
 $(DNA_SEQ_FILES) : $(PFX_DNA_SEQS_PATH)_%.dnaseqs : $$(PATH_GENOME_FASTA_$$*) \
         $(PFX_GENOME_DATA_FILE)$$*.contigs $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) | \
         $(DIR_IGGPIPE_OUT) $(DIR_GENOME_OUT_DATA) \
-        $(PATH_GET_DNA_SEQS) $(PATH_GET_SEQS_FASTA)
+        $(PATH_GET_DNA_SEQS_FOR_PRIMERS) $(PATH_GET_SEQS_FASTA)
 	@echo
-	@echo "*** getDNAseqs PARAMS=$(PARAMS) GENOME=$* ***"
+	@echo "*** getDNAseqsForPrimers PARAMS=$(PARAMS) GENOME=$* ***"
 	@echo "Extract DNA sequence around Indel Groups and write to $@"
-	$(TIME) $(CMD_RSCRIPT) $(PATH_GET_DNA_SEQS) $(WD) \
+	$(TIME) $(CMD_RSCRIPT) $(PATH_GET_DNA_SEQS_FOR_PRIMERS) $(WD) \
 	    $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) $* \
 	    $@ \
 		$(DIR_GENOME_OUT_DATA) $(EXTENSION_LEN) \
@@ -866,11 +866,88 @@ $(MARKER_COUNTS_FILE) $(MARKER_DENSITY_FILES) : $(PATH_OVERLAPPING_MARKERS_FILE)
 	@echo "Finished."
 
 ################################################################################
-# IndelsSNPs: Read input file and perform alignments, then search them for
-# Indels and SNPs.
+# LCRsToLCBs: Read LCRs data file and convert to LCBs.
+################################################################################
+
+# Phony target to make or clean PATH_LCB_FILE file.
+# If variable PARAMS is not defined, show basic usage info, else make
+# LCRsToLCBs output file target.
+ifeq ($(PARAMS),)
+LCRsToLCBs:
+	@echo
+	@echo "You must specify a PARAMS file:"
+	@echo
+	@echo "$(INDENT)make PARAMS=<allParametersFile> LCRsToLCBs"
+	@echo 
+else ifeq ($(CLEAN),)
+LCRsToLCBs: $(PATH_LCB_FILE)
+	@echo
+	@echo "LCBs data file is up to date."
+	@echo
+else
+LCRsToLCBs:
+	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_LCB_FILE)
+	@echo "LCBs data file removed."
+	@echo
+endif
+
+# PATH_LCB_FILE target.
+
+$(PATH_LCB_FILE) : $(PATH_LCR_FILE) | $(DIR_GENOME_OUT_DATA)
+	@echo
+	@echo "*** LCRsToLCBs PARAMS=$(PARAMS) ***"
+	@echo "Convert LCRs in $< to LCBs and write to $@"
+	$(TIME) $(CMD_RSCRIPT) $(PATH_LCRS_TO_LCBS) $(WD) $(PATH_LCR_FILE) $(PATH_LCB_FILE) $(REDIR)
+	@echo "Finished."
+
+################################################################################
+# getDNAseqsForIndelsSNPs: Read input file and extract DNA sequences from each
+# genome, then write combined data to output file.
 ################################################################################
 
 # A list of all FASTA files already defined above: FASTA_FILES
+
+# Phony target to make or clean PATH_INDELS_SNPS_SEQS_FILE file.
+# If variable PARAMS is not defined, show basic usage info, else make
+# getDNAseqsForIndelsSNPs output file target.
+ifeq ($(PARAMS),)
+getDNAseqsForIndelsSNPs:
+	@echo
+	@echo "You must specify a PARAMS file:"
+	@echo
+	@echo "$(INDENT)make PARAMS=<allParametersFile> getDNAseqsForIndelsSNPs"
+	@echo 
+else ifeq ($(CLEAN),)
+getDNAseqsForIndelsSNPs: $(PATH_INDELS_SNPS_SEQS_FILE)
+	@echo
+	@echo "Indels and SNPs sequence file is up to date."
+	@echo
+else
+getDNAseqsForIndelsSNPs:
+	@$(CMD_DELETE_WHEN_CLEANING) $(PATH_INDELS_SNPS_SEQS_FILE)
+	@echo "Indels and SNPs sequence file removed."
+	@echo
+endif
+
+# PATH_INDELS_SNPS_SEQS_FILE target.
+
+$(PATH_INDELS_SNPS_SEQS_FILE) : $(PATH_INDELS_SNPS_INPUT_FILE) $(FASTA_FILES) | \
+        $(DIR_GENOME_OUT_DATA) $(PATH_GET_DNA_SEQS_FOR_INDELS_SNPS) $(PATH_GET_SEQS_FASTA)
+	@echo
+	@echo "*** getDNAseqsForIndelsSNPs PARAMS=$(PARAMS) ***"
+	@echo "Get DNA sequences for $< and write merged data to $@"
+	$(TIME) $(CMD_RSCRIPT) $(PATH_GET_DNA_SEQS_FOR_INDELS_SNPS) $(WD) $(K) \
+	    $(PATH_INDELS_SNPS_INPUT_FILE) $(PATH_INDELS_SNPS_SEQS_FILE) \
+	    $(DIR_GENOME_OUT_DATA) \
+		$(CMD_PERL) $(PATH_GET_SEQS_FASTA) \
+		$(INVESTIGATE_GET_DNA_SEQS_FOR_INDELS_SNPS) \
+		$(FASTA_FILES) $(REDIR)
+	@echo "Finished."
+
+################################################################################
+# IndelsSNPs: Read input file and perform alignments, then search them for
+# Indels and SNPs.
+################################################################################
 
 # Do this to avoid case annoyance.
 indelsSNPs: IndelsSNPs
@@ -899,17 +976,15 @@ endif
 
 # PATH_INDELS_OUTPUT_FILE and PATH_SNPS_OUTPUT_FILE target.
 
-$(PATH_INDELS_OUTPUT_FILE) $(PATH_SNPS_OUTPUT_FILE) : $(PATH_INDELS_SNPS_INPUT_FILE) $(FASTA_FILES) | \
-        $(DIR_GENOME_OUT_DATA) $(PATH_PATH_ALIGN_AND_GET_INDELS_SNPS) $(PATH_GET_SEQS_FASTA)
+$(PATH_INDELS_OUTPUT_FILE) $(PATH_SNPS_OUTPUT_FILE) : $(PATH_INDELS_SNPS_SEQS_FILE) | \
+        $(PATH_ALIGN_AND_GET_INDELS_SNPS)
 	@echo
 	@echo "*** IndelsSNPs PARAMS=$(PARAMS) ***"
 	@echo "Align sequences of $< and find Indels and SNPs and write them to output files"
-	$(TIME) $(CMD_RSCRIPT) $(PATH_PATH_ALIGN_AND_GET_INDELS_SNPS) $(WD) \
-	    $(PATH_INDELS_SNPS_INPUT_FILE) $(PATH_INDELS_OUTPUT_FILE) $(PATH_SNPS_OUTPUT_FILE) \
-	    $(DIR_GENOME_OUT_DATA) \
-		$(CMD_PERL) $(PATH_GET_SEQS_FASTA) \
-		$(CMD_ALIGNER) $(MAX_SNPS_FRAC) $(INVESTIGATE_PATH_ALIGN_AND_GET_INDELS_SNPS) \
-		$(FASTA_FILES) $(REDIR)
+	$(TIME) $(CMD_RSCRIPT) $(PATH_ALIGN_AND_GET_INDELS_SNPS) $(WD) \
+	    $(PATH_INDELS_SNPS_SEQS_FILE) $(PATH_INDELS_OUTPUT_FILE) $(PATH_SNPS_OUTPUT_FILE) \
+		$(CMD_ALIGNER) $(MAX_INDELS_PER_KBP) $(MAX_SNPS_PER_KBP) $(SCRAMBLE_SEQUENCE) \
+		$(INVESTIGATE_ALIGN_AND_GET_INDELS_SNPS) $(REDIR)
 	@echo "Finished."
 
 ################################################################################

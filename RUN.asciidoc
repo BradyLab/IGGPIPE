@@ -590,17 +590,18 @@ Here is a summary of the filenames produced by each 'make' step, in pipeline ord
 |i. make PARAMS=myFilename getCommonUniqueKmers|Kmers/common.unique.kmers
 |j. make PARAMS=myFilename findLCRs|LCRs_*.tsv, BadKmers_*.tsv
 |k. make PARAMS=myFilename findIndelGroups|IndelGroupsOverlapping_*.tsv, IndelGroupsNonoverlapping_*.tsv
-|l. make PARAMS=myFilename getDNAseqs|DNAseqs_*.dnaseqs
+|l. make PARAMS=myFilename getDNAseqsForPrimers|IndelGroupsOverlapping_*.dnaseqs
 |m. make PARAMS=myFilename findPrimers|NonvalidatedMarkers_*.tsv
 |n. make PARAMS=myFilename ePCRtesting|MarkerErrors_*.tsv
 |o. make PARAMS=myFilename removeBadMarkers|MarkersOverlapping_*.tsv, MarkersNonoverlapping_*.tsv
 |p. make PARAMS=myFilename plotMarkers|MarkerCounts_*.pdf, MarkerDensity_*.png
-|q. make PARAMS=myFilename IndelsSNPs|MarkersNonoverlapping_*.indels.tsv, MarkersNonoverlapping_*.snps.tsv
-|r. make PARAMS=myFilename plotIndels|MarkersNonoverlapping_*.indels.pdf
-|s. Rscript code/R/dotplot.R dotplot.template|LCRs_*.dotplot.png
-|t. Rscript code/R/annotateFile.R annotate.template|MarkersAnnotated_*.tsv
-|u. Rscript code/R/annotateFile.R annotate/HP11_isInNearColumn.markers|MarkersAnnotated_WithInNearFeatures_*.indels.tsv
-|v. Rscript code/R/annotateFile.R annotate/HP11_to_gff3.markers|MarkersAnnotated_GFF3_*.gff3
+|q. make PARAMS=myFilename getDNAseqsForIndelsSNPs|*.withseqs.tsv
+|r. make PARAMS=myFilename IndelsSNPs|*.indels.tsv, *.snps.tsv
+|s. make PARAMS=myFilename plotIndels|*.indels.pdf
+|t. Rscript code/R/dotplot.R dotplot.template|LCRs_*.dotplot.png
+|u. Rscript code/R/annotateFile.R annotate.template|MarkersAnnotated_*.tsv
+|v. Rscript code/R/annotateFile.R annotate/HP11_isInNearColumn.markers|MarkersAnnotated_WithInNearFeatures_*.indels.tsv
+|w. Rscript code/R/annotateFile.R annotate/HP11_to_gff3.markers|MarkersAnnotated_GFF3_*.gff3
 |===================================================
 
 (Note that some of the files listed above are produced by steps to be described below).
@@ -624,20 +625,35 @@ Tables describing each column in each .tsv file type are at the end of this docu
 . *Finding Indels and SNPs*
 +
 --
-An R program that is NOT run as part of the pipeline when the 'make ... ALL' target
-is built, but which can be run using 'make ... IndelsSNPs', is able to read a file of
+Pipeline software is also provided to read a file of
 LCRs, non-overlapping Indel Groups, or non-overlapping Markers, extract the DNA sequences
 from the genomes in each LCR or Marker region and align them, then locate all Indels
-and SNPs in the aligned sequences and write their positions to files. The program
-is called alignAndGetIndelsSNPs.R. You should already have set its input file name in
-your "allParameters" parameter file (PATH_INDELS_SNPS_INPUT_FILE). Run it as follows:
+and SNPs in the aligned sequences and write their positions to files.  This part of the
+pipeline is NOT run when the 'make ... ALL' target is built.  To run this and find
+Indels and SNPs, use 'make ... IndelsSNPs', after setting the parameters in your
+"allParameters" parameter file.  These are PATH_INDELS_SNPS_INPUT_FILE (the input file
+name), MAX_INDELS_PER_KBP and MAX_SNPS_PER_KBP (maximum number of Indels and SNPs that
+may occur in an alignment per Kbp of sequence, and if exceeded, cause the alignment to
+be discarded as unreliable), and SCRAMBLE_SEQUENCE (can be set TRUE to do alignments
+with scrambled sequences, to determine the actual numbers of Indels and SNPs per Kbp
+in random sequence alignments.  Run the Indel/SNP finder as follows:
 
   make PARAMS=allParameters.XY IndelsSNPs    (replacing with your allParameters name)
 
 This produces two files in your output folder whose names end with "indels.tsv" and
-".snps.tsv", containing tables of all Indels and SNPs found in the LCR or marker
-regions.  Examine them to see the data they contain.  The columns are described in
-Table 5 and Table 6.
+".snps.tsv", containing tables of all Indels and SNPs found in either the LCR or Indel
+Group or marker regions (depending on the setting of PATH_INDELS_SNPS_INPUT_FILE).
+Examine them to see the data they contain.  The columns are described in Table 5 and
+Table 6.
+
+The default settings for the parameters MAX_INDELS_PER_KBP and MAX_SNPS_PER_KBP are
+reasonable values, but you can adjust them to either decrease FALSE positives at the
+expense of fewer TRUE positives (smaller values) or increase TRUE positives at the
+expense of more FALSE positives (larger values).
+
+Note that the pipeline for 'make IndelsSNPs' automatically invokes a preceding step,
+'make getDNAseqsForIndelsSNPs' that extracts DNA sequences in preparation for alignment,
+and writes them to a file whose name ends with "withseqs.tsv".
 --
 
 . *Plotting Indel information*
@@ -892,4 +908,18 @@ in that region is max idx value.
 |Xid,Yid|Sequence ID of the SNP in genomes X,Y.
 |Xpos,Ypos|SNP position in genomes X,Y.
 |Xval,Yval|SNP value in genomes X,Y.
+|===================================================
+
+.Columns in *.withseqs.tsv files; X,Y=chosen genome letters
+[cols="^1,9",options="header"]
+|===================================================
+|Column|Description
+|ID|Unique ID tying row back to originating input file row. LCR input files: LCRnumber.
+IndelGroup and Markers files: refID_refPos1_refPos2.
+|phases|Phase of each genome incl. ref. genome, relative to ref. genome, string of +/- chars,
++ : same direction, - : opposite direction.",
+|Xid|Genome X sequence ID
+|Xpos1|Genome X position of upstream end of sequence to align on "+" strand
+|Xpos2|Genome X position of downstream end of sequence to align on "+" strand, Xpos1 < Xpos2 always
+|Xseq|Genome X DNA sequence between the two positions
 |===================================================

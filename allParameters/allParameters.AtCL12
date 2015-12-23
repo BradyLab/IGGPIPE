@@ -1,8 +1,9 @@
 ################################################################################
 ################################################################################
 
-# This is an IGGPIPE parameter file example for doing an analysis of tomato vs
-# human genome, just to see what will happen.
+# This is an IGGPIPE parameter file example for doing a 2-species analysis of
+# A. thaliana ecotype Col-0 (C) and Ler-0 (L) genomes.  This is identical to
+# allParameters.AtCL13 except K is 12 here.
 
 ################################################################################
 ################################################################################
@@ -17,9 +18,10 @@
 # letter K here.
 ################################################################################
 
-# Try with 15.
+# For Col-0 and Ler-0, which are extremely similar, there will be a huge number
+# of common unique k-mers at k=14.  Use k=13 for faster processing.
 
-K := 15
+K := 12
 
 
 ################################################################################
@@ -54,10 +56,12 @@ GENOME_NUMBERS := 1 2
 # letter for each one.
 ################################################################################
 
-# Use H for Human, T for Tomato.
+# In this example, we use two genomes, the Heinz tomato genome (letter H) and
+# the Solanum pennellii genome (letter P).  The tomato genome is the reference
+# genome.
 
-GENOME_1 := H
-GENOME_2 := T
+GENOME_1 := C
+GENOME_2 := L
 
 
 # Combine the above letters together with one space between each letter.
@@ -78,7 +82,7 @@ GENOME_LETTERS_SQUISHED := $(shell echo "$(GENOME_LETTERS)" | sed "s/ //g")
 # that a different run with different genomes or k will produce output in a
 # different folder.  This directory will be created if it doesn't exist.
 
-DIR_IGGPIPE_OUT := outHumanTomato_$(K)
+DIR_IGGPIPE_OUT := out$(GENOME_LETTERS_SQUISHED)$(K)
 
 
 ################################################################################
@@ -87,13 +91,29 @@ DIR_IGGPIPE_OUT := outHumanTomato_$(K)
 ################################################################################
 
 # Path to parent folder of all genome data.
+# (This example assumes that an environment variable named "BRADYLAB" has been
+# defined, that gives the path to a high-level directory.)
+
+DIR_GENOME_DATA := $(BRADYLAB)/Genomes/At
+
+
+# Directories containing the FASTA files for the N_GENOMES genomes.
+# (This example uses the DIR_GENOME_DATA variable above to define the directories
+# containing files for the two genomes to be run through the IGGPIPE pipeline.)
+
+DIR_GENOME_DATA_1 := $(DIR_GENOME_DATA)
+DIR_GENOME_DATA_2 := $(DIR_GENOME_DATA)/Ler
+
 
 # Paths of the N_GENOMES FASTA files containing the genome sequences being
 # analyzed.  Each variable name must be the string "PATH_GENOME_FASTA_" followed
 # by the genome number.
 
-PATH_GENOME_FASTA_1 := $(BRADYLAB)/Genomes/Hs/hg38/hg38.fa
-PATH_GENOME_FASTA_2 := $(BRADYLAB)/Genomes/Soly/ITAG2.4_release/ITAG2.4_genomic.fasta
+# The ITAG2.4_genomic.fasta genome is the latest tomato genome release from solGenomics.net.
+# The Spenn.fasta genome is the recent S. pennellii genome release from solGenomics.net.
+
+PATH_GENOME_FASTA_1 := $(DIR_GENOME_DATA_1)/TAIR10_chr.fasta
+PATH_GENOME_FASTA_2 := $(DIR_GENOME_DATA_2)/Ler_0.v0.7.fasta
 
 
 # Directory in which to place output files that are generated from the FASTA files.
@@ -172,14 +192,17 @@ PATH_COMMON_UNIQUE_KMERS := $(DIR_KMERS)/common.unique.kmers
 # since that is the minimum number of k-mers in an LCR that could result
 # in an Indel Group call.
 
-KMIN := 2
+# Since Col-0 and Ler-0 are so similar, it should be easy to get large numbers
+# of sequential k-mers, so set this larger.
+
+KMIN := 10
 
 
 # Minimum acceptable length of an LCR in base-pairs.  This is normally equal
 # to the minimum acceptable amplicon size AMIN (defined below), although it
 # could be larger.  Smaller values make more LCRs and increase computation time.
 
-LMIN := 250
+LMIN := 400
 
 
 # Minimum distance in bp between two adjacent k-mers in an LCR.  If two k-mers are
@@ -187,7 +210,10 @@ LMIN := 250
 # a series of back-to-back k-mers in a conserved region from satisfying the KMIN
 # setting or MINFLANK setting.  A value in the range of k would be reasonable.
 
-DMIN := 5
+# Since Col-0 and Ler-0 are so similar, set this larger than normal to reduce
+# the large number of possible overlapping indel regions to be tested.
+
+DMIN := 30
 
 
 # Maximum distance in bp between two adjacent k-mers in an LCR.  If two adjacent
@@ -201,7 +227,7 @@ DMAX := 1500
 
 # Minimum IGG marker amplicon size in any genome.
 
-AMIN := 250
+AMIN := 400
 
 
 # Maximum IGG marker amplicon size in any genome.  The amplicon size will always
@@ -263,7 +289,10 @@ NDAMIN := 2
 # there is no reason not to leave this set to 0.  For the purpose of finding
 # Indel Groups only, you may want to use a larger value than 0.
 
-MINFLANK := 0
+# Since Col-0 and Ler-0 are so similar, there will be lots of common unique k-mers
+# so set this a bit larger to reduce the number of candidate indels to be tested.
+
+MINFLANK := 2
 
 
 # Two files of Indel Groups are produced, one of overlapping Indel Groups and
@@ -332,7 +361,7 @@ EXTENSION_LEN := 20
 # whose size is within this amount of the target amplicon size, then you want
 # that marker to be marked bad and deleted.
 
-EPCR_MAX_DEV := 2500
+EPCR_MAX_DEV := 5000
 
 
 # Size, in base pairs, of a "hash word" in the e-PCR program.  This parameter has
@@ -350,7 +379,7 @@ EPCR_MAX_DEV := 2500
 # default of 7 for this.  It probably shouldn't be made smaller than that, and
 # probably should be made larger.  Larger values will result in more markers.
 
-EPCR_WORD_SIZE := 9
+EPCR_WORD_SIZE := 8
 
 
 # Maximum number of off-target primer mismatches, in base pairs, within the
@@ -368,7 +397,7 @@ EPCR_MAX_MISMATCH := 0
 # (electronic PCR) testing of the candidate markers.  Set this to a size where,
 # if there is an off-target approximate primer match with this many or fewer
 # gaps in the mismatch, then you want that marker to be marked bad and deleted.
-# Larger values increase computation time.
+# Larger values increase computation time and reduce number of markers obtained.
 
 EPCR_MAX_GAPS := 0
 
@@ -379,7 +408,7 @@ EPCR_MAX_GAPS := 0
 # 2-way and 3-way markers (3 genomes with NDAMIN=2) and want to plot only the
 # 3-way markers count/density, set this to 3.
 
-PLOT_NDAMIN := 3
+PLOT_NDAMIN := $(NDAMIN)
 
 
 # For plotting number and density of final markers, this parameter sets the
@@ -389,7 +418,7 @@ PLOT_NDAMIN := 3
 # lighter gray, and multiple lines must be plotted on top of each other to
 # achieve black pixels.  For example, 0.25 would need 4 markers to get to black.
 
-PLOT_ALPHA := 0.5
+PLOT_ALPHA := 0.35
 
 
 # For finding Indels and SNPs with 'make IndelsSNPs', these parameters set the

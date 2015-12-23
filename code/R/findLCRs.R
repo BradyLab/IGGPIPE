@@ -124,13 +124,13 @@ if (is.na(Lmin) || Lmin < 100)
 
 Dmin = as.integer(args[6])
 catnow("  Dmin: ", Dmin, "\n")
-if (is.na(Dmin) || Dmin >= 100)
-    stop("Dmin must be < 100")
+if (is.na(Dmin) || Dmin < 0)
+    stop("Dmin must be > 0")
 
 Dmax = as.integer(args[7])
 catnow("  Dmax: ", Dmax, "\n")
-if (is.na(Dmax) || Dmax < 100)
-    stop("Dmax must be >= 100")
+if (is.na(Dmax) || Dmax < 100 || Dmax < Dmin)
+    stop("Dmax must be >= 100 and >= Dmin")
 
 outLcbFile = args[8]
 catnow("  outLcbFile: ", outLcbFile, "\n")

@@ -33,7 +33,7 @@ else if (testing == 1)
     {
     args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
         "outTestHP11/IndelGroupsOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0.tsv",
-        1, "outTestHP11/GenomeData/DNAseqs_K11k2L100D10_2000A100_2000d10_100N2F0X20_1.dnaseqs",
+        1, "outTestHP11/GenomeData/IndelGroupsOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20_1.dnaseqs",
         "outTestHP11/GenomeData", 20,
         "/Users/tedtoal/perl5/perlbrew/perls/perl-5.14.2/bin/perl",
         "code/perl/getSeqsFromFasta.pl", "testFASTA/ITAG2.4_test.fasta",
@@ -43,7 +43,7 @@ else if (testing == 2)
     {
     args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
         "outTestHP11/IndelGroupsOverlapping_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0.tsv",
-        2, "outTestHP11/GenomeData/DNAseqs_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0X20_2.dnaseqs",
+        2, "outTestHP11/GenomeData/IndelGroupsOverlapping_K11Km2Lm100Dm10Dx2000Am100Ax2000ADm10ADx100ND2mF0X20_2.dnaseqs",
         "outTestHP11/GenomeData", 20,
         "/Users/tedtoal/perl5/perlbrew/perls/perl-5.14.2/bin/perl",
         "code/perl/getSeqsFromFasta.pl", "testFASTA/SpennV2.0_test.fasta",
@@ -60,7 +60,7 @@ if (length(args) != Nexpected)
         "then read a genomic FASTA file for one genome and extract DNA sequences at each",
         "k-mer position, and finally, write the resulting data frame to a new file.",
         "",
-        "Usage: Rscript getDNAseqs.R <wd> <indelFile> <genomeNum> <seqOutFile> <extractDir> \\",
+        "Usage: Rscript getDNAseqsForPrimers.R <wd> <indelFile> <genomeNum> <seqOutFile> <extractDir> \\",
         "       <extensionLen> <perlPath> <getSeqsFromFasta> <fastaFile> <contigsFile> <investigate>",
         "",
         "Arguments:",
@@ -81,7 +81,7 @@ if (length(args) != Nexpected)
     stop("Try again with correct number of arguments")
     }
 
-catnow("getDNAseqs.R arguments:\n")
+catnow("getDNAseqsForPrimers.R arguments:\n")
 workingDirectory = args[1]
 catnow("  workingDirectory: ", workingDirectory, "\n")
 if (!dir.exists(workingDirectory))
@@ -398,7 +398,7 @@ df$seq = adjSeqs(df$seq, dfXP$pos.Lcut, "left")
 df$seq = adjSeqs(df$seq, dfXP$pos.Rcut, "right")
 
 ########################################
-# Finish up.
+# Save the output file.
 ########################################
 
 # Remove refS and ctg columns.

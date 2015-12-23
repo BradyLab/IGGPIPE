@@ -89,16 +89,16 @@ DIR_IGGPIPE_OUT := out$(GENOME_LETTERS_SQUISHED)$(K)
 ################################################################################
 
 # Path to parent folder of all genome data.
-
 # (This example assumes that an environment variable named "BRADYLAB" has been
 # defined, that gives the path to a high-level directory.)
+
 DIR_GENOME_DATA := $(BRADYLAB)/Genomes
 
 
 # Directories containing the FASTA files for the N_GENOMES genomes.
-
 # (This example uses the DIR_GENOME_DATA variable above to define the directories
 # containing files for the two genomes to be run through the IGGPIPE pipeline.)
+
 DIR_GENOME_DATA_1 := $(DIR_GENOME_DATA)/Soly/ITAG2.4_release
 DIR_GENOME_DATA_2 := $(DIR_GENOME_DATA)/Sope/V2.0genome
 DIR_GENOME_DATA_3 := $(DIR_GENOME_DATA)/Sotu/DM/V403genome
@@ -112,6 +112,7 @@ DIR_GENOME_DATA_3 := $(DIR_GENOME_DATA)/Sotu/DM/V403genome
 # The Spenn.fasta genome is the recent S. pennellii genome release from solGenomics.net.
 # The PGSC_DM_v4.03_genomic.fasta genome is file PGSC_DM_v4.03_pseudomolecules.fasta.zip
 # from http://potato.plantbiology.msu.edu/data.
+
 PATH_GENOME_FASTA_1 := $(DIR_GENOME_DATA_1)/ITAG2.4_genomic.fasta
 PATH_GENOME_FASTA_2 := $(DIR_GENOME_DATA_2)/Spenn.fasta
 PATH_GENOME_FASTA_3 := $(DIR_GENOME_DATA_3)/PGSC_DM_v4.03_genomic.fasta
@@ -190,7 +191,7 @@ PATH_COMMON_UNIQUE_KMERS := $(DIR_KMERS)/common.unique.kmers
 # markers.  If you want LCRs for another purpose such as a reliable Indel
 # Group list or for doing whole genome alignment, a larger value is advised.
 # This should be at least two more than twice MINFLANK (defined below),
-# since that is the minimum number of k-mers in an LCB that could result
+# since that is the minimum number of k-mers in an LCR that could result
 # in an Indel Group call.
 
 KMIN := 2
@@ -268,6 +269,7 @@ ADMAX := 300
 # but if you set this to 2, as long as two genomes have different amplicon
 # sizes, the marker is accepted (i.e. two genomes might have the same or
 # similar-sized amplicons, but the third genome would have a different size).
+
 NDAMIN := 2
 
 
@@ -278,7 +280,7 @@ NDAMIN := 2
 # two k-mers, if MINFLANK is 0.  The number of k-mers that must be present in
 # the LCR to create a candidate marker is at least 2+2*MINFLANK.  By setting
 # this to a value larger than 0, you might decrease the odds that a single
-# random common unique k-mer on the LCB could trigger creation of an IGG marker,
+# random common unique k-mer on the LCR could trigger creation of an IGG marker,
 # but since e-PCR testing of candidate primers will reject bad random markers,
 # there is no reason not to leave this set to 0.  For the purpose of finding
 # Indel Groups only, you may want to use a larger value than 0.
@@ -398,6 +400,7 @@ EPCR_MAX_GAPS := 0
 # of genomes) of the markers to be plotted.  For example, if you are making both
 # 2-way and 3-way markers (3 genomes with NDAMIN=2) and want to plot only the
 # 3-way markers count/density, set this to 3.
+
 PLOT_NDAMIN := 3
 
 
@@ -407,18 +410,30 @@ PLOT_NDAMIN := 3
 # line is black.  As the value moves towards 0, and single line is lighter and
 # lighter gray, and multiple lines must be plotted on top of each other to
 # achieve black pixels.  For example, 0.25 would need 4 markers to get to black.
+
 PLOT_ALPHA := 0.5
 
 
-# For finding Indels and SNPs with 'make IndelsSNPs', this parameter sets the
-# maximum number of SNPs, in terms of fraction of the total sequence length,
-# that may exist between any pair of genomes and still examine the sequence set
-# for Indels and SNPs.  If more than this fraction of SNPs is found, that
-# sequence set is ignored.  Sequence sets are either LCRs, Indel Groups, or
-# Markers (set by a later parameter).  Set this to reject sequence sets that
-# have an anomalously high number of SNPs, which might indicate a false positive
-# LCR, Indel Group, or marker.
-MAX_SNPS_FRAC := 0.1
+# For finding Indels and SNPs with 'make IndelsSNPs', these parameters set the
+# maximum number of Indels and SNPs per Kbp of reference genome sequence that
+# may exist in an alignment and still examine the alignment for Indels and SNPs.
+# If more than this number of Indels or SNPs is found, that alignment is ignored.
+# Set these to reject alignments that have an anomalously high number of Indels
+# or SNPs, which might indicate a false positive LCR, Indel Group, or marker and
+# an alignment of essentially random sequence.  When random sequences ARE aligned,
+# they have minimum Indel and SNP counts of around 10 and 30 per Kbp, respectively.
+
+MAX_INDELS_PER_KBP := 10
+MAX_SNPS_PER_KBP := 30
+
+
+# For finding Indels and SNPs with 'make IndelsSNPs', this parameter can be set
+# TRUE to scramble the sequences of each genome except the reference genome, in
+# order to measure the statistics on the number of Indels and SNPs found in random
+# sequence (which is displayed at the end when 'make IndelsSNPs' is run).  If this
+# is set TRUE, then set the above two parameters to 500 and 1000 respectively.
+
+SCRAMBLE_SEQUENCE := FALSE
 
 
 ################################################################################
@@ -446,6 +461,7 @@ MAX_SNPS_FRAC := 0.1
 # IGGPIPE install instructions for more details.
 
 # This is normally in the IGGPIPE installation directory.
+
 PATH_PRIMER3_SETTINGS := primer3settings.txt
 
 
@@ -492,11 +508,6 @@ PFX_OVERLAPPING_INDEL_GROUPS_FILE := IndelGroupsOverlapping
 PFX_NONOVERLAPPING_INDEL_GROUPS_FILE := IndelGroupsNonoverlapping
 
 
-# Filename prefix of DNA sequences around k-mers file, prior to finding primers.
-
-PFX_DNA_SEQS_FILE := DNAseqs
-
-
 # Filename prefix of IGG marker file, for markers prior to e-PCR verification.
 
 PFX_NONVALIDATED_MARKER_FILE := NonvalidatedMarkers
@@ -517,6 +528,11 @@ PFX_NONOVERLAPPING_MARKERS_FILE := MarkersNonoverlapping
 
 PFX_MARKER_COUNTS_FILE := MarkerCounts
 PFX_MARKER_DENSITY_FILE := MarkerDensity
+
+
+# Filename prefix of LCB data file.
+
+PFX_LCB_FILE := LCBs
 
 
 ################################################################################
@@ -543,39 +559,45 @@ PFX_MARKER_DENSITY_FILE := MarkerDensity
 
 
 # Suffix to use for the files created when LCRs are called.
-
 # (This includes in the filename the parameter values used to find LCRs)
+
 SFX_LCR_FILE := _K$(K)k$(KMIN)L$(LMIN)D$(DMIN)_$(DMAX)
 
 
 # Suffix to use for the file that holds Indel Group positions.
-
 # (This includes all of SFX_LCR_FILE and the parameter values used to find markers)
+
 SFX_INDEL_GROUPS_FILE := $(SFX_LCR_FILE)A$(AMIN)_$(AMAX)d$(ADMIN)_$(ADMAX)N$(NDAMIN)F$(MINFLANK)
 
 
 # Suffix to use for the file that holds DNA sequence around k-mers.
-
 # (This includes all of SFX_INDEL_GROUPS_FILE and the parameter value used to extract DNA sequences)
+
 SFX_DNA_SEQS_FILE := $(SFX_INDEL_GROUPS_FILE)X$(EXTENSION_LEN)
 
 
 # Suffix of IGG marker file, for markers prior to e-PCR verification.
-
 # (This includes all of SFX_DNA_SEQS_FILE and it should include the parameters
 # used when making primers, but those are in the primer parameters file.  We
 # should use a separate primer parameters filename for each run, and include
 # that filename within this filename, but we don't, we assume the same primer
 # parameter file always.  If it changes, user had better clean the directories
 # before doing a make.)
+
 SFX_NONVALIDATED_MARKER_FILE := $(SFX_DNA_SEQS_FILE)
 
 
 # Suffix to use for the files that hold candidate IGG marker primers, both
 # before and after e-PCR testing.
-
 # (This includes all of SFX_NONVALIDATED_MARKER_FILE and the parameter values used for e-PCR)
+
 SFX_GOOD_MARKER_FILE := $(SFX_NONVALIDATED_MARKER_FILE)V$(EPCR_MAX_DEV)W$(EPCR_WORD_SIZE)M$(EPCR_MAX_MISMATCH)G$(EPCR_MAX_GAPS)
+
+
+# Suffix to use for the files created when LCBs are created.
+# (No parameters are needed for conversion of LCRs to LCBs, so just the suffix here.)
+
+SFX_LCB_FILE := $(SFX_LCR_FILE)
 
 
 ################################################################################
@@ -600,7 +622,7 @@ PATH_NONOVERLAPPING_INDEL_GROUPS_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_NONOVERLAPPING
 # Path prefix of file that holds DNA sequence around k-mers, excluding only the
 # suffix, which consists of "_<genome number>.dnaseqs".
 
-PFX_DNA_SEQS_PATH := $(DIR_GENOME_OUT_DATA)/$(PFX_DNA_SEQS_FILE)$(SFX_DNA_SEQS_FILE)
+PFX_DNA_SEQS_PATH := $(DIR_GENOME_OUT_DATA)/$(PFX_OVERLAPPING_INDEL_GROUPS_FILE)$(SFX_DNA_SEQS_FILE)
 
 
 # Path of IGG marker file, for markers prior to e-PCR verification.
@@ -628,27 +650,36 @@ PFX_MARKER_COUNTS_PATH := $(DIR_MAIN_OUTPUT)/$(PFX_MARKER_COUNTS_FILE)$(SFX_GOOD
 PFX_MARKER_DENSITY_PATH := $(DIR_MAIN_OUTPUT)/$(PFX_MARKER_DENSITY_FILE)$(SFX_GOOD_MARKER_FILE)
 
 
+# Path of LCB data file.
+
+PATH_LCB_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_LCB_FILE)$(SFX_LCB_FILE).tsv
+
+
 # Path of input file for aligning LCRs or IndelGroups or Markers and locating the
 # Indels and SNPs in the alignment.  Used only if 'make IndelsSNPs' command is run.
-# This path can be any of three different files, shown here commented out: the LCRs
+# This path can be any of three different files, shown here commented out: the LCBs
 # file, the non-overlapping IndelGroups file, or the non-overlapping markers file.
 # The output files containing the Indel AND SNP positions are the same name as the
 # input file with the .suffix replaced with the suffix ".indels.tsv" and ".snps.tsv".
 # Copy and uncomment the ONE you want to use to find Indels and SNPs if you intend
 # to run 'make IndelsSNPs'.
 
-#PATH_INDELS_SNPS_INPUT_FILE := $(PATH_LCR_FILE)
+#PATH_INDELS_SNPS_INPUT_FILE := $(PATH_LCB_FILE)
 #PATH_INDELS_SNPS_INPUT_FILE := $(PATH_NONOVERLAPPING_INDEL_GROUPS_FILE)
 #PATH_INDELS_SNPS_INPUT_FILE := $(PATH_NONOVERLAPPING_MARKERS_FILE)
 # Let's use the markers file.
 PATH_INDELS_SNPS_INPUT_FILE := $(PATH_NONOVERLAPPING_MARKERS_FILE)
 
 
+# Path of input file containing DNA sequences merged with LCRs/Indel Groups/Markers
+# data, used only if 'make IndelsSNPs' command is run to find Indels and SNPs.
+
+PATH_INDELS_SNPS_SEQS_FILE := $(basename $(PATH_INDELS_SNPS_INPUT_FILE)).withseqs$(suffix $(PATH_INDELS_SNPS_INPUT_FILE))
+
+
 # Path of Indels and SNPs output files, used only if 'make IndelsSNPs' command is
 # run to find Indels and SNPs.
 
-# Replace the ".<suffix>" on PATH_INDELS_SNPS_INPUT_FILE with ".indels.<suffix>"
-# and ".snps.<suffix>" to form the output file names.
 PATH_INDELS_OUTPUT_FILE := $(basename $(PATH_INDELS_SNPS_INPUT_FILE)).indels$(suffix $(PATH_INDELS_SNPS_INPUT_FILE))
 PATH_SNPS_OUTPUT_FILE := $(basename $(PATH_INDELS_SNPS_INPUT_FILE)).snps$(suffix $(PATH_INDELS_SNPS_INPUT_FILE))
 
@@ -656,8 +687,6 @@ PATH_SNPS_OUTPUT_FILE := $(basename $(PATH_INDELS_SNPS_INPUT_FILE)).snps$(suffix
 # Path of Indels plot file, used only if 'make plotIndels' command is run to plot
 # Indel data.
 
-# Replace the ".<suffix>" on PATH_INDELS_OUTPUT_FILE with ".<pdf>" to form the
-# plot file name.
 PATH_INDELS_PLOT_FILE := $(basename $(PATH_INDELS_OUTPUT_FILE)).pdf
 
 
@@ -714,9 +743,14 @@ INVESTIGATE_EPCRTESTING := FALSE
 INVESTIGATE_RMVBADMARKERS := FALSE
 
 
-# Produce debug output when extracting and aligning sequences and locating Indels.
+# Produce debug output when getting DNA sequences for locating Indels and SNPs.
 
-INVESTIGATE_PATH_ALIGN_AND_GET_INDELS_SNPS := FALSE
+INVESTIGATE_GET_DNA_SEQS_FOR_INDELS_SNPS := FALSE
+
+
+# Produce debug output when extracting and aligning sequences and locating Indels and SNPs.
+
+INVESTIGATE_ALIGN_AND_GET_INDELS_SNPS := FALSE
 
 
 ################################################################################
