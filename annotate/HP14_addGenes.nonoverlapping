@@ -20,7 +20,7 @@ inputFileT:
 ################################################################################
 
 inputFileS:
-    path := "../../Soly/ITAG2.4_release/ITAG2.4_gene_models.gff3"
+    path := "../../Genomes/Soly/ITAG2.4_release/ITAG2.4_gene_models.gff3"
     type := gff3
 
 ################################################################################

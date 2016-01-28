@@ -2,18 +2,15 @@
 # Sample parameter file for annotateFile.R to convert a .tsv file of IGG
 # markers into a .gff3 file that could be used to display markers as a browser
 # track.  Specifically:
-#   1. Reads input file from goodTest directory:
+#   1. Reads input file from outTestHP11 directory:
 #       MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv
-#   2. Adds column "ID" containing a unique row ID equal to "ID_nn_YYY" where
-#       "nn" is the integer part of the Hid column and "YYY" is a sequence number
-#       that increments when the "nn" value is the same for more than 1 column.
-#   3. Adds fixed column "source" containing "IGG.markers" 
-#   4. Adds fixed column "feature" containing "genetic_marker"
+#   2. Adds fixed column "source" containing "IGG.markers" 
+#   3. Adds fixed column "feature" containing "genetic_marker"
 #       (Sequence Ontology term SO:0001645)
-#   5. Adds fixed column "score" containing "." (no score)
-#   6. Adds fixed column "strand" containing "." (not stranded)
-#   7. Adds fixed column "frame" containing "." (no frame)
-#   8. Writes the data to directory outTestHP11, .gff3 file:
+#   4. Adds fixed column "score" containing "." (no score)
+#   5. Adds fixed column "strand" containing "." (not stranded)
+#   6. Adds fixed column "frame" containing "." (no frame)
+#   7. Writes the data to directory outTestHP11, .gff3 file:
 #       MarkersAnnotated_GFF3_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.gff3
 #      containing these columns taken from these input columns:
 #           seqname: Hid
@@ -31,8 +28,8 @@
 # from here, choose Open.  In the browser make sure "GFF3 Markers" and "ITAG2.4
 # gene models" tracks are selected at the left.  In the drop-down box choose
 # chromosome 1 (SL2.50ch01) and enter "SL2.50ch01:39198..43998" in the position
-# box.  You should see orange bands representing markers, labelled ID_0_001 etc.
-# Clicking on a marker shows its attributes, such as primer sequences.
+# box.  You should see orange bands representing markers, labelled IGG_HP11_XXX
+# etc.  Clicking on a marker shows its attributes, such as primer sequences.
 ################################################################################
 
 ################################################################################
@@ -44,13 +41,13 @@
 # (if one is done) and is the "target" data written to the output file.
 
 inputFileT:
-    path := "goodTest/MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv"
+    path := "outTestHP11/MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv"
     type := tsv
     quote := ""
     comment := ""
-    keepColumns := "Hid,HampPos1,HampPos2,HampLen,PampLen,PHdif,prmSeqL,prmSeqR,prmTmL,prmTmR,PHphase,Hpct,Ppct,Pid,PampPos1,PampPos2"
-    addColNames := "ID,source,feature,score,strand,frame"
-    addColValues := "ID_{/Hpct/\.[0-9]*$/}_{#3},IGG.markers,genetic_marker,.,.,."
+    keepColumns := "ID,Hid,HampPos1,HampPos2,HampLen,PampLen,PHdif,prmSeqL,prmSeqR,prmTmL,prmTmR,PHphase,Hpct,Ppct,Pid,PampPos1,PampPos2"
+    addColNames := "source,feature,score,strand,frame"
+    addColValues := "IGG.markers,genetic_marker,.,.,."
 
 ################################################################################
 # Output file attribute creation parameters.

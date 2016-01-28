@@ -1,6 +1,6 @@
 RUNNING IGGPIPE TO GENERATE IGG MARKERS
 =======================================
-Ted Toal <twtoal@ucdavis.edu>
+Version v0.0, Aug 2015
 
 This describes how to run the IGGPIPE software to analyze two or more genome
 sequences and produce a file of candidate IGG marker primer pairs for amplifying
@@ -162,6 +162,58 @@ definitely want to review and consider are:
 .. EPCR_MAX_DEV
 .. EPCR_MAX_MISMATCH and EPCR_MAX_GAPS
 
+The next section gives guidance on choosing a value for K.
+--
+
+. *Choosing a value for K*
++
+--
+
+The value of K must be chosen carefully. The larger the value, the more common
+unique k-mers will be found, up to a point, beyond which the number will fall
+because unique k-mers will begin to be long enough to no longer be in common
+with the other genome.
+The computational demands of IGGPIPE in the steps that immediately follow the
+search for common unique k-mers are directly proportional to the number of such
+k-mers, which argues for keeping K as small as possible while not so small that
+there won't be enough common unique k-mers for marker identification. We have
+successfully used 7 to 10 million common unique k-mers for producing markers;
+several hundred thousand might produce too few markers, while several tens of
+millions might create an intolerable computational demand.
+
+The optimum value of
+K depends on the genetic architecture and amount of polymorphism between
+genomes. Very different genomes will have a peak number of common unique k-mers
+at a smaller K, so a smaller value would be a good choice. However, this does
+not necessarily mean that very similar genomes should use a larger value of K. 
+Two 'Arabidopsis thaliana' accessions will produce a much larger number of common
+unique k-mers for a given K, since most unique k-mers will be common. The challenge
+in that case is not to find enough of them, but to avoid having so many that
+computational resources are overwhelmed.  We found that a value of 14 worked well
+for the quite different 'S. lycopersicum' and 'S. pennellii' genomes, but for the
+Arabidopsis accessions we
+tested, a value of 14 produced so many common unique k-mers that computation
+time was relatively long, while a value of 13 produced almost as many IGG
+markers in a much shorter time (see the table in the IGGPIPE paper that shows
+computation time for these two values of K in Arabidopsis accessions). Polyploid
+species might require a larger value of K to locate enough unique k-mers in the
+repeated genomes.
+
+We advise checking the number of common unique k-mers obtained with a given value
+of K the first time the pipeline is run on a given set of genomes, and adjust K
+if necessary. To speed this process, the pipeline can be run only through the
+stage where the common unique k-mers are produced, as described below. If too few
+k-mers result,
+then the user should increase K by one, and if too many k-mers result, the user
+should decrease K by one. The pipeline is then run to completion to produce the
+IGG marker primer sequences, and the total number of primer pairs produced is
+examined.  If there are too few, it is advisable to rerun the entire pipeline
+with K both increased and decreased by one.
+--
+
+. *Additional notes on setting parameter values*
++
+--
 The parameter DIR_IGGPIPE_OUT is the path of the folder where all output will be
 placed.  You don't need to change this parameter but you should note what its value
 will be, and change it if you want to.
@@ -297,7 +349,8 @@ steps, use this command:
 
 or, better yet, log to a file also:
 
-  make PARAMS=allParameters.XY getGenomicPosIsect GENOME=1 | tee logFiles/make_getGenomicPosIsect_HP14.txt
+  make PARAMS=allParameters.XY getGenomicPosIsect GENOME=1 | \
+  tee logFiles/make_getGenomicPosIsect_HP14.txt
 
 If it completes successfully, the end of the command output will show the message:
 
@@ -326,14 +379,20 @@ The number of k-mers is influenced by both the value of K in the parameter file
 and by how different the genomes are. Very similar genomes might never have
 several millions of k-mers. The number of common unique k-mers increases as K
 is increased, up to a point, then starts to decrease. For similar genomes, you
-might need to edit the parameter file and decrease K by 1. With the tomato/pennellii
+might decide you have too many k-mers and should edit the parameter file and
+decrease K by 1 to keep computation time reasonable.  Or, you may wish to try
+running the rest of the pipeline with tens of millions of common unique k-mers
+and check to see how long the computation time actually is. With the tomato/pennellii
 genomes, K=14 was a
-good number. With Arabidopsis thaliana Col-0 and Ler-0 accessions, which were
+good number. With 'Arabidopsis thaliana' Col-0 and Ler-0 accessions, which were
 much more similar to one another than tomato/pennellii, a value of K=13 worked
-better, because K=14 produced so many k-mers that computation time was excessive.
+better, because K=14 produced so many k-mers that computation time was excessive
+(half an hour vs three hours).
 For very large genomes, you might need to increase K by 1. Since the
 number of k-mers goes up dramatically with increasing K, you probably will never
-raise K above 15, perhaps 16. The default setting in the parameter file for the
+raise K above 15 or perhaps 16.
+
+The default setting in the parameter file for the
 output directory parameter DIR_IGGPIPE_OUT is to include the value of K in the
 directory name. This means you can run IGGPIPE with one value of K, then change
 it and run it again and the output will go into a new directory.
@@ -586,23 +645,24 @@ Here is a summary of the filenames produced by each 'make' step, in pipeline ord
 |b. make PARAMS=myFilename getContigFile|GenomeData/*.contigs
 |c. make PARAMS=myFilename getKmers|Kmers/Kmers_*.kmers
 |d. make PARAMS=myFilename kmerStats|Kmers/Kmers_*.stats
-|e. make PARAMS=myFilename getGenomicPosIsect|Kmers/Kmers_*.isect
-|f. make PARAMS=myFilename mergeKmers|Kmers/Kmers_*.merge
-|g. make PARAMS=myFilename getCommonUniqueKmers|Kmers/common.unique.kmers
-|h. make PARAMS=myFilename findLCRs|LCRs_*.tsv, BadKmers_*.tsv
-|i. make PARAMS=myFilename findIndelGroups|IndelGroupsOverlapping_*.tsv, IndelGroupsNonoverlapping_*.tsv
-|j. make PARAMS=myFilename getDNAseqsForPrimers|IndelGroupsOverlapping_*.dnaseqs
-|k. make PARAMS=myFilename findPrimers|NonvalidatedMarkers_*.tsv
-|l. make PARAMS=myFilename ePCRtesting|MarkerErrors_*.tsv
-|m. make PARAMS=myFilename removeBadMarkers|MarkersOverlapping_*.tsv, MarkersNonoverlapping_*.tsv
-|n. make PARAMS=myFilename plotMarkers|MarkerCounts_*.pdf, MarkerDensity_*.png
-|o. make PARAMS=myFilename getDNAseqsForIndelsSNPs|*.withseqs.tsv
-|p. make PARAMS=myFilename IndelsSNPs|*.indels.tsv, *.snps.tsv
-|q. make PARAMS=myFilename plotIndels|*.indels.pdf
-|r. Rscript code/R/dotplot.R dotplot.template|LCRs_*.dotplot.png
-|s. Rscript code/R/annotateFile.R annotate.template|MarkersAnnotated_*.tsv
-|t. Rscript code/R/annotateFile.R annotate/HP11_isInNearColumn.markers|MarkersAnnotated_WithInNearFeatures_*.indels.tsv
-|u. Rscript code/R/annotateFile.R annotate/HP11_to_gff3.markers|MarkersAnnotated_GFF3_*.gff3
+|e. make PARAMS=myFilename kmersToText|Kmers/Kmers_*.kmers.txt
+|f. make PARAMS=myFilename getGenomicPosIsect|Kmers/Kmers_*.isect
+|g. make PARAMS=myFilename mergeKmers|Kmers/Kmers_*.merge
+|h. make PARAMS=myFilename sortCommonUniqueKmers|Kmers/common.unique.kmers
+|i. make PARAMS=myFilename findLCRs|LCRs_*.tsv, BadKmers_*.tsv
+|j. make PARAMS=myFilename findIndelGroups|IndelGroupsOverlapping_*.tsv, IndelGroupsNonoverlapping_*.tsv
+|k. make PARAMS=myFilename getDNAseqsForPrimers|IndelGroupsOverlapping_*.dnaseqs
+|l. make PARAMS=myFilename findPrimers|NonvalidatedMarkers_*.tsv
+|m. make PARAMS=myFilename ePCRtesting|MarkerErrors_*.tsv
+|n. make PARAMS=myFilename removeBadMarkers|MarkersOverlapping_*.tsv, MarkersNonoverlapping_*.tsv
+|o. make PARAMS=myFilename plotMarkers|MarkerCounts_*.pdf, MarkerDensity_*.png
+|p. make PARAMS=myFilename getDNAseqsForIndelsSNPs|*.withseqs.tsv
+|q. make PARAMS=myFilename IndelsSNPs|*.indels.tsv, *.snps.tsv
+|r. make PARAMS=myFilename plotIndels|*.indels.pdf
+|s. Rscript code/R/dotplot.R dotplot.template|LCRs_*.dotplot.png
+|t. Rscript code/R/annotateFile.R annotate.template|MarkersAnnotated_*.tsv
+|u. Rscript code/R/annotateFile.R annotate/HP11_isInNearColumn.markers|MarkersAnnotated_WithInNearFeatures_*.indels.tsv
+|v. Rscript code/R/annotateFile.R annotate/HP11_to_gff3.markers|MarkersAnnotated_GFF3_*.gff3
 |===================================================
 
 (Note that some of the files listed above are produced by steps to be described below).
@@ -751,8 +811,8 @@ different types of annotation and file conversion.
 Some of the sample parameter files generate .gff3 files that can be added as a
 track to a genome browser, to display markers in the browser.  Instructions for
 adding the track are given in comments at the start of the parameter file.  Two
-marker files, one for Arabidopsis thaliana Col-0 vs. Ler-0 accessions, and the
-other for Solanum lycopersicum vs. Solanum pennellii genomes, were created to
+marker files, one for 'Arabidopsis thaliana' Col-0 vs. Ler-0 accessions, and the
+other for 'Solanum lycopersicum' vs. 'Solanum pennellii' genomes, were created to
 test IGGPIPE, and the marker files were converted to .gff3 files suitable for
 making a browser track.  These files can be found in subfolders of the
 'annotate' folder.

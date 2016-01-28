@@ -957,13 +957,116 @@ findMers
 </div>
 </div>
 <div class="sect1">
-<h2 id="_strong_install_iggpipe_strong"><strong>Install IGGPIPE</strong></h2>
+<h2 id="_strong_install_iggpipe_quick_start_for_the_experienced_strong"><strong>Install IGGPIPE - Quick Start for the Experienced</strong></h2>
 <div class="sectionbody">
-<div class="paragraph"><p><strong>If you want a Quick Start with minimal reading, just look for the command lines
-below and execute them, with occasional skimming of the text just above/below the
-commands.</strong>
+<div class="paragraph"><p><strong>Follow brief instructions here if you are experienced with installations and want to
+try to do a Quick Start installation with minimal reading.  If you have trouble, check
+the more detailed instructions below for help.</strong>
 &#8203;<br />
 &#8203;<br /></p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Mac OSX: install Xcode and do ' xcode-select --install'; Windows: install Cygwin including
+Perl, make, and Bash
+</p>
+</li>
+<li>
+<p>
+Copy allPathParameters.template file to new file allPathParameters.ours, then edit the new
+file and set WD to IGGPIPE directory
+</p>
+</li>
+<li>
+<p>
+Install Jellyfish V2 or later (V2.2.3 works), configuring with ./configure, compiling
+with <em>make</em>, and installing with <em>sudo make install</em>
+</p>
+</li>
+<li>
+<p>
+Install a V5 or later Perl if not already installed
+</p>
+</li>
+<li>
+<p>
+Install R V3.2.1 or later.  Windows installation may require reading more installation
+details below.
+</p>
+</li>
+<li>
+<p>
+Install Primer3 V2.3.6 or later and assign CMD_PRIMER3CORE and DIR_PRIMER3CONFIG
+in allPathParameters.ours
+</p>
+</li>
+<li>
+<p>
+Install e-PCR V2.3.12-1 or later and assign CMD_EPCR in allPathParameters.ours
+</p>
+</li>
+<li>
+<p>
+Install MUSCLE V8.31 or later and assign CMD_ALIGNER in allPathParameters.ours
+</p>
+</li>
+<li>
+<p>
+Build <em>findMers</em> using <em>make</em> in the <em>findMers</em> folder.
+</p>
+</li>
+<li>
+<p>
+Test trashing a file using <em>$SHELL code/shell/trash.sh &lt;filename&gt;</em> and if it fails,
+set <em>CMD_DELETE_WHEN_CLEANING := $(CMD_DELETE)</em>  in allPathParameters.ours
+</p>
+</li>
+<li>
+<p>
+Copy primer3settings.default.txt to primer3settings.txt
+</p>
+</li>
+<li>
+<p>
+On OSX in Xcode choose Open Developer Tool, FileMerge, then set it to stay in the dock.
+</p>
+</li>
+<li>
+<p>
+Run IGGPIPE on test data using <em>make PARAMS=allParameters.test ALL | tee logFiles/makeLog.test.txt</em>
+then look through log file with <em>less logFiles/makeLog.test.txt</em> and compare actual results with
+expected results using <em>source code/shell/cmpKeyFiles.sh outTestHP11 goodTest</em> (some files
+have not yet been made)
+</p>
+</li>
+<li>
+<p>
+Run <em>make PARAMS=allParameters.test IndelsSNPs</em> and check results again
+with <em>source code/shell/cmpKeyFiles.sh outTestHP11 goodTest</em>
+</p>
+</li>
+<li>
+<p>
+Run <em>make PARAMS=allParameters.test plotIndels</em> and examine outTestHP11/Markers.indels.pdf
+</p>
+</li>
+<li>
+<p>
+Run <em>Rscript code/R/dotplot.R dotplot.template</em> and examine outTestHP11/LCRs_.dotplot.png
+</p>
+</li>
+<li>
+<p>
+Run <em>Rscript code/R/annotateFile.R annotate.template</em> and check results again
+with <em>source code/shell/cmpKeyFiles.sh outTestHP11 goodTest</em>
+</p>
+</li>
+</ol></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_strong_install_iggpipe_detailed_instructions_strong"><strong>Install IGGPIPE - Detailed Instructions</strong></h2>
+<div class="sectionbody">
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
@@ -1943,76 +2046,76 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Kmers/Kmers_*.stats</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">e. make PARAMS=myFilename sortKmers</p></td>
-<td align="left" valign="top"><p class="table">Kmers/Kmers_*.sorted</p></td>
+<td align="left" valign="top"><p class="table">e. make PARAMS=myFilename kmersToText</p></td>
+<td align="left" valign="top"><p class="table">Kmers/Kmers_*.kmers.txt</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">f. make PARAMS=myFilename kmerIsect</p></td>
-<td align="left" valign="top"><p class="table">Kmers/isect.kmers</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table">g. make PARAMS=myFilename getGenomicPos</p></td>
+<td align="left" valign="top"><p class="table">f. make PARAMS=myFilename getGenomicPosIsect</p></td>
 <td align="left" valign="top"><p class="table">Kmers/Kmers_*.isect</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">h. make PARAMS=myFilename mergeKmers</p></td>
+<td align="left" valign="top"><p class="table">g. make PARAMS=myFilename mergeKmers</p></td>
 <td align="left" valign="top"><p class="table">Kmers/Kmers_*.merge</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">i. make PARAMS=myFilename getCommonUniqueKmers</p></td>
+<td align="left" valign="top"><p class="table">h. make PARAMS=myFilename sortCommonUniqueKmers</p></td>
 <td align="left" valign="top"><p class="table">Kmers/common.unique.kmers</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">j. make PARAMS=myFilename findLCRs</p></td>
+<td align="left" valign="top"><p class="table">i. make PARAMS=myFilename findLCRs</p></td>
 <td align="left" valign="top"><p class="table"><em>LCRs_*.tsv, BadKmers_*.tsv</em></p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">k. make PARAMS=myFilename findIndelGroups</p></td>
+<td align="left" valign="top"><p class="table">j. make PARAMS=myFilename findIndelGroups</p></td>
 <td align="left" valign="top"><p class="table"><em>IndelGroupsOverlapping_*.tsv, IndelGroupsNonoverlapping_*.tsv</em></p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">l. make PARAMS=myFilename getDNAseqs</p></td>
-<td align="left" valign="top"><p class="table"><em>DNAseqs_*.dnaseqs</em></p></td>
+<td align="left" valign="top"><p class="table">k. make PARAMS=myFilename getDNAseqsForPrimers</p></td>
+<td align="left" valign="top"><p class="table"><em>IndelGroupsOverlapping_*.dnaseqs</em></p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">m. make PARAMS=myFilename findPrimers</p></td>
+<td align="left" valign="top"><p class="table">l. make PARAMS=myFilename findPrimers</p></td>
 <td align="left" valign="top"><p class="table"><em>NonvalidatedMarkers_*.tsv</em></p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">n. make PARAMS=myFilename ePCRtesting</p></td>
+<td align="left" valign="top"><p class="table">m. make PARAMS=myFilename ePCRtesting</p></td>
 <td align="left" valign="top"><p class="table"><em>MarkerErrors_*.tsv</em></p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">o. make PARAMS=myFilename removeBadMarkers</p></td>
+<td align="left" valign="top"><p class="table">n. make PARAMS=myFilename removeBadMarkers</p></td>
 <td align="left" valign="top"><p class="table"><em>MarkersOverlapping_*.tsv, MarkersNonoverlapping_*.tsv</em></p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">p. make PARAMS=myFilename plotMarkers</p></td>
+<td align="left" valign="top"><p class="table">o. make PARAMS=myFilename plotMarkers</p></td>
 <td align="left" valign="top"><p class="table"><em>MarkerCounts_*.pdf, MarkerDensity_*.png</em></p></td>
 </tr>
 <tr>
+<td align="left" valign="top"><p class="table">p. make PARAMS=myFilename getDNAseqsForIndelsSNPs</p></td>
+<td align="left" valign="top"><p class="table">*.withseqs.tsv</p></td>
+</tr>
+<tr>
 <td align="left" valign="top"><p class="table">q. make PARAMS=myFilename IndelsSNPs</p></td>
-<td align="left" valign="top"><p class="table"><em>MarkersNonoverlapping_*.indels.tsv, MarkersNonoverlapping_*.snps.tsv</em></p></td>
+<td align="left" valign="top"><p class="table">*.indels.tsv, *.snps.tsv</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">r. make PARAMS=myFilename plotIndels</p></td>
-<td align="left" valign="top"><p class="table"><em>MarkersNonoverlapping_*.indels.pdf</em></p></td>
+<td align="left" valign="top"><p class="table">*.indels.pdf</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">s. Rscript code/R/dotplot.R dotplot.template</p></td>
-<td align="left" valign="top"><p class="table"><em>LCRs_*.dotplot.png</em></p></td>
+<td align="left" valign="top"><p class="table">LCRs_*.dotplot.png</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">t. Rscript code/R/annotateFile.R annotate.template</p></td>
-<td align="left" valign="top"><p class="table"><em>MarkersAnnotated_*.tsv</em></p></td>
+<td align="left" valign="top"><p class="table">MarkersAnnotated_*.tsv</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">u. Rscript code/R/annotateFile.R annotate/HP11_isInNearColumn.markers</p></td>
-<td align="left" valign="top"><p class="table"><em>MarkersAnnotated_WithInNearFeatures_*.indels.tsv</em></p></td>
+<td align="left" valign="top"><p class="table">MarkersAnnotated_WithInNearFeatures_*.indels.tsv</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">v. Rscript code/R/annotateFile.R annotate/HP11_to_gff3.markers</p></td>
-<td align="left" valign="top"><p class="table"><em>MarkersAnnotated_GFF3_*.gff3</em></p></td>
+<td align="left" valign="top"><p class="table">MarkersAnnotated_GFF3_*.gff3</p></td>
 </tr>
 </tbody>
 </table>
@@ -2034,23 +2137,24 @@ Unix line ends and the other might have DOS line ends.
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>An R program that is NOT run as part of the pipeline when the <em>make &#8230; ALL</em> target
-is built, but which can be run using <em>make &#8230; IndelsSNPs</em>, is able to read a file of LCRs,
-non-overlapping IndelGroups, or non-overlapping Markers, extract the DNA sequences
-from the genomes in each LCR or Marker region and align them, then locate all
-Indels and SNPs in the aligned sequences and write their positions to an Indels file
-and a SNPs file.  The input file to be used is selected with parameter
-PATH_INDELS_SNPS_INPUT_FILE in the allParameters.* file.
-The program to find Indels and SNPs is called alignAndGetIndelsSNPs.R. Run it as follows:</p></div>
+<div class="paragraph"><p>Pipeline software is also provided to read a file of
+LCRs, non-overlapping Indel Groups, or non-overlapping Markers, extract the DNA sequences
+from the genomes in each LCR or Marker region and align them, then locate all Indels
+and SNPs in the aligned sequences and write their positions to files.  This part of the
+pipeline is NOT run when the <em>make &#8230; ALL</em> target is built.  Run it as follows:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.test IndelsSNPs</code></pre>
+<pre><code>make PARAMS=allParameters.XY getDNAseqsForIndelsSNPs    (replacing with your allParameters name)
+make PARAMS=allParameters.XY IndelsSNPs    (replacing with your allParameters name)</code></pre>
 </div></div>
+<div class="paragraph"><p>This produces three files in your output folder whose names end with "withseqs.tsv",
+"indels.tsv" and ".snps.tsv", the latter two containing tables of all Indels and SNPs
+found in the marker regions.</p></div>
 <div class="paragraph"><p>Check that the output files exist with:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>ls outTestHP11/Markers*.indels.tsv
-ls outTestHP11/Markers*.snps.tsv</code></pre>
+<pre><code>ls outTestHP11/NonoverlappingMarkers*.indels.tsv
+ls outTestHP11/NonoverlappingMarkers*.snps.tsv</code></pre>
 </div></div>
 <div class="paragraph"><p>This should list the files <em>outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv</em>
 and  <em>outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.snps.tsv</em></p></div>
@@ -2232,7 +2336,7 @@ Contact me, Ted Toal, <a href="mailto:twtoal@ucdavis.edu">twtoal@ucdavis.edu</a>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-10-13 16:12:19 PDT
+Last updated 2016-01-17 12:09:03 PST
 </div>
 </div>
 </body>

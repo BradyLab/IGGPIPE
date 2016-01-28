@@ -17,7 +17,7 @@ XSEP = ifelse(PATHSEP == "\\", "\\\\", PATHSEP)
 RE = paste("^.*--file=(([^", XSEP, "]*", XSEP, ")*)[^", XSEP, "]+$", sep="")
 args = commandArgs(FALSE)
 thisDir = sub(RE, "\\1", args[grepl("--file=", args)])
-#thisDir = "~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE/code/R/" # For testing only.
+#thisDir = "~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE/code/R/" # For testing only.
 
 # Source the necessary include files from the same directory containing this file.
 source(paste(thisDir, "Include_Common.R", sep=""))
@@ -32,7 +32,7 @@ if (testing == 0)
     args = commandArgs(TRUE)
 else if (testing == 1)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE", "MIN",
+    args = c("~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE", "MIN", "IGG_HP11_",
         "outTestHP11/NonvalidatedMarkers_K11k2L100D10_2000A100_2000d10_100N2F0X20.tsv",
         "outTestHP11/MarkerErrors_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1",
         "outTestHP11/MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv",
@@ -41,7 +41,7 @@ else if (testing == 1)
     }
 else if (testing == 2)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE", "MIN",
+    args = c("~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE", "MIN", "IGG_HPT14_",
         "outHPT14_400_1500_50_300/NonvalidatedMarkers_K14k4L400D1_1500A400_1500d50_300N2F0X10.tsv",
         "outHPT14_400_1500_50_300/MarkerErrors_K14k4L400D1_1500A400_1500d50_300N2F0X10V2500W8M0G0",
         "outHPT14_400_1500_50_300/MarkersOverlapping_K14k4L400D1_1500A400_1500d50_300N2F0X10V2500W8M0G0.tsv",
@@ -51,7 +51,7 @@ else if (testing == 2)
 else stop("Unknown value for 'testing'")
 }
 
-NexpectedMin = 7
+NexpectedMin = 8
 if (length(args) < NexpectedMin)
     {
     usage = c(
@@ -59,7 +59,7 @@ if (length(args) < NexpectedMin)
         "frame of bad primer pairs, then remove the bad pairs from the candidate IGG marker file",
         "and write the cleaned-up IGG marker data to a new file.",
         "",
-        "Usage: Rscript removeBadMarkers.R <wd> <minMax> <tsvMarkerFile> <badMarkerPfx> \\",
+        "Usage: Rscript removeBadMarkers.R <wd> <minMax> <IDpfx> <tsvMarkerFile> <badMarkerPfx> \\",
         "       <overlappingFile> <nonoverlappingFile> <investigate>",
         "",
         "Arguments:",
@@ -67,6 +67,7 @@ if (length(args) < NexpectedMin)
         "   <minMax>             : Either MIN or MAX to indicate the method to be used to remove overlapping",
         "                          Indel Groups.  MIN means that the smallest Indel Groups are retained over",
         "                          larger ones, while MAX means the larger are retained.",
+        "   <IDpfx>              : Prefix for marker ID numbers.",
         "   <tsvMarkerFile>      : Input file containing the candidate markers with primer pairs.",
         "   <badMarkerPfx>       : Prefix, including directory, of input files containing bad markers to",
         "                           be removed.  The filename suffix is '_<genome letter>.bad.tsv'.",
@@ -93,21 +94,24 @@ catnow("  minMax: ", minMax, "\n")
 if (!minMax %in% c("MIN", "MAX"))
     stop("minMax must be MIN or MAX")
 
-tsvMarkerFile = args[3]
+IDpfx = args[3]
+catnow("  IDpfx: ", IDpfx, "\n")
+
+tsvMarkerFile = args[4]
 catnow("  tsvMarkerFile: ", tsvMarkerFile, "\n")
 if (!file.exists(tsvMarkerFile))
     stop("File doesn't exist: ", tsvMarkerFile)
 
-badMarkerPfx = args[4]
+badMarkerPfx = args[5]
 catnow("  badMarkerPfx: ", badMarkerPfx, "\n")
 
-overlappingFile = args[5]
+overlappingFile = args[6]
 catnow("  overlappingFile: ", overlappingFile, "\n")
 
-nonoverlappingFile = args[6]
+nonoverlappingFile = args[7]
 catnow("  nonoverlappingFile: ", nonoverlappingFile, "\n")
 
-investigate = as.logical(args[7])
+investigate = as.logical(args[8])
 catnow("  investigate: ", investigate, "\n")
 if (is.na(investigate))
     stop("investigate must be TRUE or FALSE")
@@ -187,6 +191,12 @@ catnow("Sorting by reference genome position...")
 dfMarkers = dfMarkers[order(dfMarkers[, idCol[1]], dfMarkers[, ampPos1Col[1]]),]
 rownames(dfMarkers) = NULL
 catnow("\n")
+
+########################################
+# Add an "ID" column with a sequentially increasing marker ID.
+########################################
+
+dfMarkers = data.frame(ID=paste(IDpfx, 1:nrow(dfMarkers), sep=""), dfMarkers, stringsAsFactors=FALSE)
 
 ########################################
 # Write the overlapping markers to a file.

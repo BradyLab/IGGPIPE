@@ -17,7 +17,7 @@ XSEP = ifelse(PATHSEP == "\\", "\\\\", PATHSEP)
 RE = paste("^.*--file=(([^", XSEP, "]*", XSEP, ")*)[^", XSEP, "]+$", sep="")
 args = commandArgs(FALSE)
 thisDir = sub(RE, "\\1", args[grepl("--file=", args)])
-#thisDir = "~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE/code/R/" # For testing only.
+#thisDir = "~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE/code/R/" # For testing only.
 
 # Source the necessary include files from the same directory containing this file.
 source(paste(thisDir, "Include_Common.R", sep=""))
@@ -33,7 +33,7 @@ if (testing == 0)
     args = commandArgs(TRUE)
 else if (testing == 1)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE", 11,
+    args = c("~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE", 11,
         "outTestHP11/LCBs_K11k2L100D10_2000.tsv",
         "outTestHP11/LCBs_K11k2L100D10_2000.withseqs.tsv",
         "outTestHP11/GenomeData",
@@ -44,7 +44,7 @@ else if (testing == 1)
     }
 else if (testing == 2)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE", 11,
+    args = c("~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE", 11,
         "outTestHP11/IndelGroupsNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0.tsv",
         "outTestHP11/IndelGroupsNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0.withseqs.tsv",
         "outTestHP11/GenomeData",
@@ -55,7 +55,7 @@ else if (testing == 2)
     }
 else if (testing == 3)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE", 11,
+    args = c("~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE", 11,
         "outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv",
         "outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.withseqs.tsv",
         "outTestHP11/GenomeData",
@@ -66,7 +66,7 @@ else if (testing == 3)
     }
 else if (testing == 4)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE", 15,
+    args = c("~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE", 15,
         "outTaCW15/LCBs_K15k2L200D5_1000.tsv",
         "outTaCW15/LCBs_K15k2L200D5_1000.withseqs.tsv",
         "outTaCW15/GenomeData",

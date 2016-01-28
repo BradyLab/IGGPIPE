@@ -17,7 +17,7 @@ XSEP = ifelse(PATHSEP == "\\", "\\\\", PATHSEP)
 RE = paste("^.*--file=(([^", XSEP, "]*", XSEP, ")*)[^", XSEP, "]+$", sep="")
 args = commandArgs(FALSE)
 thisDir = sub(RE, "\\1", args[grepl("--file=", args)])
-#thisDir = "~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE/code/R/" # For testing only.
+#thisDir = "~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE/code/R/" # For testing only.
 
 # Source the necessary include files from the same directory containing this file.
 source(paste(thisDir, "Include_Common.R", sep=""))
@@ -32,7 +32,7 @@ if (testing == 0)
     args = commandArgs(TRUE)
 else if (testing == 1)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
+    args = c("~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE",
         "outTestHP11/NonvalidatedMarkers_K11k2L100D10_2000A100_2000d10_100N2F0X20.tsv",
         1, "outTestHP11/MarkerErrors_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1_1.bad.tsv",
         "outTestHP11/GenomeData", "/Users/tedtoal/bin/e-PCR", 3000, 8, 3, 1,
@@ -40,7 +40,7 @@ else if (testing == 1)
     }
 else if (testing == 2)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
+    args = c("~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE",
         "outTestHP11/NonvalidatedMarkers_K11k2L100D10_2000A100_2000d10_100N2F0X20.tsv",
         2, "outTestHP11/MarkerErrors_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1_2.bad.tsv",
         "outTestHP11/GenomeData", "/Users/tedtoal/bin/e-PCR", 3000, 8, 3, 1,
@@ -48,7 +48,7 @@ else if (testing == 2)
     }
 else if (testing == 3)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
+    args = c("~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE",
         "outHPT14_400_1500_50_300/NonvalidatedMarkers_K14k4L400D1_1500A400_1500d50_300N2F0X10.tsv",
         2, "outHPT14_400_1500_50_300/MarkerErrors_K14k4L400D1_1500A400_1500d50_300N2F0X10V2500W8M0G0_2.bad.tsv",
         "outHPT14_400_1500_50_300/GenomeData", "/Users/tedtoal/bin/e-PCR", 2500, 8, 0, 0,

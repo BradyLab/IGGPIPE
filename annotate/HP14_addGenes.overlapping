@@ -6,16 +6,13 @@
 # marker, and the position of the gene in base-pairs from the marker.
 #   1. Reads as inputFileT the file:
 # outHP14/MarkersOverlapping_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.tsv
-#   2. Adds column "ID" containing a unique row ID equal to "ID_nn_YYY" where
-#       "nn" is the integer part of the Hpct column and "YYY" is a sequence number
-#       that increments when the "nn" value is the same for more than 1 column.
-#   3. Reads as inputFileS the ITAG2.4 gene model gff3 file from an external directory.
-#   4. Adds a new column to the inputFileS data, extracting the attribute named
+#   2. Reads as inputFileS the ITAG2.4 gene model gff3 file from an external directory.
+#   3. Adds a new column to the inputFileS data, extracting the attribute named
 #       "Alias" from "gene" feature rows and placing it in new column "gene".
-#   5. Performs a match-and-merge operation between the two files and adds column
+#   4. Performs a match-and-merge operation between the two files and adds column
 #       "genes" to the inputFileT data, containing gene name, strand, and relative
 #       base pair position of the gene relative to the marker.
-#   6. Writes the new inputFileT data to file:
+#   5. Writes the new inputFileT data to file:
 # outHP14/MarkersOverlappingWithGenes_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.tsv
 #
 # The output file from this is copied to annotate/HP14.savedOutput because
@@ -31,15 +28,13 @@ inputFileT:
     type := tsv
     quote := ""
     comment := ""
-    addColNames := "ID"
-    addColValues := "ID_{/Hpct/\.[0-9]*$/}_{#3}"
 
 ################################################################################
 # inputFileS parameters.
 ################################################################################
 
 inputFileS:
-    path := "../../Soly/ITAG2.4_release/ITAG2.4_gene_models.gff3"
+    path := "../../Genomes/Soly/ITAG2.4_release/ITAG2.4_gene_models.gff3"
     type := gff3
 
 ################################################################################

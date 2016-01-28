@@ -17,7 +17,7 @@ XSEP = ifelse(PATHSEP == "\\", "\\\\", PATHSEP)
 RE = paste("^.*--file=(([^", XSEP, "]*", XSEP, ")*)[^", XSEP, "]+$", sep="")
 args = commandArgs(FALSE)
 thisDir = sub(RE, "\\1", args[grepl("--file=", args)])
-#thisDir = "~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE/code/R/" # For testing only.
+#thisDir = "~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE/code/R/" # For testing only.
 
 # Source the necessary include files from the same directory containing this file.
 source(paste(thisDir, "Include_Common.R", sep=""))
@@ -31,16 +31,16 @@ if (testing == 0)
     args = commandArgs(TRUE)
 else if (testing == 1)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
+    args = c("~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE",
         "outTestHP11/MarkersNonoverlappingWithInNearFeatures_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv",
         "outTestHP11/MarkersNonoverlappingWithInNearFeatures_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.pdf",
         1000, 2000, "S.lycopersicum,S.pennellii")
     }
 else if (testing == 2)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
+    args = c("~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE",
         "outHP14/IndelGroupsNonoverlappingWithInNearFeatures_K14k2L100D1_3000A100_3000d100_100N2F0.indels.tsv",
-        "outHP14/MarkersNonoverlappingWithInNearFeatures_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.indels.pdf",
+        "outHP14/MarkersNonoverlappingWithInNearFeatures_IndelGroupsNonoverlappingWithInNearFeatures_K14k2L100D1_3000A100_3000d100_100N2F0.indels.pdf",
         1000, 3000, "S.lycopersicum,S.pennellii")
     }
 else stop("Unknown value for 'testing'")

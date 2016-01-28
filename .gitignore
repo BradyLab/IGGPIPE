@@ -2,18 +2,13 @@ IGGPIPE.bbprojectd
 NOTES ONGOING.txt
 primer3settings.old.txt
 allPathParameters.ours
-allParameters/allParameters.HP14_200_700_100
-allParameters/allParameters.HP14_300_800_200
-allParameters/allParameters.HP14_500_5000_500
 logFiles/**
 out*/*
-!out*/good*/
 code/R/testOutput
 primer3settings.txt
 primer3settings.txt.tmp
 saveOutputFiles/**
 findMers
-goodHP14/**
 *.o
 *.d
 *.xml
@@ -23,3 +18,4 @@ x.*
 new.*
 align.fa
 align.fasta
+goodHP14/**

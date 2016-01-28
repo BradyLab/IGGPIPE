@@ -734,8 +734,7 @@ asciidoc.install();
 <body class="article">
 <div id="header">
 <h1>RUNNING IGGPIPE TO GENERATE IGG MARKERS</h1>
-<span id="author">Ted Toal</span><br />
-<span id="email"><code>&lt;<a href="mailto:twtoal@ucdavis.edu">twtoal@ucdavis.edu</a>&gt;</code></span><br />
+<span id="author">Version v0.0, Aug 2015</span><br />
 </div>
 <div id="content">
 <div id="preamble">
@@ -1012,6 +1011,61 @@ EPCR_MAX_MISMATCH and EPCR_MAX_GAPS
 </p>
 </li>
 </ol></div>
+<div class="paragraph"><p>The next section gives guidance on choosing a value for K.</p></div>
+</div></div>
+</li>
+<li>
+<p>
+<strong>Choosing a value for K</strong>
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>The value of K must be chosen carefully. The larger the value, the more common
+unique k-mers will be found, up to a point, beyond which the number will fall
+because unique k-mers will begin to be long enough to no longer be in common
+with the other genome.
+The computational demands of IGGPIPE in the steps that immediately follow the
+search for common unique k-mers are directly proportional to the number of such
+k-mers, which argues for keeping K as small as possible while not so small that
+there won&#8217;t be enough common unique k-mers for marker identification. We have
+successfully used 7 to 10 million common unique k-mers for producing markers;
+several hundred thousand might produce too few markers, while several tens of
+millions might create an intolerable computational demand.</p></div>
+<div class="paragraph"><p>The optimum value of
+K depends on the genetic architecture and amount of polymorphism between
+genomes. Very different genomes will have a peak number of common unique k-mers
+at a smaller K, so a smaller value would be a good choice. However, this does
+not necessarily mean that very similar genomes should use a larger value of K.
+Two <em>Arabidopsis thaliana</em> accessions will produce a much larger number of common
+unique k-mers for a given K, since most unique k-mers will be common. The challenge
+in that case is not to find enough of them, but to avoid having so many that
+computational resources are overwhelmed.  We found that a value of 14 worked well
+for the quite different <em>S. lycopersicum</em> and <em>S. pennellii</em> genomes, but for the
+Arabidopsis accessions we
+tested, a value of 14 produced so many common unique k-mers that computation
+time was relatively long, while a value of 13 produced almost as many IGG
+markers in a much shorter time (see the table in the IGGPIPE paper that shows
+computation time for these two values of K in Arabidopsis accessions). Polyploid
+species might require a larger value of K to locate enough unique k-mers in the
+repeated genomes.</p></div>
+<div class="paragraph"><p>We advise checking the number of common unique k-mers obtained with a given value
+of K the first time the pipeline is run on a given set of genomes, and adjust K
+if necessary. To speed this process, the pipeline can be run only through the
+stage where the common unique k-mers are produced, as described below. If too few
+k-mers result,
+then the user should increase K by one, and if too many k-mers result, the user
+should decrease K by one. The pipeline is then run to completion to produce the
+IGG marker primer sequences, and the total number of primer pairs produced is
+examined.  If there are too few, it is advisable to rerun the entire pipeline
+with K both increased and decreased by one.</p></div>
+</div></div>
+</li>
+<li>
+<p>
+<strong>Additional notes on setting parameter values</strong>
+</p>
+<div class="openblock">
+<div class="content">
 <div class="paragraph"><p>The parameter DIR_IGGPIPE_OUT is the path of the folder where all output will be
 placed.  You don&#8217;t need to change this parameter but you should note what its value
 will be, and change it if you want to.</p></div>
@@ -1111,18 +1165,18 @@ make a folder to contain these "log" files:</p></div>
 <div class="content">
 <pre><code>mkdir logFiles</code></pre>
 </div></div>
-<div class="paragraph"><p>To use <em>tee</em>, choose a log file name, let&#8217;s say <em>make_kmerIsect_HP14.txt</em>,
-and then add at the end of your <em>make</em> command line the extra
-commands <em>| tee logFiles/make_kmerIsect_HP14.txt</em>, as in this example:</p></div>
+<div class="paragraph"><p>To use <em>tee</em>, choose a log file name, let&#8217;s say <em>make_HP14.txt</em>, and then add at
+the end of your <em>make</em> command line the extra
+commands <em>| tee logFiles/make_HP14.txt</em>, as in this example:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY kmerIsect | tee logFiles/make_kmerIsect_HP14.txt</code></pre>
+<pre><code>make PARAMS=allParameters.XY ALL | tee logFiles/make_HP14.txt</code></pre>
 </div></div>
 <div class="paragraph"><p>Then, after <em>make</em> finishes, you can examine that log file at any time to see
 what the pipeline output was, for example:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>less logFiles/make_kmerIsect_HP14.txt</code></pre>
+<pre><code>less logFiles/make_HP14.txt</code></pre>
 </div></div>
 <div class="paragraph"><p>You should use the <em>tee</em> command each time you
 run the pipeline unless you are sure you won&#8217;t want to reexamine the output
@@ -1138,42 +1192,45 @@ flexibility to help future users that encounter the error.</p></div>
 </li>
 <li>
 <p>
-<strong>Run IGGPIPE with the command "make PARAMS=allParameters.XY kmerIsect"</strong>
+<strong>Run IGGPIPE with the command "make PARAMS=allParameters.XY getGenomicPosIsect GENOME=1"</strong>
 </p>
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>The first several steps in the pipeline extract unique k-mers from the FASTA
-files of the genomes, and intersect these to produce a list of common unique
-k-mers. To run these steps, use this command:</p></div>
+files of the genomes, intersect these to produce a list of common unique
+k-mers, and add genomic positions to them for each of the genomes. To run these
+steps, use this command:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>cd ~/Documents/IGGPIPE    (or whatever is appropriate for your system)
-make PARAMS=allParameters.XY kmerIsect    (replacing with your allParameters name)</code></pre>
+make PARAMS=allParameters.XY getGenomicPosIsect GENOME=1    (replacing with your allParameters name)</code></pre>
 </div></div>
 <div class="paragraph"><p>or, better yet, log to a file also:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY kmerIsect | tee logFiles/make_kmerIsect_HP14.txt</code></pre>
+<pre><code>make PARAMS=allParameters.XY getGenomicPosIsect GENOME=1 | \
+tee logFiles/make_getGenomicPosIsect_HP14.txt</code></pre>
 </div></div>
 <div class="paragraph"><p>If it completes successfully, the end of the command output will show the message:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>kmerIsect files are up to date.</code></pre>
+<pre><code>getGenomicPosIsect file(s) for genome(s) 1 are up to date.</code></pre>
 </div></div>
 <div class="paragraph"><p>If it says something else, indicating an error occurred, examine the output
 carefully and try to diagnose and fix the error, then enter the above <em>make</em>
 command again to retry the failed step.</p></div>
 <div class="paragraph"><p>Assuming the first steps completed successfully, count the number of k-mers in
-the common unique k-mer file, which is located in the <em>Kmers</em> subfolder of the
-output folder you specified in your allParameters file for parameter DIR_IGGPIPE_OUT.
-The name of the file is <em>isect.kmers</em> and it is a text file containing one k-mer
-per line and nothing else. You can look at it with the <em>less</em> command
-if you want to. To count the number of k-mers in it, use the <em>wc -l</em>
-command, which counts lines in a file, like this (replacing <em>outFolderForMyProject</em>
-with your output folder name):</p></div>
+the common unique k-mer file for genome 1, which is located in the <em>Kmers</em> subfolder
+of the output folder you specified in your allParameters file for parameter
+DIR_IGGPIPE_OUT.
+The name of the file is <em>Kmers_1.isect</em> and it is a text file containing one k-mer
+per line, with the position information for that k-mer following the k-mer on the line.
+You can look at it with the <em>less</em> command if you want to. To count the number of
+k-mers in it, use the <em>wc -l</em> command, which counts lines in a file, like this
+(replacing <em>outFolderForMyProject</em> with your output folder name):</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>wc -l outFolderForMyProject/Kmers/isect.kmers</code></pre>
+<pre><code>wc -l outFolderForMyProject/Kmers/Kmers_1.isect</code></pre>
 </div></div>
 <div class="paragraph"><p>If it shows that you have, say, several million or more, that is good. A few
 million or less might be too few to generate enough markers. Tens of millions
@@ -1184,9 +1241,10 @@ several millions of k-mers. The number of common unique k-mers increases as K
 is increased, up to a point, then starts to decrease. For similar genomes, you
 might need to edit the parameter file and decrease K by 1. With the tomato/pennellii
 genomes, K=14 was a
-good number. With Arabidopsis thaliana Col-0 and Ler-0 accessions, which were
+good number. With <em>Arabidopsis thaliana</em> Col-0 and Ler-0 accessions, which were
 much more similar to one another than tomato/pennellii, a value of K=13 worked
-better. For very large genomes, you might need to increase K by 1. Since the
+better, because K=14 produced so many k-mers that computation time was excessive.
+For very large genomes, you might need to increase K by 1. Since the
 number of k-mers goes up dramatically with increasing K, you probably will never
 raise K above 15, perhaps 16. The default setting in the parameter file for the
 output directory parameter DIR_IGGPIPE_OUT is to include the value of K in the
@@ -1479,60 +1537,60 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Kmers/Kmers_*.stats</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">e. make PARAMS=myFilename sortKmers</p></td>
-<td align="left" valign="top"><p class="table">Kmers/Kmers_*.sorted</p></td>
+<td align="left" valign="top"><p class="table">e. make PARAMS=myFilename kmersToText</p></td>
+<td align="left" valign="top"><p class="table">Kmers/Kmers_*.kmers.txt</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">f. make PARAMS=myFilename kmerIsect</p></td>
-<td align="left" valign="top"><p class="table">Kmers/isect.kmers</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table">g. make PARAMS=myFilename getGenomicPos</p></td>
+<td align="left" valign="top"><p class="table">f. make PARAMS=myFilename getGenomicPosIsect</p></td>
 <td align="left" valign="top"><p class="table">Kmers/Kmers_*.isect</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">h. make PARAMS=myFilename mergeKmers</p></td>
+<td align="left" valign="top"><p class="table">g. make PARAMS=myFilename mergeKmers</p></td>
 <td align="left" valign="top"><p class="table">Kmers/Kmers_*.merge</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">i. make PARAMS=myFilename getCommonUniqueKmers</p></td>
+<td align="left" valign="top"><p class="table">h. make PARAMS=myFilename sortCommonUniqueKmers</p></td>
 <td align="left" valign="top"><p class="table">Kmers/common.unique.kmers</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">j. make PARAMS=myFilename findLCRs</p></td>
+<td align="left" valign="top"><p class="table">i. make PARAMS=myFilename findLCRs</p></td>
 <td align="left" valign="top"><p class="table">LCRs_*.tsv, BadKmers_*.tsv</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">k. make PARAMS=myFilename findIndelGroups</p></td>
+<td align="left" valign="top"><p class="table">j. make PARAMS=myFilename findIndelGroups</p></td>
 <td align="left" valign="top"><p class="table">IndelGroupsOverlapping_*.tsv, IndelGroupsNonoverlapping_*.tsv</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">l. make PARAMS=myFilename getDNAseqs</p></td>
-<td align="left" valign="top"><p class="table">DNAseqs_*.dnaseqs</p></td>
+<td align="left" valign="top"><p class="table">k. make PARAMS=myFilename getDNAseqsForPrimers</p></td>
+<td align="left" valign="top"><p class="table">IndelGroupsOverlapping_*.dnaseqs</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">m. make PARAMS=myFilename findPrimers</p></td>
+<td align="left" valign="top"><p class="table">l. make PARAMS=myFilename findPrimers</p></td>
 <td align="left" valign="top"><p class="table">NonvalidatedMarkers_*.tsv</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">n. make PARAMS=myFilename ePCRtesting</p></td>
+<td align="left" valign="top"><p class="table">m. make PARAMS=myFilename ePCRtesting</p></td>
 <td align="left" valign="top"><p class="table">MarkerErrors_*.tsv</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">o. make PARAMS=myFilename removeBadMarkers</p></td>
+<td align="left" valign="top"><p class="table">n. make PARAMS=myFilename removeBadMarkers</p></td>
 <td align="left" valign="top"><p class="table">MarkersOverlapping_*.tsv, MarkersNonoverlapping_*.tsv</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">p. make PARAMS=myFilename plotMarkers</p></td>
+<td align="left" valign="top"><p class="table">o. make PARAMS=myFilename plotMarkers</p></td>
 <td align="left" valign="top"><p class="table">MarkerCounts_*.pdf, MarkerDensity_*.png</p></td>
 </tr>
 <tr>
+<td align="left" valign="top"><p class="table">p. make PARAMS=myFilename getDNAseqsForIndelsSNPs</p></td>
+<td align="left" valign="top"><p class="table">*.withseqs.tsv</p></td>
+</tr>
+<tr>
 <td align="left" valign="top"><p class="table">q. make PARAMS=myFilename IndelsSNPs</p></td>
-<td align="left" valign="top"><p class="table">MarkersNonoverlapping_*.indels.tsv, MarkersNonoverlapping_*.snps.tsv</p></td>
+<td align="left" valign="top"><p class="table">*.indels.tsv, *.snps.tsv</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">r. make PARAMS=myFilename plotIndels</p></td>
-<td align="left" valign="top"><p class="table">MarkersNonoverlapping_*.indels.pdf</p></td>
+<td align="left" valign="top"><p class="table">*.indels.pdf</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">s. Rscript code/R/dotplot.R dotplot.template</p></td>
@@ -1577,21 +1635,34 @@ post-processed (see below) to change them into other formats.</p></div>
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>An R program that is NOT run as part of the pipeline when the <em>make &#8230; ALL</em> target
-is built, but which can be run using <em>make &#8230; IndelsSNPs</em>, is able to read a file of
+<div class="paragraph"><p>Pipeline software is also provided to read a file of
 LCRs, non-overlapping Indel Groups, or non-overlapping Markers, extract the DNA sequences
 from the genomes in each LCR or Marker region and align them, then locate all Indels
-and SNPs in the aligned sequences and write their positions to files. The program
-is called alignAndGetIndelsSNPs.R. You should already have set its input file name in
-your "allParameters" parameter file (PATH_INDELS_SNPS_INPUT_FILE). Run it as follows:</p></div>
+and SNPs in the aligned sequences and write their positions to files.  This part of the
+pipeline is NOT run when the <em>make &#8230; ALL</em> target is built.  To run this and find
+Indels and SNPs, use <em>make &#8230; IndelsSNPs</em>, after setting the parameters in your
+"allParameters" parameter file.  These are PATH_INDELS_SNPS_INPUT_FILE (the input file
+name), MAX_INDELS_PER_KBP and MAX_SNPS_PER_KBP (maximum number of Indels and SNPs that
+may occur in an alignment per Kbp of sequence, and if exceeded, cause the alignment to
+be discarded as unreliable), and SCRAMBLE_SEQUENCE (can be set TRUE to do alignments
+with scrambled sequences, to determine the actual numbers of Indels and SNPs per Kbp
+in random sequence alignments.  Run the Indel/SNP finder as follows:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>make PARAMS=allParameters.XY IndelsSNPs    (replacing with your allParameters name)</code></pre>
 </div></div>
 <div class="paragraph"><p>This produces two files in your output folder whose names end with "indels.tsv" and
-".snps.tsv", containing tables of all Indels and SNPs found in the LCR or marker
-regions.  Examine them to see the data they contain.  The columns are described in
-Table 5 and Table 6.</p></div>
+".snps.tsv", containing tables of all Indels and SNPs found in either the LCR or Indel
+Group or marker regions (depending on the setting of PATH_INDELS_SNPS_INPUT_FILE).
+Examine them to see the data they contain.  The columns are described in Table 5 and
+Table 6.</p></div>
+<div class="paragraph"><p>The default settings for the parameters MAX_INDELS_PER_KBP and MAX_SNPS_PER_KBP are
+reasonable values, but you can adjust them to either decrease FALSE positives at the
+expense of fewer TRUE positives (smaller values) or increase TRUE positives at the
+expense of more FALSE positives (larger values).</p></div>
+<div class="paragraph"><p>Note that the pipeline for <em>make IndelsSNPs</em> automatically invokes a preceding step,
+<em>make getDNAseqsForIndelsSNPs</em> that extracts DNA sequences in preparation for alignment,
+and writes them to a file whose name ends with "withseqs.tsv".</p></div>
 </div></div>
 </li>
 <li>
@@ -1693,8 +1764,8 @@ different types of annotation and file conversion.</p></div>
 <div class="paragraph"><p>Some of the sample parameter files generate .gff3 files that can be added as a
 track to a genome browser, to display markers in the browser.  Instructions for
 adding the track are given in comments at the start of the parameter file.  Two
-marker files, one for Arabidopsis thaliana Col-0 vs. Ler-0 accessions, and the
-other for Solanum lycopersicum vs. Solanum pennellii genomes, were created to
+marker files, one for <em>Arabidopsis thaliana</em> Col-0 vs. Ler-0 accessions, and the
+other for <em>Solanum lycopersicum</em> vs. <em>Solanum pennellii</em> genomes, were created to
 test IGGPIPE, and the marker files were converted to .gff3 files suitable for
 making a browser track.  These files can be found in subfolders of the
 <em>annotate</em> folder.</p></div>
@@ -2177,13 +2248,57 @@ in that region is max idx value.</p></td>
 </tbody>
 </table>
 </div>
+<div class="tableblock">
+<table rules="all"
+width="100%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<caption class="title">Table 7. Columns in *.withseqs.tsv files; X,Y=chosen genome letters</caption>
+<col width="10%" />
+<col width="90%" />
+<thead>
+<tr>
+<th align="center" valign="top">Column</th>
+<th align="left" valign="top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center" valign="top"><p class="table">ID</p></td>
+<td align="left" valign="top"><p class="table">Unique ID tying row back to originating input file row. LCR input files: LCRnumber.
+IndelGroup and Markers files: refID_refPos1_refPos2.</p></td>
+</tr>
+<tr>
+<td align="center" valign="top"><p class="table">phases</p></td>
+<td align="left" valign="top"><p class="table">Phase of each genome incl. ref. genome, relative to ref. genome, string of +/- chars,
++ : same direction, - : opposite direction.",</p></td>
+</tr>
+<tr>
+<td align="center" valign="top"><p class="table">Xid</p></td>
+<td align="left" valign="top"><p class="table">Genome X sequence ID</p></td>
+</tr>
+<tr>
+<td align="center" valign="top"><p class="table">Xpos1</p></td>
+<td align="left" valign="top"><p class="table">Genome X position of upstream end of sequence to align on "+" strand</p></td>
+</tr>
+<tr>
+<td align="center" valign="top"><p class="table">Xpos2</p></td>
+<td align="left" valign="top"><p class="table">Genome X position of downstream end of sequence to align on "+" strand, Xpos1 &lt; Xpos2 always</p></td>
+</tr>
+<tr>
+<td align="center" valign="top"><p class="table">Xseq</p></td>
+<td align="left" valign="top"><p class="table">Genome X DNA sequence between the two positions</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-10-21 17:10:46 PDT
+Last updated 2016-01-17 12:31:28 PST
 </div>
 </div>
 </body>

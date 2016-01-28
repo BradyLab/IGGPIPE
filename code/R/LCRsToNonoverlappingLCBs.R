@@ -17,7 +17,7 @@ XSEP = ifelse(PATHSEP == "\\", "\\\\", PATHSEP)
 RE = paste("^.*--file=(([^", XSEP, "]*", XSEP, ")*)[^", XSEP, "]+$", sep="")
 args = commandArgs(FALSE)
 thisDir = sub(RE, "\\1", args[grepl("--file=", args)])
-#thisDir = "~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE/code/R/" # For testing only.
+#thisDir = "~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE/code/R/" # For testing only.
 
 # Source the necessary include files from the same directory containing this file.
 source(paste(thisDir, "Include_Common.R", sep=""))
@@ -34,13 +34,13 @@ if (testing == 0)
     }
 else if (testing == 1)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
+    args = c("~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE",
     "outTestHP11/LCRs_K11k2L100D10_2000.tsv", "outTestHP11/LCBs_K11k2L100D10_2000.tsv")
     investigate = TRUE
     }
 else if (testing == 2)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
+    args = c("~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE",
     "outTaCW15/LCRs_K15k2L200D5_1000.tsv", "outTaCW15/LCBs_K15k2L200D5_1000.tsv")
     investigate = TRUE
     }

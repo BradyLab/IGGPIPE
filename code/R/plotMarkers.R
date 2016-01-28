@@ -17,7 +17,7 @@ XSEP = ifelse(PATHSEP == "\\", "\\\\", PATHSEP)
 RE = paste("^.*--file=(([^", XSEP, "]*", XSEP, ")*)[^", XSEP, "]+$", sep="")
 args = commandArgs(FALSE)
 thisDir = sub(RE, "\\1", args[grepl("--file=", args)])
-#thisDir = "~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE/code/R/" # For testing only.
+#thisDir = "~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE/code/R/" # For testing only.
 
 # Source the necessary include files from the same directory containing this file.
 source(paste(thisDir, "Include_Common.R", sep=""))
@@ -32,7 +32,7 @@ if (testing == 0)
     args = commandArgs(TRUE)
 else if (testing == 1)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE", 2, 0.3,
+    args = c("~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE", 2, 0.3,
         "outTestHP11/MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv",
         "outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv",
         "outTestHP11/MarkerCounts_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1",
@@ -41,7 +41,7 @@ else if (testing == 1)
     }
 else if (testing == 2)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE", 2, 0.25,
+    args = c("~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE", 2, 0.25,
         "outHP14/MarkersOverlapping_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.tsv",
         "outHP14/MarkersNonoverlapping_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.tsv",
         "outHP14/MarkerCounts_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1",
@@ -50,7 +50,7 @@ else if (testing == 2)
     }
 else if (testing == 3)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE", 2, 0.5,
+    args = c("~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE", 2, 0.5,
         "outTaCW15/MarkersOverlapping_K15k2L200D5_1000A200_1000d50_200N2F0X20V3000W9M3G1.tsv",
         "outTaCW15/MarkersNonoverlapping_K15k2L200D5_1000A200_1000d50_200N2F0X20V3000W9M3G1.tsv",
         "outTaCW15/MarkerCounts_K15k2L200D5_1000A200_1000d50_200N2F0X20V3000W9M3G1",
@@ -250,7 +250,7 @@ for (genome in genomeLtrs)
     if (length(V) <= 50) # Reasonable maximum number of chromosomes.
         {
         ylim = range(pretty(c(0, max(V)*1.1)))
-        barplot(V, col="gray", las=2, cex.main=1.5, cex.names=1.5, ylim=ylim, yaxp=c(ylim, 10), tck=1,
+        barplot(V, col="gray", las=2, cex.main=1.5, cex.names=1.5, ylim=ylim, yaxp=c(ylim, 10),
             ylab="IGG markers per 1 Mbp", cex.lab=2, cex.axis=1.2,
             main=paste("Density of IGG markers in each FASTA sequence of genome '", genome, "'", sep=""))
         barplot(V2, width=0.5, space=c(1.4, 0.9), col="blue", add=TRUE, axes=FALSE, axisnames=FALSE, main="")

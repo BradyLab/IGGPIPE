@@ -26,7 +26,7 @@ args = commandArgs(FALSE)
 #cat("args: ", paste(args, collapse=" "), "\n", sep="")
 thisDir = sub(RE, "\\1", args[grepl("--file=", args)])
 #cat("Directory containing this .R file is: '", thisDir, "'\n", sep="")
-#thisDir = "~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE/code/R/" # For testing only.
+#thisDir = "~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE/code/R/" # For testing only.
 
 # Source the necessary include files from the same directory containing this file.
 source(paste(thisDir, "Include_Common.R", sep=""))
@@ -41,21 +41,21 @@ if (testing == 0)
     args = commandArgs(TRUE)
 else if (testing == 1)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
+    args = c("~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE",
         "outTestHP11/Kmers/common.unique.kmers", "HP", 2, 100, 10, 2000,
         "outTestHP11/LCRs_K11k2L100D10_2000.tsv",
         "outTestHP11/BadKmers_K11k2L100D10_2000.tsv", TRUE)
     }
 else if (testing == 2)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
+    args = c("~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE",
         "outHP14/Kmers/common.unique.kmers", "HP", 2, 400, 10, 1500,
         "outHP14/LCRs_K14k2L400D10_1500.tsv",
         "outHP14/BadKmers_K14k2L400D10_1500.tsv", TRUE)
     }
 else if (testing == 3)
     {
-    args = c("~/Documents/UCDavis/BradyLab/Genomes/IGGPIPE",
+    args = c("~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE",
         "outHPT14/Kmers/common.unique.kmers", "HPT", 2, 300, 5, 1500,
         "outHPT14/LCRs_K14k2L300D5_1500.tsv",
         "outHPT14/BadKmers_K14k2L300D5_1500.tsv", TRUE)

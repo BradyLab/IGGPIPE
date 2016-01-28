@@ -1,6 +1,6 @@
 IGGPIPE INSTALLATION
 ====================
-Ted Toal <twtoal@ucdavis.edu>
+Version v0.0, Aug 2015
 
 This describes how to install all elements needed to run the IGGPIPE software.
 
@@ -119,14 +119,62 @@ process if they aren't already:*
 .. findMers
 --
 
-*Install IGGPIPE*
------------------
+*Install IGGPIPE - Quick Start for the Experienced*
+---------------------------------------------------
 
-*If you want a Quick Start with minimal reading, just look for the command lines
-below and execute them, with occasional skimming of the text just above/below the
-commands.*
+*Follow brief instructions here if you are experienced with installations and want to
+try to do a Quick Start installation with minimal reading.  If you have trouble, check
+the more detailed instructions below for help.*
 {zwsp} +
 {zwsp} +
+
+. Mac OSX: install Xcode and do ' xcode-select --install'; Windows: install Cygwin including
+Perl, make, and Bash
+
+. Copy allPathParameters.template file to new file allPathParameters.ours, then edit the new
+file and set WD to IGGPIPE directory
+
+. Install Jellyfish V2 or later (V2.2.3 works), configuring with ./configure, compiling
+with 'make', and installing with 'sudo make install'
+
+. Install a V5 or later Perl if not already installed
+
+. Install R V3.2.1 or later.  Windows installation may require reading more installation
+details below.
+
+. Install Primer3 V2.3.6 or later and assign CMD_PRIMER3CORE and DIR_PRIMER3CONFIG
+in allPathParameters.ours
+
+. Install e-PCR V2.3.12-1 or later and assign CMD_EPCR in allPathParameters.ours
+
+. Install MUSCLE V8.31 or later and assign CMD_ALIGNER in allPathParameters.ours
+
+. Build 'findMers' using 'make' in the 'findMers' folder.
+
+. Test trashing a file using '$SHELL code/shell/trash.sh <filename>' and if it fails,
+set 'CMD_DELETE_WHEN_CLEANING := $(CMD_DELETE)'  in allPathParameters.ours
+
+. Copy primer3settings.default.txt to primer3settings.txt
+
+. On OSX in Xcode choose Open Developer Tool, FileMerge, then set it to stay in the dock.
+
+. Run IGGPIPE on test data using 'make PARAMS=allParameters.test ALL | tee logFiles/makeLog.test.txt'
+then look through log file with 'less logFiles/makeLog.test.txt' and compare actual results with
+expected results using 'source code/shell/cmpKeyFiles.sh outTestHP11 goodTest' (some files
+have not yet been made)
+
+. Run 'make PARAMS=allParameters.test IndelsSNPs' and check results again
+with 'source code/shell/cmpKeyFiles.sh outTestHP11 goodTest'
+
+. Run 'make PARAMS=allParameters.test plotIndels' and examine outTestHP11/Markers.indels.pdf
+
+. Run 'Rscript code/R/dotplot.R dotplot.template' and examine outTestHP11/LCRs_.dotplot.png
+
+. Run 'Rscript code/R/annotateFile.R annotate.template' and check results again
+with 'source code/shell/cmpKeyFiles.sh outTestHP11 goodTest'
+
+*Install IGGPIPE - Detailed Instructions*
+-----------------------------------------
 
 . *Install Xcode (Mac OSX only) or Cygwin (Windows only)*
 +
@@ -911,23 +959,24 @@ output files are those available in the goodTest subdirectory for comparison to 
 |b. make PARAMS=myFilename getContigFile|GenomeData/*.contigs
 |c. make PARAMS=myFilename getKmers|Kmers/Kmers_*.kmers
 |d. make PARAMS=myFilename kmerStats|Kmers/Kmers_*.stats
-|e. make PARAMS=myFilename getGenomicPosIsect|Kmers/Kmers_*.isect
-|f. make PARAMS=myFilename mergeKmers|Kmers/Kmers_*.merge
-|g. make PARAMS=myFilename getCommonUniqueKmers|Kmers/common.unique.kmers
-|h. make PARAMS=myFilename findLCRs|'LCRs_*.tsv, BadKmers_*.tsv'
-|i. make PARAMS=myFilename findIndelGroups|'IndelGroupsOverlapping_*.tsv, IndelGroupsNonoverlapping_*.tsv'
-|j. make PARAMS=myFilename getDNAseqsForPrimers|'IndelGroupsOverlapping_*.dnaseqs'
-|k. make PARAMS=myFilename findPrimers|'NonvalidatedMarkers_*.tsv'
-|l. make PARAMS=myFilename ePCRtesting|'MarkerErrors_*.tsv'
-|m. make PARAMS=myFilename removeBadMarkers|'MarkersOverlapping_*.tsv, MarkersNonoverlapping_*.tsv'
-|n. make PARAMS=myFilename plotMarkers|'MarkerCounts_*.pdf, MarkerDensity_*.png'
-|o. make PARAMS=myFilename getDNAseqsForIndelsSNPs|*.withseqs.tsv
-|p. make PARAMS=myFilename IndelsSNPs|*.indels.tsv, *.snps.tsv
-|q. make PARAMS=myFilename plotIndels|*.indels.pdf
-|r. Rscript code/R/dotplot.R dotplot.template|LCRs_*.dotplot.png
-|s. Rscript code/R/annotateFile.R annotate.template|MarkersAnnotated_*.tsv
-|t. Rscript code/R/annotateFile.R annotate/HP11_isInNearColumn.markers|MarkersAnnotated_WithInNearFeatures_*.indels.tsv
-|u. Rscript code/R/annotateFile.R annotate/HP11_to_gff3.markers|MarkersAnnotated_GFF3_*.gff3
+|e. make PARAMS=myFilename kmersToText|Kmers/Kmers_*.kmers.txt
+|f. make PARAMS=myFilename getGenomicPosIsect|Kmers/Kmers_*.isect
+|g. make PARAMS=myFilename mergeKmers|Kmers/Kmers_*.merge
+|h. make PARAMS=myFilename sortCommonUniqueKmers|Kmers/common.unique.kmers
+|i. make PARAMS=myFilename findLCRs|'LCRs_*.tsv, BadKmers_*.tsv'
+|j. make PARAMS=myFilename findIndelGroups|'IndelGroupsOverlapping_*.tsv, IndelGroupsNonoverlapping_*.tsv'
+|k. make PARAMS=myFilename getDNAseqsForPrimers|'IndelGroupsOverlapping_*.dnaseqs'
+|l. make PARAMS=myFilename findPrimers|'NonvalidatedMarkers_*.tsv'
+|m. make PARAMS=myFilename ePCRtesting|'MarkerErrors_*.tsv'
+|n. make PARAMS=myFilename removeBadMarkers|'MarkersOverlapping_*.tsv, MarkersNonoverlapping_*.tsv'
+|o. make PARAMS=myFilename plotMarkers|'MarkerCounts_*.pdf, MarkerDensity_*.png'
+|p. make PARAMS=myFilename getDNAseqsForIndelsSNPs|*.withseqs.tsv
+|q. make PARAMS=myFilename IndelsSNPs|*.indels.tsv, *.snps.tsv
+|r. make PARAMS=myFilename plotIndels|*.indels.pdf
+|s. Rscript code/R/dotplot.R dotplot.template|LCRs_*.dotplot.png
+|t. Rscript code/R/annotateFile.R annotate.template|MarkersAnnotated_*.tsv
+|u. Rscript code/R/annotateFile.R annotate/HP11_isInNearColumn.markers|MarkersAnnotated_WithInNearFeatures_*.indels.tsv
+|v. Rscript code/R/annotateFile.R annotate/HP11_to_gff3.markers|MarkersAnnotated_GFF3_*.gff3
 |===================================================
 
 (Note that some of the files listed above are produced by steps to be described below).

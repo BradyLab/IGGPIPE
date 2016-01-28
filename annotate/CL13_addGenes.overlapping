@@ -6,17 +6,14 @@
 # marker, and the position of the gene in base-pairs from the marker.
 #   1. Reads as inputFileT the file:
 # outCL13/MarkersOverlapping_K13k10L400D30_1500A400_1500d50_300N2F2X20V5000W8M0G0.tsv
-#   2. Adds column "ID" containing a unique row ID equal to "ID_nn_YYY" where
-#       "nn" is the integer part of the Cpct column and "YYY" is a sequence number
-#       that increments when the "nn" value is the same for more than 1 column.
-#   3. Reads as inputFileS the TAIR10_GFF3_genes.gff gene model gff3 file from
+#   2. Reads as inputFileS the TAIR10_GFF3_genes.gff gene model gff3 file from
 #       an external directory.
-#   4. Adds a new column to the inputFileS data, extracting the attribute named
+#   3. Adds a new column to the inputFileS data, extracting the attribute named
 #       "Name" from "gene" feature rows and placing it in new column "gene".
-#   5. Performs a match-and-merge operation between the two files and adds column
+#   4. Performs a match-and-merge operation between the two files and adds column
 #       "genes" to the inputFileT data, containing gene name, strand, and relative
 #       base pair position of the gene relative to the marker.
-#   6. Writes the new inputFileT data to file:
+#   5. Writes the new inputFileT data to file:
 # outCL13/MarkersOverlappingWithGenes_K13k10L400D30_1500A400_1500d50_300N2F2X20V5000W8M0G0.tsv
 #
 # The output file from this is copied to annotate/HP14.savedOutput because
@@ -33,15 +30,13 @@ inputFileT:
     type := tsv
     quote := ""
     comment := ""
-    addColNames := "ID"
-    addColValues := "ID_{/Cpct/\.[0-9]*$/}_{#3}"
 
 ################################################################################
 # inputFileS parameters.
 ################################################################################
 
 inputFileS:
-    path := "../../At/TAIR10_GFF3_genes.gff"
+    path := "../../Genomes/At/TAIR10_GFF3_genes.gff"
     type := gff3
 
 ################################################################################

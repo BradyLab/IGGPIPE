@@ -454,6 +454,14 @@ EPCR_MAX_MISMATCH := 3
 EPCR_MAX_GAPS := 1
 
 
+# Prefix to use for the marker IDs.  Markers are numbered sequentially, and an ID
+# column in the marker output file consists of the following prefix, followed by
+# the sequential number of each marker.  This prefix lets you assign different
+# IDs during different runs of IGGPIPE using different genomes or other parameters.
+#@@ THIS IS A REASONABLE VALUE FOR THIS PARAMETER.
+ID_PREFIX := IGG_$(GENOME_LETTERS_SQUISHED)$(K)_
+
+
 # For plotting number and density of final markers, this parameter sets the
 # minimum value in the marker NDA column (which ranges from NDAMIN to the number
 # of genomes) of the markers to be plotted.  For example, if you are making both

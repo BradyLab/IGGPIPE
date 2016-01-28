@@ -1,6 +1,5 @@
 IGGPIPE
 =======
-Ted Toal <twtoal@ucdavis.edu>
 Version v0.0, Aug 2015
 
 The BradyLab/IGGPIPE GitHub repository contains code and documentation for the

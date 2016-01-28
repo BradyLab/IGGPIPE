@@ -266,16 +266,15 @@ getMatchIdxs = function(T.position, S.position, match)
         S.position[["pos"]] = S.position[["end"]]
         idxs2 = findContainsIdxs.rows(T.position, S.position)
         idxs = getUniqueIdxs(idxs, idxs2)
-
         T.position[["pos"]] = T.position[["start"]]
         idxs2 = findContainsIdxs.rows(S.position, T.position)
         # We must swap the two idxs2 columns so that column 1 is for T.df.
-        idxs = getUniqueIdxs(idxs, idxs2[,2:1])
+        idxs = getUniqueIdxs(idxs, idxs2[, 2:1, drop=FALSE])
 
         T.position[["pos"]] = T.position[["end"]]
         idxs2 = findContainsIdxs.rows(S.position, T.position)
         # We must swap the two idxs2 columns so that column 1 is for T.df.
-        idxs = getUniqueIdxs(idxs, idxs2[,2:1])
+        idxs = getUniqueIdxs(idxs, idxs2[, 2:1, drop=FALSE])
         }
 
     # "S.TINY": The positions in S.df are either SNPs or very small contigs that
@@ -305,7 +304,7 @@ getMatchIdxs = function(T.position, S.position, match)
             idxs = getCommonIdxs(idxs, idxs2)
             }
         # We must swap the two idxs columns so that column 1 is for T.df.
-        idxs = idxs[,2:1]
+        idxs = idxs[ ,2:1, drop=FALSE]
         }
 
     # "x.NEAR", x = S/T, y = T/S: The positions in x.df are not large compared to
@@ -454,7 +453,7 @@ getMatchIdxs = function(T.position, S.position, match)
 
         # For T.NEAR we now must swap the two columns of idxs.
         if (match[["method"]] == "T.NEAR")
-            idxs = idxs[,2:1]
+            idxs = idxs[, 2:1, drop=FALSE]
         }
 
     # Sort idxs by column 1 then column 2.
@@ -506,7 +505,7 @@ positionString = function(code, T.position, S.position, idxs)
         T.position = S.position
         S.position = t
         rm(t)
-        idxs = idxs[,2:1]
+        idxs = idxs[, 2:1, drop=FALSE]
         }
 
     # Figure out {#T}.
@@ -728,18 +727,23 @@ formatData = function(format, T.colnames, S.colnames, T.df=NULL, S.df=NULL, idxs
 #   mergeCols: list defining the column names in S.df to be copied to T.df, the format of
 #       the column data that is copied, and the column names in T.df to which the data
 #       is copied.  Members are sublists, one per column to be added to T.df.  Members:
-#           "col" : name of column to add
-#           "before" : column to add it before, "" to add to end
+#           "col" : name of column to add.
+#           "before" : column to add it before, "" to add to end, default "".
 #           "format" : constructs are: {lb}, {rb}, {+col}, {#T}, {#S}, {%T}, {%S},
 #               {*S*col*val*dgts}, {*T*col*val*dgts}, {/S/col/RE/RE.replace}, {/T/col/RE/RE.replace}
 #           "maxMatch" : maximum number of matches per T.df row, 0 for no limit, default 0.
 #           "join" : "TRUE" to join all match strings for the T.df row into one column,
-#               "FALSE" to put them in separate columns with a number appended to column name
-#           "joinPfx", "joinSep", "joinSfx" : strings to separate joined match strings.
+#               "FALSE" to put them in separate columns with a number appended to column
+#               name, default TRUE.
+#           "joinPfx", "joinSep", "joinSfx" : strings to separate joined match strings,
+#               defaults "", ",", and "".
+#   NULLifEmpty: if TRUE, return NULL if no intersections are found in the data.
+#       If FALSE, stop with an error if no intersections are found.
 #
 #   *** See Details below for complete information. ***
 #
-# Returns: modified dft data frame.
+# Returns: modified T.df data frame, in same row order as supplied, or NULL (never
+#       if NULLifEmpty is FALSE).
 #
 # Details:
 #
@@ -872,7 +876,7 @@ formatData = function(format, T.colnames, S.colnames, T.df=NULL, S.df=NULL, idxs
 #           Defaults to "" (nothing is appended).
 # Example: mergeCols=list(col="genes", before="", format="{+gene_id}({#S})")
 ################################################################################
-mergeOnMatches = function(T.df, S.df, T.pos, S.pos, match, mergeCols)
+mergeOnMatches = function(T.df, S.df, T.pos, S.pos, match, mergeCols, NULLifEmpty=FALSE)
     {
 
     # Check arguments.  Try to coerce args of the wrong type to the right type.
@@ -1198,7 +1202,11 @@ mergeOnMatches = function(T.df, S.df, T.pos, S.pos, match, mergeCols)
 
     # There had better have been at least some matches found!
     if (!anyMatchesFound)
+        {
+        if (NULLifEmpty)
+            return(NULL)
         error("No matches found")
+        }
 
     # Join the separate T.df data frames back together and return that data frame.
     # This is not as trivial as a do.call(rbind, L.T.df) because different members
