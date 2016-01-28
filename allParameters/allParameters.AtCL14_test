@@ -186,10 +186,7 @@ PATH_COMMON_UNIQUE_KMERS := $(DIR_KMERS)/common.unique.kmers
 # since that is the minimum number of k-mers in an LCR that could result
 # in an Indel Group call.
 
-# Since Col-0 and Ler-0 are so similar, it should be easy to get large numbers
-# of sequential k-mers, so set this larger.
-
-KMIN := 10
+KMIN := 4
 
 
 # Minimum acceptable length of an LCR in base-pairs.  This is normally equal
@@ -207,7 +204,7 @@ LMIN := 400
 # Since Col-0 and Ler-0 are so similar, set this larger than normal to reduce
 # the large number of possible overlapping indel regions to be tested.
 
-DMIN := 30
+DMIN := 15
 
 
 # Maximum distance in bp between two adjacent k-mers in an LCR.  If two adjacent
@@ -394,6 +391,13 @@ EPCR_MAX_MISMATCH := 0
 # Larger values increase computation time and reduce number of markers obtained.
 
 EPCR_MAX_GAPS := 0
+
+
+# Prefix to use for the marker IDs.  Markers are numbered sequentially, and an ID
+# column in the marker output file consists of the following prefix, followed by
+# the sequential number of each marker.  This prefix lets you assign different
+# IDs during different runs of IGGPIPE using different genomes or other parameters.
+ID_PREFIX := IGG_$(GENOME_LETTERS_SQUISHED)$(K)_
 
 
 # For plotting number and density of final markers, this parameter sets the

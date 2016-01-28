@@ -3,8 +3,9 @@
 
 # This is an IGGPIPE parameter file example for analyzing tomato (H) ITAG2.4 and
 # S. pennellii (P) V2.0 genomes, modified from the default allParameters.template
-# example to use parameters that give somewhat larger amplicon sizes: 400-1500
-# with minimum size difference of 50-300.
+# example to use parameters matching as closely as possible those used to generate
+# the earliest version of IGG markers that had parameters LN300_800_dSZ200
+# (although those were generated with ITAG2.3 and with pennellii scaffolds).
 
 ################################################################################
 ################################################################################
@@ -184,14 +185,14 @@ PATH_COMMON_UNIQUE_KMERS := $(DIR_KMERS)/common.unique.kmers
 # since that is the minimum number of k-mers in an LCR that could result
 # in an Indel Group call.
 
-KMIN := 2
+KMIN := 4
 
 
 # Minimum acceptable length of an LCR in base-pairs.  This is normally equal
 # to the minimum acceptable amplicon size AMIN (defined below), although it
 # could be larger.  Smaller values make more LCRs and increase computation time.
 
-LMIN := 400
+LMIN := 300
 
 
 # Minimum distance in bp between two adjacent k-mers in an LCR.  If two k-mers are
@@ -199,7 +200,7 @@ LMIN := 400
 # a series of back-to-back k-mers in a conserved region from satisfying the KMIN
 # setting or MINFLANK setting.  A value in the range of k would be reasonable.
 
-DMIN := 10
+DMIN := 1
 
 
 # Maximum distance in bp between two adjacent k-mers in an LCR.  If two adjacent
@@ -208,18 +209,18 @@ DMIN := 10
 # indel within an Indel Group or LCR.  This is normally set equal to the maximum
 # acceptable amplicon size AMAX (defined below), although it could be larger.
 
-DMAX := 1500
+DMAX := 800
 
 
 # Minimum IGG marker amplicon size in any genome.
 
-AMIN := 400
+AMIN := 300
 
 
 # Maximum IGG marker amplicon size in any genome.  The amplicon size will always
 # be less than DMAX also.  This also limits the maximum Indel Group size.
 
-AMAX := 1500
+AMAX := 800
 
 
 # For a given IGG marker, when the smallest amplicon size is AMIN, this is the
@@ -229,7 +230,7 @@ AMAX := 1500
 # For the purpose of finding Indel Groups only, this is the minimum Indel
 # Group size that will ever be found.
 
-ADMIN := 50
+ADMIN := 200
 
 
 # For a given IGG marker, when the largest amplicon size is AMAX, this is the
@@ -248,7 +249,7 @@ ADMIN := 50
 #
 # For the purpose of finding Indel Groups only, this should be set equal to ADMIN.
 
-ADMAX := 300
+ADMAX := 200
 
 
 # Minimum number of distinct amplicon sizes for each marker.  Set this to the
@@ -459,7 +460,7 @@ SCRAMBLE_SEQUENCE := FALSE
 
 # This is normally in the IGGPIPE installation directory.
 
-PATH_PRIMER3_SETTINGS := primer3settings.txt
+PATH_PRIMER3_SETTINGS := primer3settings.old.txt
 
 
 # Directory in which to place these files.  This directory will be created if it

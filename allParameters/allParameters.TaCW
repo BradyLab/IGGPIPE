@@ -2,9 +2,10 @@
 ################################################################################
 
 # This is an IGGPIPE parameter file example for doing an analysis of two
-# hexaploid wheat genomes: the IWGSC (International Wheat Genome Sequencing
-# Consortium) Chinese Spring V1.0 assembly with pseudomolecules plus scaffolds,
-# and the Joint Genome Institute assembly (scaffolds only) of Synthetic W7984.
+# hexaploid wheat (Triticum aestivum) genomes: the IWGSC (International Wheat
+# Genome Sequencing Consortium) Chinese Spring V1.0 assembly with pseudomolecules
+# plus scaffolds, and the Joint Genome Institute assembly (scaffolds only) of
+# Synthetic W7984.
 
 ################################################################################
 ################################################################################
@@ -386,6 +387,13 @@ EPCR_MAX_MISMATCH := 3
 # Larger values increase computation time.
 
 EPCR_MAX_GAPS := 1
+
+
+# Prefix to use for the marker IDs.  Markers are numbered sequentially, and an ID
+# column in the marker output file consists of the following prefix, followed by
+# the sequential number of each marker.  This prefix lets you assign different
+# IDs during different runs of IGGPIPE using different genomes or other parameters.
+ID_PREFIX := IGG_$(GENOME_LETTERS_SQUISHED)$(K)_
 
 
 # For plotting number and density of final markers, this parameter sets the
