@@ -40,7 +40,7 @@ else if (testing == 2)
     {
     args = c("~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE",
         "outHP14/IndelGroupsNonoverlappingWithInNearFeatures_K14k2L100D1_3000A100_3000d100_100N2F0.indels.tsv",
-        "outHP14/MarkersNonoverlappingWithInNearFeatures_IndelGroupsNonoverlappingWithInNearFeatures_K14k2L100D1_3000A100_3000d100_100N2F0.indels.pdf",
+        "outHP14/IndelGroupsNonoverlappingWithInNearFeatures_K14k2L100D1_3000A100_3000d100_100N2F0.indels.pdf",
         1000, 3000, "S.lycopersicum,S.pennellii")
     }
 else stop("Unknown value for 'testing'")
@@ -98,6 +98,9 @@ catnow("  genomeNames: ", paste(genomeNames, collapse=","), "\n")
 ########################################
 # Initialize.
 ########################################
+
+# Let's not plot grid lines.
+plotGridLines = FALSE
 
 # Read Indels data.
 dfIndels = read.table(IndelsFile, header=TRUE, row.names=NULL, sep="\t", stringsAsFactors=FALSE)
@@ -338,8 +341,11 @@ for (genome in genomeLtrs)
     }
 
 # Make some grid lines.
-segments(1:Nbins, ylim[1], 1:Nbins, ylim[2], col=gridCol)
-segments(0, yat, xlim[2], yat, col=gridCol)
+if (plotGridLines)
+    {
+    segments(1:Nbins, ylim[1], 1:Nbins, ylim[2], col=gridCol)
+    segments(0, yat, xlim[2], yat, col=gridCol)
+    }
 
 # Legend.
 legend("topright", genomeNames, pch=20, col=genomeCols, pt.cex=2, lwd=3, lty=genomeLtys, seg.len=5, bty="n", cex=2)
@@ -414,8 +420,11 @@ for (genome in genomeLtrs)
     text(2, y, txt, pos=2, cex=0.8)
 
     # Make some grid lines.
-    segments(1:Nbins, ylim[1], 1:Nbins, ylim[2], col=gridCol)
-    segments(0, yat, xlim[2], yat, col=gridCol)
+    if (plotGridLines)
+        {
+        segments(1:Nbins, ylim[1], 1:Nbins, ylim[2], col=gridCol)
+        segments(0, yat, xlim[2], yat, col=gridCol)
+        }
 
     # Legend.
     legend("topright", features, pch=20, col=featureCols, pt.cex=2, lwd=2, lty=featureLtys, seg.len=5, bty="n")

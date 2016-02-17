@@ -1,8 +1,8 @@
 ################################################################################
 # Parameter file for annotateFile.R to convert the IGG marker file generated
-# by allParameters.template for the S. lycopersicum ITAG2.4 and S. pennellii V2.0
-# genomes into a .gff3 file that could be used to display markers as a browser
-# track:
+# by allParameters.HP14_400_1500_50_300 for the S. lycopersicum ITAG2.4 and
+# S. pennellii V2.0 genomes into a .gff3 file that could be used to display
+# markers as a browser track:
 #   1. Reads outHP14/MarkersOverlapping_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.tsv
 #   2. Adds fixed column "source" containing "IGG.markers" 
 #   3. Adds fixed column "feature" containing "genetic_marker"
@@ -32,14 +32,13 @@
 # the track named.  Then, go to solgenomics.net, select Genomes, Tomato, and
 # in the Download section, choose Genome Browser.  In JBrowse browser, select
 # File, Open, and in Local Files choose Select Files, choose the output file
-# from here, choose Open.  In the browser make sure you track and "ITAG2.4
+# from here, choose Open.  In the browser make sure your track and "ITAG2.4
 # gene models" tracks are selected at the left.  In the drop-down box choose
 # chromosome 1 (SL2.50ch01) and enter "SL2.50ch01:39198..43998" in the position
 # box.  You should see orange bands representing markers, labelled IGG_HP14_XXXX
 # etc.  Clicking on a marker shows its attributes, such as primer sequences.
-#
-# The output file from this is copied to annotate/HP14.savedOutput because
-# it may be useful to people.
+# Change band color by clicking on the track label popdown, select "Edit config",
+# and then within the '"style": {' brace block add ', "color": "blue"'
 ################################################################################
 
 ################################################################################

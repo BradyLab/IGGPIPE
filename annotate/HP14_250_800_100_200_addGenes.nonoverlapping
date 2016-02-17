@@ -1,6 +1,6 @@
 ################################################################################
-# Same as HP14_overlapping_add_genesColumn_tsv except the genes column is added
-# to the file of non-overlapping markers.
+# Same as HP14_400_1500_50_300_addGenes.overlapping except the genes column is
+# added to the allParameters.HP14_250_800_100_200 file of non-overlapping markers.
 ################################################################################
 
 ################################################################################
@@ -8,7 +8,7 @@
 ################################################################################
 
 inputFileT:
-    path := "outHP14/MarkersNonoverlapping_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.tsv"
+    path := "outHP14/MarkersNonoverlapping_K14k2L250D10_800A250_800d100_200N2F0X20V2500W8M3G1.tsv"
     type := tsv
     quote := ""
     comment := ""
@@ -82,7 +82,7 @@ mergeCols:
 ################################################################################
 
 outputFile:
-    path := "outHP14/MarkersNonoverlappingWithGenes_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.tsv"
+    path := "outHP14/MarkersNonoverlappingWithGenes_K14k2L250D10_800A250_800d100_200N2F0X20V2500W8M3G1.tsv"
     type := tsv
     header := YES
     quote := NO

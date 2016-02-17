@@ -91,7 +91,7 @@ GENOME ?= ALL
 # If variable GENOME is not 'ALL' or a valid genome number, exit with error.
 ifneq ($(GENOME),ALL)
 ifeq ($(GENOME_$(GENOME)),)
-$(error GENOME must be either a valid genome number (1..$(N_GENOMES)) or 'ALL'))
+$(error GENOME must be either a valid genome number (1..$(N_GENOMES)) or 'ALL')
 endif
 endif
 

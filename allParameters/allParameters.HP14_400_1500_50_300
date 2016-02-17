@@ -389,7 +389,7 @@ EPCR_MAX_GAPS := 1
 # column in the marker output file consists of the following prefix, followed by
 # the sequential number of each marker.  This prefix lets you assign different
 # IDs during different runs of IGGPIPE using different genomes or other parameters.
-ID_PREFIX := IGG_$(GENOME_LETTERS_SQUISHED)$(K)_
+ID_PREFIX := IGG_$(GENOME_LETTERS_SQUISHED)$(K)D_
 
 
 # For plotting number and density of final markers, this parameter sets the

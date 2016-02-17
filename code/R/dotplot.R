@@ -584,7 +584,7 @@ if (nrow(df) > 0)
     }
 
 dev.off()
-cat("Finished dot plot.\n")
+cat("Finished dot plot to file ", L$PLOT.file, "\n", sep="")
 }
 
 ################################################################################

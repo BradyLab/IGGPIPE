@@ -370,7 +370,7 @@ You can look at it with the 'less' command if you want to. To count the number o
 k-mers in it, use the 'wc -l' command, which counts lines in a file, like this
 (replacing 'outFolderForMyProject' with your output folder name):
 
-     wc -l outFolderForMyProject/Kmers/Kmers_1.isect
+  wc -l outFolderForMyProject/Kmers/Kmers_1.isect
 
 If it shows that you have, say, several million or more, that is good. A few
 million or less might be too few to generate enough markers. Tens of millions
@@ -419,15 +419,33 @@ If it says something else, indicating an error occurred, examine the output
 carefully and try to diagnose and fix the error, then enter the above 'make'
 command again to retry the failed step.
 
-Assuming the steps completed successfully, count the number of LCRs in the LCRs
-output file, which is located in the main output directory (set with the DIR_IGGPIPE_OUT
+Assuming the steps completed successfully, the LCRs output file will now be
+located in the main output directory (set with the DIR_IGGPIPE_OUT
 parameter). Its name starts with 'LCRs_', and with many command line interfaces
-you don't need to enter the full name in a command, but can instead enter 'LCRs_*'.
-The LCRs file has one LCR per line. You can look at the first few lines with the
-'head' command or load the file into Excel or a text editor to examine it, if you
-want. The command line to count the LCRs would look like this:
+you don't need to enter the full name in a command, but can instead enter 'LCRs_' and
+then press the tab key to auto-complete the remainder of the file name.  In the
+example code below, we will show the LCRs_ filename as "LCRs_*.tsv", and will use
+the "*" character in other filenames below to stand in for the long character name.
 
-     wc -l outFolderForMyProject/LCRs*
+You can look at the first few lines of the LCRs file with the
+'head' command, or you can load the file into Excel or a text editor to examine
+it, if you want.  You should definitely count the number of LCRs in the file.
+The file has one common unique k-mer per line, and the k-mer belongs to one
+LCR only, whose ID is given in the last column of the file. Thus, to count the
+number of LCRs, you need to count the number of unique values in the last column.
+You therefore need to know the column number of the last column.  The number of
+columns in the LCRs file is 2+5*N_GENOMES, since the file contains five columns
+of data for each genome that is processed, plus two additional columns (k-mer is
+first column, LCR ID is last column).  For the usual case of two genomes, the
+last column is column 12, and you can count the number of LCRs with this command:
+
+  cut -f 12 outFolderForMyProject/LCRs*.tsv | uniq | wc -l
+
+This command line is also included in shell file code/countLCRsInLCRfile.sh, which
+automatically computes the last column number and counts LCRs, given two arguments:
+the LCRs file name and the value of N_GENOMES (number of genomes).  For example:
+
+  source code/shell/countLCRsInLCRfile.sh outFolderForMyProject/LCRs*.tsv 2
 
 If you had too few common k-mers you might also have too few LCRs.  A million or
 more LCRs would be nice. The fewer you have, the fewer markers you are likely to
@@ -578,7 +596,22 @@ The command line to count the primer pairs in both files would look like this:
 Each line of the file contains one pair of primers.  Each pair is an e-PCR-validated
 IGG marker, essentially the final output of the pipeline.
 
-The columns in the Markers* file are described in Table 1.
+If you are running IGGPIPE with the NDAMIN parameter set greater than 2, you might
+wish to count the number of markers with NDA=2, NDA=3, etc., to see how many markers
+there are with different numbers of distinct amplicons.  The second column of the marker
+files is the NDA column, and this command will search for all such lines with a 2
+in that column and count them:
+
+    cut -f 2 outFolderForMyProject/Markers* | grep -E "^2$" | wc -l
+
+The shell file code/countMarkersInMarkerFile.sh is provided to automate this for all
+values of NDA.  It counts markers, given two arguments: the Markers file name and
+the value of NDAMIN.  It requires a single file name, and won't work if wildcards
+are used to select multiple files. For example:
+
+  source code/shell/countMarkersInMarkerFile.sh outFolderForMyProject/MarkersOverlapping*.tsv 3
+ 
+The columns in the Markers* files are described in Table 1.
 --
 
 . *Run IGGPIPE with the command "make PARAMS=allParameters.XY ALL"*

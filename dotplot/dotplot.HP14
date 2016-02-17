@@ -70,8 +70,8 @@ PTLINE.alpha := 0.5
 # there will be one grid line at the start and one at the end of each chromosome,
 # with the rest spaced evenly between.
 # Also defined here is the grid line color and line width.
-X.grid.lines.per.seqid := 3
-Y.grid.lines.per.seqid := 3
+X.grid.lines.per.seqid := 0
+Y.grid.lines.per.seqid := 0
 GRID.line.color := darkslategray
 GRID.line.width := 1
 
@@ -159,8 +159,8 @@ Y.chr.label.replace := "\1"
 # Axis label text, position, color, and size.  If text is "", no label is plotted.
 # Position is 0 for neutral, negative for inward, positive for outward.  If the
 # text is "", the related values are ignored but still must be present in this file.
-X.axis.label.text := "S. lycopersicum"
-Y.axis.label.text := "S.pennellii"
+X.axis.label.text := "Genome SolyITAG2.4"
+Y.axis.label.text := "Genome SopeV2.0"
 X.axis.label.position := 6
 Y.axis.label.position := 4
 X.axis.label.color := white

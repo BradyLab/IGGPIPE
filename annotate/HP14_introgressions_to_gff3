@@ -39,9 +39,6 @@
 # ITAG2.4".  Then select File, Open, and in Local Files choose Select Files,
 # choose the output file from here, choose Open.  You should see orange bands
 # representing introgressions, spanning long regions of each chromosome.
-#
-# The output file from this is copied to annotate/HP14.savedOutput because
-# it may be useful to people.
 ################################################################################
 
 ################################################################################
