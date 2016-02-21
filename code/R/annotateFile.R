@@ -37,6 +37,7 @@ testing = 0
 #testing = 5 # For testing only.
 #testing = 6 # For testing only.
 #testing = 7 # For testing only.
+#testing = 8 # For testing only.
 {
 if (testing == 0)
     args = commandArgs(TRUE)
@@ -57,6 +58,8 @@ else
         args = "annotate/test_add_genesColumn.markers"
     else if (testing == 7)
         args = "annotate/test_add_isInNearColumn.markers"
+    else if (testing == 8)
+        args = "annotate/HPT14_300_1500_50_300_to_gff3.overlapping"
     else
         stop("Unknown value for 'testing'")
     }

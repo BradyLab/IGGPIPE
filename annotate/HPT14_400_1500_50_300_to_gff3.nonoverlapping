@@ -1,6 +1,6 @@
 ################################################################################
 # Same as HPT14_300_1500_50_300_to_gff3.overlapping except the .gff3 file is
-# created from the allParameters.HPT14_300_1500_50_300 file of non-overlapping
+# created from the allParameters.HPT14_400_1500_50_300 file of non-overlapping
 # markers.
 ################################################################################
 

@@ -2,7 +2,7 @@
 # Parameter file for annotateFile.R to convert the IGG marker file generated
 # by allParameters.HP14_400_1500_50_300 for the S. lycopersicum ITAG2.4 and
 # S. pennellii V2.0 genomes into a .gff3 file that could be used to display
-# markers as a browser track:
+# markers as a browser track of an S. lycopersicum genome browser:
 #   1. Reads outHP14/MarkersOverlapping_K14k2L400D10_1500A400_1500d50_300N2F0X20V3000W8M3G1.tsv
 #   2. Adds fixed column "source" containing "IGG.markers" 
 #   3. Adds fixed column "feature" containing "genetic_marker"

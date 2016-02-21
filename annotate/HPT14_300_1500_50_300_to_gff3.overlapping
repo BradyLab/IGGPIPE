@@ -1,6 +1,45 @@
 ################################################################################
-# Same as HP14_400_1500_50_300_to_gff3.overlapping except the .gff3 file is
-# created from the allParameters.HP14_300_800_200 file of overlapping markers.
+# Parameter file for annotateFile.R to convert the IGG marker file generated
+# by allParameters.HPT14_300_1500_50_300 for the S. lycopersicum ITAG2.4,
+# S. pennellii V2.0, and S. tuberosum PGSC DM V4.03 genomes into a .gff3 file
+# that could be used to display markers as a browser track of an S. lycopersicum
+# genome browser:
+#   1. Reads outHPT14/MarkersOverlapping_K14k2L300D5_1500A300_1500d50_300N2F0X15V2500W8M0G0.tsv
+#   2. Adds fixed column "source" containing "IGG.markers" 
+#   3. Adds fixed column "feature" containing "genetic_marker"
+#       (Sequence Ontology term SO:0001645)
+#   4. Adds fixed column "score" containing "." (no score)
+#   5. Adds fixed column "strand" containing "." (not stranded)
+#   6. Adds fixed column "frame" containing "." (no frame)
+#   7. Adds an "attributes" column, creating attributes from the following input
+#       data columns and using the column name as the attribute name, in this order:
+#           ID, HampLen, PampLen, TampLen, PHdif, THdif, prmSeqL, prmSeqR, prmTmL, prmTmR,
+#           PHphase, THphase, Hpct, Ppct, Tpct, Pid, PampPos1, PampPos2, Tid, TampPos1, TampPos2
+#   8. Writes the data to .gff3 file:
+# outHPT14/MarkersOverlapping_K14k2L300D5_1500A300_1500d50_300N2F0X15V2500W8M0G0.gff3
+#       using data taken from these input columns:
+#           seqname: Hid
+#           source: source
+#           feature: feature
+#           start: HampPos1
+#           end: HampPos2
+#           score: score
+#           strand: strand
+#           frame: frame
+#           attributes: attributes
+#
+# This data file can be added as a track to the solgenomics.net S. lycopersicum
+# ITAG2.4 JBrowse genome browser.  Suggestion: rename the file to what you want
+# the track named.  Then, go to solgenomics.net, select Genomes, Tomato, and
+# in the Download section, choose Genome Browser.  In JBrowse browser, select
+# File, Open, and in Local Files choose Select Files, choose the output file
+# from here, choose Open.  In the browser make sure your track and "ITAG2.4
+# gene models" tracks are selected at the left.  In the drop-down box choose
+# chromosome 1 (SL2.50ch01) and enter "SL2.50ch01:39198..43998" in the position
+# box.  You should see orange bands representing markers, labelled IGG_HP14_XXXX
+# etc.  Clicking on a marker shows its attributes, such as primer sequences.
+# Change band color by clicking on the track label popdown, select "Edit config",
+# and then within the '"style": {' brace block add ', "color": "blue"'
 ################################################################################
 
 ################################################################################
@@ -12,20 +51,20 @@
 # (if one is done) and is the "target" data written to the output file.
 
 inputFileT:
-    path := "outHP14/MarkersOverlapping_K14k4L300D1_800A300_800d200_200N2F0X20V3000W8M3G1.tsv"
+    path := "outHPT14/MarkersOverlapping_K14k2L300D5_1500A300_1500d50_300N2F0X15V2500W8M0G0.tsv"
     type := tsv
     quote := ""
     comment := ""
-    keepColumns := "ID,Hid,HampPos1,HampPos2,HampLen,PampLen,PHdif,prmSeqL,prmSeqR,prmTmL,prmTmR,PHphase,Hpct,Ppct,Pid,PampPos1,PampPos2"
-    addColNames := "source,feature,score,strand,frame"
-    addColValues := "IGG.markers,genetic_marker,.,.,."
+    keepColumns := "ID,Hid,HampPos1,HampPos2,HampLen,PampLen,TampLen,PHdif,THdif,prmSeqL,prmSeqR,prmTmL,prmTmR,PHphase,THphase,Hpct,Ppct,Tpct,Pid,PampPos1,PampPos2,Tid,TampPos1,TampPos2"
+    addColNames := "ID,source,feature,score,strand,frame"
+    addColValues := "ID_{/Hpct/\.[0-9]*$/}_{#3},IGG.markers,genetic_marker,.,.,."
 
 ################################################################################
 # Output file attribute creation parameters.
 ################################################################################
 
 attrCreation:
-    columnsForAttrs := "ID,HampLen,PampLen,PHdif,prmSeqL,prmSeqR,prmTmL,prmTmR,PHphase,Hpct,Ppct,Pid,PampPos1,PampPos2"
+    columnsForAttrs := "ID,HampLen,PampLen,TampLen,PHdif,THdif,prmSeqL,prmSeqR,prmTmL,prmTmR,PHphase,THphase,Hpct,Ppct,Tpct,Pid,PampPos1,PampPos2,Tid,TampPos1,TampPos2"
     attributesColumn := attributes
     merge := NO
     remove := YES
@@ -35,7 +74,7 @@ attrCreation:
 ################################################################################
 
 outputFile:
-    path := "outHP14/MarkersOverlapping_K14k4L300D1_800A300_800d200_200N2F0X20V3000W8M3G1.gff3"
+    path := "outHPT14/MarkersOverlapping_K14k2L300D5_1500A300_1500d50_300N2F0X15V2500W8M0G0.gff3"
     type := gff3
     outColNames := "Hid,source,feature,HampPos1,HampPos2,score,strand,frame,attributes"
     newColNames := "seqname,source,feature,start,end,score,strand,frame,attributes"
