@@ -185,16 +185,17 @@ refContigPosCol = contigPosCol[refGenome]
 # Find LCRs.
 ########################################
 
-# Smallest number of common unique k-mers to process at one time.  We do not
-# process all of them at once because the memory requirements may be too intensive.
-# However, we must process all k-mers of a given contig together.  We will do even
-# more than that, and process all k-mers of a given reference genome sequence ID
-# together.  The input common unique k-mer file is sorted by reference genome
-# sequence ID and position.  Therefore, we will read in MIN_KMERS_AT_ONCE
-# common unique k-mers from this file, then continue reading in MIN_KMERS_AT_ONCE
-# additional k-mers at a time, until we encounter the next sequence ID.  Then, we
-# will process all k-mers prededing that next sequence ID, then move on to repeat
-# the process.
+# MIN_KMERS_AT_ONCE is the smallest number of common unique k-mers to process at
+# one time.  We do not process ALL k-mers at once because the memory requirements
+# may be too intensive.  However, we must process all k-mers of a given contig
+# together.  We will do even more than that, and process all k-mers of a given
+# reference genome sequence ID together.  The input common unique k-mer file is
+# sorted by reference genome sequence ID and position.  Therefore, we will read
+# in MIN_KMERS_AT_ONCE common unique k-mers from this file, then continue reading
+# in MIN_KMERS_AT_ONCE additional k-mers at a time, until we encounter the next
+# sequence ID.  Then, we will process all k-mers prededing that next sequence ID,
+# then move on to repeat the process, including the k-mers just read but not
+# processed as part of the next batch.
 MIN_KMERS_AT_ONCE = 500000
 
 # Open the input file and read the first MIN_KMERS_AT_ONCE k-mers.
@@ -712,8 +713,8 @@ while (nrow(kmerBufferDf) > 0)
     ############################################################################
     # Define a function to apply the discontinuity testing.  LL is a list with
     # these members:
-    #   lcr: data frame containing k-mers being tested, all assigned to same LCR,
-    #       and sorted in reference genome order.
+    #   lcr: data frame containing k-mers being tested, all assigned to the same
+    #       LCR, and sorted in reference genome order.
     #   deferred: NULL or data frame of k-mers that have been removed (via
     #       previous calls to this with the same LCR number) from data frame lcr
     #       because they don't satisfy requirements, but that may form a separate

@@ -8,7 +8,7 @@
 ################################################################################
 
 inputFileT:
-    path := "outHPT14/MarkersNonoverlapping_K14k2L300D5_1500A300_1500d50_300N2F0X15V2500W8M0G0.tsv"
+    path := "outHPT14_400_1500_50_300/MarkersNonoverlapping_K14k4L400D1_1500A400_1500d50_300N2F0X10V2500W8M0G0.tsv"
     type := tsv
     quote := ""
     comment := ""
@@ -82,7 +82,7 @@ mergeCols:
 ################################################################################
 
 outputFile:
-    path := "outHPT14/MarkersNonoverlappingWithGenes_K14k2L300D5_1500A300_1500d50_300N2F0X15V2500W8M0G0.tsv"
+    path := "outHPT14_400_1500_50_300/MarkersNonoverlappingWithGenes_K14k4L400D1_1500A400_1500d50_300N2F0X10V2500W8M0G0.tsv"
     type := tsv
     header := YES
     quote := NO

@@ -77,6 +77,15 @@ CMD_DELETE := rm -fd
 CMD_DELETE_WHEN_CLEANING := $(CMD_TRASH)
 
 
+# Command to use for timing and measuring memory usage of pipeline commands when
+# the TIME_CMDS variable is set to YES in the allParameters.* file.  The shell
+# usually provides the simple command "time", which provides user and system CPU
+# time usage as well as real time passed.  Often another time utility is available
+# in /usr/bin/time that provides more information such as memory usage.
+
+CMD_TIME := time
+
+
 # The parameters ABOVE these comments are critical parameters that must always
 # be set in a new installation of IGGPIPE.  For a quick start, you are finished!
 

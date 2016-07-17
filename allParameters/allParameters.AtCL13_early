@@ -1,9 +1,8 @@
 ################################################################################
 ################################################################################
 
-# This is an IGGPIPE parameter file example for doing a 3-species analysis of
-# S. lycopersicum (tomato) (H), S. pennellii (P), and S. tuberosum (potato) (T)
-# genomes.
+# This is an IGGPIPE parameter file example for doing a 2-species analysis of
+# A. thaliana ecotype Col-0 (C) (TAIR10 release) and Ler-0 (L) genomes.
 
 ################################################################################
 ################################################################################
@@ -18,7 +17,10 @@
 # letter K here.
 ################################################################################
 
-K := 14
+# For Col-0 and Ler-0, which are extremely similar, there will be a huge number
+# of common unique k-mers at k=14.  Use k=13 for faster processing.
+
+K := 13
 
 
 ################################################################################
@@ -27,7 +29,7 @@ K := 14
 # include one definition per genome.
 ################################################################################
 
-N_GENOMES := 3
+N_GENOMES := 2
 
 
 # Genome numbers, starting at 1, separated from each other by a space.  If
@@ -35,7 +37,7 @@ N_GENOMES := 3
 # it seems to be very difficult to generate this sequence automatically in 'make',
 # as, despite all its macros, it has no concept of arithmetic and counting.
 
-GENOME_NUMBERS := 1 2 3
+GENOME_NUMBERS := 1 2
 
 
 ################################################################################
@@ -53,13 +55,12 @@ GENOME_NUMBERS := 1 2 3
 # letter for each one.
 ################################################################################
 
-# H = Solanum lycopersicum (Heinz tomato) genome (reference genome)
-# P = Solanum pennellii genome
-# T = Solanum tuberosum (potato) genome
+# In this example, we use two genomes, the Arabidopsis thaliana ecotype Col-0
+# genome (letter C) and the Ler-0 ecotype genome (letter L).  The Col-0 genome
+# is the reference genome.
 
-GENOME_1 := H
-GENOME_2 := P
-GENOME_3 := T
+GENOME_1 := C
+GENOME_2 := L
 
 
 # Combine the above letters together with one space between each letter.
@@ -92,30 +93,28 @@ DIR_IGGPIPE_OUT := out$(GENOME_LETTERS_SQUISHED)$(K)
 # (This example assumes that an environment variable named "BRADYLAB" has been
 # defined, that gives the path to a high-level directory.)
 
-DIR_GENOME_DATA := $(BRADYLAB)/Genomes
+DIR_GENOME_DATA := $(BRADYLAB)/Genomes/At
 
 
 # Directories containing the FASTA files for the N_GENOMES genomes.
 # (This example uses the DIR_GENOME_DATA variable above to define the directories
 # containing files for the two genomes to be run through the IGGPIPE pipeline.)
 
-DIR_GENOME_DATA_1 := $(DIR_GENOME_DATA)/Soly/ITAG2.4_release
-DIR_GENOME_DATA_2 := $(DIR_GENOME_DATA)/Sope/V2.0genome
-DIR_GENOME_DATA_3 := $(DIR_GENOME_DATA)/Sotu/DM/V403genome
+DIR_GENOME_DATA_1 := $(DIR_GENOME_DATA)
+DIR_GENOME_DATA_2 := $(DIR_GENOME_DATA)/Ler
 
 
 # Paths of the N_GENOMES FASTA files containing the genome sequences being
 # analyzed.  Each variable name must be the string "PATH_GENOME_FASTA_" followed
 # by the genome number.
 
-# The ITAG2.4_genomic.fasta genome is the latest tomato genome release from solGenomics.net.
-# The Spenn.fasta genome is the recent S. pennellii genome release from solGenomics.net.
-# The PGSC_DM_v4.03_genomic.fasta genome is file PGSC_DM_v4.03_pseudomolecules.fasta.zip
-# from http://potato.plantbiology.msu.edu/data.
+# The TAIR10_chr.fasta genome is the latest A. thaliana Col-0 genome release from
+# TAIR (Arabidopsis.org).  The Ler_0.v0.7.fasta genome is from the Wellcome Trust
+# Centre for Human Genetics (http://mus.well.ox.ac.uk) as part of the 19 genomes
+# for Arabidopsis.
 
-PATH_GENOME_FASTA_1 := $(DIR_GENOME_DATA_1)/ITAG2.4_genomic.fasta
-PATH_GENOME_FASTA_2 := $(DIR_GENOME_DATA_2)/Spenn.fasta
-PATH_GENOME_FASTA_3 := $(DIR_GENOME_DATA_3)/PGSC_DM_v4.03_genomic.fasta
+PATH_GENOME_FASTA_1 := $(DIR_GENOME_DATA_1)/TAIR10_chr.fasta
+PATH_GENOME_FASTA_2 := $(DIR_GENOME_DATA_2)/Ler_0.v0.7.fasta
 
 
 # Directory in which to place output files that are generated from the FASTA files.
@@ -188,14 +187,17 @@ PATH_COMMON_UNIQUE_KMERS := $(DIR_KMERS)/common.unique.kmers
 # since that is the minimum number of k-mers in an LCR that could result
 # in an Indel Group call.
 
-KMIN := 2
+# Since Col-0 and Ler-0 are so similar, it should be easy to get large numbers
+# of sequential k-mers, so set this larger.
+
+KMIN := 10
 
 
 # Minimum acceptable length of an LCR in base-pairs.  This is normally equal
 # to the minimum acceptable amplicon size AMIN (defined below), although it
 # could be larger.  Smaller values make more LCRs and increase computation time.
 
-LMIN := 300
+LMIN := 400
 
 
 # Minimum distance in bp between two adjacent k-mers in an LCR.  If two k-mers are
@@ -203,7 +205,10 @@ LMIN := 300
 # a series of back-to-back k-mers in a conserved region from satisfying the KMIN
 # setting or MINFLANK setting.  A value in the range of k would be reasonable.
 
-DMIN := 5
+# Since Col-0 and Ler-0 are so similar, set this larger than normal to reduce
+# the large number of possible overlapping indel regions to be tested.
+
+DMIN := 30
 
 
 # Maximum distance in bp between two adjacent k-mers in an LCR.  If two adjacent
@@ -217,7 +222,7 @@ DMAX := 1500
 
 # Minimum IGG marker amplicon size in any genome.
 
-AMIN := 300
+AMIN := 400
 
 
 # Maximum IGG marker amplicon size in any genome.  The amplicon size will always
@@ -279,7 +284,10 @@ NDAMIN := 2
 # there is no reason not to leave this set to 0.  For the purpose of finding
 # Indel Groups only, you may want to use a larger value than 0.
 
-MINFLANK := 0
+# Since Col-0 and Ler-0 are so similar, there will be lots of common unique k-mers
+# so set this a bit larger to reduce the number of candidate indels to be tested.
+
+MINFLANK := 2
 
 
 # Two files of Indel Groups are produced, one of overlapping Indel Groups and
@@ -339,7 +347,7 @@ OVERLAP_REMOVAL := MIN
 # a primer designed and so will be rejected.  All bases of the k-mer are of
 # course identical across all genomes.
 
-EXTENSION_LEN := 15
+EXTENSION_LEN := 20
 
 
 # Maximum deviation in base pairs from expected amplicon size of off-target
@@ -348,7 +356,7 @@ EXTENSION_LEN := 15
 # whose size is within this amount of the target amplicon size, then you want
 # that marker to be marked bad and deleted.
 
-EPCR_MAX_DEV := 2500
+EPCR_MAX_DEV := 5000
 
 
 # Size, in base pairs, of a "hash word" in the e-PCR program.  This parameter has
@@ -384,7 +392,7 @@ EPCR_MAX_MISMATCH := 0
 # (electronic PCR) testing of the candidate markers.  Set this to a size where,
 # if there is an off-target approximate primer match with this many or fewer
 # gaps in the mismatch, then you want that marker to be marked bad and deleted.
-# Larger values increase computation time.
+# Larger values increase computation time and reduce number of markers obtained.
 
 EPCR_MAX_GAPS := 0
 
@@ -393,7 +401,7 @@ EPCR_MAX_GAPS := 0
 # column in the marker output file consists of the following prefix, followed by
 # the sequential number of each marker.  This prefix lets you assign different
 # IDs during different runs of IGGPIPE using different genomes or other parameters.
-ID_PREFIX := IGG_$(GENOME_LETTERS_SQUISHED)$(K)A_
+ID_PREFIX := IGG_$(GENOME_LETTERS_SQUISHED)$(K)_
 
 
 # For plotting number and density of final markers, this parameter sets the
@@ -402,7 +410,7 @@ ID_PREFIX := IGG_$(GENOME_LETTERS_SQUISHED)$(K)A_
 # 2-way and 3-way markers (3 genomes with NDAMIN=2) and want to plot only the
 # 3-way markers count/density, set this to 3.
 
-PLOT_NDAMIN := 3
+PLOT_NDAMIN := $(NDAMIN)
 
 
 # For plotting number and density of final markers, this parameter sets the
@@ -412,7 +420,7 @@ PLOT_NDAMIN := 3
 # lighter gray, and multiple lines must be plotted on top of each other to
 # achieve black pixels.  For example, 0.25 would need 4 markers to get to black.
 
-PLOT_ALPHA := 0.5
+PLOT_ALPHA := 0.35
 
 
 # For finding Indels and SNPs with 'make IndelsSNPs', these parameters set the

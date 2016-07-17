@@ -1,6 +1,20 @@
 ################################################################################
-# Same as HPT14_300_1500_50_300_addGenes.overlapping except the genes column is
-# added to the allParameters.HPT14_400_1500_50_300 file of overlapping markers.
+# Parameter file for annotateFile.R to add an "isInNear" column to the IGG marker
+# Indel Groups  file in subfolder outCL13 named:
+#       outCL13/IndelGroupsNonoverlapping_K13k4L100D1_3000A100_3000d100_100N2F0.snps.tsv
+# The "isInNear" column gives the CDSs, introns, five-prime-utr's, and three-
+# prime-utrs overlapping or within 1000 bp up/downstream of each Indel Group,
+# and the position of the feature in base-pairs from the Indel Group.
+#   1. Reads as inputFileT the file shown above.
+#   2. Reads as inputFileS the TAIR10 gene model gff3 file from an external directory.
+#   3. Adds a new column to the inputFileS data, extracting the attribute named
+#       "ID" from "CDS", "intron", "five_prime_utr", and "three_prime_utr" feature
+#       rows and placing it in new column "ID".
+#   4. Performs a match-and-merge operation between the two files and adds column
+#       "isInNear" to the inputFileT data, containing feature name, strand, and
+#       relative base pair position of the feature relative to the marker.
+#   5. Writes the new inputFileT data to subfolder outCL13 to this file:
+#       outCL13/IndelGroupsNonoverlappingWithInNearFeatures_K13k4L100D1_3000A100_3000d100_100N2F0.snps.tsv
 ################################################################################
 
 ################################################################################
@@ -8,17 +22,15 @@
 ################################################################################
 
 inputFileT:
-    path := "outHPT14_400_1500_50_300/MarkersOverlapping_K14k4L400D1_1500A400_1500d50_300N2F0X10V2500W8M0G0.tsv"
+    path := "outCL13/IndelGroupsNonoverlapping_K13k4L100D1_3000A100_3000d100_100N2F0.snps.tsv"
     type := tsv
-    quote := ""
-    comment := ""
 
 ################################################################################
 # inputFileS parameters.
 ################################################################################
 
 inputFileS:
-    path := "../../Genomes/Soly/ITAG2.4_release/ITAG2.4_gene_models.gff3"
+    path := "../../Genomes/At/TAIR10_GFF3_genes_repaired.gff3"
     type := gff3
 
 ################################################################################
@@ -27,9 +39,8 @@ inputFileS:
 
 attrExtractS:
     attributesColumn := attributes
-    keepFeatures := gene
-    extractAttrs := Alias
-    newAttrColumns := gene
+    keepFeatures := CDS,intron,five_prime_UTR,three_prime_UTR
+    extractAttrs := ID
     missingAttrValues := ""
     removeAttrColumns := YES
 
@@ -38,18 +49,18 @@ attrExtractS:
 ################################################################################
 
 positionT:
-    start := HampPos1
-    end := HampPos2
-    id := Hid
+    id := Cid
+    start := Cpos
+    end := ""
 
 ################################################################################
 # Match and merge: inputFileS position columns.
 ################################################################################
 
 positionS:
+    id := seqname
     start := start
     end := end
-    id := seqname
 
 ################################################################################
 # Match and merge: Match method for matching rows from inputFileT with rows from
@@ -59,8 +70,8 @@ positionS:
 match:
     method := S.NEAR
     closest := 0
-    start.down := 3000
-    end.up := 3000
+    start.down := 1000
+    end.up := 1000
 
 ################################################################################
 # Match and merge: columns to add and the format of the new column data.
@@ -68,19 +79,16 @@ match:
 
 mergeCols:
     1:
-        col := genes
-        before := NDA
+        col := isInNear
         maxMatch := 0
-        join := YES
-        joinSep := ","
-        format := "{+gene}({#T}:{+strand})" # E.g. "Solyc07g008570(@384:+)" means plus strand, gene overlaps with marker starting 384 bp marker start.
+        format := "{+ID}({#T}:{+strand})" # E.g. "intron:AT2G14270(@384:+)" means plus strand, intron overlaps with marker starting 384 bp after marker start.
 
 ################################################################################
 # Output file parameters.
 ################################################################################
 
 outputFile:
-    path := "outHPT14_400_1500_50_300/MarkersOverlappingWithGenes_K14k4L400D1_1500A400_1500d50_300N2F0X10V2500W8M0G0.tsv"
+    path := "outCL13/IndelGroupsNonoverlappingWithInNearFeatures_K13k4L100D1_3000A100_3000d100_100N2F0.snps.tsv"
     type := tsv
     header := YES
     quote := NO

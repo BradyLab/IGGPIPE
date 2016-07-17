@@ -671,8 +671,8 @@ PATH_LCB_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_LCB_FILE)$(SFX_LCB_FILE).tsv
 PATH_INDELS_SNPS_INPUT_FILE := $(PATH_LCB_FILE)
 
 
-# Path of input file containing DNA sequences merged with LCRs/Indel Groups/Markers
-# data, used only if 'make IndelsSNPs' command is run to find Indels and SNPs.
+# Path of input file containing DNA sequences merged with LCBs or Indel Groups or
+# Markers data, used only if 'make IndelsSNPs' command is run to find Indels and SNPs.
 
 PATH_INDELS_SNPS_SEQS_FILE := $(basename $(PATH_INDELS_SNPS_INPUT_FILE)).withseqs$(suffix $(PATH_INDELS_SNPS_INPUT_FILE))
 

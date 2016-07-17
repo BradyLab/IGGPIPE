@@ -44,8 +44,8 @@ IGGPIPE will not work on 32-bit Windows systems.
 --
 Before starting the installation, consider whether the computer on which the
 software is to be installed has enough memory for the problem at hand. We have
-been running IGGPIPE using 16GB of RAM, and we recommend no less than that amount.
-For larger genomes or more genomes, you will possibly need more. The computer we
+been running IGGPIPE using 16GB of RAM, and we recommend that amount or more,
+although depending on your genomes, you may get by with less.  The computer we
 used has a 2.4 GHz processor, which has been adequate. You should monitor memory
 usage while the pipeline is running, and if it becomes excessive for your computer,
 you know you will need more memory to run those genomes.

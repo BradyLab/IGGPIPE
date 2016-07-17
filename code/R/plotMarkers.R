@@ -1,7 +1,7 @@
 ################################################################################
 # See usage below for description.
 # Author: Ted Toal
-# Date: 2013-2015
+# Date: 2013-2016
 # Brady Lab, UC Davis
 ################################################################################
 
@@ -27,6 +27,8 @@ testing = 0
 #testing = 1 # For testing only.  .test
 #testing = 2 # For testing only.  .HP
 #testing = 3 # For testing only.  .TaCW
+#testing = 4 # For testing only.  .AtCL
+#testing = 5 # For testing only.  .HPT
 {
 if (testing == 0)
     args = commandArgs(TRUE)
@@ -56,6 +58,25 @@ else if (testing == 3)
         "outTaCW15/MarkerCounts_K15k2L200D5_1000A200_1000d50_200N2F0X20V3000W9M3G1",
         "outTaCW15/MarkerDensity_K15k2L200D5_1000A200_1000d50_200N2F0X20V3000W9M3G1",
         "outTaCW15/GenomeData/Genome_1.idlens", "outTaCW15/GenomeData/Genome_2.idlens")
+    }
+else if (testing == 4)
+    {
+    args = c("~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE", 2, 0.85,
+        "outCL13/MarkersOverlapping_K13k4L400D15_1500A400_1500d50_300N2F2X20V5000W8M0G0.tsv",
+        "outCL13/MarkersNonoverlapping_K13k4L400D15_1500A400_1500d50_300N2F2X20V5000W8M0G0.tsv",
+        "outCL13/MarkerCounts_K13k4L400D15_1500A400_1500d50_300N2F2X20V5000W8M0G0",
+        "outCL13/MarkerDensity_K13k4L400D15_1500A400_1500d50_300N2F2X20V5000W8M0G0",
+        "outCL13/GenomeData/Genome_1.idlens", "outCL13/GenomeData/Genome_2.idlens")
+    }
+else if (testing == 5)
+    {
+    args = c("~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE", 2, 0.8,
+        "outHPT14/MarkersOverlapping_K14k2L300D5_1500A300_1500d50_300N2F0X15V2500W8M0G0.tsv",
+        "outHPT14/MarkersNonoverlapping_K14k2L300D5_1500A300_1500d50_300N2F0X15V2500W8M0G0.tsv",
+        "outHPT14/MarkerCounts_K14k2L300D5_1500A300_1500d50_300N2F0X15V2500W8M0G0",
+        "outHPT14/MarkerDensity_K14k2L300D5_1500A300_1500d50_300N2F0X15V2500W8M0G0",
+        "outHPT14/GenomeData/Genome_1.idlens", "outHPT14/GenomeData/Genome_2.idlens",
+        "outHPT14/GenomeData/Genome_3.idlens")
     }
 else stop("Unknown value for 'testing'")
 }
@@ -203,12 +224,55 @@ catnow("Number of non-overlapping markers:", nrow(dfNoOverlaps), "\n")
 ########################################
 
 # Read the sequence ID/length files for each genome to get a list of all possible
-# sequence IDs and their lengths.
+# sequence IDs and their lengths.  Remove IDs that are not in the dfMarkers.
 idlens = list()
 for (genome in genomeLtrs)
     {
+    id.Col = idCol[genome]
+    theseIDs = sort(unique(dfMarkers[,id.Col]))
     idlens[[genome]] = read.table(idlensFiles[genome], header=TRUE, row.names=1, sep="\t", stringsAsFactors=FALSE)
+    idlens[[genome]] = idlens[[genome]][theseIDs,,drop=FALSE]
     idlens[[genome]]$len = idlens[[genome]]$len * 1e-6 # Convert to Mbp.
+    }
+
+########################################
+# Remove letters that are common to the beginning of all IDs to form shorter ID names
+# that can be used for plotting names on axes.  Make lists of values for las, cex, line,
+# and xlab that depend on how much the names are shortened.
+########################################
+
+las = list()
+cex = list()
+line = list()
+xlab = list()
+for (genome in genomeLtrs)
+    {
+    las[[genome]] = 2
+    cex[[genome]] = 2
+    line[[genome]] = -2
+    xlab[[genome]] = ""
+    S = rownames(idlens[[genome]])
+    N = max(sapply(S, nchar))
+    if (N > 3)
+        {
+        for (i in 1:N)
+            {
+            x = substr(S, 1, i)
+            if (!all(x == x[1]))
+                break
+            }
+        idlens[[genome]]$shortIDs = substr(S, i, N)
+
+        # If the longest shortID is no more than 3 characters long, use las=0,
+        # use an x-axis label, and use larger cex for displaying the IDs.
+        if (max(sapply(idlens[[genome]]$shortIDs, nchar)) <= 3)
+            {
+            las[[genome]] = 0
+            cex[[genome]] = 5
+            line[[genome]] = 0
+            xlab[[genome]] = "Sequence ID"
+            }
+        }
     }
 
 ########################################
@@ -228,8 +292,7 @@ catnow("After NDAmin applied, number of non-overlapping markers:", nrow(dfNoOver
 
 pdfCountsFile = paste(pdfCountsFilePfx, ".plot.pdf", sep="")
 pdf(pdfCountsFile, height=8, width=11)
-par(mar=par("mar")+c(4,2,0,0))
-par(mgp=c(3,1,1))
+par(mar=par("mar")+c(4,2,1,0))
 
 ########################################
 # Plot counts of markers on chromosomes as either a bar or line plot.
@@ -243,17 +306,20 @@ for (genome in genomeLtrs)
     pos1.Col = ampPos1Col[genome]
     NeachID = table(dfMarkers[,id.Col])
     V = NeachID/(idlens[[genome]][names(NeachID), "len"])
+    names(V) = idlens[[genome]][names(V), "shortIDs"]
     NeachID2 = table(dfNoOverlaps[,id.Col])
     V2 = NeachID2/(idlens[[genome]][names(NeachID2), "len"])
     V2 = V2[names(NeachID)]
     # Make either a bar plot or a line plot, depending on number of chromosomes/scaffolds.
     if (length(V) <= 50) # Reasonable maximum number of chromosomes.
         {
-        ylim = range(pretty(c(0, max(V)*1.1)))
-        barplot(V, col="gray", las=2, cex.main=1.5, cex.names=1.5, ylim=ylim, yaxp=c(ylim, 10),
-            ylab="IGG markers per 1 Mbp", cex.lab=2, cex.axis=1.2,
-            main=paste("Density of IGG markers in each FASTA sequence of genome '", genome, "'", sep=""))
+        ylim = range(pretty(c(0, max(V)*1.2)))
+        bp = barplot(V, col="gray", cex.main=2.5, cex.lab=3, cex.axis=2, names.arg=NA,
+            ylim=ylim, yaxp=c(ylim, 10), mgp=c(4,1,0),
+            xlab=xlab[[genome]], ylab="IGG markers per 1 Mbp",
+            main=paste("IGG markers density in genome '", genome, "'", sep=""))
         barplot(V2, width=0.5, space=c(1.4, 0.9), col="blue", add=TRUE, axes=FALSE, axisnames=FALSE, main="")
+        mtext(names(V), 1, at=as.vector(bp), cex=cex[[genome]]/2, las=las[[genome]], line=1)
         legend("topright", c("All markers", "Non-overlapping markers"), fill=c("gray", "blue"), cex=1.5)
         }
     else # Assume thousands of scaffolds, do a sorted plot of number per Mbp of scaffold.
@@ -273,7 +339,7 @@ for (genome in genomeLtrs)
         V2 = V2[ord]
         plot(1:length(V), V, type="l", ylim=ylim, col="black", cex.main=1.5, cex.axis=1.2, log="y",
             xlab="Number of FASTA Sequences", ylab="Density of IGG markers per 1 Mbp", cex.lab=2,
-            main=paste("Density of IGG markers in FASTA sequences of genome '", genome, "'", sep=""))
+            main=paste("IGG marker density in genome '", genome, "'", sep=""))
         lines(1:length(V2), V2, col="blue")
         legend("topleft", c("All markers", "Non-overlapping markers"), lwd=2, col=c("black", "blue"), cex=1.5)
         }
@@ -290,7 +356,6 @@ maxDif = max(abs(ampDifs))
 xpretty = pretty(c(-maxDif, +maxDif), 20)
 xlim = range(xpretty)
 par(mai=c(1,1,1,5))
-par(mgp=c(3,1,0))
 hist(ampDifs, xlim=xlim, breaks=50,
     xlab=paste("Amplicon length difference from genome", refGenomeLtr, sep=""),
     main="Distribution of amplicon length differences", cex.lab=1.5, cex.axis=1.5)
@@ -308,7 +373,7 @@ catnow("Finished making plots of counts of number of good candidate markers, out
 ########################################
 
 # Use the same scale for the y-axis of all plots.
-maxSeqLenMbp = max(unlist(idlens))
+maxSeqLenMbp = max(sapply(idlens, function(df) max(df$len)))
 xlim = c(0, 1.2*maxSeqLenMbp)
 
 # Set the color of the line segments drawn at each marker position.
@@ -339,23 +404,23 @@ for (genome in genomeLtrs)
         }
 
     # Title cex expansion factor needs to be smaller if the number of IDs is small.
-    cex.main = (numIds-2)/4 + 1
-    if (cex.main > 3)
-        cex.main = 3
+    cex.main = (numIds-2)/4 + 2.5
+    if (cex.main > 10)
+        cex.main = 10
 
     # Make the png bitmap width be proportional to the number of sequences in this genome.
     pngDensityFile = paste(pngDensityFilePfx, "_", genome, ".plot.png", sep="")
     png(pngDensityFile, height=1200, width=500+100*numIds)
-    par(mar=par("mar")+c(4,2,0,0))
+    par(mar=par("mar")+c(4,5,1,0))
 
     # Start the plot.
     xlim = c(0, numIds+1)
     ylim = c(0, maxSeqLenMbp)
-    plot(NA, type="n", xlim=xlim, ylim=ylim, cex.main=cex.main,
-        xlab="", ylab="Sequence position (Mbp)", cex.lab=3, axes=FALSE, frame=FALSE,
-        main=paste("Non-overlapping IGG markers in each FASTA sequence of genome '", genome, "'", sep=""))
+    plot(NA, type="n", xlim=xlim, ylim=ylim, cex.main=cex.main, mgp=c(5,1,0), frame=FALSE,
+        xlab=xlab[[genome]], ylab="Sequence position (Mbp)", cex.lab=6, axes=FALSE,
+        main=paste("Non-overlapping IGG markers in genome '", genome, "'", sep=""))
     at = pretty(ylim)
-    axis(2, at=at, line=-2, cex.axis=3)
+    axis(2, at=at, line=-3, cex.axis=6)
 
     # Plot each sequence (chromosome/scaffold).
     for (i in 1:numIds)
@@ -364,7 +429,8 @@ for (genome in genomeLtrs)
         h = 0.4
         x = i - h
         len = idlens[[genome]][id, "len"]
-        mtext(id, 1, at=x, cex=2, las=2, line=-2)
+        shortID = idlens[[genome]][id, "shortIDs"]
+        mtext(shortID, 1, at=x, cex=cex[[genome]], las=las[[genome]], line=line[[genome]])
         rect(x-h, 0, x+h, len)
         pos = dfNoOverlaps[dfNoOverlaps[,id.Col] == id, pos1.Col]*1e-6
         if (length(pos) > 0)

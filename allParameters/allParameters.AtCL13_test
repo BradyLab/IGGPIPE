@@ -55,9 +55,9 @@ GENOME_NUMBERS := 1 2
 # letter for each one.
 ################################################################################
 
-# In this example, we use two genomes, the Heinz tomato genome (letter H) and
-# the Solanum pennellii genome (letter P).  The tomato genome is the reference
-# genome.
+# In this example, we use two genomes, the Arabidopsis thaliana ecotype Col-0
+# genome (letter C) and the Ler-0 ecotype genome (letter L).  The Col-0 genome
+# is the reference genome.
 
 GENOME_1 := C
 GENOME_2 := L
@@ -108,8 +108,10 @@ DIR_GENOME_DATA_2 := $(DIR_GENOME_DATA)/Ler
 # analyzed.  Each variable name must be the string "PATH_GENOME_FASTA_" followed
 # by the genome number.
 
-# The ITAG2.4_genomic.fasta genome is the latest tomato genome release from solGenomics.net.
-# The Spenn.fasta genome is the recent S. pennellii genome release from solGenomics.net.
+# The TAIR10_chr.fasta genome is the latest A. thaliana Col-0 genome release from
+# TAIR (Arabidopsis.org).  The Ler_0.v0.7.fasta genome is from the Wellcome Trust
+# Centre for Human Genetics (http://mus.well.ox.ac.uk) as part of the 19 genomes
+# for Arabidopsis.
 
 PATH_GENOME_FASTA_1 := $(DIR_GENOME_DATA_1)/TAIR10_chr.fasta
 PATH_GENOME_FASTA_2 := $(DIR_GENOME_DATA_2)/Ler_0.v0.7.fasta
@@ -675,8 +677,8 @@ PATH_LCB_FILE := $(DIR_MAIN_OUTPUT)/$(PFX_LCB_FILE)$(SFX_LCB_FILE).tsv
 PATH_INDELS_SNPS_INPUT_FILE := $(PATH_NONOVERLAPPING_MARKERS_FILE)
 
 
-# Path of input file containing DNA sequences merged with LCRs/Indel Groups/Markers
-# data, used only if 'make IndelsSNPs' command is run to find Indels and SNPs.
+# Path of input file containing DNA sequences merged with LCBs or Indel Groups or
+# Markers data, used only if 'make IndelsSNPs' command is run to find Indels and SNPs.
 
 PATH_INDELS_SNPS_SEQS_FILE := $(basename $(PATH_INDELS_SNPS_INPUT_FILE)).withseqs$(suffix $(PATH_INDELS_SNPS_INPUT_FILE))
 

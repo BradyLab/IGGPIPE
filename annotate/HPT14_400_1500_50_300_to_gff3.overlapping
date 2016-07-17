@@ -13,7 +13,7 @@
 # (if one is done) and is the "target" data written to the output file.
 
 inputFileT:
-    path := "outHPT14/MarkersOverlapping_K14k2L300D5_1500A300_1500d50_300N2F0X15V2500W8M0G0.tsv"
+    path := "outHPT14_400_1500_50_300/MarkersOverlapping_K14k4L400D1_1500A400_1500d50_300N2F0X10V2500W8M0G0.tsv"
     type := tsv
     quote := ""
     comment := ""
@@ -36,7 +36,7 @@ attrCreation:
 ################################################################################
 
 outputFile:
-    path := "outHPT14/MarkersOverlapping_K14k2L300D5_1500A300_1500d50_300N2F0X15V2500W8M0G0.gff3"
+    path := "outHPT14_400_1500_50_300/MarkersOverlapping_K14k4L400D1_1500A400_1500d50_300N2F0X10V2500W8M0G0.gff3"
     type := gff3
     outColNames := "Hid,source,feature,HampPos1,HampPos2,score,strand,frame,attributes"
     newColNames := "seqname,source,feature,start,end,score,strand,frame,attributes"

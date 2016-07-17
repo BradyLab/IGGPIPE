@@ -55,10 +55,10 @@ if (length(args) != Nexpected)
         "multiple pieces which we will call 'locally conserved blocks'.  When the common",
         "unique k-mers are sorted in order by any genome, the consecutive k-mers that are",
         "part of the same LCR become an LCB, and when a different LCR interrupts the first",
-        "LCR (i.e. is located in the middle of it; overlaps it), a new LCB is started.  Write"
+        "LCR (i.e. is located in the middle of it; overlaps it), a new LCB is started.  Write",
         "the LCBs to the output file, containing the positions of the LCB k-mers in each",
         "genome, along with their relative phases (+ or - strand relative to reference genome)",
-        "and an LCB ID number.  The contig information that is part of the input file is"
+        "and an LCB ID number.  The contig information that is part of the input file is",
         "dropped.",
         "",
         "Usage: Rscript LCRsToNonoverlappingLCBs.R <wd> <inputFile> <outputFile>",

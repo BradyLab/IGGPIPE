@@ -24,7 +24,7 @@
 #       error message is used as the argument to errfunc().
 #   allowNA: TRUE to allow NAs in result, FALSE not to.
 #   name: the name of the object, to be used in the default error message.  If NULL,
-#       the calling argument name is used.
+#       the 'obj' calling argument name is used.
 #
 # Returns: obj coerced to type.
 #
@@ -457,7 +457,7 @@ getMatchIdxs = function(T.position, S.position, match)
         }
 
     # Sort idxs by column 1 then column 2.
-    idxs = idxs[order(idxs[,1], idxs[,2]),]
+    idxs = idxs[order(idxs[,1], idxs[,2]),,drop=FALSE]
     return(idxs)
     }
 
@@ -770,9 +770,9 @@ formatData = function(format, T.colnames, S.colnames, T.df=NULL, S.df=NULL, idxs
 #       len: (optional) NAME OF THE COLUMN containing the NUMBER OF NUCLEOTIDE BASE PAIRS
 #           of the CONTIG.
 #       end: (optional) NAME OF THE COLUMN containing a number that is the END POSITION
-#           of the CONTIG.  Both "len" and "end" should not be specified, and if they
-#           are, "len" takes precedence.  If neither "len" nor "end" are specified, the
-#           length is taken as 1 bp for all data frame rows.
+#           of the CONTIG.  Both "len" and "end" should not simultaneously be specified,
+#           and if they are, "len" takes precedence.  If neither "len" nor "end" are
+#           specified, the length is taken as 1 bp for all data frame rows.
 # Example: T.pos=list(id="chr", start="pos", len="length")
 #
 # The argument "match" is a list that describes how to compare the position information
@@ -789,7 +789,7 @@ formatData = function(format, T.colnames, S.colnames, T.df=NULL, S.df=NULL, idxs
 #               either one may be a SNP or a CONTIG, and matching requires that the two
 #               are near to one another to the degree specified by the members "closest"
 #               and "start.up", "start.down", "end.up", "end.down".
-#           "T.NEAR": The opposite of T.NEAR, swap S.df and T.df roles.
+#           "T.NEAR": The opposite of S.NEAR, swap S.df and T.df roles.
 #       closest: this is only applicable when method is S/T.NEAR, and it is optional and
 #               if not specified is taken as 0.  It can have one of these values:
 #           0: ALL contigs satisfying the four position limits below are taken as matches.
@@ -815,7 +815,7 @@ formatData = function(format, T.colnames, S.colnames, T.df=NULL, S.df=NULL, idxs
 #               end.up: x.end must be no less than y.start-end.up
 #               end.down: x.end must be no more than y.end+end.down
 #           If any of the values is NA, the test above uses the largest adjacent
-#           x.start-to-x.start or x.end-to-x.end distance 
+#           x.start-to-x.start or x.end-to-x.end distance
 # Example: match=list(method="S.NEAR", start.up=NA, start.down=1000, end.up=1000, end.down=NA, closest=2)
 #
 # The argument "mergeCols" is a list that defines the column names in S.df to be copied to T.df,
@@ -880,7 +880,7 @@ mergeOnMatches = function(T.df, S.df, T.pos, S.pos, match, mergeCols, NULLifEmpt
     {
 
     # Check arguments.  Try to coerce args of the wrong type to the right type.
-    
+
     # Invoke stop with message given by ... or list L (if not NULL), including
     # name of this function in the message.
     error = function(..., L=NULL)
@@ -905,7 +905,7 @@ mergeOnMatches = function(T.df, S.df, T.pos, S.pos, match, mergeCols, NULLifEmpt
             error(name, " must be of length 1", L=list(...))
         return(obj)
         }
-                    
+
     # Call coerceJustOne() with type=class(V), then make sure 'obj' is one of
     # the elements in V, and if not, stop with an appropriate message including
     # the calling name of 'obj', or use ... as the stop message if ... is specified.
@@ -919,7 +919,7 @@ mergeOnMatches = function(T.df, S.df, T.pos, S.pos, match, mergeCols, NULLifEmpt
             error(name, " must be one of ", paste(V, collapse=", "), L=list(...))
         return(obj)
         }
-                    
+
     # Make sure 'obj' has a member named 'mem' and if not, stop with an
     # appropriate message including the calling name of 'obj'.
     requireMember = function(obj, mem)
@@ -935,12 +935,14 @@ mergeOnMatches = function(T.df, S.df, T.pos, S.pos, match, mergeCols, NULLifEmpt
     requireNonNAcolName = function(obj, mem, V, Vname)
         {
         objName = deparse(substitute(obj))
-        if (!is.character(obj[[mem]]) || length(obj[[mem]]) != 1)
-            error(objName, "[[", mem, "]] must be a single character string")
+        if (length(obj[[mem]]) != 1)
+            error(objName, "[[", mem, "]] must be of length 1 but is of length ", length(obj[[mem]]))
+        if (!is.character(obj[[mem]]))
+            error(objName, "[[", mem, "]] must be a character string but is '", obj[[mem]], "'")
         if (is.na(obj[[mem]]))
-            error(objName, "[[", mem, "]] must be not be NA")
+            error(objName, "[[", mem, "]] must be not be NA but is '", obj[[mem]], "'")
         if (!obj[[mem]] %in% V)
-            error(objName, "[[", mem, "]] must be a ", Vname)
+            error(objName, "[[", mem, "]] must be a ", Vname, " but is '", obj[[mem]], "'")
         }
 
     # Coerce vector 'V' to an integer and make sure it has no NAs.  If this fails,
@@ -1043,7 +1045,7 @@ mergeOnMatches = function(T.df, S.df, T.pos, S.pos, match, mergeCols, NULLifEmpt
             L[["joinSep"]] = ","
         if (is.null(L[["joinSfx"]]))
             L[["joinSfx"]] = ""
-            
+
         for (S in c("col", "before", "format", "maxMatch", "join", "joinPfx", "joinSep", "joinSfx"))
             {
             if (is.null(L[[S]]))

@@ -1,7 +1,7 @@
 ################################################################################
 # Parameter file for annotateFile.R to add an "isInNear" column to the IGG marker
 # Indel Groups file in subfolder outHP14 named:
-#       outHP14/IndelGroupsNonoverlapping_K14k2L100D1_3000A100_3000d100_100N2F0.indels.tsv 
+#       outHP14/IndelGroupsNonoverlapping_K14k4L100D1_3000A100_3000d100_100N2F0.snps.tsv 
 # The "isInNear" column gives the CDSs, introns, five-prime-utr's, and three-
 # prime-utrs overlapping or within 1000 bp up/downstream of each Indel Group,
 # and the position of the feature in base-pairs from the Indel Group.
@@ -14,7 +14,7 @@
 #       "isInNear" to the inputFileT data, containing feature name, strand, and
 #       relative base pair position of the feature relative to the marker.
 #   5. Writes the new inputFileT data to subfolder outHP14 to this file:
-#       IndelGroupsNonoverlappingWithInNearFeatures_K14k2L100D1_3000A100_3000d100_100N2F0.indels.tsv
+#       IndelGroupsNonoverlappingWithInNearFeatures_K14k4L100D1_3000A100_3000d100_100N2F0.snps.tsv
 ################################################################################
 
 ################################################################################
@@ -22,7 +22,7 @@
 ################################################################################
 
 inputFileT:
-    path := "outHP14/IndelGroupsNonoverlapping_K14k2L100D1_3000A100_3000d100_100N2F0.indels.tsv"
+    path := "outHP14/IndelGroupsNonoverlapping_K14k4L100D1_3000A100_3000d100_100N2F0.snps.tsv"
     type := tsv
 
 ################################################################################
@@ -50,8 +50,8 @@ attrExtractS:
 
 positionT:
     id := Hid
-    start := Hstart
-    end := Hend
+    start := Hpos
+    end := ""
 
 ################################################################################
 # Match and merge: inputFileS position columns.
@@ -69,7 +69,7 @@ positionS:
 
 match:
     method := S.NEAR
-    closest := 1
+    closest := 0
     start.down := 1000
     end.up := 1000
 
@@ -88,7 +88,7 @@ mergeCols:
 ################################################################################
 
 outputFile:
-    path := "outHP14/IndelGroupsNonoverlappingWithInNearFeatures_K14k2L100D1_3000A100_3000d100_100N2F0.indels.tsv"
+    path := "outHP14/IndelGroupsNonoverlappingWithInNearFeatures_K14k4L100D1_3000A100_3000d100_100N2F0.snps.tsv"
     type := tsv
     header := YES
     quote := NO

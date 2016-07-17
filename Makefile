@@ -13,7 +13,7 @@
 # only if the prerequisite includes $$.  If it does, the first (normal) expansion
 # changes $$ to a single $.  Then, the second expansion expands that $, which
 # would normally be followed by something that included $* (the "stem" match of
-# a static pattern rule.  Thus, $$(VAR_NAME_PREFIX$$*) would allow a nested
+# a static pattern rule).  Thus, $$(VAR_NAME_PREFIX$$*) would allow a nested
 # variable reference where the variable name ends in a value equal to the stem
 # of the static pattern rule.  We use the genome number as the stem value here.
 .SECONDEXPANSION:
@@ -74,6 +74,8 @@ endif
 ################################################################################
 usage:
 	less help.txt
+help:
+	less help.txt
 
 ################################################################################
 # If user invokes 'make clean', give him some instructions on how to clean.
@@ -109,7 +111,7 @@ endif
 # If variable TIME_CMDS is YES, set TIME and REDIR to time commands and redirect
 # stderr to stdout.  If not YES, leave these empty.
 ifeq ($(TIME_CMDS),YES)
-TIME := (time
+TIME := ($(CMD_TIME)
 REDIR := ) 2>&1
 endif
 
@@ -194,6 +196,7 @@ TARGET_IDLEN := $(PFX_GENOME_DATA_FILE)$(GENOME).idlens
 endif
 
 # Phony target to make or clean TARGET_IDLEN file(s).
+.PHONY: getSeqInfo
 ifeq ($(CLEAN),)
 getSeqInfo: $(TARGET_IDLEN)
 	@echo
@@ -214,7 +217,8 @@ $(IDLEN_FILES) : $(PFX_GENOME_DATA_FILE)%.idlens : $$(PATH_GENOME_FASTA_$$*) | \
 	@echo
 	@echo "*** getSeqInfo PARAMS=$(PARAMS) GENOME=$* ***"
 	@echo "Extracting sequence IDs and lengths from $< into $@"
-	$(TIME) $(CMD_PERL) $(PATH_EXTRACT_SEQ_IDS) $< $@ $(REDIR)
+	$(TIME) \
+		$(CMD_PERL) $(PATH_EXTRACT_SEQ_IDS) $< $@ $(REDIR) ### getSeqInfo_$*
 	@echo "Finished."
 
 ################################################################################
@@ -234,6 +238,7 @@ TARGET_CONTIG := $(PFX_GENOME_DATA_FILE)$(GENOME).contigs
 endif
 
 # Phony target to make or clean TARGET_CONTIG file(s).
+.PHONY: getContigFile
 ifeq ($(CLEAN),)
 getContigFile: $(TARGET_CONTIG)
 	@echo
@@ -254,7 +259,8 @@ $(CONTIG_FILES) : $(PFX_GENOME_DATA_FILE)%.contigs : $$(PATH_GENOME_FASTA_$$*) |
 	@echo
 	@echo "*** getContigFile PARAMS=$(PARAMS) GENOME=$* ***"
 	@echo "Extracting contig positions and lengths from $< into $@"
-	$(TIME) $(PATH_FINDMERS) -f $@ $< $(REDIR)
+	$(TIME) \
+		$(PATH_FINDMERS) -f $@ $< $(REDIR) ### getContigFile_$*
 	@echo "Finished."
 
 ################################################################################
@@ -281,6 +287,7 @@ TARGET_TEXT_KMERS := $(PFX_KMERS_DATA_FILE)$(GENOME).kmers.txt
 endif
 
 # Phony target to make or clean TARGET_BINARY_KMERS file(s).
+.PHONY: getKmers
 ifeq ($(CLEAN),)
 getKmers: $(TARGET_TEXT_KMERS)
 	@echo
@@ -300,7 +307,8 @@ $(KMERS_BINARY_FILES) : $(PFX_KMERS_DATA_FILE)%.kmers : $$(PATH_GENOME_FASTA_$$*
 	@echo
 	@echo "*** getKmers PARAMS=$(PARAMS) GENOME=$* ***"
 	@echo "Extracting unique $(K)-mers from $< into binary file $@"
-	$(TIME) $(CMD_JELLYFISH) count -C -m $(K) -s $(JELLYFISH_HASH_SIZE) -U 1 -o $@ $< $(REDIR)
+	$(TIME) \
+		$(CMD_JELLYFISH) count -C -m $(K) -s $(JELLYFISH_HASH_SIZE) -U 1 -o $@ $< $(REDIR) ### getKmers_$*
 	@echo "Finished."
 
 ################################################################################
@@ -320,6 +328,7 @@ TARGET_STATS := $(PFX_KMERS_DATA_FILE)$(GENOME).stats
 endif
 
 # Phony target to make or clean TARGET_STATS file(s).
+.PHONY: kmerStats
 ifeq ($(CLEAN),)
 kmerStats: $(TARGET_STATS)
 	@echo
@@ -340,7 +349,8 @@ $(KMERS_STATS_FILES) : $(PFX_KMERS_DATA_FILE)%.stats : $(PFX_KMERS_DATA_FILE)%.k
 	@echo
 	@echo "*** kmerStats PARAMS=$(PARAMS) GENOME=$* ***"
 	@echo "Getting statistics for $(K)-mers from $< into $@"
-	$(TIME) $(CMD_JELLYFISH) stats -v $< >$@ $(REDIR)
+	$(TIME) \
+		$(CMD_JELLYFISH) stats -v $< >$@ $(REDIR) ### jellyfish_$*
 	@echo "Finished."
 	@echo
 	@echo "Statistics are:"
@@ -364,6 +374,7 @@ TARGET_TEXT_KMERS := $(PFX_KMERS_DATA_FILE)$(GENOME).kmers.txt
 endif
 
 # Phony target to make or clean TARGET_TEXT_KMERS file(s).
+.PHONY: kmersToText
 ifeq ($(CLEAN),)
 kmersToText: $(TARGET_TEXT_KMERS)
 	@echo
@@ -383,7 +394,8 @@ $(KMERS_TEXT_FILES) : $(PFX_KMERS_DATA_FILE)%.kmers.txt : $(PFX_KMERS_DATA_FILE)
 	@echo
 	@echo "*** kmersToText PARAMS=$(PARAMS) GENOME=$* ***"
 	@echo "Converting $(K)-mers from binary file $< into text format in file $@"
-	$(TIME) $(CMD_JELLYFISH) dump -c -o $@ $< $(REDIR)
+	$(TIME) \
+		$(CMD_JELLYFISH) dump -c -o $@ $< $(REDIR) ### jellydump_$*
 	@echo "Finished."
 
 ################################################################################
@@ -407,6 +419,7 @@ TARGET_ISECT := $(PFX_KMERS_DATA_FILE)$(GENOME).isect
 endif
 
 # Phony target to make or clean TARGET_ISECT file(s).
+.PHONY: getGenomicPosIsect
 ifeq ($(CLEAN),)
 getGenomicPosIsect: $(TARGET_ISECT)
 	@echo
@@ -429,11 +442,14 @@ $(ISECT_KMER_FILES) : $(PFX_KMERS_DATA_FILE)%.isect : $(KMERS_TEXT_FILES) $$(PAT
 	@echo "Intersect unique k-mers in $< and get genomic positions of common unique $(K)-mers into $@"
 	@echo
 	@echo "Adding genomic positions to common unique $(K)-mers from $< into $@.pos"
-	$(TIME) $(PATH_FINDMERS) -v2 $(KMERS_TEXT_FILES_i) $(PATH_GENOME_FASTA_$*) $(K) $@.pos $(REDIR)
+	$(TIME) \
+		$(PATH_FINDMERS) -v2 $(KMERS_TEXT_FILES_i) $(PATH_GENOME_FASTA_$*) $(K) $@.pos $(REDIR) ### getGenomicPosIsect_$*
 	@echo "Sorting by $(K)-mer from $@.pos into $@, removing header line"
-	$(TIME) tail -n +2 $@.pos | sort >$@ $(REDIR)
+	$(TIME) \
+		tail -n +2 $@.pos | sort >$@ $(REDIR) ### sort_kmer_$*
 	@echo "Removing $@.pos"
-	$(TIME) rm $@.pos $(REDIR)
+	$(TIME) \
+		rm $@.pos $(REDIR) ### rm_$*
 	@echo "Finished."
 
 ################################################################################
@@ -467,6 +483,7 @@ TARGET_MERGE := $(PFX_KMERS_DATA_FILE)$(GENOME).merge
 endif
 
 # Phony target to make or clean TARGET_MERGE file(s).
+.PHONY: mergeKmers
 ifeq ($(CLEAN),)
 mergeKmers: $(TARGET_MERGE)
 	@echo
@@ -484,9 +501,10 @@ TARGET_MERGE_1 := $(word 1,$(MERGE_KMER_FILES))
 
 $(TARGET_MERGE_1) : $(PFX_KMERS_DATA_FILE)1.isect
 	@echo
-	@echo "*** mergeKmers PARAMS=$(PARAMS) GENOME=$* ***"
+	@echo "*** mergeKmers PARAMS=$(PARAMS) ***"
 	@echo "Copy common unique $(K)-mers for genome 1 from $< to $@"
-	$(TIME) cp $< $@ $(REDIR)
+	$(TIME) \
+		cp $< $@ $(REDIR) ### cp
 	@echo "Finished."
 
 # Define the target files for all other genomes, they are done the same way.
@@ -505,7 +523,8 @@ $(TARGET_MERGE_OTHERS) : $(PFX_KMERS_DATA_FILE)%.merge : $(PFX_KMERS_DATA_FILE)%
 	@echo
 	@echo "*** mergeKmers PARAMS=$(PARAMS) GENOME=$* ***"
 	@echo "Merge common unique $(K)-mers for genomes $(word $*,$(G_PREV)) and $* to $@"
-	$(TIME) join -t '	' $(PFX_KMERS_DATA_FILE)$(word $*,$(G_PREV)).merge $< >$@ $(REDIR)
+	$(TIME) \
+		join -t '	' $(PFX_KMERS_DATA_FILE)$(word $*,$(G_PREV)).merge $< >$@ $(REDIR) ### join_$*
 	@echo "Finished."
 
 ################################################################################
@@ -518,6 +537,7 @@ $(TARGET_MERGE_OTHERS) : $(PFX_KMERS_DATA_FILE)%.merge : $(PFX_KMERS_DATA_FILE)%
 UNSORTED_COMMON_UNIQUE_KMERS := $(PFX_KMERS_DATA_FILE)$(N_GENOMES).merge
 
 # Phony target to make or clean PATH_COMMON_UNIQUE_KMERS file.
+.PHONY: sortCommonUniqueKmers
 ifeq ($(CLEAN),)
 sortCommonUniqueKmers: $(PATH_COMMON_UNIQUE_KMERS)
 	@echo
@@ -535,7 +555,8 @@ $(PATH_COMMON_UNIQUE_KMERS) : $(UNSORTED_COMMON_UNIQUE_KMERS)
 	@echo "*** sortCommonUniqueKmers PARAMS=$(PARAMS) ***"
 	@echo
 	@echo "Sort merged common unique $(K)-mers by reference genome position from $< into $(PATH_COMMON_UNIQUE_KMERS)"
-	$(TIME) sort -k 2,2 -k 5,5n -k 3,3n $< >$(PATH_COMMON_UNIQUE_KMERS) $(REDIR)
+	$(TIME) \
+		sort -k 2,2 -k 5,5n -k 3,3n $< >$(PATH_COMMON_UNIQUE_KMERS) $(REDIR) ### sort_merged
 	@echo "Finished."
 
 ################################################################################
@@ -545,6 +566,7 @@ $(PATH_COMMON_UNIQUE_KMERS) : $(UNSORTED_COMMON_UNIQUE_KMERS)
 ################################################################################
 
 # Phony target to make or clean PATH_LCR_FILE and PATH_BAD_KMERS_FILE files.
+.PHONY: findLCRs
 ifeq ($(CLEAN),)
 findLCRs: $(PATH_LCR_FILE) $(PATH_BAD_KMERS_FILE)
 	@echo
@@ -572,11 +594,12 @@ $(PTN_LCR_FILE) $(PTN_BAD_KMERS_FILE) : $(PATH_COMMON_UNIQUE_KMERS) | \
 	@echo "*** findLCRs PARAMS=$(PARAMS) ***"
 	@echo
 	@echo "Find locally conserved regions using common unique $(K)-mers from $< into $@"
-	$(TIME) $(CMD_RSCRIPT) $(PATH_FIND_LCRS) $(WD) $(PATH_COMMON_UNIQUE_KMERS) \
+	$(TIME) \
+		$(CMD_RSCRIPT) $(PATH_FIND_LCRS) $(WD) $(PATH_COMMON_UNIQUE_KMERS) \
 	    $(GENOME_LETTERS_SQUISHED) $(KMIN) $(LMIN) $(DMIN) $(DMAX) \
 	    $(PATH_LCR_FILE) \
 	    $(PATH_BAD_KMERS_FILE) \
-	    $(INVESTIGATE_FINDLCRS) $(REDIR)
+	    $(INVESTIGATE_FINDLCRS) $(REDIR) ### findLCRs
 	@echo "Finished."
 
 ################################################################################
@@ -586,6 +609,7 @@ $(PTN_LCR_FILE) $(PTN_BAD_KMERS_FILE) : $(PATH_COMMON_UNIQUE_KMERS) | \
 # A list of all .idlens files is already defined above: IDLEN_FILES
 
 # Phony target to make or clean PATH_OVERLAPPING_INDEL_GROUPS_FILE and PATH_NONOVERLAPPING_INDEL_GROUPS_FILE files.
+.PHONY: findIndelGroups
 ifeq ($(CLEAN),)
 findIndelGroups: $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) $(PATH_NONOVERLAPPING_INDEL_GROUPS_FILE)
 	@echo
@@ -612,12 +636,13 @@ $(PTN_OVERLAPPING_INDELS_FILE) $(PTN_NONOVERLAPPING_INDELS_FILE) : $(PATH_LCR_FI
 	@echo
 	@echo "*** findIndelGroups PARAMS=$(PARAMS) ***"
 	@echo "Find Indel Groups using locally conserved regions in $< and write them to two output files"
-	$(TIME) $(CMD_RSCRIPT) $(PATH_FIND_INDEL_GROUPS) $(WD) \
+	$(TIME) \
+		$(CMD_RSCRIPT) $(PATH_FIND_INDEL_GROUPS) $(WD) \
 	    $(PATH_LCR_FILE) \
 	    $(AMIN) $(AMAX) $(ADMIN) $(ADMAX) $(NDAMIN) $(MINFLANK) $(OVERLAP_REMOVAL) \
 	    $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) $(PATH_NONOVERLAPPING_INDEL_GROUPS_FILE) \
 	    $(GENOME_LETTERS_SQUISHED) $(INVESTIGATE_ANALYZELCRS) \
-	    $(IDLEN_FILES) $(REDIR)
+	    $(IDLEN_FILES) $(REDIR) ### findIndelGroups
 	@echo "Finished."
 
 ################################################################################
@@ -639,6 +664,7 @@ TARGET_DNASEQ := $(PFX_DNA_SEQS_PATH)_$(GENOME).dnaseqs
 endif
 
 # Phony target to make or clean TARGET_DNASEQ file(s).
+.PHONY: getDNAseqsForPrimers
 ifeq ($(CLEAN),)
 getDNAseqsForPrimers: $(TARGET_DNASEQ)
 	@echo
@@ -661,13 +687,14 @@ $(DNA_SEQ_FILES) : $(PFX_DNA_SEQS_PATH)_%.dnaseqs : $$(PATH_GENOME_FASTA_$$*) \
 	@echo
 	@echo "*** getDNAseqsForPrimers PARAMS=$(PARAMS) GENOME=$* ***"
 	@echo "Extract DNA sequence around Indel Groups and write to $@"
-	$(TIME) $(CMD_RSCRIPT) $(PATH_GET_DNA_SEQS_FOR_PRIMERS) $(WD) \
+	$(TIME) \
+		$(CMD_RSCRIPT) $(PATH_GET_DNA_SEQS_FOR_PRIMERS) $(WD) \
 	    $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) $* \
 	    $@ \
 		$(DIR_GENOME_OUT_DATA) $(EXTENSION_LEN) \
 		$(CMD_PERL) $(PATH_GET_SEQS_FASTA) \
 		$(PATH_GENOME_FASTA_$*) \
-		$(PFX_GENOME_DATA_FILE)$*.contigs $(INVESTIGATE_GETDNASEQS) $(REDIR)
+		$(PFX_GENOME_DATA_FILE)$*.contigs $(INVESTIGATE_GETDNASEQS) $(REDIR) ### getDNAseqsForPrimers_$*
 	@echo "Finished."
 
 ################################################################################
@@ -677,6 +704,7 @@ $(DNA_SEQ_FILES) : $(PFX_DNA_SEQS_PATH)_%.dnaseqs : $$(PATH_GENOME_FASTA_$$*) \
 # A list of all .dnaseqs files is already defined above: DNA_SEQ_FILES
 
 # Phony target to make or clean PATH_NONVALIDATED_MARKER_FILE file.
+.PHONY: findPrimers
 ifeq ($(CLEAN),)
 findPrimers: $(PATH_NONVALIDATED_MARKER_FILE)
 	@echo
@@ -696,13 +724,14 @@ $(PATH_NONVALIDATED_MARKER_FILE) : $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) $(DNA_S
 	@echo
 	@echo "*** findPrimers PARAMS=$(PARAMS) ***"
 	@echo "Find primers around Indel Groups in $< and write to $@"
-	$(TIME) $(CMD_RSCRIPT) $(PATH_FIND_PRIMERS) $(WD) \
+	$(TIME) \
+		$(CMD_RSCRIPT) $(PATH_FIND_PRIMERS) $(WD) \
 		$(PATH_OVERLAPPING_INDEL_GROUPS_FILE) \
 		$(PFX_DNA_SEQS_PATH) \
 		$(PATH_NONVALIDATED_MARKER_FILE) \
 		$(CMD_PRIMER3CORE) $(PATH_PRIMER3_SETTINGS) $(DIR_PRIMER3CONFIG) \
 		$(PATH_PRIMER3_IN) $(PATH_PRIMER3_OUT) \
-		$(INVESTIGATE_FINDPRIMERS) $(REDIR)
+		$(INVESTIGATE_FINDPRIMERS) $(REDIR) ### findPrimers
 	@echo "Finished."
 
 ################################################################################
@@ -722,6 +751,7 @@ TARGET_BAD_MARKER := $(PFX_BAD_MARKER_ERROR_PATH)_$(word $(GENOME),$(GENOME_NUMB
 endif
 
 # Phony target to make or clean TARGET_BAD_MARKER file(s).
+.PHONY: ePCRtesting
 ifeq ($(CLEAN),)
 ePCRtesting: $(TARGET_BAD_MARKER)
 	@echo
@@ -743,11 +773,12 @@ $(BAD_MARKER_FILES) : $(PFX_BAD_MARKER_ERROR_PATH)_%.bad.tsv : $$(PATH_GENOME_FA
 	@echo
 	@echo "*** ePCRtesting PARAMS=$(PARAMS) GENOME=$* ***"
 	@echo "Use e-PCR to test marker primer pairs and write errors to $@"
-	$(TIME) $(CMD_RSCRIPT) $(PATH_EPCR_TESTING) $(WD) \
+	$(TIME) \
+		$(CMD_RSCRIPT) $(PATH_EPCR_TESTING) $(WD) \
 	    $(PATH_NONVALIDATED_MARKER_FILE) $* $@ \
 	    $(DIR_GENOME_OUT_DATA) $(CMD_EPCR) \
 	    $(EPCR_MAX_DEV) $(EPCR_WORD_SIZE) $(EPCR_MAX_MISMATCH) $(EPCR_MAX_GAPS) \
-		$(PATH_GENOME_FASTA_$*) $(INVESTIGATE_EPCRTESTING) $(REDIR)
+		$(PATH_GENOME_FASTA_$*) $(INVESTIGATE_EPCRTESTING) $(REDIR) ### ePCRtesting_$*
 	@echo "Finished."
 
 ################################################################################
@@ -760,6 +791,7 @@ $(BAD_MARKER_FILES) : $(PFX_BAD_MARKER_ERROR_PATH)_%.bad.tsv : $$(PATH_GENOME_FA
 # A list of all .bad.tsv files is already defined above: BAD_MARKER_FILES
 
 # Phony target to make or clean PATH_OVERLAPPING_MARKERS_FILE and PATH_NONOVERLAPPING_MARKERS_FILE.
+.PHONY: removeBadMarkers
 ifeq ($(CLEAN),)
 removeBadMarkers: $(PATH_OVERLAPPING_MARKERS_FILE) $(PATH_NONOVERLAPPING_MARKERS_FILE)
 	@echo
@@ -786,13 +818,14 @@ $(PTN_OVERLAPPING_MARKERS_FILE) $(PTN_NONOVERLAPPING_MARKERS_FILE) : $(PATH_NONV
 	@echo
 	@echo "*** removeBadMarkers PARAMS=$(PARAMS) ***"
 	@echo "Remove markers identified by e-PCR as bad from $< and write good ones to two output files"
-	$(TIME) $(CMD_RSCRIPT) $(PATH_RMV_BAD_MARKERS) $(WD) \
+	$(TIME) \
+		$(CMD_RSCRIPT) $(PATH_RMV_BAD_MARKERS) $(WD) \
 	    $(OVERLAP_REMOVAL) $(ID_PREFIX) \
 	    $(PATH_NONVALIDATED_MARKER_FILE) \
 	    $(PFX_BAD_MARKER_ERROR_PATH) \
 		$(PATH_OVERLAPPING_MARKERS_FILE) \
 		$(PATH_NONOVERLAPPING_MARKERS_FILE) \
-		$(INVESTIGATE_RMVBADMARKERS) $(REDIR)
+		$(INVESTIGATE_RMVBADMARKERS) $(REDIR) ### removeBadMarkers
 	@echo "Finished."
 
 ################################################################################
@@ -809,6 +842,7 @@ MARKER_COUNTS_FILE := $(PFX_MARKER_COUNTS_PATH).plot.pdf
 MARKER_DENSITY_FILES := $(foreach G,$(GENOME_LETTERS),$(PFX_MARKER_DENSITY_PATH)_$(G).plot.png)
 
 # Phony target to make or clean MARKER_COUNTS_FILE and MARKER_DENSITY_FILES files.
+.PHONY: plotMarkers
 ifeq ($(CLEAN),)
 plotMarkers: $(MARKER_COUNTS_FILE) $(MARKER_DENSITY_FILES)
 	@echo
@@ -828,12 +862,13 @@ $(MARKER_COUNTS_FILE) $(MARKER_DENSITY_FILES) : $(PATH_OVERLAPPING_MARKERS_FILE)
 	@echo
 	@echo "*** plotMarkers PARAMS=$(PARAMS) ***"
 	@echo "Make density plots of 'good' candidate IGG markers to output files"
-	$(TIME) $(CMD_RSCRIPT) $(PATH_PLOT_MARKERS) $(WD) $(PLOT_NDAMIN) $(PLOT_ALPHA) \
+	$(TIME) \
+		$(CMD_RSCRIPT) $(PATH_PLOT_MARKERS) $(WD) $(PLOT_NDAMIN) $(PLOT_ALPHA) \
 	    $(PATH_OVERLAPPING_MARKERS_FILE) \
 	    $(PATH_NONOVERLAPPING_MARKERS_FILE) \
 		$(PFX_MARKER_COUNTS_PATH) \
 		$(PFX_MARKER_DENSITY_PATH) \
-		$(IDLEN_FILES) $(REDIR)
+		$(IDLEN_FILES) $(REDIR) ### plotMarkers
 	@echo "Finished."
 
 ################################################################################
@@ -843,6 +878,7 @@ $(MARKER_COUNTS_FILE) $(MARKER_DENSITY_FILES) : $(PATH_OVERLAPPING_MARKERS_FILE)
 # Phony target to make or clean PATH_LCB_FILE file.
 # If variable PARAMS is not defined, show basic usage info, else make
 # LCRsToLCBs output file target.
+.PHONY: LCRsToLCBs
 ifeq ($(PARAMS),)
 LCRsToLCBs:
 	@echo
@@ -868,7 +904,8 @@ $(PATH_LCB_FILE) : $(PATH_LCR_FILE) | $(DIR_GENOME_OUT_DATA)
 	@echo
 	@echo "*** LCRsToLCBs PARAMS=$(PARAMS) ***"
 	@echo "Convert LCRs in $< to LCBs and write to $@"
-	$(TIME) $(CMD_RSCRIPT) $(PATH_LCRS_TO_LCBS) $(WD) $(PATH_LCR_FILE) $(PATH_LCB_FILE) $(REDIR)
+	$(TIME) \
+		$(CMD_RSCRIPT) $(PATH_LCRS_TO_LCBS) $(WD) $(PATH_LCR_FILE) $(PATH_LCB_FILE) $(REDIR) ### LCRsToLCBs
 	@echo "Finished."
 
 ################################################################################
@@ -881,6 +918,7 @@ $(PATH_LCB_FILE) : $(PATH_LCR_FILE) | $(DIR_GENOME_OUT_DATA)
 # Phony target to make or clean PATH_INDELS_SNPS_SEQS_FILE file.
 # If variable PARAMS is not defined, show basic usage info, else make
 # getDNAseqsForIndelsSNPs output file target.
+.PHONY: getDNAseqsForIndelsSNPs
 ifeq ($(PARAMS),)
 getDNAseqsForIndelsSNPs:
 	@echo
@@ -907,12 +945,13 @@ $(PATH_INDELS_SNPS_SEQS_FILE) : $(PATH_INDELS_SNPS_INPUT_FILE) $(FASTA_FILES) | 
 	@echo
 	@echo "*** getDNAseqsForIndelsSNPs PARAMS=$(PARAMS) ***"
 	@echo "Get DNA sequences for $< and write merged data to $@"
-	$(TIME) $(CMD_RSCRIPT) $(PATH_GET_DNA_SEQS_FOR_INDELS_SNPS) $(WD) $(K) \
+	$(TIME) \
+		$(CMD_RSCRIPT) $(PATH_GET_DNA_SEQS_FOR_INDELS_SNPS) $(WD) $(K) \
 	    $(PATH_INDELS_SNPS_INPUT_FILE) $(PATH_INDELS_SNPS_SEQS_FILE) \
 	    $(DIR_GENOME_OUT_DATA) \
 		$(CMD_PERL) $(PATH_GET_SEQS_FASTA) \
 		$(INVESTIGATE_GET_DNA_SEQS_FOR_INDELS_SNPS) \
-		$(FASTA_FILES) $(REDIR)
+		$(FASTA_FILES) $(REDIR) ### getDNAseqsForIndelsSNPs
 	@echo "Finished."
 
 ################################################################################
@@ -926,6 +965,7 @@ indelsSNPs: IndelsSNPs
 # Phony target to make or clean PATH_INDELS_OUTPUT_FILE and PATH_SNPS_OUTPUT_FILE files.
 # If variable PARAMS is not defined, show basic usage info, else make IndelsSNPs
 # output file target.
+.PHONY: IndelsSNPs
 ifeq ($(PARAMS),)
 IndelsSNPs:
 	@echo
@@ -952,10 +992,11 @@ $(PATH_INDELS_OUTPUT_FILE) $(PATH_SNPS_OUTPUT_FILE) : $(PATH_INDELS_SNPS_SEQS_FI
 	@echo
 	@echo "*** IndelsSNPs PARAMS=$(PARAMS) ***"
 	@echo "Align sequences of $< and find Indels and SNPs and write them to output files"
-	$(TIME) $(CMD_RSCRIPT) $(PATH_ALIGN_AND_GET_INDELS_SNPS) $(WD) \
+	$(TIME) \
+		$(CMD_RSCRIPT) $(PATH_ALIGN_AND_GET_INDELS_SNPS) $(WD) \
 	    $(PATH_INDELS_SNPS_SEQS_FILE) $(PATH_INDELS_OUTPUT_FILE) $(PATH_SNPS_OUTPUT_FILE) \
 		$(CMD_ALIGNER) $(MAX_INDELS_PER_KBP) $(MAX_SNPS_PER_KBP) $(SCRAMBLE_SEQUENCE) \
-		$(INVESTIGATE_ALIGN_AND_GET_INDELS_SNPS) $(REDIR)
+		$(INVESTIGATE_ALIGN_AND_GET_INDELS_SNPS) $(REDIR) ### IndelsSNPs
 	@echo "Finished."
 
 ################################################################################
@@ -968,6 +1009,7 @@ plotindels: plotIndels
 # Phony target to make or clean PATH_INDELS_PLOT_FILE file.
 # If variable PARAMS is not defined, show basic usage info, else make plotIndels
 # output file target.
+.PHONY: plotIndels
 ifeq ($(PARAMS),)
 plotIndels:
 	@echo
@@ -993,8 +1035,9 @@ $(PATH_INDELS_PLOT_FILE) : $(PATH_INDELS_OUTPUT_FILE) | $(PATH_PLOT_INDELS)
 	@echo
 	@echo "*** plotIndels PARAMS=$(PARAMS) ***"
 	@echo "Make plots of Indel information to file $@"
-	$(TIME) $(CMD_RSCRIPT) $(PATH_PLOT_INDELS) $(WD) $(PATH_INDELS_OUTPUT_FILE) \
-	    $(PATH_INDELS_PLOT_FILE) $(REDIR)
+	$(TIME) \
+		$(CMD_RSCRIPT) $(PATH_PLOT_INDELS) $(WD) $(PATH_INDELS_OUTPUT_FILE) \
+	    $(PATH_INDELS_PLOT_FILE) $(REDIR) ### plotIndels
 	@echo "Finished."
 
 ################################################################################

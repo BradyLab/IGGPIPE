@@ -11,6 +11,9 @@
 # Maximum number of points to plot on any plot.
 maxPlotPoints = 20000
 
+# Color of text marker point of mean.
+colMean = "darkseagreen4"
+
 # Pathname separator.
 #PATHSEP = ifelse(grepl("/", Sys.getenv("HOME")), "/", "\\")
 PATHSEP = "/"
@@ -120,10 +123,20 @@ refEndCol = endCol[refGenomeLtr]
 catnow("Number of Indels:", nrow(dfIndels), "\n")
 
 ########################################
+# Double-check the indel file to make sure Start < End for all genomes.
+# This has been a problem.
+########################################
+
+for (genome in genomeLtrs)
+    if (any(dfIndels[, startCol[genome]] >= dfIndels[, endCol[genome]]))
+        stop("Indel file is bad, start sometimes >= end for genome ", genome);
+
+########################################
 # Create pdf file.
 ########################################
 
 pdf(pdfPlotFile, height=8, width=8)
+par(mar=par("mar")+c(0,1,0,0))
 
 ########################################
 # Make scatter plots (one per genome pair) where x-axis is amplicon or LCR length
@@ -152,7 +165,7 @@ for (i in 1:Npairs)
         sizeDiffs = sizeDiffs[idxs]
         numIndels = numIndels[idxs]
         }
-    plot(sizeDiffs, numIndels, type="p", xlim=xlim, ylim=ylim, cex=0.5, pch=20,
+    plot(sizeDiffs, numIndels, type="p", xlim=xlim, ylim=ylim, cex.lab=2, cex.axis=1.75, cex=0.5, pch=20,
         main=paste("Scatter plot of amplicon/LCR size diff. vs. number of indels, genomes ",
             g1, " and ", g2, sep=""),
         xlab="Amplicon/LCR size difference (bp)", ylab="Number of Indels")
@@ -160,8 +173,8 @@ for (i in 1:Npairs)
     meanSizeDiff = mean(sizeDiffs)
     meanNumIndels = mean(numIndels)
     catnow("meanSizeDiff =", meanSizeDiff, " meanNumIndels =", meanNumIndels, "\n")
-    points(meanSizeDiff, meanNumIndels, pch=20, cex=2, col="tan")
-    text(meanSizeDiff, meanNumIndels, "Mean", cex=2, col="tan", pos=4)
+    points(meanSizeDiff, meanNumIndels, pch=20, cex=2, col=colMean)
+    text(meanSizeDiff, meanNumIndels, "Mean", cex=2, col=colMean, pos=4)
     }
 
 ########################################
@@ -198,7 +211,7 @@ for (i in 1:Npairs)
         sizeDiffs = sizeDiffs[idxs]
         indelLens = indelLens[idxs]
         }
-    plot(sizeDiffs, indelLens, type="p", xlim=xlim, ylim=ylim, cex=0.5, pch=20,
+    plot(sizeDiffs, indelLens, type="p", xlim=xlim, ylim=ylim, cex.lab=2, cex.axis=1.75, cex=0.5, pch=20,
         main=paste("Scatter plot of amplicon/LCR size diff. vs. indels size, genomes ",
             g1, " and ", g2, sep=""),
         xlab="Amplicon size difference (bp)", ylab="Indels size (bp)")
@@ -206,8 +219,8 @@ for (i in 1:Npairs)
     meanSizeDiff = mean(sizeDiffs)
     meanIndelsLens = mean(indelLens)
     catnow("meanSizeDiff =", meanSizeDiff, " meanIndelsLens =", meanIndelsLens, "\n")
-    points(meanSizeDiff, meanIndelsLens, pch=20, cex=2, col="tan")
-    text(meanSizeDiff, meanIndelsLens, "Mean", cex=2, col="tan", pos=4)
+    points(meanSizeDiff, meanIndelsLens, pch=20, cex=2, col=colMean)
+    text(meanSizeDiff, meanIndelsLens, "Mean", cex=2, col=colMean, pos=4)
     }
 
 ########################################

@@ -3,7 +3,7 @@ Usage:
 
 To run the entire pipeline on your own data, invoke 'make' as follows:
 
-     make PARAMS=myFilename ALL | tee logFiles/makeLog.txt
+     make PARAMS=myFilename ALL 2>&1 | tee logFiles/makeLog.txt
 
 Here, 'myFilename' is the name of the parameter file you want to use to run the
 pipeline.  This file would be an edited copy of allParameters.template, such as
@@ -15,16 +15,18 @@ files I've tested.  You may want to put your own parameter files in here too, or
 in a separate subdirectory you create.  If you do that, specify the full pathname
 to 'make', e.g.:
 
-     make PARAMS=allParameters/myFilename ALL | tee logFiles/makeLog.txt
+     make PARAMS=allParameters/myFilename ALL 2>&1 | tee logFiles/makeLog.txt
 
 Note that it may take many hours to run everything through to completion.  If an
 error occurs, try to find the cause and fix it, then rerun the same 'make' command.
 All steps that have already completed successfully are not re-run.
 
-Also note that '| tee logFiles/makeLog.txt' causes all 'make' output to be written
-to text file 'makeLog.txt' in the 'logFiles' directory, so you have a record of
-it, in addition to writing it to the console.  To view the log you could use a
-command such as 'less logFiles/makeLog.txt'.
+Also note that '2>&1 | tee logFiles/makeLog.txt' causes all 'make' standard and
+error output to be written to text file 'makeLog.txt' in the 'logFiles' directory,
+so you have a record of it, in addition to writing it to the console.  To view the
+log you could use a command such as 'less logFiles/makeLog.txt'.  The '2>&1'
+directs standard error output to the same place as regular output, and is optional.
+We won't show the log file redirection below, but you can always use it.
 
 Rather than running the entire pipeline all at once as shown above, you may
 choose to run one pipeline step at a time and inspect its output before going
@@ -110,8 +112,10 @@ file as DIR_IGGPIPE_OUT):
 
 If you want to analyze an LCR, Indel Group, or marker file for Indels and SNPs
 (a parameter should have already been set in the allParameters file to choose
-which one), then use these commands to analyze for Indels and SNPs and to plot
-Indel information:
+which one), then these commands analyze for Indels and SNPs and plot Indel
+information.  The last one, plotIndels, will cause the first two to also be
+done, so it is the only one you need to perform the entire analysis from
+finding K-mers to plotting Indels:
 
      make PARAMS=myFilename getDNAseqsForIndelsSNPs
      make PARAMS=myFilename IndelsSNPs

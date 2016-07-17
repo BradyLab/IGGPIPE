@@ -1,9 +1,9 @@
 ################################################################################
 ################################################################################
 
-# This is an IGGPIPE parameter file example for doing a 3-species analysis of
-# S. lycopersicum (tomato) (H), S. pennellii (P), and S. tuberosum (potato) (T)
-# genomes.
+# This is an IGGPIPE parameter file example for analyzing tomato (H) ITAG2.4 and
+# S. pennellii (P) V2.0 genomes.  This is for CPU/memory usage for paper.  This
+# is like allParameters.HP14_250_800_100_200 but changes LMIN/AMIN from 250 to 100.
 
 ################################################################################
 ################################################################################
@@ -27,7 +27,7 @@ K := 14
 # include one definition per genome.
 ################################################################################
 
-N_GENOMES := 3
+N_GENOMES := 2
 
 
 # Genome numbers, starting at 1, separated from each other by a space.  If
@@ -35,7 +35,7 @@ N_GENOMES := 3
 # it seems to be very difficult to generate this sequence automatically in 'make',
 # as, despite all its macros, it has no concept of arithmetic and counting.
 
-GENOME_NUMBERS := 1 2 3
+GENOME_NUMBERS := 1 2
 
 
 ################################################################################
@@ -53,13 +53,12 @@ GENOME_NUMBERS := 1 2 3
 # letter for each one.
 ################################################################################
 
-# H = Solanum lycopersicum (Heinz tomato) genome (reference genome)
-# P = Solanum pennellii genome
-# T = Solanum tuberosum (potato) genome
+# In this example, we use two genomes, the Heinz tomato genome (letter H) and
+# the Solanum pennellii genome (letter P).  The tomato genome is the reference
+# genome.
 
 GENOME_1 := H
 GENOME_2 := P
-GENOME_3 := T
 
 
 # Combine the above letters together with one space between each letter.
@@ -101,21 +100,16 @@ DIR_GENOME_DATA := $(BRADYLAB)/Genomes
 
 DIR_GENOME_DATA_1 := $(DIR_GENOME_DATA)/Soly/ITAG2.4_release
 DIR_GENOME_DATA_2 := $(DIR_GENOME_DATA)/Sope/V2.0genome
-DIR_GENOME_DATA_3 := $(DIR_GENOME_DATA)/Sotu/DM/V403genome
 
 
 # Paths of the N_GENOMES FASTA files containing the genome sequences being
 # analyzed.  Each variable name must be the string "PATH_GENOME_FASTA_" followed
 # by the genome number.
-
 # The ITAG2.4_genomic.fasta genome is the latest tomato genome release from solGenomics.net.
 # The Spenn.fasta genome is the recent S. pennellii genome release from solGenomics.net.
-# The PGSC_DM_v4.03_genomic.fasta genome is file PGSC_DM_v4.03_pseudomolecules.fasta.zip
-# from http://potato.plantbiology.msu.edu/data.
 
 PATH_GENOME_FASTA_1 := $(DIR_GENOME_DATA_1)/ITAG2.4_genomic.fasta
 PATH_GENOME_FASTA_2 := $(DIR_GENOME_DATA_2)/Spenn.fasta
-PATH_GENOME_FASTA_3 := $(DIR_GENOME_DATA_3)/PGSC_DM_v4.03_genomic.fasta
 
 
 # Directory in which to place output files that are generated from the FASTA files.
@@ -195,7 +189,7 @@ KMIN := 2
 # to the minimum acceptable amplicon size AMIN (defined below), although it
 # could be larger.  Smaller values make more LCRs and increase computation time.
 
-LMIN := 300
+LMIN := 100
 
 
 # Minimum distance in bp between two adjacent k-mers in an LCR.  If two k-mers are
@@ -203,7 +197,7 @@ LMIN := 300
 # a series of back-to-back k-mers in a conserved region from satisfying the KMIN
 # setting or MINFLANK setting.  A value in the range of k would be reasonable.
 
-DMIN := 5
+DMIN := 10
 
 
 # Maximum distance in bp between two adjacent k-mers in an LCR.  If two adjacent
@@ -212,18 +206,18 @@ DMIN := 5
 # indel within an Indel Group or LCR.  This is normally set equal to the maximum
 # acceptable amplicon size AMAX (defined below), although it could be larger.
 
-DMAX := 1500
+DMAX := 800
 
 
 # Minimum IGG marker amplicon size in any genome.
 
-AMIN := 300
+AMIN := 100
 
 
 # Maximum IGG marker amplicon size in any genome.  The amplicon size will always
 # be less than DMAX also.  This also limits the maximum Indel Group size.
 
-AMAX := 1500
+AMAX := 800
 
 
 # For a given IGG marker, when the smallest amplicon size is AMIN, this is the
@@ -233,7 +227,7 @@ AMAX := 1500
 # For the purpose of finding Indel Groups only, this is the minimum Indel
 # Group size that will ever be found.
 
-ADMIN := 50
+ADMIN := 100
 
 
 # For a given IGG marker, when the largest amplicon size is AMAX, this is the
@@ -252,7 +246,7 @@ ADMIN := 50
 #
 # For the purpose of finding Indel Groups only, this should be set equal to ADMIN.
 
-ADMAX := 300
+ADMAX := 200
 
 
 # Minimum number of distinct amplicon sizes for each marker.  Set this to the
@@ -318,7 +312,7 @@ MINFLANK := 0
 # Therefore you would set this to MIN if you want to bias towards getting
 # shorter amplicons, and to MAX to bias towards longer ones.
 
-OVERLAP_REMOVAL := MIN
+OVERLAP_REMOVAL := MAX
 
 
 # Number of base pairs of additional sequence to retrieve on each side of each
@@ -339,7 +333,7 @@ OVERLAP_REMOVAL := MIN
 # a primer designed and so will be rejected.  All bases of the k-mer are of
 # course identical across all genomes.
 
-EXTENSION_LEN := 15
+EXTENSION_LEN := 20
 
 
 # Maximum deviation in base pairs from expected amplicon size of off-target
@@ -376,7 +370,7 @@ EPCR_WORD_SIZE := 8
 # mismatched bases, then you want that marker to be marked bad and deleted.
 # Larger values increase computation time and reduce number of markers obtained.
 
-EPCR_MAX_MISMATCH := 0
+EPCR_MAX_MISMATCH := 3
 
 
 # Maximum number of off-target primer match gaps, in base pairs, within the
@@ -384,16 +378,16 @@ EPCR_MAX_MISMATCH := 0
 # (electronic PCR) testing of the candidate markers.  Set this to a size where,
 # if there is an off-target approximate primer match with this many or fewer
 # gaps in the mismatch, then you want that marker to be marked bad and deleted.
-# Larger values increase computation time.
+# Larger values increase computation time and reduce number of markers obtained.
 
-EPCR_MAX_GAPS := 0
+EPCR_MAX_GAPS := 1
 
 
 # Prefix to use for the marker IDs.  Markers are numbered sequentially, and an ID
 # column in the marker output file consists of the following prefix, followed by
 # the sequential number of each marker.  This prefix lets you assign different
 # IDs during different runs of IGGPIPE using different genomes or other parameters.
-ID_PREFIX := IGG_$(GENOME_LETTERS_SQUISHED)$(K)A_
+ID_PREFIX := IGG_$(GENOME_LETTERS_SQUISHED)$(K)B_
 
 
 # For plotting number and density of final markers, this parameter sets the
@@ -402,7 +396,7 @@ ID_PREFIX := IGG_$(GENOME_LETTERS_SQUISHED)$(K)A_
 # 2-way and 3-way markers (3 genomes with NDAMIN=2) and want to plot only the
 # 3-way markers count/density, set this to 3.
 
-PLOT_NDAMIN := 3
+PLOT_NDAMIN := $(NDAMIN)
 
 
 # For plotting number and density of final markers, this parameter sets the
@@ -412,7 +406,7 @@ PLOT_NDAMIN := 3
 # lighter gray, and multiple lines must be plotted on top of each other to
 # achieve black pixels.  For example, 0.25 would need 4 markers to get to black.
 
-PLOT_ALPHA := 0.5
+PLOT_ALPHA := 0.25
 
 
 # For finding Indels and SNPs with 'make IndelsSNPs', these parameters set the
@@ -589,7 +583,7 @@ SFX_NONVALIDATED_MARKER_FILE := $(SFX_DNA_SEQS_FILE)
 
 
 # Suffix to use for the files that hold candidate IGG marker primers, both
-# before and after e-PCR testing.
+# before and after e-PCR testing,  and marker density plots.
 # (This includes all of SFX_NONVALIDATED_MARKER_FILE and the parameter values used for e-PCR)
 
 SFX_GOOD_MARKER_FILE := $(SFX_NONVALIDATED_MARKER_FILE)V$(EPCR_MAX_DEV)W$(EPCR_WORD_SIZE)M$(EPCR_MAX_MISMATCH)G$(EPCR_MAX_GAPS)

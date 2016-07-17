@@ -28,6 +28,7 @@ testing = 0
 #testing = 2 # For testing only, outTestHP11 IndelGroupsNonoverlapping
 #testing = 3 # For testing only, outTestHP11 MarkersNonoverlapping
 #testing = 4 # For testing only, outTaCW15 LCBs
+#testing = 5 # For testing only, outHP14 IndelGroupsNonoverlapping
 {
 # Which aligner?  I had problems with ClustalW2, see comments later.
 useClustal = FALSE
@@ -40,9 +41,9 @@ if (testing == 0)
 else if (testing == 1)
     {
     args = c("~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE",
-        "outTestHP11/LCBs_K11k2L100D10_2000.withseqs.tsv",
-        "outTestHP11/LCBs_K11k2L100D10_2000.indels.tsv",
-        "outTestHP11/LCBs_K11k2L100D10_2000.snps.tsv",
+        "outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.withseqs.tsv",
+        "outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv",
+        "outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.snps.tsv",
         aligner, 10, 30, FALSE, TRUE)
     }
 else if (testing == 2)
@@ -68,6 +69,14 @@ else if (testing == 4)
         "outTaCW15/LCBs_K15k2L200D5_1000.indels.tsv",
         "outTaCW15/LCBs_K15k2L200D5_1000.snps.tsv",
         aligner, 10, 30, FALSE, TRUE)
+    }
+else if (testing == 5)
+    {
+    args = c("~/Documents/UCDavis/BradyLab/IGGPIPE/IGGPIPE",
+        "outHP14/IndelGroupsNonoverlapping_K14k4L100D1_3000A100_3000d100_100N2F0.withseqs.tsv",
+        "outHP14/IndelGroupsNonoverlapping_K14k4L100D1_3000A100_3000d100_100N2F0.indels.tsv",
+        "outHP14/IndelGroupsNonoverlapping_K14k4L100D1_3000A100_3000d100_100N2F0.snps.tsv",
+        aligner, 20, 120, FALSE, TRUE)
     }
 else stop("Unknown value for 'testing'")
 }
@@ -125,7 +134,7 @@ if (length(args) < NexpectedMin)
         "",
         "Arguments:",
         "   <wd>              : Path of R working directory, specify other file paths relative to this.",
-        "   <inputFile>       : Input file containing LCBs, Indel groups, or markers.",
+        "   <inputFile>       : Input file containing LCBs, Indel groups, or markers, with DNA sequences.",
         "   <outIndelFile>    : Output file to which to write data frame of Indel information.",
         "   <outSNPfile>      : Output file to which to write data frame of SNP information.",
         ifelse(useClustal,
@@ -474,9 +483,11 @@ for (alignCount in 1:nrow(df))
                 }
             else
                 {
-                dfi[, startCols[genome]] = d[, pos2Cols[genome]] - indelBaseBeforeStart.genome + 1
-                dfi[, endCols[genome]] = d[, pos2Cols[genome]] - indelBaseAfterEnd.genome + 1
+                dfi[, startCols[genome]] = d[, pos2Cols[genome]] - indelBaseAfterEnd.genome + 1
+                dfi[, endCols[genome]] = d[, pos2Cols[genome]] - indelBaseBeforeStart.genome + 1
                 }
+            if (any(dfi[, startCols[genome]] >= dfi[, endCols[genome]]))
+                stop("Software error: expected start < end always")
             }
         dfIndels = rbind.fast(dfIndels, dfi)
 
