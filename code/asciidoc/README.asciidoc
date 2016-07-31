@@ -64,7 +64,7 @@ either one and follow the instructions.
 References
 ----------
 
-.*IGG markers and the IGGPIPE software are described in:*
+.*Please cite the following paper when using IGGPIPE software:*
 
 [bibliography]
 - Toal, Ted, Diana Burkart-Waco, Tyson Howell, Mily Ron, Sundaram Kuppu, Anne Bagg
