@@ -48,13 +48,13 @@ NOTE: Alternatively, you can clone the git repository with this command line com
 
 *Install IGGPIPE*
 ~~~~~~~~~~~~~~~~~
-* Look inside the downloaded IGGPIPE folder on your computer for file INSTALL.pdf
-or INSTALL.html and open either one and follow the instructions.
+* Look inside the downloaded IGGPIPE folder on your computer for file
+INSTALL.html, open it, and follow the instructions.
 
 *Run IGGPIPE to generate markers after installation*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-* Find file RUN.pdf or RUN.html in the IGGPIPE folder on your computer and open
-either one and follow the instructions.
+* Find file RUN.html in the IGGPIPE folder on your computer, open
+it, and follow the instructions.
 
 *For problems and help:*
 ~~~~~~~~~~~~~~~~~~~~~~~~
