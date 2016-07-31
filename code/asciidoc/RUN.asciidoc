@@ -23,10 +23,12 @@ are required.
 . *Work from the command line*
 +
 --
-Most work here is done from the command line, by opening the Terminal application.
+Most work here is done from the command line (by opening the Terminal application
+(Mac) or CygWin command console (Windows)).
+
 Commands will be shown here and you may be able to get by with no knowledge of the
-command line, other than knowing how to start it (by starting the Terminal app
-on the Mac). However, ideally you should be familiar with some basic command
+command line, other than knowing how to start it. However, ideally you should
+be familiar with some basic command
 line commands such as 'cd', 'ls', 'cp', 'rm', 'mv', 'sudo', 'less',
 'head' and 'tail', 'man', and 'mkdir'. If you do not know how to use the command
 line or don't know these basic commands, you may want to take some time to learn
@@ -55,12 +57,13 @@ directory with this command:
 . *Know how to use a plain text editor and have one available*
 +
 --
-You must have a plain text editor you know how to use.  If nothing else, the Mac
-"TextEdit" program will work (use Plain Text format).  The free open-source
-TextWrangler program is strongly recommended, available from the Apple App
-Store (Applications, App Store) or from:
-
-http://www.barebones.com/products/textwrangler
+You must have a plain text editor you know how to use.  On a Mac the "TextEdit"
+program will work (use Plain Text format), but 'do not' use Notepad on Windows.
+The free open-source TextWrangler program is strongly recommended for Mac
+(available from the Apple App
+Store (Applications, App Store) or from http://www.barebones.com/products/textwrangler),
+and the open-source Notepad++ program is recommended for Windows (available from
+https://notepad-plus-plus.org).
 --
 
 *Quick Start*
@@ -74,7 +77,7 @@ the commands in the 'Synopsis" box just under that heading.
 
 *Running IGGPIPE*
 -----------------
-. *Assign a single capital letter name to each genome*
+. *Assign a single capital letter name to each genome, herein referred to as X and Y*
 +
 --
 IGGPIPE makes frequent use of a single capital letter to refer to a genome. For
@@ -85,7 +88,7 @@ examples below the genome letters are substituted with "X" and "Y". Replace
 these with your own genome letters.
 --
 
-. *Copy allParameters.template file to new file allParameters.XY*
+. *Copy allParameters.template file to new file allParameters.XY where XY = your genome letters*
 +
 --
 .'Synopsis:'
@@ -106,8 +109,8 @@ parameter file. Also, if you decided to make two different sets of markers from 
 same genomes, using two different parameter settings, you might make two different
 parameter files. Here, we assume to begin with that you are only running your genomes
 with two genomes and a single set of parameters, and we will name the parameter file
-allParameters.XY, where X and Y are capital letters you chose to represent the two
-genomes. It is convenient to include those letters in the file name, to help you
+allParameters.XY, *where X and Y are capital letters you chose to represent the two
+genomes.* It is convenient to include those letters in the file name, to help you
 keep multiple parameter file straight.
 
 Copy allParameters.template to allParameters.XY (substituting your genome letters
@@ -125,7 +128,7 @@ You may want to adopt the same strategy and put your "allParameters" files in th
 'allParameters' subfolder or in a subfolder you make yourself.
 --
 
-. *Open the allParameters.XY file in your plain text editor*
+. *Open the allParameters.XY file in your plain text editor (XY = your genome letters)*
 +
 --
 Open the new *allParameters.XY* file created above in your plain text editor
@@ -248,7 +251,7 @@ not likely to contribute to viable markers, you should remove them from the FAST
 to be analyzed.
 --
 
-. *When finished making parameter value changes, save the modified allParameters.XY file*
+. *Save the modified allParameters.XY file (XY = your genome letters)*
 
 . *Check Primer3 settings in primer3settings.txt (optional)*
 +
@@ -330,7 +333,7 @@ can be run with this command:
 If at any point you want to remove 'all' files already generated and start anew,
 you can do that with this command:
 
-  make PARAMS=allParameters.XY CLEAN=1 ALL    #(replacing with your allParameters name)
+  make PARAMS=allParameters.XY CLEAN=1 ALL    #(XY = your genome letters)
 
 Running IGGPIPE with a 'make' command will usually produce a lot of output on
 the terminal, and some of this output may be important to examine, especially
@@ -342,7 +345,7 @@ is provided as a place to save these files.  To use 'tee', choose a log file
 name, let's say 'make_HP14.txt', and then add at the end of your 'make' command
 line the extra commands '| tee logFiles/make_HP14.txt', as in this example:
 
-  make PARAMS=allParameters.XY ALL | tee logFiles/make_ALL_HP14.txt
+  make PARAMS=allParameters.HP ALL | tee logFiles/make_ALL_HP14.txt
 
 Then, after 'make' finishes, you can examine that log file at any time to see
 what the pipeline output was, for example:
@@ -366,13 +369,19 @@ and help' section).
 . *Choose between a 'make ALL' and a step-wise 'make'*
 +
 --
+.'Synopsis:'
+*****************************************************
+  make PARAMS=allParameters.XY ALL | \
+    tee logFiles/make_ALL_XY14.txt #(XY = your genome letters, 14 = your K)
+*****************************************************
+
 As mentioned in the previous section, the IGGPIPE pipeline can be run one step
 at a time, or all steps from start to finish. The remaining sections in this
 document describe running one step at a time. However, instead of following
 those steps, you can instead use this command, which runs the pipeline start
 to finish:
 
-  make PARAMS=allParameters.XY ALL | tee logFiles/make_ALL_HP14.txt
+  make PARAMS=allParameters.XY ALL | tee logFiles/make_ALL_XY14.txt
 
 An expert might prefer this approach, but even a novice could use this command
 and, while the pipeline is running, examine intermediate output files (as
@@ -419,11 +428,11 @@ to generate the files anew.
 *****************************************************
   cd ~/Documents/IGGPIPE    #(or whatever is appropriate for your system)
   make PARAMS=allParameters.XY getGenomicPosIsect GENOME=1 | \
-      tee logFiles/make_getGenomicPosIsect_1_HP14.txt
+      tee logFiles/make_getGenomicPosIsect_1_XY14.txt #(XY = your genome letters, 14 = your K)
   wc -l outFolderForMyProject/Kmers/Kmers_1.isect
   # (if necessary, adjust K and repeat above)
   make PARAMS=allParameters.XY getGenomicPosIsect GENOME=ALL | \
-      tee logFiles/make_getGenomicPosIsect_ALL_HP14.txt
+      tee logFiles/make_getGenomicPosIsect_ALL_XY14.txt
 *****************************************************
 
 The first several steps in the pipeline extract unique k-mers from the FASTA
@@ -432,12 +441,12 @@ k-mers, and add genomic positions to them for each of the genomes. To run these
 steps on genome 1, use this command:
 
   cd ~/Documents/IGGPIPE    #(or whatever is appropriate for your system)
-  make PARAMS=allParameters.XY getGenomicPosIsect GENOME=1    #(replacing with your allParameters name)
+  make PARAMS=allParameters.XY getGenomicPosIsect GENOME=1     #(XY = your genome letters)
 
 or, better yet, log to a file also:
 
   make PARAMS=allParameters.XY getGenomicPosIsect GENOME=1 | \
-      tee logFiles/make_getGenomicPosIsect_1_HP14.txt
+      tee logFiles/make_getGenomicPosIsect_1_XY14.txt #(XY = your genome letters, 14 = your K)
 
 If it completes successfully, the end of the command output will show the message:
 
@@ -474,7 +483,7 @@ decrease K by 1 and try again, with the same commands (here we've changed "_1"
 to "_2" in the log file name to create a separate log file):
 
   make PARAMS=allParameters.XY getGenomicPosIsect GENOME=1 | \
-      tee logFiles/make_getGenomicPosIsect_2_HP14.txt
+      tee logFiles/make_getGenomicPosIsect_2_XY14.txt
   wc -l outFolderForMyProject/Kmers/Kmers_1.isect
 
 Note that the default setting in the parameter file for the
@@ -491,7 +500,7 @@ the pipeline on the remaining genome(s) to get the common unique k-mers for
 them:
 
   make PARAMS=allParameters.XY getGenomicPosIsect GENOME=ALL | \
-      tee logFiles/make_getGenomicPosIsect_ALL_HP14.txt
+      tee logFiles/make_getGenomicPosIsect_ALL_XY14.txt
 --
 
 . *Run IGGPIPE second part to generate LCRs*
@@ -499,14 +508,14 @@ them:
 --
 .'Synopsis:'
 *****************************************************
-  make PARAMS=allParameters.XY findLCRs | tee logFiles/make_findLCRs_1_HP14.txt
+  make PARAMS=allParameters.XY findLCRs | tee logFiles/make_findLCRs_1_XY14.txt
   source code/shell/countLCRsInLCRfile.sh outFolderForMyProject/LCRs*.tsv 2
 *****************************************************
 
 The next few steps of the pipeline analyze the common unique k-mers to find
 locally conserved regions (LCRs). To run these steps, use this command:
 
-  make PARAMS=allParameters.XY findLCRs    #(replacing with your allParameters name)
+  make PARAMS=allParameters.XY findLCRs
 
 If it completes successfully, the end of the command output will show the message:
 
@@ -562,7 +571,7 @@ together, with too much separation from the next k-mer, to form a useful LCR).
 You can edit the parameter file, change the LMIN parameter, and rerun this
 step with the same commands:
 
-  make PARAMS=allParameters.XY findLCRs    #(replacing with your allParameters name)
+  make PARAMS=allParameters.XY findLCRs
   source code/shell/countLCRsInLCRfile.sh outFolderForMyProject/LCRs*.tsv 2
 
 Another option is to increase the number of common unique k-mers by changing K
@@ -583,7 +592,7 @@ NOTE: The columns in the LCRs* file are described in Table 4.
 --
 .'Synopsis:'
 *****************************************************
-  make PARAMS=allParameters.XY findIndelGroups | tee logFiles/make_findIndelGroups_HP14.txt
+  make PARAMS=allParameters.XY findIndelGroups | tee logFiles/make_findIndelGroups_XY14.txt
   wc -l outFolderForMyProject/IndelGroups*
 *****************************************************
 
@@ -591,7 +600,7 @@ The next step of the pipeline analyzes the LCRs to find Indel Groups that satisf
 the parameters AMIN, AMAX, ADMIN, ADMAX, NDAMIN, and MINFLANK. To run this step,
 use this command:
 
-  make PARAMS=allParameters.XY findIndelGroups    #(replacing with your allParameters name)
+  make PARAMS=allParameters.XY findIndelGroups
 
 If it completes successfully, the end of the command output will show the message:
 
@@ -635,7 +644,7 @@ The columns in the IndelGroups* files are described in Table 3.
 --
 .'Synopsis:'
 *****************************************************
-  make PARAMS=allParameters.XY findPrimers    #(replacing with your allParameters name)
+  make PARAMS=allParameters.XY findPrimers
   wc -l outFolderForMyProject/NonvalidatedMarkers*
 *****************************************************
 
@@ -646,7 +655,7 @@ in file primer3settings.txt.
 
 To run these steps, use this command:
 
-  make PARAMS=allParameters.XY findPrimers    #(replacing with your allParameters name)
+  make PARAMS=allParameters.XY findPrimers
 
 Depending on the number of Indel Groups, this can take a 'long' time. We have
 seen it take two days to finish running all Indel Groups through Primer3.
@@ -682,7 +691,7 @@ The columns in the NonvalidatedMarkers* file are described in Table 1.
 --
 .'Synopsis:'
 *****************************************************
-  make PARAMS=allParameters.XY removeBadMarkers    #(replacing with your allParameters name)
+  make PARAMS=allParameters.XY removeBadMarkers
   wc -l outFolderForMyProject/Markers*
 *****************************************************
 
@@ -694,7 +703,7 @@ or more genomes, and writes new files with the validated IGG marker primer pairs
 
 To run these steps, use this command:
 
-  make PARAMS=allParameters.XY removeBadMarkers    #(replacing with your allParameters name)
+  make PARAMS=allParameters.XY removeBadMarkers
 
 Depending on the number of primer pairs, this can take a 'long' time. We have seen it
 take two days 'per genome' to finish running all primer pairs through e-PCR.
@@ -745,14 +754,14 @@ The columns in the Markers* files are described in Table 1.
 --
 .'Synopsis:'
 *****************************************************
-  make PARAMS=allParameters.XY plotMarkers    #(replacing with your allParameters name)
-  make PARAMS=allParameters.XY ALL    #(replacing with your allParameters name)
+  make PARAMS=allParameters.XY plotMarkers
+  make PARAMS=allParameters.XY ALL
 *****************************************************
 
 Now you can run the rest of the pipeline to finish up.  The final step produces some
 plots of marker statistics and density.  This is done with this command:
 
-  make PARAMS=allParameters.XY plotMarkers    #(replacing with your allParameters name)
+  make PARAMS=allParameters.XY plotMarkers
 
 This final pipeline step produces several output files in the main output directory.
 One file is a .pdf file with name starting with MarkerCounts_, containing plots of
@@ -766,7 +775,7 @@ file limits the output to the first several scaffolds.
 After using the above command, enter this command, which runs the entire
 pipeline, checking that all steps have been completed from start to finish:
 
-  make PARAMS=allParameters.XY ALL    #(replacing with your allParameters name)
+  make PARAMS=allParameters.XY ALL
 
 It will verify that all pipeline steps have been completed, and if so, it issues
 this message:
@@ -843,7 +852,7 @@ be discarded as unreliable), and SCRAMBLE_SEQUENCE (can be set TRUE to do alignm
 with scrambled sequences, to determine the actual numbers of indels and SNPs per Kbp
 in random sequence alignments.  Run the indel/SNP finder as follows:
 
-  make PARAMS=allParameters.XY IndelsSNPs    #(replacing with your allParameters name)
+  make PARAMS=allParameters.XY IndelsSNPs
 
 This produces two files in your output folder with names ending in "indels.tsv" and
 ".snps.tsv", containing tables of all indels and SNPs found in either the LCR or Indel
@@ -869,7 +878,7 @@ is built, but which can be run using 'make ... plotIndels', reads the indels fil
 by 'make ... IndelsSNPs' and plots information from it in a pdf file. The program is called
 plotIndels.R. Run it as follows:
 
-  make PARAMS=allParameters.XY plotIndels    #(replacing with your allParameters name)
+  make PARAMS=allParameters.XY plotIndels
 
 This produces a file in your output folder with a name ending in "indels.pdf",
 containing plots of various indel information.  Examine it to see the plots it

@@ -775,10 +775,11 @@ are required.</p></div>
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>Most work here is done from the command line, by opening the Terminal application.
-Commands will be shown here and you may be able to get by with no knowledge of the
-command line, other than knowing how to start it (by starting the Terminal app
-on the Mac). However, ideally you should be familiar with some basic command
+<div class="paragraph"><p>Most work here is done from the command line (by opening the Terminal application
+(Mac) or CygWin command console (Windows)).</p></div>
+<div class="paragraph"><p>Commands will be shown here and you may be able to get by with no knowledge of the
+command line, other than knowing how to start it. However, ideally you should
+be familiar with some basic command
 line commands such as <em>cd</em>, <em>ls</em>, <em>cp</em>, <em>rm</em>, <em>mv</em>, <em>sudo</em>, <em>less</em>,
 <em>head</em> and <em>tail</em>, <em>man</em>, and <em>mkdir</em>. If you do not know how to use the command
 line or don&#8217;t know these basic commands, you may want to take some time to learn
@@ -811,11 +812,13 @@ directory with this command:</p></div>
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>You must have a plain text editor you know how to use.  If nothing else, the Mac
-"TextEdit" program will work (use Plain Text format).  The free open-source
-TextWrangler program is strongly recommended, available from the Apple App
-Store (Applications, App Store) or from:</p></div>
-<div class="paragraph"><p><a href="http://www.barebones.com/products/textwrangler">http://www.barebones.com/products/textwrangler</a></p></div>
+<div class="paragraph"><p>You must have a plain text editor you know how to use.  On a Mac the "TextEdit"
+program will work (use Plain Text format), but <em>do not</em> use Notepad on Windows.
+The free open-source TextWrangler program is strongly recommended for Mac
+(available from the Apple App
+Store (Applications, App Store) or from <a href="http://www.barebones.com/products/textwrangler">http://www.barebones.com/products/textwrangler</a>),
+and the open-source Notepad++ program is recommended for Windows (available from
+<a href="https://notepad-plus-plus.org">https://notepad-plus-plus.org</a>).</p></div>
 </div></div>
 </li>
 </ol></div>
@@ -838,7 +841,7 @@ the commands in the 'Synopsis" box just under that heading.</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-<strong>Assign a single capital letter name to each genome</strong>
+<strong>Assign a single capital letter name to each genome, herein referred to as X and Y</strong>
 </p>
 <div class="openblock">
 <div class="content">
@@ -852,7 +855,7 @@ these with your own genome letters.</p></div>
 </li>
 <li>
 <p>
-<strong>Copy allParameters.template file to new file allParameters.XY</strong>
+<strong>Copy allParameters.template file to new file allParameters.XY where XY = your genome letters</strong>
 </p>
 <div class="openblock">
 <div class="content">
@@ -876,8 +879,8 @@ parameter file. Also, if you decided to make two different sets of markers from 
 same genomes, using two different parameter settings, you might make two different
 parameter files. Here, we assume to begin with that you are only running your genomes
 with two genomes and a single set of parameters, and we will name the parameter file
-allParameters.XY, where X and Y are capital letters you chose to represent the two
-genomes. It is convenient to include those letters in the file name, to help you
+allParameters.XY, <strong>where X and Y are capital letters you chose to represent the two
+genomes.</strong> It is convenient to include those letters in the file name, to help you
 keep multiple parameter file straight.</p></div>
 <div class="paragraph"><p>Copy allParameters.template to allParameters.XY (substituting your genome letters
 for X and Y), using either your file explorer application or via the command line.
@@ -897,7 +900,7 @@ You may want to adopt the same strategy and put your "allParameters" files in th
 </li>
 <li>
 <p>
-<strong>Open the allParameters.XY file in your plain text editor</strong>
+<strong>Open the allParameters.XY file in your plain text editor (XY = your genome letters)</strong>
 </p>
 <div class="openblock">
 <div class="content">
@@ -1083,7 +1086,7 @@ to be analyzed.</p></div>
 </li>
 <li>
 <p>
-<strong>When finished making parameter value changes, save the modified allParameters.XY file</strong>
+<strong>Save the modified allParameters.XY file (XY = your genome letters)</strong>
 </p>
 </li>
 <li>
@@ -1168,7 +1171,7 @@ can be run with this command:</p></div>
 you can do that with this command:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY CLEAN=1 ALL    #(replacing with your allParameters name)</code></pre>
+<pre><code>make PARAMS=allParameters.XY CLEAN=1 ALL    #(XY = your genome letters)</code></pre>
 </div></div>
 <div class="paragraph"><p>Running IGGPIPE with a <em>make</em> command will usually produce a lot of output on
 the terminal, and some of this output may be important to examine, especially
@@ -1181,7 +1184,7 @@ name, let&#8217;s say <em>make_HP14.txt</em>, and then add at the end of your <e
 line the extra commands <em>| tee logFiles/make_HP14.txt</em>, as in this example:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY ALL | tee logFiles/make_ALL_HP14.txt</code></pre>
+<pre><code>make PARAMS=allParameters.HP ALL | tee logFiles/make_ALL_HP14.txt</code></pre>
 </div></div>
 <div class="paragraph"><p>Then, after <em>make</em> finishes, you can examine that log file at any time to see
 what the pipeline output was, for example:</p></div>
@@ -1208,6 +1211,15 @@ and help</em> section).</p></div>
 </p>
 <div class="openblock">
 <div class="content">
+<div class="sidebarblock">
+<div class="content">
+<div class="title"><em>Synopsis:</em></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>make PARAMS=allParameters.XY ALL | \
+  tee logFiles/make_ALL_XY14.txt #(XY = your genome letters, 14 = your K)</code></pre>
+</div></div>
+</div></div>
 <div class="paragraph"><p>As mentioned in the previous section, the IGGPIPE pipeline can be run one step
 at a time, or all steps from start to finish. The remaining sections in this
 document describe running one step at a time. However, instead of following
@@ -1215,7 +1227,7 @@ those steps, you can instead use this command, which runs the pipeline start
 to finish:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY ALL | tee logFiles/make_ALL_HP14.txt</code></pre>
+<pre><code>make PARAMS=allParameters.XY ALL | tee logFiles/make_ALL_XY14.txt</code></pre>
 </div></div>
 <div class="paragraph"><p>An expert might prefer this approach, but even a novice could use this command
 and, while the pipeline is running, examine intermediate output files (as
@@ -1267,11 +1279,11 @@ to generate the files anew.</p></div>
 <div class="content">
 <pre><code>cd ~/Documents/IGGPIPE    #(or whatever is appropriate for your system)
 make PARAMS=allParameters.XY getGenomicPosIsect GENOME=1 | \
-    tee logFiles/make_getGenomicPosIsect_1_HP14.txt
+    tee logFiles/make_getGenomicPosIsect_1_XY14.txt #(XY = your genome letters, 14 = your K)
 wc -l outFolderForMyProject/Kmers/Kmers_1.isect
 # (if necessary, adjust K and repeat above)
 make PARAMS=allParameters.XY getGenomicPosIsect GENOME=ALL | \
-    tee logFiles/make_getGenomicPosIsect_ALL_HP14.txt</code></pre>
+    tee logFiles/make_getGenomicPosIsect_ALL_XY14.txt</code></pre>
 </div></div>
 </div></div>
 <div class="paragraph"><p>The first several steps in the pipeline extract unique k-mers from the FASTA
@@ -1281,13 +1293,13 @@ steps on genome 1, use this command:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>cd ~/Documents/IGGPIPE    #(or whatever is appropriate for your system)
-make PARAMS=allParameters.XY getGenomicPosIsect GENOME=1    #(replacing with your allParameters name)</code></pre>
+make PARAMS=allParameters.XY getGenomicPosIsect GENOME=1     #(XY = your genome letters)</code></pre>
 </div></div>
 <div class="paragraph"><p>or, better yet, log to a file also:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>make PARAMS=allParameters.XY getGenomicPosIsect GENOME=1 | \
-    tee logFiles/make_getGenomicPosIsect_1_HP14.txt</code></pre>
+    tee logFiles/make_getGenomicPosIsect_1_XY14.txt #(XY = your genome letters, 14 = your K)</code></pre>
 </div></div>
 <div class="paragraph"><p>If it completes successfully, the end of the command output will show the message:</p></div>
 <div class="literalblock">
@@ -1326,7 +1338,7 @@ to "_2" in the log file name to create a separate log file):</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>make PARAMS=allParameters.XY getGenomicPosIsect GENOME=1 | \
-    tee logFiles/make_getGenomicPosIsect_2_HP14.txt
+    tee logFiles/make_getGenomicPosIsect_2_XY14.txt
 wc -l outFolderForMyProject/Kmers/Kmers_1.isect</code></pre>
 </div></div>
 <div class="paragraph"><p>Note that the default setting in the parameter file for the
@@ -1342,7 +1354,7 @@ them:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>make PARAMS=allParameters.XY getGenomicPosIsect GENOME=ALL | \
-    tee logFiles/make_getGenomicPosIsect_ALL_HP14.txt</code></pre>
+    tee logFiles/make_getGenomicPosIsect_ALL_XY14.txt</code></pre>
 </div></div>
 </div></div>
 </li>
@@ -1357,7 +1369,7 @@ them:</p></div>
 <div class="title"><em>Synopsis:</em></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY findLCRs | tee logFiles/make_findLCRs_1_HP14.txt
+<pre><code>make PARAMS=allParameters.XY findLCRs | tee logFiles/make_findLCRs_1_XY14.txt
 source code/shell/countLCRsInLCRfile.sh outFolderForMyProject/LCRs*.tsv 2</code></pre>
 </div></div>
 </div></div>
@@ -1365,7 +1377,7 @@ source code/shell/countLCRsInLCRfile.sh outFolderForMyProject/LCRs*.tsv 2</code>
 locally conserved regions (LCRs). To run these steps, use this command:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY findLCRs    #(replacing with your allParameters name)</code></pre>
+<pre><code>make PARAMS=allParameters.XY findLCRs</code></pre>
 </div></div>
 <div class="paragraph"><p>If it completes successfully, the end of the command output will show the message:</p></div>
 <div class="literalblock">
@@ -1423,7 +1435,7 @@ You can edit the parameter file, change the LMIN parameter, and rerun this
 step with the same commands:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY findLCRs    #(replacing with your allParameters name)
+<pre><code>make PARAMS=allParameters.XY findLCRs
 source code/shell/countLCRsInLCRfile.sh outFolderForMyProject/LCRs*.tsv 2</code></pre>
 </div></div>
 <div class="paragraph"><p>Another option is to increase the number of common unique k-mers by changing K
@@ -1455,7 +1467,7 @@ pipeline steps that do not need to be repeated.</p></div>
 <div class="title"><em>Synopsis:</em></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY findIndelGroups | tee logFiles/make_findIndelGroups_HP14.txt
+<pre><code>make PARAMS=allParameters.XY findIndelGroups | tee logFiles/make_findIndelGroups_XY14.txt
 wc -l outFolderForMyProject/IndelGroups*</code></pre>
 </div></div>
 </div></div>
@@ -1464,7 +1476,7 @@ the parameters AMIN, AMAX, ADMIN, ADMAX, NDAMIN, and MINFLANK. To run this step,
 use this command:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY findIndelGroups    #(replacing with your allParameters name)</code></pre>
+<pre><code>make PARAMS=allParameters.XY findIndelGroups</code></pre>
 </div></div>
 <div class="paragraph"><p>If it completes successfully, the end of the command output will show the message:</p></div>
 <div class="literalblock">
@@ -1513,7 +1525,7 @@ pipeline steps.</p></div>
 <div class="title"><em>Synopsis:</em></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY findPrimers    #(replacing with your allParameters name)
+<pre><code>make PARAMS=allParameters.XY findPrimers
 wc -l outFolderForMyProject/NonvalidatedMarkers*</code></pre>
 </div></div>
 </div></div>
@@ -1524,7 +1536,7 @@ in file primer3settings.txt.</p></div>
 <div class="paragraph"><p>To run these steps, use this command:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY findPrimers    #(replacing with your allParameters name)</code></pre>
+<pre><code>make PARAMS=allParameters.XY findPrimers</code></pre>
 </div></div>
 <div class="paragraph"><p>Depending on the number of Indel Groups, this can take a <em>long</em> time. We have
 seen it take two days to finish running all Indel Groups through Primer3.
@@ -1565,7 +1577,7 @@ few of them as bad and remove them.</p></div>
 <div class="title"><em>Synopsis:</em></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY removeBadMarkers    #(replacing with your allParameters name)
+<pre><code>make PARAMS=allParameters.XY removeBadMarkers
 wc -l outFolderForMyProject/Markers*</code></pre>
 </div></div>
 </div></div>
@@ -1577,7 +1589,7 @@ or more genomes, and writes new files with the validated IGG marker primer pairs
 <div class="paragraph"><p>To run these steps, use this command:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY removeBadMarkers    #(replacing with your allParameters name)</code></pre>
+<pre><code>make PARAMS=allParameters.XY removeBadMarkers</code></pre>
 </div></div>
 <div class="paragraph"><p>Depending on the number of primer pairs, this can take a <em>long</em> time. We have seen it
 take two days <em>per genome</em> to finish running all primer pairs through e-PCR.</p></div>
@@ -1635,15 +1647,15 @@ are used to select multiple files. For example:</p></div>
 <div class="title"><em>Synopsis:</em></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY plotMarkers    #(replacing with your allParameters name)
-make PARAMS=allParameters.XY ALL    #(replacing with your allParameters name)</code></pre>
+<pre><code>make PARAMS=allParameters.XY plotMarkers
+make PARAMS=allParameters.XY ALL</code></pre>
 </div></div>
 </div></div>
 <div class="paragraph"><p>Now you can run the rest of the pipeline to finish up.  The final step produces some
 plots of marker statistics and density.  This is done with this command:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY plotMarkers    #(replacing with your allParameters name)</code></pre>
+<pre><code>make PARAMS=allParameters.XY plotMarkers</code></pre>
 </div></div>
 <div class="paragraph"><p>This final pipeline step produces several output files in the main output directory.
 One file is a .pdf file with name starting with MarkerCounts_, containing plots of
@@ -1657,7 +1669,7 @@ file limits the output to the first several scaffolds.</p></div>
 pipeline, checking that all steps have been completed from start to finish:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY ALL    #(replacing with your allParameters name)</code></pre>
+<pre><code>make PARAMS=allParameters.XY ALL</code></pre>
 </div></div>
 <div class="paragraph"><p>It will verify that all pipeline steps have been completed, and if so, it issues
 this message:</p></div>
@@ -1819,7 +1831,7 @@ with scrambled sequences, to determine the actual numbers of indels and SNPs per
 in random sequence alignments.  Run the indel/SNP finder as follows:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY IndelsSNPs    #(replacing with your allParameters name)</code></pre>
+<pre><code>make PARAMS=allParameters.XY IndelsSNPs</code></pre>
 </div></div>
 <div class="paragraph"><p>This produces two files in your output folder with names ending in "indels.tsv" and
 ".snps.tsv", containing tables of all indels and SNPs found in either the LCR or Indel
@@ -1847,7 +1859,7 @@ by <em>make &#8230; IndelsSNPs</em> and plots information from it in a pdf file.
 plotIndels.R. Run it as follows:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY plotIndels    #(replacing with your allParameters name)</code></pre>
+<pre><code>make PARAMS=allParameters.XY plotIndels</code></pre>
 </div></div>
 <div class="paragraph"><p>This produces a file in your output folder with a name ending in "indels.pdf",
 containing plots of various indel information.  Examine it to see the plots it
@@ -2465,7 +2477,7 @@ IndelGroup and Markers files: refID_refPos1_refPos2.</p></td>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-07-31 11:40:49 PDT
+Last updated 2016-07-31 12:39:33 PDT
 </div>
 </div>
 </body>
