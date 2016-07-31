@@ -32,6 +32,11 @@ INDENT := $(EMPTY)    $(EMPTY)
 % : %.o
 
 ################################################################################
+# Include VERSION.txt.
+################################################################################
+include VERSION.txt
+
+################################################################################
 # Include path parameters definition file.
 ################################################################################
 include allPathParameters.ours
@@ -52,7 +57,13 @@ all: ALL
 endif
 
 ################################################################################
-# 'basic_usage' target, show basic usage info.
+# Target version: show version number from VERSION.txt file.
+################################################################################
+version:
+	@echo "IGGPIPE Version $(VERSION)"
+
+################################################################################
+# target basic_usage: show basic usage info.
 ################################################################################
 ifeq ($(PARAMS),)
 basic_usage:
@@ -64,13 +75,13 @@ basic_usage:
 	@echo "Summarizing the usage info, you must specify a parameter file using PARAMS in"
 	@echo "the make command, and either specify target ALL to run the entire pipeline or",
 	@echo "specify a pipeline step name.  For example:"
-	@echo 
+	@echo
 	@echo "$(INDENT)make PARAMS=allParameters.test ALL"
-	@echo 
+	@echo
 endif
 
 ################################################################################
-# If user invokes 'make usage', show usage info.
+# Target usage: show usage info.
 ################################################################################
 usage:
 	less help.txt
@@ -78,7 +89,7 @@ help:
 	less help.txt
 
 ################################################################################
-# If user invokes 'make clean', give him some instructions on how to clean.
+# Target clean: give user some instructions on how to clean away files.
 ################################################################################
 clean:
 	@echo "Use 'make PARAMS=filename CLEAN=1 ALL' to remove files made with parameter file 'filename'"
@@ -116,7 +127,7 @@ REDIR := ) 2>&1
 endif
 
 ################################################################################
-# General pipeline targets.
+# ALL target.
 ################################################################################
 
 # Target for running or cleaning entire pipeline or cleaning entire output directory.
@@ -151,7 +162,7 @@ ALL: getSeqInfo getKmers kmersToText kmerStats getContigFile getGenomicPosIsect 
 endif
 
 ################################################################################
-# Create output directories.
+# Targets to create output directories.
 ################################################################################
 
 # Target for making the main output directory.
@@ -179,7 +190,7 @@ $(DIR_PRIMER_DATA):
 	mkdir -p $(DIR_PRIMER_DATA)
 
 ################################################################################
-# getSeqInfo: Get sequence ID and length information.  Argument: GENOME
+# Target getSeqInfo: Get sequence ID and length information.  Argument: GENOME
 ################################################################################
 
 # A list of all FASTA files to be analyzed.
@@ -222,7 +233,8 @@ $(IDLEN_FILES) : $(PFX_GENOME_DATA_FILE)%.idlens : $$(PATH_GENOME_FASTA_$$*) | \
 	@echo "Finished."
 
 ################################################################################
-# getContigFile: Get sequence contig positions and lengths.  Argument: GENOME
+# Target getContigFile: Get sequence contig positions and lengths.
+# Argument: GENOME
 ################################################################################
 
 # A list of all FASTA files already defined above: FASTA_FILES
@@ -264,7 +276,7 @@ $(CONTIG_FILES) : $(PFX_GENOME_DATA_FILE)%.contigs : $$(PATH_GENOME_FASTA_$$*) |
 	@echo "Finished."
 
 ################################################################################
-# getKmers: Get unique k-mers.  Argument: GENOME
+# Target getKmers: Get unique k-mers.  Argument: GENOME
 ################################################################################
 
 # A list of all FASTA files already defined above: FASTA_FILES
@@ -312,7 +324,7 @@ $(KMERS_BINARY_FILES) : $(PFX_KMERS_DATA_FILE)%.kmers : $$(PATH_GENOME_FASTA_$$*
 	@echo "Finished."
 
 ################################################################################
-# kmerStats: Get unique k-mer statistics.  Argument: GENOME
+# Target kmerStats: Get unique k-mer statistics.  Argument: GENOME
 ################################################################################
 
 # A list of all .kmers files already defined above: KMERS_FILES
@@ -358,7 +370,7 @@ $(KMERS_STATS_FILES) : $(PFX_KMERS_DATA_FILE)%.stats : $(PFX_KMERS_DATA_FILE)%.k
 	@echo
 
 ################################################################################
-# kmersToText: Convert binary k-mers to text k-mers.  Argument: GENOME
+# Target kmersToText: Convert binary k-mers to text k-mers.  Argument: GENOME
 ################################################################################
 
 # A list of all binary .kmers files already defined above: KMERS_BINARY_FILES
@@ -399,8 +411,8 @@ $(KMERS_TEXT_FILES) : $(PFX_KMERS_DATA_FILE)%.kmers.txt : $(PFX_KMERS_DATA_FILE)
 	@echo "Finished."
 
 ################################################################################
-# getGenomicPosIsect: Intersect unique k-mers to get common unique k-mers, and
-# add genomic positions to them.  Argument: GENOME
+# Target getGenomicPosIsect: Intersect unique k-mers to get common unique
+# k-mers, and add genomic positions to them.  Argument: GENOME
 ################################################################################
 
 # A list of all FASTA files already defined above: FASTA_FILES
@@ -453,8 +465,9 @@ $(ISECT_KMER_FILES) : $(PFX_KMERS_DATA_FILE)%.isect : $(KMERS_TEXT_FILES) $$(PAT
 	@echo "Finished."
 
 ################################################################################
-# mergeKmers: Merge files of common unique k-mers having genomic positions into
-# a single file containing the data for all genomes.  Argument: GENOME
+# Target mergeKmers: Merge files of common unique k-mers having genomic
+# positions into a single file containing the data for all genomes.
+# Argument: GENOME
 ################################################################################
 
 # We want to join corresponding lines of multiple genome files, with the k-mer
@@ -528,8 +541,8 @@ $(TARGET_MERGE_OTHERS) : $(PFX_KMERS_DATA_FILE)%.merge : $(PFX_KMERS_DATA_FILE)%
 	@echo "Finished."
 
 ################################################################################
-# sortCommonUniqueKmers: Sort merged kmers file to obtain sorted common unique
-# k-mers file.
+# Target sortCommonUniqueKmers: Sort merged kmers file to obtain sorted common
+# unique k-mers file.
 ################################################################################
 
 # The last file in the chain of merged files from the merge operation preceding this.
@@ -560,9 +573,9 @@ $(PATH_COMMON_UNIQUE_KMERS) : $(UNSORTED_COMMON_UNIQUE_KMERS)
 	@echo "Finished."
 
 ################################################################################
-# findLCRs: Find locally conserved regions using common unique k-mers with
-# genomic positions that have been merged into a single file sorted by reference
-# genome position.
+# Target findLCRs: Find locally conserved regions using common unique k-mers
+# with genomic positions that have been merged into a single file sorted by
+# reference genome position.
 ################################################################################
 
 # Phony target to make or clean PATH_LCR_FILE and PATH_BAD_KMERS_FILE files.
@@ -603,7 +616,8 @@ $(PTN_LCR_FILE) $(PTN_BAD_KMERS_FILE) : $(PATH_COMMON_UNIQUE_KMERS) | \
 	@echo "Finished."
 
 ################################################################################
-# findIndelGroups: Analyze locally conserved regions to find insertions/deletions.
+# Target findIndelGroups: Analyze locally conserved regions to find
+# insertions/deletions.
 ################################################################################
 
 # A list of all .idlens files is already defined above: IDLEN_FILES
@@ -646,7 +660,8 @@ $(PTN_OVERLAPPING_INDELS_FILE) $(PTN_NONOVERLAPPING_INDELS_FILE) : $(PATH_LCR_FI
 	@echo "Finished."
 
 ################################################################################
-# getDNAseqsForPrimers: Extract DNA sequence around Indel Groups, for making primers.
+# Target getDNAseqsForPrimers: Extract DNA sequence around Indel Groups, for
+# making primers.
 ################################################################################
 
 # A list of all FASTA files already defined above: FASTA_FILES
@@ -698,7 +713,7 @@ $(DNA_SEQ_FILES) : $(PFX_DNA_SEQS_PATH)_%.dnaseqs : $$(PATH_GENOME_FASTA_$$*) \
 	@echo "Finished."
 
 ################################################################################
-# findPrimers: Run primer3 to search for primers around Indel Groups.
+# Target findPrimers: Run primer3 to search for primers around Indel Groups.
 ################################################################################
 
 # A list of all .dnaseqs files is already defined above: DNA_SEQ_FILES
@@ -735,7 +750,8 @@ $(PATH_NONVALIDATED_MARKER_FILE) : $(PATH_OVERLAPPING_INDEL_GROUPS_FILE) $(DNA_S
 	@echo "Finished."
 
 ################################################################################
-# ePCRtesting: Run e-PCR to test all primer pairs for proper amplicon size.
+# Target ePCRtesting: Run e-PCR to test all primer pairs for proper amplicon
+# size.
 ################################################################################
 
 # A list of all FASTA files already defined above: FASTA_FILES
@@ -782,10 +798,10 @@ $(BAD_MARKER_FILES) : $(PFX_BAD_MARKER_ERROR_PATH)_%.bad.tsv : $$(PATH_GENOME_FA
 	@echo "Finished."
 
 ################################################################################
-# removeBadMarkers: Read bad marker files that failed e-PCR, then read full
-# marker file, remove the bad markers from it, and write new files of good ones,
-# one set overlapping, the other non-overlapping.  ID numbers are added to the
-# markers.
+# Target removeBadMarkers: Read bad marker files that failed e-PCR, then read
+# full marker file, remove the bad markers from it, and write new files of good
+# ones, one set overlapping, the other non-overlapping.  ID numbers are added to
+# the markers.
 ################################################################################
 
 # A list of all .bad.tsv files is already defined above: BAD_MARKER_FILES
@@ -829,8 +845,8 @@ $(PTN_OVERLAPPING_MARKERS_FILE) $(PTN_NONOVERLAPPING_MARKERS_FILE) : $(PATH_NONV
 	@echo "Finished."
 
 ################################################################################
-# plotMarkers: Make density plots of final "good" candidate IGG markers, both
-# overlapping and non-overlapping.
+# Target plotMarkers: Make density plots of final "good" candidate IGG markers,
+# both overlapping and non-overlapping.
 ################################################################################
 
 # A list of all .idlens files is already defined above: IDLEN_FILES
@@ -872,7 +888,7 @@ $(MARKER_COUNTS_FILE) $(MARKER_DENSITY_FILES) : $(PATH_OVERLAPPING_MARKERS_FILE)
 	@echo "Finished."
 
 ################################################################################
-# LCRsToLCBs: Read LCRs data file and convert to LCBs.
+# Target LCRsToLCBs: Read LCRs data file and convert to LCBs.
 ################################################################################
 
 # Phony target to make or clean PATH_LCB_FILE file.
@@ -885,7 +901,7 @@ LCRsToLCBs:
 	@echo "You must specify a PARAMS file:"
 	@echo
 	@echo "$(INDENT)make PARAMS=<allParametersFile> LCRsToLCBs"
-	@echo 
+	@echo
 else ifeq ($(CLEAN),)
 LCRsToLCBs: $(PATH_LCB_FILE)
 	@echo
@@ -909,8 +925,8 @@ $(PATH_LCB_FILE) : $(PATH_LCR_FILE) | $(DIR_GENOME_OUT_DATA)
 	@echo "Finished."
 
 ################################################################################
-# getDNAseqsForIndelsSNPs: Read input file and extract DNA sequences from each
-# genome, then write combined data to output file.
+# Target getDNAseqsForIndelsSNPs: Read input file and extract DNA sequences from
+# each genome, then write combined data to output file.
 ################################################################################
 
 # A list of all FASTA files already defined above: FASTA_FILES
@@ -925,7 +941,7 @@ getDNAseqsForIndelsSNPs:
 	@echo "You must specify a PARAMS file:"
 	@echo
 	@echo "$(INDENT)make PARAMS=<allParametersFile> getDNAseqsForIndelsSNPs"
-	@echo 
+	@echo
 else ifeq ($(CLEAN),)
 getDNAseqsForIndelsSNPs: $(PATH_INDELS_SNPS_SEQS_FILE)
 	@echo
@@ -955,8 +971,8 @@ $(PATH_INDELS_SNPS_SEQS_FILE) : $(PATH_INDELS_SNPS_INPUT_FILE) $(FASTA_FILES) | 
 	@echo "Finished."
 
 ################################################################################
-# IndelsSNPs: Read input file and perform alignments, then search them for
-# Indels and SNPs.
+# Target IndelsSNPs: Read input file and perform alignments, then search them
+# for Indels and SNPs.
 ################################################################################
 
 # Do this to avoid case annoyance.
@@ -972,7 +988,7 @@ IndelsSNPs:
 	@echo "You must specify a PARAMS file:"
 	@echo
 	@echo "$(INDENT)make PARAMS=<allParametersFile> IndelsSNPs"
-	@echo 
+	@echo
 else ifeq ($(CLEAN),)
 IndelsSNPs: $(PATH_INDELS_OUTPUT_FILE) $(PATH_SNPS_OUTPUT_FILE)
 	@echo
@@ -1000,7 +1016,8 @@ $(PATH_INDELS_OUTPUT_FILE) $(PATH_SNPS_OUTPUT_FILE) : $(PATH_INDELS_SNPS_SEQS_FI
 	@echo "Finished."
 
 ################################################################################
-# plotIndels: Make plots of information about Indels found within Indel groups.
+# Target plotIndels: Make plots of information about Indels found within Indel
+# groups.
 ################################################################################
 
 # Do this to avoid case annoyance.
@@ -1016,7 +1033,7 @@ plotIndels:
 	@echo "You must specify a PARAMS file:"
 	@echo
 	@echo "$(INDENT)make PARAMS=<allParametersFile> plotIndels"
-	@echo 
+	@echo
 else ifeq ($(CLEAN),)
 plotIndels: $(PATH_INDELS_PLOT_FILE)
 	@echo
@@ -1039,6 +1056,43 @@ $(PATH_INDELS_PLOT_FILE) : $(PATH_INDELS_OUTPUT_FILE) | $(PATH_PLOT_INDELS)
 		$(CMD_RSCRIPT) $(PATH_PLOT_INDELS) $(WD) $(PATH_INDELS_OUTPUT_FILE) \
 	    $(PATH_INDELS_PLOT_FILE) $(REDIR) ### plotIndels
 	@echo "Finished."
+
+################################################################################
+# Target documents: Convert .asciidoc documents to .html files using asciidoc
+# application (developer only).
+#
+# Target README: Update README document
+# Target INSTALL: Update INSTALL document
+# Target RUN: Update RUN document
+#
+# Requirements:
+#   1. "python" is installed on your system (https://www.python.org/downloads/)
+#   2. "asciidoc" tools are installed (http://asciidoc.org/INSTALL.html)
+# Make a symbolic link in a directory on your path that is named asciidoc,
+# pointing to the "asciidoc.py" file in the asciidoc install directory.
+# For example, if asciidoc-8.6.9 were downloaded into ~/src, and if ~/bin
+# is on your path, this would make a symbolic link:
+#   ln -s ~/src/asciidoc-8.6.9/asciidoc.py ~/bin/asciidoc
+# Also make sure the file "asciidoc.py" is executable:
+#   chmod +x ~/src/asciidoc-8.6.9/asciidoc.py
+################################################################################
+
+documents: README INSTALL RUN
+
+README: README.html
+
+README.html: code/asciidoc/README.asciidoc
+	asciidoc -a VERSION=$(VERSION) -b html -o ./README.html code/asciidoc/README.asciidoc
+
+INSTALL: INSTALL.html
+
+INSTALL.html: code/asciidoc/INSTALL.asciidoc
+	asciidoc -a VERSION=$(VERSION) -b html -o ./INSTALL.html code/asciidoc/INSTALL.asciidoc
+
+RUN: RUN.html
+
+RUN.html: code/asciidoc/RUN.asciidoc
+	asciidoc -a VERSION=$(VERSION) -b html -o ./RUN.html code/asciidoc/RUN.asciidoc
 
 ################################################################################
 # End of file.

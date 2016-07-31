@@ -734,58 +734,12 @@ asciidoc.install();
 <body class="article">
 <div id="header">
 <h1>IGGPIPE INSTALLATION</h1>
-<span id="author">Version v0.0, Aug 2015</span><br />
+<span id="author">Version V1.0</span><br />
 </div>
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph"><p>This describes how to install all elements needed to run the IGGPIPE software.</p></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_strong_if_not_done_already_download_iggpipe_files_strong"><strong>If not done already, download IGGPIPE files</strong></h2>
-<div class="sectionbody">
-<div class="olist arabic"><ol class="arabic">
-<li>
-<p>
-Browse to <a href="https://github.com/BradyLab/IGGPIPE">https://github.com/BradyLab/IGGPIPE</a>
-</p>
-</li>
-<li>
-<p>
-At bottom of right column on screen, click "Download ZIP" and choose a place to
-put it on your computer.
-</p>
-</li>
-<li>
-<p>
-Unzip the zip file on your computer.
-</p>
-</li>
-<li>
-<p>
-Rename the unzipped folder from "IGGPIPE-master" to just "IGGPIPE".
-</p>
-</li>
-<li>
-<p>
-If you are a GitHub user and wish to use the IGGPIPE GitHub repository directly,
-instead of the above steps, you can fork the IGGPIPE repository and work on your own
-copy. The <em>master</em> branch is where the releases reside, each tagged with a version
-number. You can create a branch whose contents are the same as a tagged version
-with the command:
-</p>
-<div class="openblock">
-<div class="content">
-<div class="literalblock">
-<div class="content">
-<pre><code>git checkout -b my_V1.0_branch v1.0"</code></pre>
-</div></div>
-<div class="paragraph"><p>You can then do the installation process using those files.</p></div>
-<div class="paragraph"><p>We will try to monitor for pull requests if you make useful changes.</p></div>
-</div></div>
-</li>
-</ol></div>
 </div>
 </div>
 <div class="sect1">
@@ -814,8 +768,8 @@ IGGPIPE will not work on 32-bit Windows systems.</p></div>
 <div class="content">
 <div class="paragraph"><p>Before starting the installation, consider whether the computer on which the
 software is to be installed has enough memory for the problem at hand. We have
-been running IGGPIPE using 16GB of RAM, and we recommend no less than that amount.
-For larger genomes or more genomes, you will possibly need more. The computer we
+been running IGGPIPE using 16GB of RAM, and we recommend that amount or more,
+although depending on your genomes, you may get by with less.  The computer we
 used has a 2.4 GHz processor, which has been adequate. You should monitor memory
 usage while the pipeline is running, and if it becomes excessive for your computer,
 you know you will need more memory to run those genomes.</p></div>
@@ -860,15 +814,17 @@ directory with this command:</p></div>
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>You must have a plain text editor you know how to use.  If nothing else, the
-simple editor <em>nano</em>, which comes with Mac, Linux, and Cygwin, will work. On
+simple terminal editor <em>nano</em>, which comes with Mac, Linux, and Cygwin, will work. On
 a Mac you can also use the <em>TextEdit</em> program (use Plain Text format).  For Mac,
 the free open-source TextWrangler program is strongly recommended, and its more
 capable version called BBEdit is totally worth the $50 price for anyone who
 regularly edits text files.  TextWrangler is available from the Apple App Store
 (Applications, App Store) or from:</p></div>
 <div class="paragraph"><p><a href="http://www.barebones.com/products/textwrangler">http://www.barebones.com/products/textwrangler</a></p></div>
-<div class="paragraph"><p>On Windows, <em>do not use Notepad</em>, as it will cause problems with DOS vs Unix line
-ends.  If you don&#8217;t want to use <em>nano</em>, look into Notepad++, a free text editor.</p></div>
+<div class="paragraph"><p>On Windows, <strong><em>do not use Notepad</em></strong>, as it will cause problems with DOS vs Unix line
+ends.  If you don&#8217;t want to use <em>nano</em>, look into Notepad<code>, a free text editor.
+In Notepad</code>, make sure you set line endings to unix style under the setting
+“Edit &gt; EOL Conversion &gt; Unix/OSX Format”.</p></div>
 </div></div>
 </li>
 <li>
@@ -881,7 +837,7 @@ process if they aren&#8217;t already:</strong>
 <div class="olist loweralpha"><ol class="loweralpha">
 <li>
 <p>
-Xcode (V7.0.1 works) (Apple App Store; <em>make</em> and <em>g++</em>)
+Xcode (Mac only, V7.0.1 works) (Apple App Store; <em>make</em> and <em>g++</em>)
 </p>
 </li>
 <li>
@@ -1064,26 +1020,72 @@ with <em>source code/shell/cmpKeyFiles.sh outTestHP11 goodTest</em>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_strong_install_iggpipe_detailed_instructions_strong"><strong>Install IGGPIPE - Detailed Instructions</strong></h2>
+<h2 id="_strong_detailed_installation_instructions_part_1_download_the_iggpipe_files_strong"><strong>Detailed Installation Instructions Part 1: Download the IGGPIPE files</strong></h2>
 <div class="sectionbody">
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-<strong>Install Xcode (Mac OSX only) or Cygwin (Windows only)</strong>
+If you are an experienced GitHub user, you can clone the IGGPIPE repository with:
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><code>git clone https://github.com/BradyLab/IGGPIPE.git</code></pre>
+</div></div>
+</li>
+<li>
+<p>
+If you are <em>not</em> an experienced GitHub user, browse to <a href="https://github.com/BradyLab/IGGPIPE">https://github.com/BradyLab/IGGPIPE</a>,
+click the "Clone or download" button at the right side of the screen near the top
+and select <em>Download ZIP</em>, then choose a place to put it on your computer.  Unzip the
+zip file on your computer, and rename the unzipped folder from "IGGPIPE-master" to
+just "IGGPIPE".
+</p>
+</li>
+<li>
+<p>
+Another option for experienced GitHub users is to fork the IGGPIPE GitHub repository
+rather than cloning it, the preferred method if you intend to do any development work
+on the IGGPIPE code.  Forking lets you create a parallel repository of your own, that
+is independent of the main IGGPIPE repository.  If you make code changes that you think
+should be included in the main IGGPIPE repository, you can create a pull request to it.
+We will try to monitor for those.
+</p>
+</li>
+<li>
+<p>
+For experienced Git users, note that the <em>master</em> branch is where the releases reside,
+each tagged with a version number.  Use <em>git tag</em> to list tags.  The HEAD of the master
+branch is where the most recent release resides.  You can create a branch whose contents
+are the same as a tagged version with the following command, then do the installation
+process using those files.
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><code>git checkout -b my_V1.0_branch v1.0"</code></pre>
+</div></div>
+</li>
+</ol></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_strong_detailed_installation_instructions_part_2_install_xcode_mac_osx_or_cygwin_windows_strong"><strong>Detailed Installation Instructions Part 2: Install Xcode (Mac OSX) or Cygwin (Windows)</strong></h2>
+<div class="sectionbody">
+<div class="paragraph"><p><strong>For installation on OSX or Windows, a development toolkit including C++ compiler
+must be installed.  For installation on Linux systems, skip this part.</strong>
+&#8203;<br />
+&#8203;<br /></p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+<strong>Install Xcode (Mac OSX only)</strong>
 </p>
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>IGGPIPE makes use of a utility called <em>make</em>, and also, some of the applications used
 by IGGPIPE are distributed as source code that must be compiled and built into a runnable
-application on the user&#8217;s computer, which requires a C++ compiler (g\++ utility). On
-Linux, these utilities are already installed so you can skip this step.</p></div>
-<div class="dlist"><dl>
-<dt class="hdlist1">
-<strong>Xcode (OSX)</strong>
-</dt>
-<dd>
-<div class="openblock">
-<div class="content">
+application on the user&#8217;s computer, which requires a C++ compiler (g++ utility). On
+Linux, these utilities are already installed so you can skip this step.
+For Cygwin users skip to the <strong><em>Cygwin (Windows)</em></strong> section below.</p></div>
 <div class="paragraph"><p>On Mac OSX, the Apple Developer Toolkit named Xcode provides <em>make</em> and the other
 required utilities.  Xcode is available free from the Apple App Store
 (Applications, App Store).  If you don&#8217;t have Xcode installed already, run the App Store
@@ -1111,11 +1113,11 @@ as <em>make</em> and <em>g++</em> are installed, and if not, installs them:</p><
 &#8203;<br />
 &#8203;<br /></p></div>
 </div></div>
-</dd>
-<dt class="hdlist1">
-<strong>Cygwin (Windows)</strong>
-</dt>
-<dd>
+</li>
+<li>
+<p>
+<strong>Install Cygwin (Windows only)</strong>
+</p>
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>On Windows, the open source Cygwin tools environment provides <em>make</em> and the other
@@ -1126,7 +1128,7 @@ from:</p></div>
 <pre><code>https://www.cygwin.com</code></pre>
 </div></div>
 <div class="paragraph"><p>You should follow the instructions there for installation of Cygwin.  Make sure
-you set the Cygwin installer so as to install:</p></div>
+you set the Cygwin installer to install:</p></div>
 <div class="olist loweralpha"><ol class="loweralpha">
 <li>
 <p>
@@ -1161,13 +1163,24 @@ and correct R installation instructions are given in a later step.
 &#8203;<br />
 &#8203;<br /></p></div>
 </div></div>
-</dd>
-</dl></div>
-</div></div>
 </li>
+</ol></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_strong_detailed_installation_instructions_part_3_start_editing_allpathparameters_ours_strong"><strong>Detailed Installation Instructions Part 3: Start editing allPathParameters.ours</strong></h2>
+<div class="sectionbody">
+<div class="paragraph"><p><strong>There is a text file in the IGGPIPE main directory that contains tool path
+settings for running IGGPIPE: <em>allPathParameters.template</em>.  The file provides
+settings of paths where applications have been installed, and related settings.
+Before installing any prerequisite applications, a copy of this file must be
+prepared for editing, as follows.</strong>
+&#8203;<br />
+&#8203;<br /></p></div>
+<div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-<strong>Change to IGGPIPE directory</strong>
+<strong>On command line, change to IGGPIPE directory</strong>
 </p>
 <div class="openblock">
 <div class="content">
@@ -1188,14 +1201,9 @@ downloaded the IGGPIPE files:</p></div>
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>A variety of applications must be installed. Before installing them, you should
-prepare a text file for editing. There is a text file in the IGGPIPE main
-directory that contains tool path settings for running IGGPIPE:
-allPathParameters.template.</p></div>
-<div class="paragraph"><p>The file provides settings of paths where applications have been installed, and
-related settings. To make your own version of this file containing your own
-application paths, copy the file to a new filename, replacing ".template" with
-".ours":</p></div>
+<div class="paragraph"><p>To make your own version of the <em>allPathParameters.template</em> file containing your
+own application paths, copy the file to a new filename, replacing ".template"
+with ".ours":</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>cp allPathParameters.template allPathParameters.ours</code></pre>
@@ -1218,7 +1226,8 @@ command line to open your editor to edit the template file:</p></div>
 <div class="content">
 <pre><code>nano allPathParameters.ours</code></pre>
 </div></div>
-<div class="paragraph"><p>Under Windows, don&#8217;t use Notepad as it will cause problems with DOS versus Unix line ends.
+<div class="paragraph"><p>Under Windows, don&#8217;t use Notepad as it will cause problems with DOS versus Unix line ends
+(we recommend Notepad++ if you are not comfortable with a command line editor like <em>nano</em>).
 &#8203;<br />
 &#8203;<br /></p></div>
 </div></div>
@@ -1246,7 +1255,7 @@ IGGPIPE directory (already done above) and entering this command:</p></div>
 <div class="content">
 <pre><code>cygpath -am .</code></pre>
 </div></div>
-<div class="paragraph"><p>(note the <em>.</em> for current directory)</p></div>
+<div class="paragraph"><p>(note the "." for current directory)</p></div>
 <div class="paragraph"><p>For example, maybe your WD assignment would look like this:</p></div>
 <div class="literalblock">
 <div class="content">
@@ -1254,9 +1263,21 @@ IGGPIPE directory (already done above) and entering this command:</p></div>
 </div></div>
 </div></div>
 </li>
+</ol></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_strong_detailed_installation_instructions_part_4_install_prerequisite_applications_strong"><strong>Detailed Installation Instructions Part 4: Install prerequisite applications</strong></h2>
+<div class="sectionbody">
+<div class="paragraph"><p><strong>This section provides details for installing the prerequisite applications. You
+can skip steps if you already have that application installed, but skim the steps
+to make sure you&#8217;ve done everything they require.</strong>
+&#8203;<br />
+&#8203;<br /></p></div>
+<div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-<strong>Install Jellyfish</strong>
+<strong>Install Jellyfish (version V2.2.3+)</strong>
 </p>
 <div class="openblock">
 <div class="content">
@@ -1276,10 +1297,16 @@ you must do an installation.  You can find the Jellyfish at:</p></div>
 <div class="content">
 <pre><code>http://www.genome.umd.edu/jellyfish.html</code></pre>
 </div></div>
-<div class="paragraph"><p>We chose the "latest source and binaries" link, then downloaded the .tar.gz file.
+<div class="paragraph"><p>We chose the "latest source and binaries" link, then downloaded the ".tar.gz" file.
 Double-click this file in Finder, in the Downloads folder, and it unpacks
-to produce a jellyfish folder.  We chose to move this folder to a directory named
-<em>src</em> under our user root directory:</p></div>
+to produce a jellyfish folder, or execute the command:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>tar -zxvf jellyfish.tar.gz</code></pre>
+</div></div>
+<div class="paragraph"><p>replacing jellyfish with the file name (usually with a version number).
+We chose to move the extracted folder to a directory named <em>src</em> under our user
+home directory:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>cd ~
@@ -1321,7 +1348,7 @@ then installed on your computer.</p></div>
 <dd>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>To compile Jellyfish on OSX, Linux, or Windows/Cygwin:</p></div>
+<div class="paragraph"><p>To compile Jellyfish:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>(change into Jellyfish directory)
@@ -1372,8 +1399,8 @@ that version of GCC the default, and the second installs a package that
 makes the third command work. After the above, you should be able to
 run './configure ; make' as normal.</code></pre>
 </div></div>
-<div class="paragraph"><p>Those steps might allow you to compile Jellyfish with an older version of OSX and
-Xcode.
+<div class="paragraph"><p>Those steps might allow you to compile Jellyfish on your system, but we had no
+problems and didn&#8217;t use the above steps.
 &#8203;<br />
 &#8203;<br /></p></div>
 </div></div>
@@ -1384,7 +1411,7 @@ Xcode.
 <dd>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>To install the Jellyfish program after compiling it, use this command:</p></div>
+<div class="paragraph"><p>To install the Jellyfish program after compiling it:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>sudo make install</code></pre>
@@ -1393,8 +1420,12 @@ Xcode.
 password.  On Windows/Cygwin, leave <em>sudo</em> off the above command.</p></div>
 <div class="paragraph"><p>The <em>make install</em> command places the Jellyfish program in the PATH variable so
 that the program can be run with the command <em>jellyfish</em>. (Sometimes it is necessary
-to log out and back in for a PATH change to take effect). Rerun the "jellyfish --version"
-command to verify that Jellyfish is installed.</p></div>
+to log out and back in for a PATH change to take effect). Rerun this command to
+verify that Jellyfish is installed:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>jellyfish --version</code></pre>
+</div></div>
 <div class="paragraph"><p>The parameter CMD_JELLYFISH in the allPathParameters.ours file is already set to
 <em>jellyfish</em>, which is the command needed to run the Jellyfish program. You
 shouldn&#8217;t need to change it.</p></div>
@@ -1480,16 +1511,13 @@ installer.  For example, we installed into directory C:/cygwin64/home/username/b
 <em>Rscript</em>, which is the command needed to run the Rscript program. You shouldn&#8217;t
 need to change it, UNLESS you are running Windows.  For Windows, set CMD_RSCRIPT
 to the full path to Rscript.exe.  The correct path to use can be obtained by
-changing into directory containing Rscript.exe and entering the commands:</p></div>
+changing into the directory containing Rscript.exe and entering the command:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>readlink -f primer3_core.exe
-cygpath -am  (output from readlink command above)</code></pre>
+<pre><code>cygpath -am Rscript.exe</code></pre>
 </div></div>
-<div class="paragraph"><p>The <em>readlink</em> command produces a path as output, and you put that path as the
-argument to the <em>cygpath</em> command, and it produces a path whose output is the
-value to assign to CMD_RSCRIPT parameter. The <em>readlink</em> command path would
-probably also work.
+<div class="paragraph"><p>The <em>cygpath</em> command produces a path whose output is the value to assign to
+the CMD_RSCRIPT parameter.
 &#8203;<br />
 &#8203;<br /></p></div>
 </div></div>
@@ -1503,10 +1531,9 @@ probably also work.
 <div class="paragraph"><p>Primer3 is a classic bioinformatics application that generates primers from
 sequence data.  It is used by IGGPIPE to generate primers for candidate IGG
 markers, so it must be installed on your computer. This version of IGGPIPE was
-tested with Primer3 version 2.3.6, although later versions and earlier V2
-versions will probably be fine. You probably know if you already have
-Primer3 installed. If you don&#8217;t know that you do, then you should install
-it. Look for it here:</p></div>
+tested with Primer3 version 2.3.6, although other versions will probably be fine.
+You probably know if you already have Primer3 installed. If you don&#8217;t know that
+you do, then you should install it. Look for it here:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>http://sourceforge.net/projects/primer3</code></pre>
@@ -1516,7 +1543,8 @@ Make sure you download the correct version (primer3, not primer3plus). Put the
 downloaded directory wherever you want on your computer. The file named
 primer3_core (primer3_core.exe on Windows) in the root directory of the
 downloaded package is the executable program file.  In Windows it is necessary
-to change the file to be executable, with this command:</p></div>
+to change the file to be executable by running this command in the directory
+containing the primer3_core.exe file:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>chmod u+x primer3_core.exe</code></pre>
@@ -1527,13 +1555,12 @@ file, for example:</p></div>
 <div class="content">
 <pre><code>CMD_PRIMER3CORE := ~/Documents/primer3-2.3.6/primer3_core</code></pre>
 </div></div>
-<div class="paragraph"><p>For Windows, as in the previous step involving Rscript, use <em>readlink</em> and
-<em>cygpath</em> to get the paths needed, first changing into the directory where
-primer3_core.exe is located, then:</p></div>
+<div class="paragraph"><p>For Windows, as in the previous step involving Rscript, use <em>cygpath</em> to get the
+path needed, first changing into the directory where primer3_core.exe is located,
+then:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>readlink -f e-PCR.exe
-cygpath -am  (output from readlink command above)</code></pre>
+<pre><code>cygpath -am primer3_core.exe</code></pre>
 </div></div>
 <div class="paragraph"><p>A set of files containing thermodynamic settings is provided with the Primer3
 installation, in a subdirectory of the main Primer3 directory named <em>primer3_config</em>.
@@ -1560,23 +1587,31 @@ directory and entering the command:</p></div>
 <div class="paragraph"><p>e-PCR is an "electronic PCR" application from NCBI that uses primers and sequence
 data to do an <em>in silico</em> PCR amplification.  It is used by IGGPIPE to test primers
 of candidate IGG markers to see if they generate unique amplicons of the
-expected length, so it must be installed on your computer. This version of IGGPIPE
-was tested with e-PCR version 2.3.12-1 (-V option displays version 2.3.12, but
-downloaded file was 2.3.12-1), although later versions will probably be
-fine.</p></div>
+expected length. This version of IGGPIPE was tested with e-PCR
+version 2.3.12-1 (-V option displays version 2.3.12, but
+downloaded file was 2.3.12-1), although later versions will probably be fine.</p></div>
 <div class="paragraph"><p>To install e-PCR, look for it here:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>http://www.ncbi.nlm.nih.gov/tools/epcr</code></pre>
 </div></div>
-<div class="paragraph"><p>The download link uses FTP protocol. Log in as user GUEST with no password.
-Look for the latest .zip version or tar.gz, copy the file or folder to your,
+<div class="paragraph"><p>The download link uses FTP protocol. Log in as user GUEST with no password. (If you
+have trouble connecting via FTP, you may want to check into the open software app
+named Cyberduck, which works well for this).
+Look for the latest .zip version or tar.gz, copy the file or folder to your
 computer, and unzip it. Put the unzipped directory wherever you want on your
 computer.</p></div>
 <div class="paragraph"><p>In some cases, a binary distribution might be available, so once downloaded, you
-should be able to run e-PCR without further ado.  At the time we downloaded version
-2.3.12-1, it was only available as source code and it was necessary to run <em>make</em>
-to compile and build the program.</p></div>
+should be able to run e-PCR after changing the executable file to have the
+executable attribute with this command (after changing into the directory
+containing the file):</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>chmod u+x (filename)</code></pre>
+</div></div>
+<div class="paragraph"><p>At the time we downloaded the latest version, which was 2.3.12-1, and it was
+only available as source code so it was necessary to run <em>make</em> to compile and
+build the program.</p></div>
 <div class="paragraph"><p>Refer to the file <em>BUILD.html</em> in the e-PCR source directory for instructions on
 compiling the source.</p></div>
 <div class="paragraph"><p>Under Windows, the program was able to be built with this command:</p></div>
@@ -1636,12 +1671,11 @@ example:</p></div>
 <div class="content">
 <pre><code>CMD_EPCR := ~/Documents/e-PCR-2.3.12-1/e-PCR</code></pre>
 </div></div>
-<div class="paragraph"><p>For Windows, as in the previous step, use <em>readlink</em> and <em>cygpath</em> to get the paths
-needed, first changing into the directory where e-PCR.exe is located, then:</p></div>
+<div class="paragraph"><p>For Windows, as in the previous step, use <em>cygpath</em> to get the path needed, first
+changing into the directory where e-PCR.exe is located, then:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>readlink -f e-PCR.exe
-cygpath -am  (output from readlink command above)</code></pre>
+<pre><code>cygpath -am e-PCR.exe</code></pre>
 </div></div>
 </div></div>
 </li>
@@ -1651,10 +1685,10 @@ cygpath -am  (output from readlink command above)</code></pre>
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>MUSCLE is an open-domain multiple sequence aligner.  It is used by IGGPIPE only
+<div class="paragraph"><p>MUSCLE is a public-domain multiple sequence aligner.  It is used by IGGPIPE only
 if you choose to search markers or LCRs for Indels and SNPs by using the <em>make IndelsSNPs</em>
-command, so if you don&#8217;t do that you can skip this step, although you may as
-well install it. This version of IGGPIPE was tested with MUSCLE version v.8.31,
+command, so if you don&#8217;t do that you can skip this step, although we recommend
+installing it. This version of IGGPIPE was tested with MUSCLE version v.8.31,
 although later versions will probably be fine. To install MUSCLE, look for it
 here:</p></div>
 <div class="literalblock">
@@ -1669,16 +1703,26 @@ as a bin folder.</p></div>
 <div class="content">
 <pre><code>CMD_ALIGNER := ~/bin/muscle3.8.31_i86darwin64</code></pre>
 </div></div>
-<div class="paragraph"><p>For Windows, as in the previous step, use <em>readlink</em> and <em>cygpath</em> to get the paths
-needed, first changing into the directory where muscle3.8.31_i86win32.exe is
-located, then:</p></div>
+<div class="paragraph"><p>For Windows, as in the previous step, use <em>cygpath</em> to get the path needed, first
+changing into the directory where muscle3.8.31_i86win32.exe is located (note that
+"darwin64" above is changed to "win32" here), then:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>readlink -f muscle3.8.31_i86win32.exe
-cygpath -am  (output from readlink command above)</code></pre>
+<pre><code>cygpath -am muscle3.8.31_i86win32.exe</code></pre>
 </div></div>
 </div></div>
 </li>
+</ol></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_strong_detailed_installation_instructions_part_5_install_iggpipe_components_strong"><strong>Detailed Installation Instructions Part 5: Install IGGPIPE components</strong></h2>
+<div class="sectionbody">
+<div class="paragraph"><p><strong>The following steps describe the final installation steps: installing components
+of IGGPIPE itself and then testing the installation.</strong>
+&#8203;<br />
+&#8203;<br /></p></div>
+<div class="olist arabic"><ol class="arabic">
 <li>
 <p>
 <strong>Build findMers</strong>
@@ -1701,12 +1745,11 @@ make
 findMers
 cd ../../..</code></pre>
 </div></div>
-<div class="paragraph"><p>The <em>make</em> should compile the C++ files in the findMers folder.  It should
+<div class="paragraph"><p>The <em>make</em> tool should compile the C++ files in the findMers folder.  It should
 complete without error, and there will be a file named
 "findMers" in the directory, and when that file is run with the <em>findMers</em>
-command shown above following <em>make</em>, it will display a page of usage
-information. The path to "findMers" is already set correctly in the
-allPathParameters.ours file.
+command, it will display a page of usage information. The path to "findMers" is
+already set correctly in the allPathParameters.ours file.
 &#8203;<br />
 &#8203;<br /></p></div>
 </div></div>
@@ -1838,6 +1881,13 @@ without saving anything.
 &#8203;<br /></p></div>
 </div></div>
 </li>
+</ol></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_strong_detailed_installation_instructions_part_6_test_the_installation_strong"><strong>Detailed Installation Instructions Part 6: Test the installation</strong></h2>
+<div class="sectionbody">
+<div class="olist arabic"><ol class="arabic">
 <li>
 <p>
 <strong>Run IGGPIPE using the test parameters in allParameters.test and check for success</strong>
@@ -1850,7 +1900,8 @@ of the S. lycopersicum (tomato) and S. pennellii genomes, with only two chromoso
 (1 and 2) and only about 14 Mbp for each one. The parameter file allParameters.test
 has parameters set for using these FASTA files and doing the test. It is more-or-less
 a copy of the allParameters.template file, modified for testing IGGPIPE.</p></div>
-<div class="paragraph"><p>To test IGGPIPE, from the command line in the IGGPIPE main directory, enter this command:</p></div>
+<div class="paragraph"><p>To test IGGPIPE, enter this command from the command line in the IGGPIPE main
+directory:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>make PARAMS=allParameters.test ALL | tee logFiles/makeLog.test.txt</code></pre>
@@ -1866,73 +1917,74 @@ specifically happened at each step, for example with this command:</p></div>
 </div></div>
 <div class="paragraph"><p>Note that the output includes timestamps telling how long each step took to run.</p></div>
 <div class="paragraph"><p>If the pipeline fails, an error message of some kind is displayed, and <em>make</em> stops.
-(There is a problem with Windows, where sometimes <em>make</em> does not stop on an error,
+(There is a problem with Windows/Cygwin, where sometimes <em>make</em> does not stop on an error,
 but keeps going.  We have not found a way around this.  If this happens to you, you
 will need to go back through the output to look for errors.)  If an error occurs,
 proceed to the next step, troubleshooting.</p></div>
 <div class="paragraph"><p>If no error occurs, there should be several
 files in the output folder "outTestHP11", including files starting with these
-prefixes and suffixes (shown in the order that they are produced by the pipeline):</p></div>
+prefixes and suffixes (shown in the order that they are produced by the pipeline).
+The long suffix composed of parameter values is represented with "&lt;sfx&gt;":</p></div>
 <div class="olist loweralpha"><ol class="loweralpha">
 <li>
 <p>
-LCRs_*.tsv
+LCRs_&lt;sfx&gt;.tsv
 </p>
 </li>
 <li>
 <p>
-BadKmers_*.tsv
+BadKmers_&lt;sfx&gt;.tsv
 </p>
 </li>
 <li>
 <p>
-IndelGroupsOverlapping_*.tsv
+IndelGroupsOverlapping_&lt;sfx&gt;.tsv
 </p>
 </li>
 <li>
 <p>
-IndelGroupsNonoverlapping_*.tsv
+IndelGroupsNonoverlapping_&lt;sfx&gt;.tsv
 </p>
 </li>
 <li>
 <p>
-NonvalidatedMarkers_*.tsv
+NonvalidatedMarkers_&lt;sfx&gt;.tsv
 </p>
 </li>
 <li>
 <p>
-MarkerErrors_*.tsv
+MarkerErrors_&lt;sfx&gt;.tsv
 </p>
 </li>
 <li>
 <p>
-MarkersOverlapping_*.tsv
+<strong>MarkersOverlapping_&lt;sfx&gt;.tsv</strong>
 </p>
 </li>
 <li>
 <p>
-MarkersNonoverlapping_*.tsv
+<strong>MarkersNonoverlapping_&lt;sfx&gt;.tsv</strong>
 </p>
 </li>
 <li>
 <p>
-MarkerCounts_*.pdf
+MarkerCounts_&lt;sfx&gt;.pdf
 </p>
 </li>
 <li>
 <p>
-MarkerDensity_*.png
+MarkerDensity_&lt;sfx&gt;.png
 </p>
 </li>
 </ol></div>
-<div class="paragraph"><p>The MarkersOverlapping_ and MarkersNonoverlapping_ files are the final output files
-containing the markers.</p></div>
+<div class="paragraph"><p>The <strong>MarkersOverlapping_&lt;sfx&gt;.tsv</strong> and <strong>MarkersNonoverlapping_&lt;sfx&gt;.tsv</strong> files
+are the final output files containing the markers.</p></div>
 <div class="paragraph"><p>The .pdf and .png files should be examined to see how they depict marker counts
 and densities.</p></div>
 <div class="paragraph"><p>The tables at the end of the RUN document describe the columns in these tab-separated
 data files.</p></div>
 <div class="paragraph"><p>To make sure the pipeline ran correctly, compare the MarkersOverlapping_ file to the
-expected result, which is in subdirectory goodTest:</p></div>
+expected result, which is in the subdirectory <em>goodTest</em>:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>cmp outTestHP11/MarkersOverlapping_*.tsv goodTest/MarkersOverlapping_*.tsv</code></pre>
@@ -1957,7 +2009,7 @@ directories in file paths, we found that we could use "/" in all the paths in
 the allParameters.ours file and allParameters.test file and it worked fine; we
 did not have to use "\" anywhere.</p></div>
 <div class="paragraph"><p>In Windows, if you need to know the path that you should place into a CMD_
-variable as the full path to a .exe file, use <em>readlink -f (exe filename)</em>.</p></div>
+variable as the full path to a .exe file, use <em>cygpath -am (exe filename)</em>.</p></div>
 <div class="paragraph"><p>Windows gave the most problems, and the most common problem with Windows was in
 text file line endings, which under Windows can be either "DOS" or "Unix" line
 endings.  IGGPIPE produces files with Unix line endings exclusively, but it
@@ -1992,7 +2044,7 @@ version number than what we used.</p></div>
 output being produced by the <em>cmp</em> command shown in the preceding step, you
 should do difference testing on other output files.  Each of the files whose
 prefixes and suffixes are listed in the previous step have a "good" version of
-the file containing the expected results, in folder goodTest.  Each
+the file containing the expected results, in the <em>goodTest</em> directory.  Each
 of those files can be compared to the output IGGPIPE produced when you ran it
 using a <em>cmp</em> command to see which ones are good. No output means the files match.
 A shell script named <em>cmpKeyFiles.sh</em> is provided that runs <em>cmp</em> on each of these
@@ -2013,7 +2065,8 @@ the LCRs_ file:</p></div>
 with the first file listed in the previous step), then you can tell which step
 produced an incorrect result based on which file in the list is the first one that
 is incorrect.  The following <em>make</em> steps produce the following output files <em>(italicized
-output files are those available in the goodTest subdirectory for comparison to your files)</em>:</p></div>
+output files are those available in the goodTest subdirectory for comparison to your files)</em>.
+The long suffix composed of parameter values is represented with "&lt;sfx&gt;":</p></div>
 <div class="tableblock">
 <table rules="all"
 width="100%"
@@ -2023,98 +2076,98 @@ cellspacing="0" cellpadding="4">
 <col width="50%" />
 <thead>
 <tr>
-<th align="left" valign="top"><em>make</em> command or other command</th>
+<th align="left" valign="top">Command</th>
 <th align="left" valign="top">Produces output file(s)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left" valign="top"><p class="table">a. make PARAMS=myFilename getSeqInfo</p></td>
-<td align="left" valign="top"><p class="table">GenomeData/*.idlens</p></td>
+<td align="left" valign="top"><p class="table">make PARAMS=myFilename getSeqInfo</p></td>
+<td align="left" valign="top"><p class="table">GenomeData/&lt;sfx&gt;.idlens</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">b. make PARAMS=myFilename getContigFile</p></td>
-<td align="left" valign="top"><p class="table">GenomeData/*.contigs</p></td>
+<td align="left" valign="top"><p class="table">make PARAMS=myFilename getContigFile</p></td>
+<td align="left" valign="top"><p class="table">GenomeData/&lt;sfx&gt;.contigs</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">c. make PARAMS=myFilename getKmers</p></td>
-<td align="left" valign="top"><p class="table">Kmers/Kmers_*.kmers</p></td>
+<td align="left" valign="top"><p class="table">make PARAMS=myFilename getKmers</p></td>
+<td align="left" valign="top"><p class="table">Kmers/Kmers_&lt;sfx&gt;.kmers</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">d. make PARAMS=myFilename kmerStats</p></td>
-<td align="left" valign="top"><p class="table">Kmers/Kmers_*.stats</p></td>
+<td align="left" valign="top"><p class="table">make PARAMS=myFilename kmerStats</p></td>
+<td align="left" valign="top"><p class="table">Kmers/Kmers_&lt;sfx&gt;.stats</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">e. make PARAMS=myFilename kmersToText</p></td>
-<td align="left" valign="top"><p class="table">Kmers/Kmers_*.kmers.txt</p></td>
+<td align="left" valign="top"><p class="table">make PARAMS=myFilename kmersToText</p></td>
+<td align="left" valign="top"><p class="table">Kmers/Kmers_&lt;sfx&gt;.kmers.txt</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">f. make PARAMS=myFilename getGenomicPosIsect</p></td>
-<td align="left" valign="top"><p class="table">Kmers/Kmers_*.isect</p></td>
+<td align="left" valign="top"><p class="table">make PARAMS=myFilename getGenomicPosIsect</p></td>
+<td align="left" valign="top"><p class="table">Kmers/Kmers_&lt;sfx&gt;.isect</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">g. make PARAMS=myFilename mergeKmers</p></td>
-<td align="left" valign="top"><p class="table">Kmers/Kmers_*.merge</p></td>
+<td align="left" valign="top"><p class="table">make PARAMS=myFilename mergeKmers</p></td>
+<td align="left" valign="top"><p class="table">Kmers/Kmers_&lt;sfx&gt;.merge</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">h. make PARAMS=myFilename sortCommonUniqueKmers</p></td>
+<td align="left" valign="top"><p class="table">make PARAMS=myFilename sortCommonUniqueKmers</p></td>
 <td align="left" valign="top"><p class="table">Kmers/common.unique.kmers</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">i. make PARAMS=myFilename findLCRs</p></td>
-<td align="left" valign="top"><p class="table"><em>LCRs_*.tsv, BadKmers_*.tsv</em></p></td>
+<td align="left" valign="top"><p class="table">make PARAMS=myFilename findLCRs</p></td>
+<td align="left" valign="top"><p class="table"><em>LCRs_&lt;sfx&gt;.tsv, BadKmers_&lt;sfx&gt;.tsv</em></p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">j. make PARAMS=myFilename findIndelGroups</p></td>
-<td align="left" valign="top"><p class="table"><em>IndelGroupsOverlapping_*.tsv, IndelGroupsNonoverlapping_*.tsv</em></p></td>
+<td align="left" valign="top"><p class="table">make PARAMS=myFilename findIndelGroups</p></td>
+<td align="left" valign="top"><p class="table"><em>IndelGroupsOverlapping_&lt;sfx&gt;.tsv, IndelGroupsNonoverlapping_&lt;sfx&gt;.tsv</em></p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">k. make PARAMS=myFilename getDNAseqsForPrimers</p></td>
-<td align="left" valign="top"><p class="table"><em>IndelGroupsOverlapping_*.dnaseqs</em></p></td>
+<td align="left" valign="top"><p class="table">make PARAMS=myFilename getDNAseqsForPrimers</p></td>
+<td align="left" valign="top"><p class="table"><em>IndelGroupsOverlapping_&lt;sfx&gt;.dnaseqs</em></p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">l. make PARAMS=myFilename findPrimers</p></td>
-<td align="left" valign="top"><p class="table"><em>NonvalidatedMarkers_*.tsv</em></p></td>
+<td align="left" valign="top"><p class="table">make PARAMS=myFilename findPrimers</p></td>
+<td align="left" valign="top"><p class="table"><em>NonvalidatedMarkers_&lt;sfx&gt;.tsv</em></p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">m. make PARAMS=myFilename ePCRtesting</p></td>
-<td align="left" valign="top"><p class="table"><em>MarkerErrors_*.tsv</em></p></td>
+<td align="left" valign="top"><p class="table">make PARAMS=myFilename ePCRtesting</p></td>
+<td align="left" valign="top"><p class="table"><em>MarkerErrors_&lt;sfx&gt;.tsv</em></p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">n. make PARAMS=myFilename removeBadMarkers</p></td>
-<td align="left" valign="top"><p class="table"><em>MarkersOverlapping_*.tsv, MarkersNonoverlapping_*.tsv</em></p></td>
+<td align="left" valign="top"><p class="table">make PARAMS=myFilename removeBadMarkers</p></td>
+<td align="left" valign="top"><p class="table"><em>MarkersOverlapping_&lt;sfx&gt;.tsv, MarkersNonoverlapping_&lt;sfx&gt;.tsv</em></p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">o. make PARAMS=myFilename plotMarkers</p></td>
-<td align="left" valign="top"><p class="table"><em>MarkerCounts_*.pdf, MarkerDensity_*.png</em></p></td>
+<td align="left" valign="top"><p class="table">make PARAMS=myFilename plotMarkers</p></td>
+<td align="left" valign="top"><p class="table"><em>MarkerCounts_&lt;sfx&gt;.pdf, MarkerDensity_&lt;sfx&gt;.png</em></p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">p. make PARAMS=myFilename getDNAseqsForIndelsSNPs</p></td>
-<td align="left" valign="top"><p class="table">*.withseqs.tsv</p></td>
+<td align="left" valign="top"><p class="table">make PARAMS=myFilename getDNAseqsForIndelsSNPs</p></td>
+<td align="left" valign="top"><p class="table">&lt;sfx&gt;.withseqs.tsv</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">q. make PARAMS=myFilename IndelsSNPs</p></td>
-<td align="left" valign="top"><p class="table">*.indels.tsv, *.snps.tsv</p></td>
+<td align="left" valign="top"><p class="table">make PARAMS=myFilename IndelsSNPs</p></td>
+<td align="left" valign="top"><p class="table">&lt;sfx&gt;.indels.tsv, &lt;sfx&gt;.snps.tsv</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">r. make PARAMS=myFilename plotIndels</p></td>
-<td align="left" valign="top"><p class="table">*.indels.pdf</p></td>
+<td align="left" valign="top"><p class="table">make PARAMS=myFilename plotIndels</p></td>
+<td align="left" valign="top"><p class="table">&lt;sfx&gt;.indels.pdf</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">s. Rscript code/R/dotplot.R dotplot.template</p></td>
-<td align="left" valign="top"><p class="table">LCRs_*.dotplot.png</p></td>
+<td align="left" valign="top"><p class="table">Rscript code/R/dotplot.R dotplot.template</p></td>
+<td align="left" valign="top"><p class="table">LCRs_&lt;sfx&gt;.dotplot.png</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">t. Rscript code/R/annotateFile.R annotate.template</p></td>
-<td align="left" valign="top"><p class="table">MarkersAnnotated_*.tsv</p></td>
+<td align="left" valign="top"><p class="table">Rscript code/R/annotateFile.R annotate.template</p></td>
+<td align="left" valign="top"><p class="table">MarkersAnnotated_&lt;sfx&gt;.tsv</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">u. Rscript code/R/annotateFile.R annotate/HP11_isInNearColumn.markers</p></td>
-<td align="left" valign="top"><p class="table">MarkersAnnotated_WithInNearFeatures_*.indels.tsv</p></td>
+<td align="left" valign="top"><p class="table">Rscript code/R/annotateFile.R annotate/HP11_isInNearColumn.markers</p></td>
+<td align="left" valign="top"><p class="table">MarkersAnnotated_WithInNearFeatures_&lt;sfx&gt;.indels.tsv</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">v. Rscript code/R/annotateFile.R annotate/HP11_to_gff3.markers</p></td>
-<td align="left" valign="top"><p class="table">MarkersAnnotated_GFF3_*.gff3</p></td>
+<td align="left" valign="top"><p class="table">Rscript code/R/annotateFile.R annotate/HP11_to_gff3.markers</p></td>
+<td align="left" valign="top"><p class="table">MarkersAnnotated_GFF3_&lt;sfx&gt;.gff3</p></td>
 </tr>
 </tbody>
 </table>
@@ -2123,9 +2176,7 @@ cellspacing="0" cellpadding="4">
 <div class="paragraph"><p>Different results between the goodTest directory files and your outTestHP11
 directory files might be due to running a software package of a different
 version than what we used for testing. For example, a different version of e-PCR
-might cause a mismatch starting at file <em>MarkerErrors_*.tsv</em>. Another possibility
-to be aware of is that the files may in fact be identical except one might have
-Unix line ends and the other might have DOS line ends.
+might cause a mismatch starting at file <em>MarkerErrors_&lt;sfx&gt;.tsv</em>.
 &#8203;<br />
 &#8203;<br /></p></div>
 </div></div>
@@ -2155,8 +2206,10 @@ found in the marker regions.</p></div>
 <pre><code>ls outTestHP11/NonoverlappingMarkers*.indels.tsv
 ls outTestHP11/NonoverlappingMarkers*.snps.tsv</code></pre>
 </div></div>
-<div class="paragraph"><p>This should list the files <em>outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv</em>
-and  <em>outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.snps.tsv</em></p></div>
+<div class="paragraph"><p>This should list the files:</p></div>
+<div class="paragraph"><p><em>outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.tsv</em></p></div>
+<div class="paragraph"><p>and</p></div>
+<div class="paragraph"><p><em>outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.snps.tsv</em></p></div>
 <div class="paragraph"><p>You can examine them with Excel or a text editor to see the Indel and SNP data they contain.
 &#8203;<br />
 &#8203;<br /></p></div>
@@ -2181,7 +2234,8 @@ plotIndels.R. Run it as follows:</p></div>
 <div class="content">
 <pre><code>ls outTestHP11/Markers*.indels.pdf</code></pre>
 </div></div>
-<div class="paragraph"><p>This should list the file <em>outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.pdf</em></p></div>
+<div class="paragraph"><p>This should list the file:</p></div>
+<div class="paragraph"><p><em>outTestHP11/MarkersNonoverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.indels.pdf</em></p></div>
 <div class="paragraph"><p>You might want to open it and look at the plots.
 &#8203;<br />
 &#8203;<br /></p></div>
@@ -2208,9 +2262,11 @@ as follows:</p></div>
 <div class="content">
 <pre><code>ls outTestHP11/LCRs_*.dotplot.png</code></pre>
 </div></div>
-<div class="paragraph"><p>This should list the file <em>outTestHP11/LCRs_K11k2L100D10_2000.dotplot.png</em>, an image file.
-You may want to examine it (e.g. in the OSX Preview app) to see the dot plot.</p></div>
-<div class="paragraph"><p>There are other sample parameter files in subdirectory <em>dotplot</em>, although the
+<div class="paragraph"><p>This should list the file:</p></div>
+<div class="paragraph"><p><em>outTestHP11/LCRs_K11k2L100D10_2000.dotplot.png</em></p></div>
+<div class="paragraph"><p>(This is an image file).  You may want to examine it (e.g. in the OSX Preview app)
+to see the dot plot.</p></div>
+<div class="paragraph"><p>There are other sample parameter files in the subdirectory <em>dotplot</em>, although the
 parameter file is fairly straightforward and you probably don&#8217;t need other examples
 to work from.
 &#8203;<br />
@@ -2223,18 +2279,18 @@ to work from.
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>A common need is to add additional annotation information the table of markers. For
-example, you might be working with an introgression line population and
+<div class="paragraph"><p>A common need is to add additional annotation information to the table of markers.
+For example, you might be working with an introgression line population and
 wish to annotate each marker with the names of the lines whose introgressions that
 marker lies within, along with the marker position relative to the introgression.
 Or, you might want to annotate each marker with the ID of the nearest gene and its
-distance away. You may also want to change file format, from .tsv (tab-separated)
-to .gff3 or .gtf for adding the markers to a browser track. All this can be done with
-the R program annotateFile.R that is provided with IGGPIPE. It is driven by a parameter
-file, a sample of which has been provided, annotate.template, that is set for using
-the test data produced by running IGGPIPE with allParameters.test, along with
-additional annotation test data in folder code/R/test_GFFfuncsAndMergeData. Run
-annotateFile.R as follows:</p></div>
+distance away. You may also want to change the file format, for example from .tsv
+(tab-separated) to .gff3 or .gtf for adding the markers to a browser track. All this
+can be done with the R program annotateFile.R that is provided with IGGPIPE.
+It is driven by the parameter file annotate.template, a sample of which has been
+provided preset for using the test data produced by running IGGPIPE with
+allParameters.test, along with additional annotation test data in folder
+code/R/test_GFFfuncsAndMergeData. Run annotateFile.R as follows:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>Rscript code/R/annotateFile.R annotate.template</code></pre>
@@ -2244,17 +2300,17 @@ annotateFile.R as follows:</p></div>
 <div class="content">
 <pre><code>ls outTestHP11/MarkersAnnotated*</code></pre>
 </div></div>
-<div class="paragraph"><p>This should list file
-<em>MarkersAnnotated_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv</em>
-in the outTestHP11 folder.
+<div class="paragraph"><p>This should list the file:</p></div>
+<div class="paragraph"><p><em>MarkersAnnotated_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv</em></p></div>
+<div class="paragraph"><p>in the outTestHP11 folder.
 You can examine this file with a text editor or Excel to see the new column that
-was added compared to the input file
-<em>MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv</em>.</p></div>
-<div class="paragraph"><p>There are other sample parameter files in subdirectory <em>annotate</em> which produce
+was added compared to the input file:</p></div>
+<div class="paragraph"><p><em>MarkersOverlapping_K11k2L100D10_2000A100_2000d10_100N2F0X20V3000W8M3G1.tsv</em>.</p></div>
+<div class="paragraph"><p>There are other sample parameter files in the subdirectory <em>annotate</em> which produce
 other types of files or do other types of file data manipulation.  The parameters
 can be challenging to set properly, especially when merging data from a separate
 file, so these sample files can be helpful. Also, when .gff3 files are used, they
-must conform well to the expected GFF3 format else an error is likely to occur.
+must conform well to the expected GFF3 format or else an error is likely to occur.
 &#8203;<br />
 &#8203;<br /></p></div>
 </div></div>
@@ -2269,13 +2325,13 @@ must conform well to the expected GFF3 format else an error is likely to occur.
 edit primer3settings.txt file and make any changes that are
 important for your needs. For example, you might change the parameters that
 determine the acceptable <em>range of primer Tm values</em>. If you have several
-different setting values you use, you will probably want to keep a directory
+different values you use for settings, you will probably want to keep a directory
 of different primer3settings.txt files and copy the needed one prior to each
 run of IGGPIPE.</p></div>
 <div class="paragraph"><p>The Primer3 user manual (<a href="http://primer3.sourceforge.net/primer3_manual.htm">http://primer3.sourceforge.net/primer3_manual.htm</a>)
 describes all the parameters.</p></div>
 <div class="paragraph"><p>An explanation of the sequence data IGGPIPE gives Primer3 in order to generate
-primers will be helpful, particularly in understanding the setting of the
+primers will be helpful, particularly in understanding how to set the
 parameter PRIMER_PRODUCT_SIZE_RANGE. Since IGGPIPE is making primers to be used
 in different genomes with different sequences and sequence lengths between
 the two primer sites, it cannot use the typical method of giving Primer3 the
@@ -2300,7 +2356,7 @@ primer3settings.txt to Primer3&#8217;s file primer3web_v4_0_0_default_settings.t
 </div></div>
 </li>
 </ol></div>
-<div class="paragraph"><p><strong>That completes the installation of IGGPIPE.</strong></p></div>
+<div class="paragraph"><p><strong>This completes the installation of IGGPIPE.</strong></p></div>
 </div>
 </div>
 <div class="sect1">
@@ -2335,7 +2391,7 @@ Contact me, Ted Toal, <a href="mailto:twtoal@ucdavis.edu">twtoal@ucdavis.edu</a>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-01-17 12:12:55 PST
+Last updated 2016-07-31 09:00:37 PDT
 </div>
 </div>
 </body>

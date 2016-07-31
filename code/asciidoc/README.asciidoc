@@ -1,9 +1,9 @@
 IGGPIPE
 =======
-Version v0.0, Aug 2015
+Version {VERSION}
 
 The BradyLab/IGGPIPE GitHub repository contains code and documentation for the
-software package called *IGGPIPE* (*IGG* **P**ipeline).
+software package called *IGGPIPE* (**I**ndel **G**roup in **G**enomes **Pipe**line).
 
 *IGGPIPE* analyzes two or more genomes
 for length-polymorphic regions bounded by unique sequences and designs PCR
@@ -11,16 +11,16 @@ primers within these sequences. The primers can be used to amplify the region
 from genomic DNA of any of the species used to create the markers, and the
 amplicon size will indicate which species the DNA came from - an *IGG* marker.
 
-*IGG* stands for _Indel Group in Genomes_.
-
 Download, Installation, and Running
 -----------------------------------
 
 *Requirements*
 ~~~~~~~~~~~~~~
 * Installation has been tested on 64-bit Mac OSX, 64-bit Linux, and 64-bit Windows.
-It will not work on 32-bit Windows.
-* Installation instructions include installing these programs:
+It will not work on 32-bit systems (due to dependency on Jellyfish2).
+* See the INSTALL document section 'Detailed Installation Instructions Part 4:
+Install prerequisite applications' for instructions to install these required
+programs:
 +
 --
 .. Xcode (V6.4 works) (Apple App Store; 'make' and 'g++')
@@ -36,7 +36,13 @@ It will not work on 32-bit Windows.
 ~~~~~~~~~~~~~~~~~~~~~~~~
 . Browse to https://github.com/BradyLab/IGGPIPE
 . At bottom of right column on screen, click "Download ZIP" and choose a place to
-put it on your computer.
+save it on your computer.
++
+--
+NOTE: Alternatively, you can clone the git repository with this command line command:
+
+  git clone https://github.com/BradyLab/IGGPIPE.git
+--
 . Unzip the zip file on your computer.
 . Rename the unzipped folder from "IGGPIPE-master" to just "IGGPIPE".
 
@@ -54,7 +60,7 @@ either one and follow the instructions.
 ~~~~~~~~~~~~~~~~~~~~~~~~
 * Post an issue on GitHub under BradyLab/IGGPIPE repository
 * Contact me, Ted Toal, twtoal@ucdavis.edu
- 
+
 References
 ----------
 

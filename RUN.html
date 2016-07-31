@@ -734,7 +734,7 @@ asciidoc.install();
 <body class="article">
 <div id="header">
 <h1>RUNNING IGGPIPE TO GENERATE IGG MARKERS</h1>
-<span id="author">Version v0.0, Aug 2015</span><br />
+<span id="author">Version V1.0</span><br />
 </div>
 <div id="content">
 <div id="preamble">
@@ -742,47 +742,14 @@ asciidoc.install();
 <div class="paragraph"><p>This describes how to run the IGGPIPE software to analyze two or more genome
 sequences and produce a file of candidate IGG marker primer pairs for amplifying
 length-polymorphic regions of those genomes.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content"><strong>See the INSTALL document for installation and testing of IGGPIPE</strong></td>
+</tr></table>
 </div>
-</div>
-<div class="sect1">
-<h2 id="_strong_if_not_done_already_download_iggpipe_files_strong"><strong>If not done already, download IGGPIPE files</strong></h2>
-<div class="sectionbody">
-<div class="olist arabic"><ol class="arabic">
-<li>
-<p>
-Browse to <a href="https://github.com/BradyLab/IGGPIPE">https://github.com/BradyLab/IGGPIPE</a>
-</p>
-</li>
-<li>
-<p>
-At bottom of right column on screen, click "Download ZIP" and choose a place to
-put it on your computer.
-</p>
-</li>
-<li>
-<p>
-Unzip the zip file on your computer.
-</p>
-</li>
-<li>
-<p>
-Rename the unzipped folder from "IGGPIPE-master" to just "IGGPIPE".
-</p>
-</li>
-</ol></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_strong_if_not_done_already_install_iggpipe_strong"><strong>If not done already, install IGGPIPE</strong></h2>
-<div class="sectionbody">
-<div class="ulist"><ul>
-<li>
-<p>
-Look inside the downloaded IGGPIPE folder on your computer for file INSTALL.pdf
-or INSTALL.html and open either one and follow the instructions.
-</p>
-</li>
-</ul></div>
 </div>
 </div>
 <div class="sect1">
@@ -855,6 +822,17 @@ Store (Applications, App Store) or from:</p></div>
 </div>
 </div>
 <div class="sect1">
+<h2 id="_strong_quick_start_strong"><strong>Quick Start</strong></h2>
+<div class="sectionbody">
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph"><p>Experienced bioinformaticians can attempt to quickly run the IGGPIPE pipeline on
+the target genomes, by reading only the heading of each step below and executing
+the commands in the 'Synopsis" box just under that heading.</p></div>
+</div></div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_strong_running_iggpipe_strong"><strong>Running IGGPIPE</strong></h2>
 <div class="sectionbody">
 <div class="olist arabic"><ol class="arabic">
@@ -867,7 +845,9 @@ Store (Applications, App Store) or from:</p></div>
 <div class="paragraph"><p>IGGPIPE makes frequent use of a single capital letter to refer to a genome. For
 example, filenames and tab-separated file column names use such letters. Choose
 a single capital letter you will use to represent each of your genomes. For
-example, I used H=Heinz and P=pennellii for some of my testing.</p></div>
+example, I used H=Heinz and P=pennellii for some of my testing. In many of the
+examples below the genome letters are substituted with "X" and "Y". Replace
+these with your own genome letters.</p></div>
 </div></div>
 </li>
 <li>
@@ -876,8 +856,18 @@ example, I used H=Heinz and P=pennellii for some of my testing.</p></div>
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>IGGPIPE has a number of parameters that must be set to the values you desire. These
-are contained in plain text files whose name starts with "allParameters". IGGPIPE
+<div class="sidebarblock">
+<div class="content">
+<div class="title"><em>Synopsis:</em></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>cd ~/Documents/IGGPIPE    #(or whatever is appropriate for your system)
+cp allParameters.template allParameters.HP    #(here, X=H, Y=P)</code></pre>
+</div></div>
+</div></div>
+<div class="paragraph"><p>IGGPIPE has a number of parameters that must be set to appropriate values for
+your needs. These are contained in plain text files with names starting
+with "allParameters". IGGPIPE
 provides a template file named <strong>allParameters.template</strong> that you copy and edit to
 create your own "allParameters" files containing the parameter settings you want.</p></div>
 <div class="paragraph"><p>You should make a new parameter file for each different set of settings you
@@ -889,12 +879,13 @@ with two genomes and a single set of parameters, and we will name the parameter 
 allParameters.XY, where X and Y are capital letters you chose to represent the two
 genomes. It is convenient to include those letters in the file name, to help you
 keep multiple parameter file straight.</p></div>
-<div class="paragraph"><p><strong>Copy allParameters.template to allParameters.XY</strong> (substituting your genome letters
-for X and Y), using either the Mac&#8217;s Finder or via the command line. For example:</p></div>
+<div class="paragraph"><p>Copy allParameters.template to allParameters.XY (substituting your genome letters
+for X and Y), using either your file explorer application or via the command line.
+For example:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>cd ~/Documents/IGGPIPE    (or whatever is appropriate for your system)
-cp allParameters.template allParameters.HP    (here, X=H, Y=P)</code></pre>
+<pre><code>cd ~/Documents/IGGPIPE    #(or whatever is appropriate for your system)
+cp allParameters.template allParameters.HP    #(here, X=H, Y=P)</code></pre>
 </div></div>
 <div class="paragraph"><p>Besides the sample parameter file "allParameters.template", there are several more
 sample "allParameters" parameter files in the subfolder <em>allParameters</em>.  These
@@ -917,28 +908,29 @@ line:</p></div>
 <div class="content">
 <pre><code>nano allParameters.XY</code></pre>
 </div></div>
-<div class="paragraph"><p>If you are in a hurry, you don&#8217;t need to read anything in the file, but
-can simply <strong>search for "##\#"</strong>, which are comment lines
-marking items that may need to be changed.</p></div>
-<div class="paragraph"><p>Each "#@@" comment says whether it must be changed, might need to
-be changed, or probably will never need to be changed, etc. Many of these items
-typically will never need to be changed, so the actual number of changes that need
-to be made is smaller than it might first appear.  It is
-recommended that rather than hurrying, you take time to read through
-the file, as the comments explain the purpose of each parameter, and you will
-want to know this information, at least for key parameters, to select the right
-parameter values for your needs.</p></div>
+<div class="paragraph"><p>To facilitate quick editing of the essential parts of the file, all parameters
+that need to be examined and probably changed by you have been placed at the
+top of the file.  Other parameters that are unlikely to be changed are placed
+at the bottom of the file, and a comment block indicates where they start.
+You can edit the parameters at the top of the file and then just skip the
+remaining sections.</p></div>
+<div class="paragraph"><p>Comments starting with "#@@" say whether a parameter <em>must be changed</em>, <em>might
+need to be changed</em>, <em>probably will never need to be changed</em>, etc. It is
+recommended that you take time to read through the first part of the file, as
+the comments explain the purpose of each parameter, and you will want to know
+this information for the key parameters, to select the right parameter values
+for your needs.</p></div>
 </div></div>
 </li>
 <li>
 <p>
-<strong>Search for "#@@" and set parameters to desired values</strong>
+<strong>Search for "#@@" and set parameters to appropriate values</strong>
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>Search for "#@@" in the allParameters.XY file and check each one to see if it
-needs to be changed. If so, set it to the value you desire. Parameters you will
-definitely want to review and consider are:</p></div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title"><em>Synopsis:</em></div>
 <div class="olist loweralpha"><ol class="loweralpha">
 <li>
 <p>
@@ -957,7 +949,7 @@ GENOME_NUMBERS
 </li>
 <li>
 <p>
-GENOME_1, GENOME_2, etc.
+GENOME_1, GENOME_2, etc. (the genome letters chosen above)
 </p>
 </li>
 <li>
@@ -1005,13 +997,21 @@ OVERLAP_REMOVAL
 EPCR_MAX_DEV
 </p>
 </li>
-<li>
-<p>
-EPCR_MAX_MISMATCH and EPCR_MAX_GAPS
-</p>
-</li>
 </ol></div>
-<div class="paragraph"><p>The next section gives guidance on choosing a value for K.</p></div>
+<div class="literalblock">
+<div class="title"><em>When you reach the following comment lines, you can stop, since the remaining parameters are seldom changed:</em></div>
+<div class="content">
+<pre><code>#@@ Nothing below this point has to be changed.  Unless you are studying the
+#@@ parameters in detail, skip the remaining sections.</code></pre>
+</div></div>
+</div></div>
+<div class="paragraph"><p>Search for "@@" (Ctrl + W in nano then type “@@” without quotes) in the
+allParameters.XY file and check each one to see if it needs to be changed.
+If so, set it to the value you desire.  Parameters you will definitely want to
+review and consider are listed in the synopsis box above.</p></div>
+<div class="paragraph"><p>The comments above each parameter give recommendations on how to choose an
+appropriate value for these parameters.  The next section gives guidance on
+choosing a value for K.</p></div>
 </div></div>
 </li>
 <li>
@@ -1047,17 +1047,19 @@ time was relatively long, while a value of 13 produced almost as many IGG
 markers in a much shorter time (see the table in the IGGPIPE paper that shows
 computation time for these two values of K in Arabidopsis accessions). Polyploid
 species might require a larger value of K to locate enough unique k-mers in the
-repeated genomes.</p></div>
+repeated genomes. Since the number of k-mers goes up dramatically with
+increasing K, you will likely never use a value for K greater than 15 or 16.</p></div>
 <div class="paragraph"><p>We advise checking the number of common unique k-mers obtained with a given value
 of K the first time the pipeline is run on a given set of genomes, and adjust K
 if necessary. To speed this process, the pipeline can be run only through the
-stage where the common unique k-mers are produced, as described below. If too few
-k-mers result,
+stage where the common unique k-mers are produced. If too few k-mers result,
 then the user should increase K by one, and if too many k-mers result, the user
 should decrease K by one. The pipeline is then run to completion to produce the
 IGG marker primer sequences, and the total number of primer pairs produced is
 examined.  If there are too few, it is advisable to rerun the entire pipeline
-with K both increased and decreased by one.</p></div>
+with K both increased and decreased by one.  <em>The section below on running the
+first part of the pipeline will show you how to check the number of common
+unique k-mers, after which you may decide to adjust K and re-run.</em></p></div>
 </div></div>
 </li>
 <li>
@@ -1077,12 +1079,16 @@ inordinately long amount of time to run when there are tens to hundreds of thous
 of scaffolds.  If this is your case, and if many of the scaffolds are very small and
 not likely to contribute to viable markers, you should remove them from the FASTA file
 to be analyzed.</p></div>
-<div class="paragraph"><p>After finishing changes, save the modified allParameters.XY file.</p></div>
 </div></div>
 </li>
 <li>
 <p>
-<strong>Check Primer3 settings in primer3settings.txt if desired</strong>
+<strong>When finished making parameter value changes, save the modified allParameters.XY file</strong>
+</p>
+</li>
+<li>
+<p>
+<strong>Check Primer3 settings in primer3settings.txt (optional)</strong>
 </p>
 <div class="openblock">
 <div class="content">
@@ -1092,7 +1098,7 @@ use different Primer3 settings from the defaults listed in this file. If so,
 edit the file and make the desired changes. For example, you might change the
 parameters that determine the acceptable <em>range of primer Tm values</em>. If you
 have several different setting values you use, you will probably want to keep
-a directory of different primer3settings.txt files and copy the needed one
+a directory of different primer3settings.txt files and copy the appropriate one
 to "primer3settings.txt" prior to each run of IGGPIPE. When testing IGGPIPE
 using the allParameters.test file that was created during installation, always
 copy primer3settings.default.txt to primer3settings.txt first.</p></div>
@@ -1102,14 +1108,18 @@ describes all the Primer3 settings file parameters.</p></div>
 </li>
 <li>
 <p>
-<strong>Understand use of <em>make</em> and "Makefile" for running IGGPIPE</strong>
+<strong>Understand the use of <em>make</em> and "Makefile" for running IGGPIPE</strong>
 </p>
 <div class="openblock">
 <div class="content">
+<div class="paragraph"><p>This section is an introduction to the use of the <em>make</em> command with IGGPIPE.
+Experienced users of <em>make</em> may wish to simply note the commands shown below,
+<em>make usage</em>, <em>make PARAMS=&lt;file&gt; &lt;target&gt;</em>, <em>make PARAMS=&lt;file&gt; CLEAN=1 &lt;target&gt;</em>,
+and piping to the <em>tee</em> command.</p></div>
 <div class="paragraph"><p>The IGGPIPE software consists of multiple software applications that progressively
 analyze the genome sequence data and eventually produce candidate IGG marker
 primers. The task of running all this software has been automated using a
-"Makefile", which is a file with that name containing commands formatted correctly
+"Makefile", which is a file containing commands formatted correctly
 for reading the allParameters.XY parameter file and running the software applications.
 The Makefile is applied by using the application named <em>make</em>, which was installed
 when IGGPIPE was installed, if it didn&#8217;t already exist.</p></div>
@@ -1148,29 +1158,30 @@ further. The following sections will guide you in this.</p></div>
 </div></div>
 <div class="paragraph"><p>That command will use the <em>less</em> command to display file <em>help.txt</em>. Press the
 space bar to move through the text, or press <em>q</em> to exit from the help text.</p></div>
-<div class="paragraph"><p>If at any point you want to remove ALL files already generated and start anew,
+<div class="paragraph"><p>For example, the usage information indicates that the first step of the pipeline
+can be run with this command:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>make PARAMS=allParameters.XY getSeqInfo</code></pre>
+</div></div>
+<div class="paragraph"><p>If at any point you want to remove <em>all</em> files already generated and start anew,
 you can do that with this command:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY CLEAN=1 ALL    (replacing with your allParameters name)</code></pre>
+<pre><code>make PARAMS=allParameters.XY CLEAN=1 ALL    #(replacing with your allParameters name)</code></pre>
 </div></div>
 <div class="paragraph"><p>Running IGGPIPE with a <em>make</em> command will usually produce a lot of output on
 the terminal, and some of this output may be important to examine, especially
 if an error occurs. Since the output might scroll off the screen and be
 unavailable, it is a good idea to save it, and this can be done by using
 the <em>tee</em> command along with the <em>make</em> command. The <em>tee</em> command can write
-everything that is displayed on the terminal to a file also. You might want to
-make a folder to contain these "log" files:</p></div>
+everything that is displayed on the terminal to a file also. Folder <em>logFiles</em>
+is provided as a place to save these files.  To use <em>tee</em>, choose a log file
+name, let&#8217;s say <em>make_HP14.txt</em>, and then add at the end of your <em>make</em> command
+line the extra commands <em>| tee logFiles/make_HP14.txt</em>, as in this example:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>mkdir logFiles</code></pre>
-</div></div>
-<div class="paragraph"><p>To use <em>tee</em>, choose a log file name, let&#8217;s say <em>make_HP14.txt</em>, and then add at
-the end of your <em>make</em> command line the extra
-commands <em>| tee logFiles/make_HP14.txt</em>, as in this example:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>make PARAMS=allParameters.XY ALL | tee logFiles/make_HP14.txt</code></pre>
+<pre><code>make PARAMS=allParameters.XY ALL | tee logFiles/make_ALL_HP14.txt</code></pre>
 </div></div>
 <div class="paragraph"><p>Then, after <em>make</em> finishes, you can examine that log file at any time to see
 what the pipeline output was, for example:</p></div>
@@ -1187,29 +1198,96 @@ problems and handle them without error, but there are probably many situations
 that we haven&#8217;t yet encountered. If you email us with information about errors
 and their resolution if you were able to resolve them, we&#8217;ll try to make
 improvements to IGGPIPE in error handling and in its input data format
-flexibility to help future users that encounter the error.</p></div>
+flexibility to help future users that encounter the error. (See <em>For problems
+and help</em> section).</p></div>
 </div></div>
 </li>
 <li>
 <p>
-<strong>Run IGGPIPE with the command "make PARAMS=allParameters.XY getGenomicPosIsect GENOME=1"</strong>
+<strong>Choose between a <em>make ALL</em> and a step-wise <em>make</em></strong>
 </p>
 <div class="openblock">
 <div class="content">
+<div class="paragraph"><p>As mentioned in the previous section, the IGGPIPE pipeline can be run one step
+at a time, or all steps from start to finish. The remaining sections in this
+document describe running one step at a time. However, instead of following
+those steps, you can instead use this command, which runs the pipeline start
+to finish:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>make PARAMS=allParameters.XY ALL | tee logFiles/make_ALL_HP14.txt</code></pre>
+</div></div>
+<div class="paragraph"><p>An expert might prefer this approach, but even a novice could use this command
+and, while the pipeline is running, examine intermediate output files (as
+described in the remaining sections) as they become available (using a different
+terminal window to access the files while the pipeline continues running in one
+terminal window). In that way you don&#8217;t need to constantly monitor if a step
+has completed in order to start the next one.</p></div>
+<div class="paragraph"><p>The above command can also be used <em>at any time</em> to re-run the pipeline.  For each
+step of the pipeline that was previously run successfully, it will simply output
+a message saying that the files from that pipeline step are up to date.  However,
+for any step that was either not run at all, failed, or whose output files were
+deleted, it will attempt to re-run that step and the following steps that depend
+on it.  At the very end, when it has successfully completed all pipeline steps,
+it issues this message:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>ALL files are up to date</code></pre>
+</div></div>
+<div class="paragraph"><p>This is the message you want to see to know that the pipeline has completed
+successfully.</p></div>
+<div class="paragraph"><p>If you edit the parameter file and change parameters (causing the names of the
+files that are produced to also be changed, since the parameter values are contained
+within the file names), then when you use the above <em>make</em> command, the pipeline
+re-runs starting at whatever step uses the changed parameters, so you can easily
+make parameter changes and try again, without losing results from previous runs
+with different parameter values.</p></div>
+<div class="paragraph"><p>Sometimes you may want to force the pipeline to re-run starting at a certain
+step. For example, maybe you want to re-run the pipeline starting at the <em>findLCRs</em>
+step. To do this, you can either delete the output files produced by that step,
+or use this command to delete them:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>make PARAMS=allParameters.XY CLEAN=1 findLCRs    #(replacing 'findLCRs' with whatever step you want)</code></pre>
+</div></div>
+<div class="paragraph"><p>After that, you can re-run the pipeline with the <em>make &#8230; ALL</em> command shown above
+to generate the files anew.</p></div>
+</div></div>
+</li>
+<li>
+<p>
+<strong>Run IGGPIPE first part to generate common unique k-mers</strong>
+</p>
+<div class="openblock">
+<div class="content">
+<div class="sidebarblock">
+<div class="content">
+<div class="title"><em>Synopsis:</em></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>cd ~/Documents/IGGPIPE    #(or whatever is appropriate for your system)
+make PARAMS=allParameters.XY getGenomicPosIsect GENOME=1 | \
+    tee logFiles/make_getGenomicPosIsect_1_HP14.txt
+wc -l outFolderForMyProject/Kmers/Kmers_1.isect
+# (if necessary, adjust K and repeat above)
+make PARAMS=allParameters.XY getGenomicPosIsect GENOME=ALL | \
+    tee logFiles/make_getGenomicPosIsect_ALL_HP14.txt</code></pre>
+</div></div>
+</div></div>
 <div class="paragraph"><p>The first several steps in the pipeline extract unique k-mers from the FASTA
 files of the genomes, intersect these to produce a list of common unique
 k-mers, and add genomic positions to them for each of the genomes. To run these
-steps, use this command:</p></div>
+steps on genome 1, use this command:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>cd ~/Documents/IGGPIPE    (or whatever is appropriate for your system)
-make PARAMS=allParameters.XY getGenomicPosIsect GENOME=1    (replacing with your allParameters name)</code></pre>
+<pre><code>cd ~/Documents/IGGPIPE    #(or whatever is appropriate for your system)
+make PARAMS=allParameters.XY getGenomicPosIsect GENOME=1    #(replacing with your allParameters name)</code></pre>
 </div></div>
 <div class="paragraph"><p>or, better yet, log to a file also:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>make PARAMS=allParameters.XY getGenomicPosIsect GENOME=1 | \
-tee logFiles/make_getGenomicPosIsect_HP14.txt</code></pre>
+    tee logFiles/make_getGenomicPosIsect_1_HP14.txt</code></pre>
 </div></div>
 <div class="paragraph"><p>If it completes successfully, the end of the command output will show the message:</p></div>
 <div class="literalblock">
@@ -1218,9 +1296,12 @@ tee logFiles/make_getGenomicPosIsect_HP14.txt</code></pre>
 </div></div>
 <div class="paragraph"><p>If it says something else, indicating an error occurred, examine the output
 carefully and try to diagnose and fix the error, then enter the above <em>make</em>
-command again to retry the failed step.</p></div>
-<div class="paragraph"><p>Assuming the first steps completed successfully, count the number of k-mers in
-the common unique k-mer file for genome 1, which is located in the <em>Kmers</em> subfolder
+command again to retry the failed step. If you are unable to fix problems and
+need help, email us and we&#8217;ll try to assist. (See <em>For problems and help</em>
+section).</p></div>
+<div class="paragraph"><p>Once <em>make</em> completes successfully, count the number of k-mers in
+the common unique k-mer file for genome 1 (the other genomes will have the same
+number, with different positions of course), which is located in the <em>Kmers</em> subfolder
 of the output folder you specified in your allParameters file for parameter
 DIR_IGGPIPE_OUT.
 The name of the file is <em>Kmers_1.isect</em> and it is a text file containing one k-mer
@@ -1232,46 +1313,59 @@ k-mers in it, use the <em>wc -l</em> command, which counts lines in a file, like
 <div class="content">
 <pre><code>wc -l outFolderForMyProject/Kmers/Kmers_1.isect</code></pre>
 </div></div>
-<div class="paragraph"><p>If it shows that you have, say, several million or more, that is good. A few
+<div class="paragraph"><p>If it shows that you have, say, five million or more, that is good. Three
 million or less might be too few to generate enough markers. Tens of millions
 might be too many and cause subsequent pipeline steps to take a very long time.
-The number of k-mers is influenced by both the value of K in the parameter file
-and by how different the genomes are. Very similar genomes might never have
-several millions of k-mers. The number of common unique k-mers increases as K
-is increased, up to a point, then starts to decrease. For similar genomes, you
-might decide you have too many k-mers and should edit the parameter file and
-decrease K by 1 to keep computation time reasonable.  Or, you may wish to try
-running the rest of the pipeline with tens of millions of common unique k-mers
-and check to see how long the computation time actually is. With the tomato/pennellii
-genomes, K=14 was a
-good number. With <em>Arabidopsis thaliana</em> Col-0 and Ler-0 accessions, which were
-much more similar to one another than tomato/pennellii, a value of K=13 worked
-better, because K=14 produced so many k-mers that computation time was excessive
-(half an hour vs three hours).
-For very large genomes, you might need to increase K by 1. Since the
-number of k-mers goes up dramatically with increasing K, you probably will never
-raise K above 15 or perhaps 16.</p></div>
-<div class="paragraph"><p>The default setting in the parameter file for the
+Refer to the discussion in the section above titled <em>Choosing a value for K</em> for
+more information.  Based on the number of common unique k-mers produced, you may
+decide at this point to try running the rest of the pipeline and check to see
+how many markers are found and how much computation time is actually required.
+Alternatively, you may decide to edit the parameter file and increase or
+decrease K by 1 and try again, with the same commands (here we&#8217;ve changed "_1"
+to "_2" in the log file name to create a separate log file):</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>make PARAMS=allParameters.XY getGenomicPosIsect GENOME=1 | \
+    tee logFiles/make_getGenomicPosIsect_2_HP14.txt
+wc -l outFolderForMyProject/Kmers/Kmers_1.isect</code></pre>
+</div></div>
+<div class="paragraph"><p>Note that the default setting in the parameter file for the
 output directory parameter DIR_IGGPIPE_OUT is to include the value of K in the
 directory name. This means you can run IGGPIPE with one value of K, then change
-it and run it again and the output will go into a new directory.</p></div>
-<div class="paragraph"><p>If you feel you have too few or too many k-mers, then you should increase or
-decrease K by 1 and try again. Try both an increase and a decrease in K to see
-how the number of k-mers is affected. Set the parameter file to the value of K
-that seems best to you for proceeding with additional pipeline steps.</p></div>
+K and run it again and the output will go into a new directory.</p></div>
+<div class="paragraph"><p>To thoroughly explore the effect of K on number of common unique k-mers, run the
+pipeline after both an increase and a decrease in K to see how the number of
+k-mers is affected.</p></div>
+<div class="paragraph"><p>After you have chosen a value for K to use for the rest of the pipeline, run
+the pipeline on the remaining genome(s) to get the common unique k-mers for
+them:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>make PARAMS=allParameters.XY getGenomicPosIsect GENOME=ALL | \
+    tee logFiles/make_getGenomicPosIsect_ALL_HP14.txt</code></pre>
+</div></div>
 </div></div>
 </li>
 <li>
 <p>
-<strong>Run IGGPIPE with the command "make PARAMS=allParameters.XY findLCRs"</strong>
+<strong>Run IGGPIPE second part to generate LCRs</strong>
 </p>
 <div class="openblock">
 <div class="content">
+<div class="sidebarblock">
+<div class="content">
+<div class="title"><em>Synopsis:</em></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>make PARAMS=allParameters.XY findLCRs | tee logFiles/make_findLCRs_1_HP14.txt
+source code/shell/countLCRsInLCRfile.sh outFolderForMyProject/LCRs*.tsv 2</code></pre>
+</div></div>
+</div></div>
 <div class="paragraph"><p>The next few steps of the pipeline analyze the common unique k-mers to find
 locally conserved regions (LCRs). To run these steps, use this command:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY findLCRs    (replacing with your allParameters name)</code></pre>
+<pre><code>make PARAMS=allParameters.XY findLCRs    #(replacing with your allParameters name)</code></pre>
 </div></div>
 <div class="paragraph"><p>If it completes successfully, the end of the command output will show the message:</p></div>
 <div class="literalblock">
@@ -1281,7 +1375,7 @@ locally conserved regions (LCRs). To run these steps, use this command:</p></div
 <div class="paragraph"><p>If it says something else, indicating an error occurred, examine the output
 carefully and try to diagnose and fix the error, then enter the above <em>make</em>
 command again to retry the failed step.</p></div>
-<div class="paragraph"><p>Assuming the steps completed successfully, the LCRs output file will now be
+<div class="paragraph"><p>Once <em>make</em> completes successfully, the LCRs output file will now be
 located in the main output directory (set with the DIR_IGGPIPE_OUT
 parameter). Its name starts with <em>LCRs_</em>, and with many command line interfaces
 you don&#8217;t need to enter the full name in a command, but can instead enter <em>LCRs_</em> and
@@ -1310,42 +1404,67 @@ the LCRs file name and the value of N_GENOMES (number of genomes).  For example:
 <div class="content">
 <pre><code>source code/shell/countLCRsInLCRfile.sh outFolderForMyProject/LCRs*.tsv 2</code></pre>
 </div></div>
-<div class="paragraph"><p>If you had too few common k-mers you might also have too few LCRs.  A million or
-more LCRs would be nice. The fewer you have, the fewer markers you are likely to
-get.  If there seem to be too few, check the pipeline output.  It will show the
+<div class="paragraph"><p>If you had too few common unique k-mers you might also have too few LCRs.
+A million or more LCRs is ideal.
+The fewer you have, the fewer markers you are likely to get.
+The easiest thing to do at this point is to continue running the rest of the
+pipeline and find out how many markers you get at the end.  However, if the
+number of LCRs is low (well under a million) and if you are not looking for a
+high marker density, you may want to try adjusting some parameters.  To do
+this, first check the pipeline output.  It will show the
 number of common unique k-mers it processes (it processes them in batches), and
-the number remaining after it enforces DMIN, LMIN, and KMIN on the reference
+the number remaining after it enforces LMIN, KMIN, and DMIN on the reference
 genome. If these numbers fall dramatically towards 0, it indicates that either
-there are no good LCRs between the two genomes, or the parameters DMIN, LMIN, and/or
-KMIN might be too strict. However, expect a pretty big drop with the LMIN step,
+there are no good LCRs between the two genomes, or the parameters LMIN, DMIN,
+and/or KMIN might be too strict. (Expect a pretty big drop with the LMIN step,
 because typically a large fraction of the common unique k-mers are too close
-together, with too much separation from the next k-mer, to form a useful LCR.</p></div>
-<div class="paragraph"><p>If you feel you have too few LCRs, then you should try editing the parameter file
-and changing the DMIN, LMIN,
-and/or KMIN parameters and try again. The default value for the LCRs_ filename,
-set by the parameters SFX_LCR_FILE and PATH_LCR_FILE, includes the values of
-DMIN, LMIN, and KMIN in the filename, so if you change the values, you can
-simply re-run the pipeline with the same <em>make</em> command, and it will generate a
-new LCRs_ file with a different name, without repeating preceding pipeline steps
-that do not need to be repeated.</p></div>
-<div class="paragraph"><p>Set the parameter file to the values for DMIN, LMIN, and KMIN that seem best to
-you and re-run this pipeline step before proceeding with additional pipeline
-steps.</p></div>
-<div class="paragraph"><p>The columns in the LCRs* file are described in Table 4.</p></div>
+together, with too much separation from the next k-mer, to form a useful LCR).
+You can edit the parameter file, change the LMIN parameter, and rerun this
+step with the same commands:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>make PARAMS=allParameters.XY findLCRs    #(replacing with your allParameters name)
+source code/shell/countLCRsInLCRfile.sh outFolderForMyProject/LCRs*.tsv 2</code></pre>
+</div></div>
+<div class="paragraph"><p>Another option is to increase the number of common unique k-mers by changing K
+to see if that increases the number of LCRs.</p></div>
+<div class="paragraph"><p>When you rerun with a new parameter value, note that the default value for the
+LCRs_ filename, set by the parameters SFX_LCR_FILE and PATH_LCR_FILE, includes
+the values of K, LMIN, DMIN, and KMIN in the filename, so if you change the
+values, when you re-run the pipeline with the same <em>make</em> command, it will
+generate a new LCRs_ file with a different name, without repeating preceding
+pipeline steps that do not need to be repeated.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">The columns in the LCRs* file are described in Table 4.</td>
+</tr></table>
+</div>
 </div></div>
 </li>
 <li>
 <p>
-<strong>Run IGGPIPE with the command "make PARAMS=allParameters.XY findIndelGroups"</strong>
+<strong>Run IGGPIPE third part to find indel groups</strong>
 </p>
 <div class="openblock">
 <div class="content">
+<div class="sidebarblock">
+<div class="content">
+<div class="title"><em>Synopsis:</em></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>make PARAMS=allParameters.XY findIndelGroups | tee logFiles/make_findIndelGroups_HP14.txt
+wc -l outFolderForMyProject/IndelGroups*</code></pre>
+</div></div>
+</div></div>
 <div class="paragraph"><p>The next step of the pipeline analyzes the LCRs to find Indel Groups that satisfy
 the parameters AMIN, AMAX, ADMIN, ADMAX, NDAMIN, and MINFLANK. To run this step,
 use this command:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY findIndelGroups    (replacing with your allParameters name)</code></pre>
+<pre><code>make PARAMS=allParameters.XY findIndelGroups    #(replacing with your allParameters name)</code></pre>
 </div></div>
 <div class="paragraph"><p>If it completes successfully, the end of the command output will show the message:</p></div>
 <div class="literalblock">
@@ -1355,7 +1474,7 @@ use this command:</p></div>
 <div class="paragraph"><p>If it says something else, indicating an error occurred, then as usual, examine
 the output carefully and try to diagnose and fix the error, then enter the
 above <em>make</em> command again to retry the failed step.</p></div>
-<div class="paragraph"><p>Assuming the step completed successfully, count the number of Indel Groups in the
+<div class="paragraph"><p>Once <em>make</em> completes successfully, count the number of Indel Groups in the
 two output files. One output file includes all Indel Groups found, even when they
 overlap one another. The other output file includes only non-overlapping Indel
 Groups, which were determined based on the setting of the parameter OVERLAP_REMOVAL.
@@ -1372,13 +1491,14 @@ The command line to count the Indel Groups in both files would look like this:</
 markers you will obtain, so pay close attention to the count. If you had too
 few LCRs you might also have too few markers. Tens of thousands of overlapping
 markers and thousands of non-overlapping ones are nice numbers to have. If
-there seem to be too few, you may want to experiment with different values for
+there are too few, you may want to experiment with different values for
 the AMIN, AMAX, ADMIN, ADMAX, NDAMIN, and MINFLANK parameters. As with the LCRs,
 these values are normally part of the IndelGroups output file filenames, so if
 you edit the parameter file and change the values, then re-run the pipeline by
 entering the same <em>make</em> command above, new files are produced with new names.</p></div>
-<div class="paragraph"><p>Set the parameter file to the values for the parameters that seem best to
-you and re- run this pipeline step before proceeding with remaining pipeline steps.</p></div>
+<div class="paragraph"><p>Set the parameter file to the values for the parameters that are appropriate for
+your needs and re-run this pipeline step before proceeding with remaining
+pipeline steps.</p></div>
 <div class="paragraph"><p>The columns in the IndelGroups* files are described in Table 3.</p></div>
 </div></div>
 </li>
@@ -1388,6 +1508,15 @@ you and re- run this pipeline step before proceeding with remaining pipeline ste
 </p>
 <div class="openblock">
 <div class="content">
+<div class="sidebarblock">
+<div class="content">
+<div class="title"><em>Synopsis:</em></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>make PARAMS=allParameters.XY findPrimers    #(replacing with your allParameters name)
+wc -l outFolderForMyProject/NonvalidatedMarkers*</code></pre>
+</div></div>
+</div></div>
 <div class="paragraph"><p>The next several steps of the pipeline extract DNA sequences for each Indel Group
 from all genomes using the parameter EXTENSION_LEN, then Primer3 (actually, primer3_core)
 is run to design primers for each Indel Group, using the primer design parameters
@@ -1395,10 +1524,13 @@ in file primer3settings.txt.</p></div>
 <div class="paragraph"><p>To run these steps, use this command:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY findPrimers    (replacing with your allParameters name)</code></pre>
+<pre><code>make PARAMS=allParameters.XY findPrimers    #(replacing with your allParameters name)</code></pre>
 </div></div>
-<div class="paragraph"><p>Depending on the number of Indel Groups, this can take a <em>long</em> time. We have seen it
-take two days to finish running all Indel Groups through Primer3.</p></div>
+<div class="paragraph"><p>Depending on the number of Indel Groups, this can take a <em>long</em> time. We have
+seen it take two days to finish running all Indel Groups through Primer3.
+If running times are excessively long, you can adjust the parameters from
+previous steps, such as LMIN and/or K, to reduce the number of LCRs and Indel
+Groups.</p></div>
 <div class="paragraph"><p>If it completes successfully, the end of the command output will show the message:</p></div>
 <div class="literalblock">
 <div class="content">
@@ -1406,7 +1538,7 @@ take two days to finish running all Indel Groups through Primer3.</p></div>
 </div></div>
 <div class="paragraph"><p>If it says something else, try to diagnose and fix the error as usual, then enter
 the same <em>make</em> command again to retry the failed step.</p></div>
-<div class="paragraph"><p>Assuming the steps completed successfully, count the number of IGG marker primer
+<div class="paragraph"><p>Once <em>make</em> completes successfully, count the number of IGG marker primer
 pairs in the output file, which is located in the main output directory and has a
 name that starts with <em>NonvalidatedMarkers_</em>.
 You can look at the first few lines with the <em>head</em> command or
@@ -1428,15 +1560,24 @@ few of them as bad and remove them.</p></div>
 </p>
 <div class="openblock">
 <div class="content">
+<div class="sidebarblock">
+<div class="content">
+<div class="title"><em>Synopsis:</em></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>make PARAMS=allParameters.XY removeBadMarkers    #(replacing with your allParameters name)
+wc -l outFolderForMyProject/Markers*</code></pre>
+</div></div>
+</div></div>
 <div class="paragraph"><p>The next several steps of the pipeline run e-PCR on each primer pair in the
 NonvalidatedMarkers* file.  All markers are run through e-PCR once for each genome.
 After that, an R script is run which examines the e-PCR results and removes from
-the NonvalidatedMarkers* primer pairs all those pairs that failed the e-PCR test
-in or more genomes, and writes new files with the validated IGG marker primer pairs.</p></div>
+the NonvalidatedMarkers* file all primer pairs that failed the e-PCR test in one
+or more genomes, and writes new files with the validated IGG marker primer pairs.</p></div>
 <div class="paragraph"><p>To run these steps, use this command:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY removeBadMarkers    (replacing with your allParameters name)</code></pre>
+<pre><code>make PARAMS=allParameters.XY removeBadMarkers    #(replacing with your allParameters name)</code></pre>
 </div></div>
 <div class="paragraph"><p>Depending on the number of primer pairs, this can take a <em>long</em> time. We have seen it
 take two days <em>per genome</em> to finish running all primer pairs through e-PCR.</p></div>
@@ -1447,7 +1588,7 @@ take two days <em>per genome</em> to finish running all primer pairs through e-P
 </div></div>
 <div class="paragraph"><p>If it says something else, try to diagnose and fix the error as usual, then enter
 the same <em>make</em> command again to retry the failed step.</p></div>
-<div class="paragraph"><p>Assuming the steps completed successfully, count the number of validate IGG primer
+<div class="paragraph"><p>Once <em>make</em> completes successfully, count the number of validate IGG primer
 pairs in the two output files. One output file includes all validated primer pairs,
 even when their amplicons overlap one another. The other output file includes only
 primer pairs that produce non-overlapping amplicons, determined based on the setting
@@ -1489,54 +1630,43 @@ are used to select multiple files. For example:</p></div>
 </p>
 <div class="openblock">
 <div class="content">
+<div class="sidebarblock">
+<div class="content">
+<div class="title"><em>Synopsis:</em></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>make PARAMS=allParameters.XY plotMarkers    #(replacing with your allParameters name)
+make PARAMS=allParameters.XY ALL    #(replacing with your allParameters name)</code></pre>
+</div></div>
+</div></div>
 <div class="paragraph"><p>Now you can run the rest of the pipeline to finish up.  The final step produces some
 plots of marker statistics and density.  This is done with this command:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY plotMarkers    (replacing with your allParameters name)</code></pre>
+<pre><code>make PARAMS=allParameters.XY plotMarkers    #(replacing with your allParameters name)</code></pre>
 </div></div>
-<div class="paragraph"><p>However, you can also use this command, which is the command that runs the entire
-pipeline, all steps from start to finish:</p></div>
+<div class="paragraph"><p>This final pipeline step produces several output files in the main output directory.
+One file is a .pdf file with name starting with MarkerCounts_, containing plots of
+counts of markers on each chromosome of each genome.  You can examine that file with
+any .pdf file viewer.  The other files are .png image files with names starting with
+MarkerDensity_ and ending in <em>_X.plot.png</em>, where X is replaced with the genome letters
+you assigned for your analysis.  Each .png file has an image of the chromosomes with
+lines showing the positions of each marker.  When multiple scaffolds are used, the
+file limits the output to the first several scaffolds.</p></div>
+<div class="paragraph"><p>After using the above command, enter this command, which runs the entire
+pipeline, checking that all steps have been completed from start to finish:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY ALL    (replacing with your allParameters name)</code></pre>
+<pre><code>make PARAMS=allParameters.XY ALL    #(replacing with your allParameters name)</code></pre>
 </div></div>
-<div class="paragraph"><p>This same command could have been used from the very start, to simply run the
-entire pipeline. It can be used <em>at any time</em> to re-run the pipeline.  For each
-step of the pipeline that was previously run successfully, it will simply output
-a message saying that the files from that pipeline step are up to date.  However,
-for any step that was either not run at all, or failed, it will attempt to re-run
-that step and following steps that depend on it.  At the very end, when it has
-successfully completed all pipeline steps, it issues this message:</p></div>
+<div class="paragraph"><p>It will verify that all pipeline steps have been completed, and if so, it issues
+this message:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>ALL files are up to date</code></pre>
 </div></div>
 <div class="paragraph"><p>This is the message you want to see to know that the pipeline has completed
 successfully.</p></div>
-<div class="paragraph"><p>If you edit the parameter file and change parameters (so that the names of the
-files that are produced are also changed, since the parameter values are contained
-within the file names), then when you use the above <em>make</em> command, the pipeline
-re-runs starting at whatever step uses the changed parameters, so you can easily
-make parameter changes and try again.</p></div>
-<div class="paragraph"><p>Sometimes you may want to force the pipeline to re-run starting at a certain
-step. For example, maybe you want to re-run the pipeline starting at the <em>findLCRs</em>
-step. To do this, you can either delete the output files produced by that step,
-or use this command to delete them:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>make PARAMS=allParameters.XY CLEAN=1 findLCRs    (replacing 'findLCRs' with whatever step you want)</code></pre>
-</div></div>
-<div class="paragraph"><p>After that, you can re-run the pipeline with the <em>make &#8230; ALL</em> command shown above
-to generate the files anew.</p></div>
-<div class="paragraph"><p>The final step, plotMarkers, produces several output files in the main output directory.
-One file is a .pdf file whose name starts with MarkerCounts_, containing plots of
-counts of markers on each chromosome of each genome.  You can examine that file with
-any .pdf file viewer.  The other files are .png image files whose names start with
-MarkerDensity_ and end with <em>_X.plot.png</em>, where X is replaced with the genome letters
-you assigned for your analysis.  Each .png file has an image of the chromosomes with
-lines showing the positions of each marker.  When multiple scaffolds are used, the
-file limits the output to the first several scaffolds.</p></div>
 </div></div>
 </li>
 <li>
@@ -1652,7 +1782,7 @@ cellspacing="0" cellpadding="4">
 </table>
 </div>
 <div class="paragraph"><p>(Note that some of the files listed above are produced by steps to be described below).</p></div>
-<div class="paragraph"><p>The marker file names and other file names of files in the main output directory
+<div class="paragraph"><p>The marker file names and names of other files in the main output directory
 are very long and cumbersome, because they include parameter values in them. You
 may want to copy files to a shorter name to work with them.</p></div>
 <div class="paragraph"><p>The meaning of <em>overlapping</em> and <em>non-overlapping</em> should be clear from the
@@ -1671,28 +1801,28 @@ post-processed (see below) to change them into other formats.</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-<strong>Finding Indels and SNPs</strong>
+<strong>Finding indels and SNPs</strong>
 </p>
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>Pipeline software is also provided to read a file of
 LCRs, non-overlapping Indel Groups, or non-overlapping Markers, extract the DNA sequences
-from the genomes in each LCR or Marker region and align them, then locate all Indels
+from the genomes in each LCR or Marker region and align them, then locate all indels
 and SNPs in the aligned sequences and write their positions to files.  This part of the
 pipeline is NOT run when the <em>make &#8230; ALL</em> target is built.  To run this and find
-Indels and SNPs, use <em>make &#8230; IndelsSNPs</em>, after setting the parameters in your
+indels and SNPs, use <em>make &#8230; IndelsSNPs</em>, after setting the parameters in your
 "allParameters" parameter file.  These are PATH_INDELS_SNPS_INPUT_FILE (the input file
-name), MAX_INDELS_PER_KBP and MAX_SNPS_PER_KBP (maximum number of Indels and SNPs that
+name), MAX_INDELS_PER_KBP and MAX_SNPS_PER_KBP (maximum number of indels and SNPs that
 may occur in an alignment per Kbp of sequence, and if exceeded, cause the alignment to
 be discarded as unreliable), and SCRAMBLE_SEQUENCE (can be set TRUE to do alignments
-with scrambled sequences, to determine the actual numbers of Indels and SNPs per Kbp
-in random sequence alignments.  Run the Indel/SNP finder as follows:</p></div>
+with scrambled sequences, to determine the actual numbers of indels and SNPs per Kbp
+in random sequence alignments.  Run the indel/SNP finder as follows:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY IndelsSNPs    (replacing with your allParameters name)</code></pre>
+<pre><code>make PARAMS=allParameters.XY IndelsSNPs    #(replacing with your allParameters name)</code></pre>
 </div></div>
-<div class="paragraph"><p>This produces two files in your output folder whose names end with "indels.tsv" and
-".snps.tsv", containing tables of all Indels and SNPs found in either the LCR or Indel
+<div class="paragraph"><p>This produces two files in your output folder with names ending in "indels.tsv" and
+".snps.tsv", containing tables of all indels and SNPs found in either the LCR or Indel
 Group or marker regions (depending on the setting of PATH_INDELS_SNPS_INPUT_FILE).
 Examine them to see the data they contain.  The columns are described in Table 5 and
 Table 6.</p></div>
@@ -1702,25 +1832,25 @@ expense of fewer TRUE positives (smaller values) or increase TRUE positives at t
 expense of more FALSE positives (larger values).</p></div>
 <div class="paragraph"><p>Note that the pipeline for <em>make IndelsSNPs</em> automatically invokes a preceding step,
 <em>make getDNAseqsForIndelsSNPs</em> that extracts DNA sequences in preparation for alignment,
-and writes them to a file whose name ends with "withseqs.tsv".</p></div>
+and writes them to a file with name ending in "withseqs.tsv".</p></div>
 </div></div>
 </li>
 <li>
 <p>
-<strong>Plotting Indel information</strong>
+<strong>Plotting indel information</strong>
 </p>
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>Another R program that is NOT run as part of the pipeline when the <em>make &#8230; ALL</em> target
-is built, but which can be run using <em>make &#8230; plotIndels</em>, reads the Indels file produced
+is built, but which can be run using <em>make &#8230; plotIndels</em>, reads the indels file produced
 by <em>make &#8230; IndelsSNPs</em> and plots information from it in a pdf file. The program is called
 plotIndels.R. Run it as follows:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>make PARAMS=allParameters.XY plotIndels    (replacing with your allParameters name)</code></pre>
+<pre><code>make PARAMS=allParameters.XY plotIndels    #(replacing with your allParameters name)</code></pre>
 </div></div>
-<div class="paragraph"><p>This produces a file in your output folder whose name ends with "indels.pdf",
-containing plots of various Indel information.  Examine it to see the plots it
+<div class="paragraph"><p>This produces a file in your output folder with a name ending in "indels.pdf",
+containing plots of various indel information.  Examine it to see the plots it
 contains.</p></div>
 </div></div>
 </li>
@@ -1741,21 +1871,18 @@ describe each parameter.  The program is then run from
 the command line with a command like this:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>cd ~/Documents/IGGPIPE    (or whatever is appropriate for your system)
-Rscript code/R/dotplot.R dotplot.XY    (or whatever name you gave the parameter file)</code></pre>
+<pre><code>cd ~/Documents/IGGPIPE    #(or whatever is appropriate for your system)
+Rscript code/R/dotplot.R dotplot.XY    #(or whatever name you gave the parameter file)</code></pre>
 </div></div>
-<div class="paragraph"><p>When it finishes running, the dot plot output file can be found in the place and under
-the name specified in the parameter file. Use multiple parameter files with different
+<div class="paragraph"><p>When it finishes running, the dot plot output file can be found with the name
+specified in the dotplot.XY parameter file. Use multiple parameter files with different
 settings to explore different regions of the genomes in greater resolution (parameters
 include what region of the genome is to be plotted).</p></div>
 <div class="paragraph"><p>The "dotplot.template" file is configured for generating a dot plot file
 using the LCRs generated via the allParameters.test configuration file.</p></div>
 <div class="paragraph"><p>Besides the sample parameter file "dotplot.template" (which has settings for
 testing the IGGPIPE installation), there are several more sample "dotplot" parameter
-files in the subfolder <em>dotplot</em>, that were used for plotting data from various
-genomes that IGGPIPE was tested with, although the
-parameter file is straightforward and you probably don&#8217;t need other examples
-to work from.  You may want to put your own "dotplot"
+files in the subfolder <em>dotplot</em>.  You may want to put your own "dotplot"
 parameter files in subfolder <em>dotplot</em> or your own subfolder to keep them organized.</p></div>
 </div></div>
 </li>
@@ -1787,11 +1914,11 @@ Comments in the file describe each parameter. The program is then run from the
 command line with a command like this:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>cd ~/Documents/IGGPIPE    (or whatever is appropriate for your system)
-Rscript code/R/annotate.R addGenes.XY    (or whatever name you gave the parameter file)</code></pre>
+<pre><code>cd ~/Documents/IGGPIPE    #(or whatever is appropriate for your system)
+Rscript code/R/annotate.R addGenes.XY    #(or whatever name you gave the parameter file)</code></pre>
 </div></div>
-<div class="paragraph"><p>When it finishes running, the output files can be found in the place(s) and under
-the name(s) specified in the parameter file.</p></div>
+<div class="paragraph"><p>When it finishes running, the output files can be found with the name(s) specified
+in the addGenes.XY parameter file.</p></div>
 <div class="paragraph"><p>Besides the sample parameter file "annotate.template" (which has settings for
 testing the IGGPIPE installation), there are several more sample "annotate"
 parameter files in
@@ -1933,7 +2060,7 @@ if opposite directions</p></td>
 </tr>
 <tr>
 <td align="center" valign="top"><p class="table">kmer1</p></td>
-<td align="left" valign="top"><p class="table">Common unique k-mer for left side primer region, canonical (exically smaller of k-mer and its reverse complement)</p></td>
+<td align="left" valign="top"><p class="table">Common unique k-mer for left side primer region, canonical (lexically smaller of k-mer and its reverse complement)</p></td>
 </tr>
 <tr>
 <td align="center" valign="top"><p class="table">kmer1strands</p></td>
@@ -1948,7 +2075,7 @@ A value of 0 means the amplicon and k-mer ends correspond, &gt;0 means k-mer sta
 </tr>
 <tr>
 <td align="center" valign="top"><p class="table">kmer2</p></td>
-<td align="left" valign="top"><p class="table">Common unique k-mer for right side primer region, canonical (exically smaller of k-mer and its reverse complement)</p></td>
+<td align="left" valign="top"><p class="table">Common unique k-mer for right side primer region, canonical (lexically smaller of k-mer and its reverse complement)</p></td>
 </tr>
 <tr>
 <td align="center" valign="top"><p class="table">kmer2strands</p></td>
@@ -2040,7 +2167,7 @@ cellspacing="0" cellpadding="4">
 </tr>
 <tr>
 <td align="center" valign="top"><p class="table">kmer2</p></td>
-<td align="left" valign="top"><p class="table">Common unique k-mer for right side primer region, canonical (exically smaller of k-mer and its reverse complement)</p></td>
+<td align="left" valign="top"><p class="table">Common unique k-mer for right side primer region, canonical (lexically smaller of k-mer and its reverse complement)</p></td>
 </tr>
 <tr>
 <td align="center" valign="top"><p class="table">NDA</p></td>
@@ -2215,29 +2342,29 @@ IndelGroup and Markers files: refID_refPos1_refPos2.</p></td>
 </tr>
 <tr>
 <td align="center" valign="top"><p class="table">idx</p></td>
-<td align="left" valign="top"><p class="table">Starts at 1 and counts each Indel within an ID. For given ID (input row), number of Indels
+<td align="left" valign="top"><p class="table">Starts at 1 and counts each indel within an ID. For given ID (input row), number of indels
 in that region is max idx value. If more than two genomes, entire region where alignment has a
-gap in one or more genomes is counted as one Indel even if multiple gap regions occur in different
+gap in one or more genomes is counted as one indel even if multiple gap regions occur in different
 genomes.</p></td>
 </tr>
 <tr>
 <td align="center" valign="top"><p class="table">Xdel,Ydel</p></td>
-<td align="left" valign="top"><p class="table">Total number of deleted bps within the Indel in genomes X,Y. With 2 genomes, del = 0
+<td align="left" valign="top"><p class="table">Total number of deleted bps within the indel in genomes X,Y. With 2 genomes, del = 0
 in genome with insertion (no gaps), del &gt; 0 in genome with deletion (gaps). With &gt;2 genomes, del
-can be non-zero for all genomes. A genome has only insertions in the Indel if del is 0, and it has
+can be non-zero for all genomes. A genome has only insertions in the indel if del is 0, and it has
 only deletions if end-start-1 = 0, and otherwise it has a mixture of at least one insertion and
-one deletion within the Indel interval.</p></td>
+one deletion within the indel interval.</p></td>
 </tr>
 <tr>
 <td align="center" valign="top"><p class="table">Xid,Yid</p></td>
-<td align="left" valign="top"><p class="table">Sequence ID of the Indel in genomes X,Y.</p></td>
+<td align="left" valign="top"><p class="table">Sequence ID of the indel in genomes X,Y.</p></td>
 </tr>
 <tr>
 <td align="center" valign="top"><p class="table">Xstart,Xend,Ystart,Yend</p></td>
-<td align="left" valign="top"><p class="table">Overall Indel starting and ending position in genomes X,Y.
-start/end are positions of bps just BEFORE first and AFTER last Indel gap in any genome,
+<td align="left" valign="top"><p class="table">Overall indel starting and ending position in genomes X,Y.
+start/end are positions of bps just BEFORE first and AFTER last indel gap in any genome,
 so they refer to the same two bps in all genomes. Always start &lt; end. If <em>-</em> phase,
-start is bp just AFTER, end is bp just BEFORE, opposite of <em>+</em>. Length of the Indel region
+start is bp just AFTER, end is bp just BEFORE, opposite of <em>+</em>. Length of the indel region
 in each genome is end-start-1.</p></td>
 </tr>
 </tbody>
@@ -2338,7 +2465,7 @@ IndelGroup and Markers files: refID_refPos1_refPos2.</p></td>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-01-31 19:56:11 PST
+Last updated 2016-07-31 11:40:49 PDT
 </div>
 </div>
 </body>

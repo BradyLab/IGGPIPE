@@ -1,5 +1,8 @@
-
 Usage:
+
+To check IGGPIPE version:
+
+    make version
 
 To run the entire pipeline on your own data, invoke 'make' as follows:
 

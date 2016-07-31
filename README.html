@@ -734,19 +734,18 @@ asciidoc.install();
 <body class="article">
 <div id="header">
 <h1>IGGPIPE</h1>
-<span id="author">Version v0.0, Aug 2015</span><br />
+<span id="author">Version V1.0</span><br />
 </div>
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph"><p>The BradyLab/IGGPIPE GitHub repository contains code and documentation for the
-software package called <strong>IGGPIPE</strong> (<strong>IGG</strong> <strong>P</strong>ipeline).</p></div>
+software package called <strong>IGGPIPE</strong> (<strong>I</strong>ndel <strong>G</strong>roup in <strong>G</strong>enomes <strong>Pipe</strong>line).</p></div>
 <div class="paragraph"><p><strong>IGGPIPE</strong> analyzes two or more genomes
 for length-polymorphic regions bounded by unique sequences and designs PCR
 primers within these sequences. The primers can be used to amplify the region
 from genomic DNA of any of the species used to create the markers, and the
 amplicon size will indicate which species the DNA came from - an <strong>IGG</strong> marker.</p></div>
-<div class="paragraph"><p><strong>IGG</strong> stands for <em>Indel Group in Genomes</em>.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -758,12 +757,14 @@ amplicon size will indicate which species the DNA came from - an <strong>IGG</st
 <li>
 <p>
 Installation has been tested on 64-bit Mac OSX, 64-bit Linux, and 64-bit Windows.
-It will not work on 32-bit Windows.
+It will not work on 32-bit systems (due to dependency on Jellyfish2).
 </p>
 </li>
 <li>
 <p>
-Installation instructions include installing these programs:
+See the INSTALL document section <em>Detailed Installation Instructions Part 4:
+Install prerequisite applications</em> for instructions to install these required
+programs:
 </p>
 <div class="openblock">
 <div class="content">
@@ -819,8 +820,23 @@ Browse to <a href="https://github.com/BradyLab/IGGPIPE">https://github.com/Brady
 <li>
 <p>
 At bottom of right column on screen, click "Download ZIP" and choose a place to
-put it on your computer.
+save it on your computer.
 </p>
+<div class="openblock">
+<div class="content">
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">Alternatively, you can clone the git repository with this command line command:</td>
+</tr></table>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre><code>git clone https://github.com/BradyLab/IGGPIPE.git</code></pre>
+</div></div>
+</div></div>
 </li>
 <li>
 <p>
@@ -892,7 +908,7 @@ within Next Generation Sequencing Data by an in silico K-mer-based Pipeline</em>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-01-17 12:12:24 PST
+Last updated 2016-07-31 09:00:32 PDT
 </div>
 </div>
 </body>
