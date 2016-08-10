@@ -40,8 +40,8 @@ programs:
 *Download IGGPIPE files*
 ~~~~~~~~~~~~~~~~~~~~~~~~
 . Browse to https://github.com/BradyLab/IGGPIPE
-. At bottom of right column on screen, click "Download ZIP" and choose a place to
-save it on your computer.
+. Click the "Clone or download" button at the right side of the screen near the top
+. Select 'Download ZIP', then choose a place to put it on your computer
 +
 --
 NOTE: Alternatively, you can clone the git repository with this command line command:
