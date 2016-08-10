@@ -2,6 +2,9 @@ RUNNING IGGPIPE TO GENERATE IGG MARKERS
 =======================================
 Version {VERSION}
 
+To view the RUN manual on your computer, open RUN.html in a browser.  File
+RUN.asciidoc is meant to be viewed on GitHub.
+
 This describes how to run the IGGPIPE software to analyze two or more genome
 sequences and produce a file of candidate IGG marker primer pairs for amplifying
 length-polymorphic regions of those genomes.

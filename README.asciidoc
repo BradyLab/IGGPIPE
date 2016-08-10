@@ -2,6 +2,9 @@ IGGPIPE
 =======
 Version {VERSION}
 
+To view README on your computer, open README.html in a browser.  File
+README.asciidoc is meant to be viewed on GitHub.
+
 The BradyLab/IGGPIPE GitHub repository contains code and documentation for the
 software package called *IGGPIPE* (**I**ndel **G**roup in **G**enomes **Pipe**line).
 

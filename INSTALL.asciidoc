@@ -2,6 +2,9 @@ IGGPIPE INSTALLATION
 ====================
 Version {VERSION}
 
+To view the INSTALL manual on your computer, open INSTALL.html in a browser.  File
+INSTALL.asciidoc is meant to be viewed on GitHub.
+
 This describes how to install all elements needed to run the IGGPIPE software.
 
 *Requirements for installing IGGPIPE*
