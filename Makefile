@@ -1081,18 +1081,18 @@ documents: README INSTALL RUN
 
 README: README.html
 
-README.html: code/asciidoc/README.asciidoc
-	asciidoc -a VERSION=$(VERSION) -b html -o ./README.html code/asciidoc/README.asciidoc
+README.html: README.asciidoc
+	asciidoc -a VERSION=$(VERSION) -b html -o README.html README.asciidoc
 
 INSTALL: INSTALL.html
 
-INSTALL.html: code/asciidoc/INSTALL.asciidoc
-	asciidoc -a VERSION=$(VERSION) -b html -o ./INSTALL.html code/asciidoc/INSTALL.asciidoc
+INSTALL.html: INSTALL.asciidoc
+	asciidoc -a VERSION=$(VERSION) -b html -o INSTALL.html INSTALL.asciidoc
 
 RUN: RUN.html
 
-RUN.html: code/asciidoc/RUN.asciidoc
-	asciidoc -a VERSION=$(VERSION) -b html -o ./RUN.html code/asciidoc/RUN.asciidoc
+RUN.html: RUN.asciidoc
+	asciidoc -a VERSION=$(VERSION) -b html -o RUN.html RUN.asciidoc
 
 ################################################################################
 # End of file.

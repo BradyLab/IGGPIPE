@@ -2,8 +2,10 @@ IGGPIPE
 =======
 Version {VERSION}
 
-To view README on your computer, open README.html in a browser.  File
-README.asciidoc is meant to be viewed on GitHub.
+To view README on your computer, open *README.html* in a browser.  It
+will show the IGGPIPE version number above. File *README.asciidoc* is meant to be
+viewed on GitHub and does not show the version number.  File *Version.txt* also
+has the version number.
 
 The BradyLab/IGGPIPE GitHub repository contains code and documentation for the
 software package called *IGGPIPE* (**I**ndel **G**roup in **G**enomes **Pipe**line).
